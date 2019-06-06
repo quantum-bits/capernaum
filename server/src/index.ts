@@ -1,26 +1,23 @@
-import request from "request";
 import { config } from "dotenv";
+config(); // Import configuration to environment.
 
-config();
-console.log(process.env);
+import QualtricsAPI from "./QualtricsAPI";
 
-const options = {
-  method: "GET",
-  url: [process.env.CAP_BASE_URL!, "surveys", process.env.TEST_SURVEY_ID!].join(
-    "/"
-  ),
-  headers: {
-    "x-api-token": process.env.CAP_API_TOKEN
-  }
-};
+const api = new QualtricsAPI();
 
-request(options, function(error, response, body) {
-  if (error) {
-    throw new Error(error);
-  }
-  if (response.statusCode === 200) {
-    console.log(body);
-  } else {
-    console.log(body);
-  }
-});
+/*
+if (process.env.TEST_SURVEY_ID) {
+  api
+    .getSurvey(process.env.TEST_SURVEY_ID)
+    .then(response => console.log(JSON.stringify(response.data, null, 2)));
+} else {
+  throw new Error("No survey ID");
+}
+*/
+if (process.env.CAP_ORG_ID) {
+  api
+    .getOrganization(process.env.CAP_ORG_ID)
+    .then(response => console.log(JSON.stringify(response.data, null, 2)));
+} else {
+  throw new Error("No organization ID");
+}
