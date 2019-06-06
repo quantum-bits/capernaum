@@ -1,17 +1,26 @@
 import request from "request";
+import { config } from "dotenv";
+
+config();
+console.log(process.env);
 
 const options = {
   method: "GET",
-  url: "https://taylorcfse.ca1.qualtrics.com/API/v3/surveys/SV_79eEMf5sfGy2DiZ",
+  url: [process.env.CAP_BASE_URL!, "surveys", process.env.TEST_SURVEY_ID!].join(
+    "/"
+  ),
   headers: {
-    "x-api-token": "JwyfF35aDOdKa7ArCN9nEd87riLiPAofYMy9a1II"
+    "x-api-token": process.env.CAP_API_TOKEN
   }
 };
 
 request(options, function(error, response, body) {
+  if (error) {
+    throw new Error(error);
+  }
   if (response.statusCode === 200) {
     console.log(body);
+  } else {
+    console.log(body);
   }
-  if (error) throw new Error(error);
-  // run some code
 });
