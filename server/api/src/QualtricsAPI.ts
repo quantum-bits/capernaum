@@ -28,18 +28,17 @@ export default class QualtricsAPI {
     });
   }
 
-  /** Get a survey with the given ID. */
-  async getSurvey(surveyId: string) {
-    return this.get("surveys", surveyId);
+  /** Get a survey with the given ID. If no ID, get them all. */
+  async getSurvey(surveyId?: string) {
+    if (surveyId) {
+      return this.get("surveys", surveyId);
+    } else {
+      return this.get("surveys");
+    }
   }
 
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
     return this.get("organizations", organizationId);
-  }
-
-  /** Get list of surveys. */
-  async getSurveys() {
-    return this.get("surveys");
   }
 }

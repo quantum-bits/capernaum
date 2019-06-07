@@ -23,7 +23,7 @@ export default class Org extends Command {
             return index === 0 || index === size;
           }
         };
-        console.log(table(data, options));
+        this.log(table(data, options));
       });
     } else {
       throw new Error("No organization ID");
