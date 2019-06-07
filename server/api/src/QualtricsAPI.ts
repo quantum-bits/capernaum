@@ -20,8 +20,16 @@ export default class QualtricsAPI {
 
   private async get(...urlSegments: string[]) {
     urlSegments.unshift(this.base_url);
-
     return axios.get(urlSegments.join("/"), {
+      headers: {
+        "x-api-token": this.api_token
+      }
+    });
+  }
+
+  private async post(data: object, ...urlSegments: string[]) {
+    urlSegments.unshift(this.base_url);
+    return axios.post(urlSegments.join("/"), data, {
       headers: {
         "x-api-token": this.api_token
       }
@@ -40,5 +48,22 @@ export default class QualtricsAPI {
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
     return this.get("organizations", organizationId);
+  }
+
+  async createResponseExport(surveyId: string) {
+    return this.post(
+      { format: "json" },
+      "surveys",
+      surveyId,
+      "export-responses"
+    );
+  }
+
+  async getResponseExportProgress(surveyId: string, progressId: string) {
+    return this.get("surveys", surveyId, "export-responses", progressId);
+  }
+
+  async getResponseExportFile(surveyId: string, fileId: string) {
+    return this.get("surveys", surveyId, "export-responses", fileId, "file");
   }
 }
