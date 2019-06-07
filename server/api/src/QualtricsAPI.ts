@@ -37,4 +37,9 @@ export default class QualtricsAPI {
   async getOrganization(organizationId: string) {
     return this.get("organizations", organizationId);
   }
+
+  /** Get list of surveys. */
+  async getSurveys() {
+    return this.get("surveys");
+  }
 }
