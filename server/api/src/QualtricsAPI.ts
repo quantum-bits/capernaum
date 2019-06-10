@@ -1,52 +1,5 @@
 import axios from "axios";
-import { fromBuffer } from "yauzl";
-
-class ZipFileEntry {
-  fileName: string = "";
-  content: string = "";
-
-  constructor(fileName: string) {
-    this.fileName = fileName;
-  }
-}
-
-async function extractZipContent(inBuffer: Buffer) {
-  console.log("BUFFER", inBuffer, inBuffer.length);
-  return new Promise((resolve, reject) => {
-    fromBuffer(inBuffer, (err, zipFile) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!zipFile) {
-        throw new Error("Bogus zipFile");
-      }
-
-      const entries: ZipFileEntry[] = [];
-      zipFile.on("entry", entry => {
-        const currentEntry = new ZipFileEntry(entry.fileName);
-        entries.push(currentEntry);
-
-        zipFile.openReadStream(entry, (err, readStream) => {
-          if (err) {
-            return reject(err);
-          }
-          if (!readStream) {
-            throw new Error("Bogus readStream");
-          }
-          const chunks: string[] = [];
-          readStream.on("data", chunk => {
-            console.log("CHUNK", chunk);
-            chunks.push(chunk.toString());
-          });
-          readStream.on("end", () => {
-            currentEntry.content = chunks.join("");
-            return resolve(entries);
-          });
-        });
-      });
-    });
-  });
-}
+import { extractZipContent } from "./helpers";
 
 export default class QualtricsAPI {
   base_url: string = "";
@@ -123,7 +76,6 @@ export default class QualtricsAPI {
       }
     )
       .then(response => {
-        console.log("DATA LEN", response.data.length);
         const b = Buffer.from(response.data, "binary");
         return extractZipContent(b);
       })
