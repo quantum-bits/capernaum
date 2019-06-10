@@ -1,4 +1,52 @@
 import axios from "axios";
+import { fromBuffer } from "yauzl";
+
+class ZipFileEntry {
+  fileName: string = "";
+  content: string = "";
+
+  constructor(fileName: string) {
+    this.fileName = fileName;
+  }
+}
+
+async function extractZipContent(inBuffer: Buffer) {
+  console.log("BUFFER", inBuffer, inBuffer.length);
+  return new Promise((resolve, reject) => {
+    fromBuffer(inBuffer, (err, zipFile) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!zipFile) {
+        throw new Error("Bogus zipFile");
+      }
+
+      const entries: ZipFileEntry[] = [];
+      zipFile.on("entry", entry => {
+        const currentEntry = new ZipFileEntry(entry.fileName);
+        entries.push(currentEntry);
+
+        zipFile.openReadStream(entry, (err, readStream) => {
+          if (err) {
+            return reject(err);
+          }
+          if (!readStream) {
+            throw new Error("Bogus readStream");
+          }
+          const chunks: string[] = [];
+          readStream.on("data", chunk => {
+            console.log("CHUNK", chunk);
+            chunks.push(chunk.toString());
+          });
+          readStream.on("end", () => {
+            currentEntry.content = chunks.join("");
+            return resolve(entries);
+          });
+        });
+      });
+    });
+  });
+}
 
 export default class QualtricsAPI {
   base_url: string = "";
@@ -18,18 +66,22 @@ export default class QualtricsAPI {
     }
   }
 
-  private async get(...urlSegments: string[]) {
-    urlSegments.unshift(this.base_url);
-    return axios.get(urlSegments.join("/"), {
+  private makeUrl(...segments: string[]) {
+    segments.unshift(this.base_url);
+    return segments.join("/");
+  }
+
+  private async get(url: string, moreConfig: object = {}) {
+    return axios.get(url, {
       headers: {
         "x-api-token": this.api_token
-      }
+      },
+      ...moreConfig
     });
   }
 
-  private async post(data: object, ...urlSegments: string[]) {
-    urlSegments.unshift(this.base_url);
-    return axios.post(urlSegments.join("/"), data, {
+  private async post(url: string, data: object) {
+    return axios.post(url, data, {
       headers: {
         "x-api-token": this.api_token
       }
@@ -39,31 +91,44 @@ export default class QualtricsAPI {
   /** Get a survey with the given ID. If no ID, get them all. */
   async getSurvey(surveyId?: string) {
     if (surveyId) {
-      return this.get("surveys", surveyId);
+      return this.get(this.makeUrl("surveys", surveyId));
     } else {
-      return this.get("surveys");
+      return this.get(this.makeUrl("surveys"));
     }
   }
 
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
-    return this.get("organizations", organizationId);
+    return this.get(this.makeUrl("organizations", organizationId));
   }
 
+  /** Export responses from Qualtrics. */
   async createResponseExport(surveyId: string) {
-    return this.post(
-      { format: "json" },
-      "surveys",
-      surveyId,
-      "export-responses"
-    );
+    return this.post(this.makeUrl("surveys", surveyId, "export-responses"), {
+      format: "json"
+    });
   }
 
   async getResponseExportProgress(surveyId: string, progressId: string) {
-    return this.get("surveys", surveyId, "export-responses", progressId);
+    return this.get(
+      this.makeUrl("surveys", surveyId, "export-responses", progressId)
+    );
   }
 
   async getResponseExportFile(surveyId: string, fileId: string) {
-    return this.get("surveys", surveyId, "export-responses", fileId, "file");
+    return this.get(
+      this.makeUrl("surveys", surveyId, "export-responses", fileId, "file"),
+      {
+        responseType: "arraybuffer"
+      }
+    )
+      .then(response => {
+        console.log("DATA LEN", response.data.length);
+        const b = Buffer.from(response.data, "binary");
+        return extractZipContent(b);
+      })
+      .catch(err => {
+        throw err;
+      });
   }
 }

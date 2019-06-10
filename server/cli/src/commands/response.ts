@@ -3,6 +3,7 @@ import QualtricsAPI from "../../../api/src/QualtricsAPI";
 import chalk from "chalk";
 import { table } from "table";
 import { format, parse, compareAsc } from "date-fns";
+import { gunzipSync, unzipSync } from "zlib";
 
 interface ListSurveysResult {
   id: string;
@@ -50,7 +51,7 @@ export default class Response extends Command {
           .then(response => this.log(response.data));
         break;
       case SubCommand.Check:
-        if (!args.progressId) {
+        if (!args.extraId) {
           throw new Error("No progress identifier");
         }
         api
@@ -60,7 +61,8 @@ export default class Response extends Command {
       case SubCommand.Get:
         api
           .getResponseExportFile(args.surveyId, args.extraId)
-          .then(response => this.log(response));
+          .then(entries => console.log("ENTRIES", entries))
+          .catch(err => this.error(err));
         break;
     }
   }
