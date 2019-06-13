@@ -1,4 +1,30 @@
 import { fromBuffer } from "yauzl";
+import { DateTime } from "luxon";
+
+/*
+ * ---------- Time and date ----------
+ */
+export function nowUtc(): string {
+  return DateTime.utc().toString();
+}
+
+export function isValidDate(dateIn: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateIn);
+}
+
+export function normalizeDateTime(dateIn: string): string {
+  const dt = DateTime.fromISO(dateIn, { zone: "utc" });
+  return dt.toString();
+}
+
+/** Sleep for `ms` milliseconds and resolve. */
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/*
+ * ---------- Zip files ----------
+ */
 
 class ZipFileEntry {
   fileName: string = "";
@@ -12,7 +38,7 @@ class ZipFileEntry {
 /** Unzip PKZIP data in a node Buffer.
  * Returns a list of ZipFileEntries containing the data.
  */
-export async function extractZipContent(inBuffer: Buffer) {
+export function extractZipContent(inBuffer: Buffer): Promise<ZipFileEntry[]> {
   return new Promise((resolve, reject) => {
     fromBuffer(inBuffer, (err, zipFile) => {
       if (err) {
