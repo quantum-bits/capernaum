@@ -30,7 +30,25 @@ export default class NavDrawer extends Vue {
       {
         title: "About",
         route: "about",
-        icon: "school"
+        icon: "school",
+        children: [
+          {
+            title: "This project",
+            route: "about-more",
+            icon: "autorenew"
+          },
+          {
+            title: "The Center for Scripture Engagement",
+            route: "about-even-more",
+            icon: "dashboard"
+          }
+        ]
+      },
+      {
+        title: "Letters",
+        route: "letters",
+        icon: "email",
+        divider: true
       }
     ];
   }

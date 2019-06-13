@@ -17,6 +17,26 @@ export default new Router({
       path: "/about",
       name: "about",
       component: () => import("./pages/About.vue")
+    },
+    {
+      path: "/letters",
+      name: "letters",
+      component: () => import("./pages/Letters.vue")
+    },
+    {
+      path: "/compose/:id",
+      name: "compose",
+      component: () => import("./pages/Compose.vue")
+    },
+    {
+      path: "/about-more",
+      name: "about-more",
+      component: () => import("./pages/About.vue")
+    },
+    {
+      path: "/about-even-more",
+      name: "about-even-more",
+      component: () => import("./pages/About.vue")
     }
   ]
 });
