@@ -25,51 +25,10 @@
             - refactor the text areas into their own components
             - make it so the text areas are not editable at first; an "edit" button makes them editable
             - have an "add another" button
-            - eventually need the textarea to have some controls (bold fact, italics, add link, etc.)
-
-
-
-        // named route
-router.push({ name: 'user', params: { userId: '123' } })
-    
-    <v-layout row wrap>
-      <v-flex xs6>
-        <v-textarea
-          name="input-7-1"
-          label="Default style"
-          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-          hint="Hint text"
-        ></v-textarea>
-      </v-flex>
-      <v-flex xs6>
-        <v-textarea
-          solo
-          name="input-7-4"
-          label="Solo textarea"
-          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-        ></v-textarea>
-      </v-flex>
-      <v-flex xs6>
-        <v-textarea
-          box
-          name="input-7-4"
-          label="Box textarea"
-          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-        ></v-textarea>
-      </v-flex>
-      <v-flex xs6>
-        <v-textarea
-          outline
-          name="input-7-4"
-          label="Outline textarea"
-          value="The Woodman set to work at once, and so sharp was his axe that the tree was soon chopped nearly through."
-        ></v-textarea>
-      </v-flex>
-    </v-layout>
-
+            - eventually need the textarea to have some controls (bold face, italics, add link, etc.)
     -->
 
-
+    <LetterTextArea :id="id" :order="order" :textArea="textArea" />
 
   </v-container>
 </template>
@@ -79,10 +38,18 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
 
-@Component
+import LetterTextArea from "@/components/LetterTextArea.vue";
+
+@Component({
+  components: { LetterTextArea }
+})
 export default class Compose extends Vue {
 
 letterTitle: String = '';
+
+id: Number = 1;
+order: Number = 1;
+textArea: any = '';
 
 surveyLetter: any = {
     title: '',
@@ -108,8 +75,7 @@ mounted () {
             id: response.data.id,
             textBoxes: textBoxes
         };
-	});
-  }
-
+    }); 
+    }
 }
 </script>
