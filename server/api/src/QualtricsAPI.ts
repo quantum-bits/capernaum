@@ -152,14 +152,15 @@ export default class QualtricsAPI {
 
   /** Request, await, and fetch responses. */
   async getResponses(surveyId: string, startDate?: string, endDate?: string) {
+    // Start the export.
     const createResult = await this.createResponseExport(
       surveyId,
       startDate,
       endDate
     );
-
     apiDebug("createResult %O", createResult.data);
 
+    // Await completion of the export.
     let exportResult: AxiosResponse<ResponseExportProgress>;
     let awaitingResponse = true;
     while (awaitingResponse) {
@@ -169,6 +170,7 @@ export default class QualtricsAPI {
         createResult.data.result.progressId
       );
       apiDebug("exportResult %O", exportResult.data);
+
       if (exportResult.data.result.status === "complete") {
         awaitingResponse = false;
       } else {
@@ -176,6 +178,7 @@ export default class QualtricsAPI {
       }
     }
 
+    // Fetch the export data itself. Returns a Promise of ZipEntry objects.
     return this.getResponseExportFile(
       surveyId,
       exportResult!.data.result.fileId

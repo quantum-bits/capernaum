@@ -60,7 +60,7 @@ export default class Response extends Command {
       case SubCommand.Create:
         api
           .createResponseExport(args.surveyId, flags.startDate, flags.endDate)
-          .then(response => this.log(response.data))
+          .then(response => this.log(JSON.stringify(response.data, null, 2)))
           .catch(err => this.error(err));
         break;
 
@@ -70,7 +70,7 @@ export default class Response extends Command {
         }
         api
           .getResponseExportProgress(args.surveyId, args.extraId)
-          .then(response => this.log(response.data))
+          .then(response => this.log(JSON.stringify(response.data, null, 2)))
           .catch(err => this.error(err));
         break;
 
