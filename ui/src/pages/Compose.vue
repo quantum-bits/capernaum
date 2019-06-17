@@ -1,21 +1,16 @@
 <template>
   <v-container>
-    <h1 class="headline mb-3">{{ surveyLetter.title }}</h1>
+    <h1 class="headline mb-3">{{ title }}</h1>
 
-    <h2 class="title font-weight-regular mb-1"> Survey: <span class="font-weight-light">{{ surveyLetter.surveyTitle }}</span></h2>
-    <h2 class="title font-weight-regular mb-5">Last Update: <span class="font-weight-light">{{ surveyLetter.lastUpdate }}</span></h2>
+    <h2 class="title font-weight-regular mb-1"> Survey: <span class="font-weight-light">{{ surveyTitle }}</span></h2>
+    <h2 class="title font-weight-regular mb-5">Last Update: <span class="font-weight-light">{{ lastUpdate }}</span></h2>
     <h2 class="title font-weight-regular mb-3">Paragraphs: </h2>
 
     <v-layout row wrap>
-        <v-flex xs8 offset-xs2>
+        <v-flex xs10 offset-xs1>
             <!-- https://www.youtube.com/watch?v=Y3S7KShrRX0 -->
-            <div class="form-group" v-for="textBox in surveyLetter.textBoxes" :key="textBox.id">
-                <v-textarea 
-                    name="'input_'+textBox.id"
-                    box
-                    v-model="textBox.text"
-                    hint="Hint text"
-                ></v-textarea>
+            <div class="form-group" v-for="(textBox, index) in textBoxes" :key="textBox.id">
+                <LetterTextArea :id="textBox.id" :order="textBox.order" :initialTextArea="textBox.text" :initialEditModeOn="false" :numItems="textBoxes.length" v-on:move-up="moveUp(index)" v-on:move-down="moveDown(index)"/>
             </div>
         </v-flex>
     </v-layout>
@@ -28,7 +23,10 @@
             - eventually need the textarea to have some controls (bold face, italics, add link, etc.)
     -->
 
-    <LetterTextArea :id="id" :order="order" :textArea="textArea" />
+    
+
+
+    
 
   </v-container>
 </template>
@@ -37,6 +35,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import axios from 'axios';
 import { AxiosResponse } from 'axios';
+import _ from "lodash";
 
 import LetterTextArea from "@/components/LetterTextArea.vue";
 
@@ -45,36 +44,60 @@ import LetterTextArea from "@/components/LetterTextArea.vue";
 })
 export default class Compose extends Vue {
 
-letterTitle: String = '';
+title: string = '';
+surveyTitle: string = '';
+lastUpdate: string = '';
+id: number = 0;
+textBoxes: any = [];
 
-id: Number = 1;
-order: Number = 1;
-textArea: any = '';
+//https://stackoverflow.com/questions/40512585/vue-js-cant-orderby-in-v-for/40512856
+//get orderedTextBoxes(): any{
+//    return _.orderBy(this.textBoxes,'order');
+//}
 
-surveyLetter: any = {
-    title: '',
-    surveyTitle: '',
-    lastUpdate: '',
-    id: '',
-    textBoxes: []
-};
+moveUp(index: number) {
+    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
+    console.log('move up!', index);
+    let textBox = this.textBoxes[index];
+    this.textBoxes.splice(index,1);
+    this.textBoxes.splice(index-1,0,textBox);
+    this.resetOrderProperty();
+    console.log(this.textBoxes);
+}
 
+moveDown(index: number) {
+    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
+    console.log('move down!', index);
+    let textBox = this.textBoxes[index+1];
+    this.textBoxes.splice(index+1,1);
+    this.textBoxes.splice(index,0,textBox);
+    this.resetOrderProperty();
+    console.log(this.textBoxes);
+}
+
+resetOrderProperty() {
+    // cycles through the textBox array and resets the 'order' property to reflect the current ordering of the text boxes
+    for (let i = 0; i < this.textBoxes.length; i++ ){
+        this.textBoxes[i].order = i;
+    }
+}
+
+// assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
 mounted () {
     axios
       .get('http://localhost:3000/letter-data/'+this.$route.params.id)
       .then((response: AxiosResponse) => {
         console.log(response);
-        let textBoxes: any = [];
+        let localTextBoxes: any = [];
         response.data.textBoxes.forEach((element: any) => {
-            textBoxes.push(element);
+            localTextBoxes.push(element);
         });
-        this.surveyLetter = {
-            title: response.data.title,
-            surveyTitle: response.data.surveyTitle,
-            lastUpdate: response.data.lastUpdate,
-            id: response.data.id,
-            textBoxes: textBoxes
-        };
+        this.textBoxes = _.orderBy(localTextBoxes,'order');
+        this.resetOrderProperty();
+        this.title = response.data.title;
+        this.surveyTitle = response.data.surveyTitle;
+        this.lastUpdate = response.data.lastUpdate;
+        this.id = response.data.id;
     }); 
     }
 }

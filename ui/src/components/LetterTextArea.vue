@@ -1,71 +1,80 @@
 <template>
-  <div>
-    <!--Use the component in the right place of the template-->
-    <tiptap-vuetify 
-        v-model="content" 
-        :extensions="extensions" 
-        :toolbar-attributes="{ color: 'yellow' }"
-    >
-    
-    </tiptap-vuetify>
+  <v-layout>
+    <v-flex xs12 sm12>
+      <v-card v-if="editModeOn">
+        <v-card-title primary-title>
+          <div>
+            <h3 class="headline mb-0">Paragraph &#35;{{order}}:</h3>
+            <vue-editor v-model="textArea" :editorToolbar="customToolbar"></vue-editor>
+          </div>
+        </v-card-title>
+        <v-card-actions>
+          <v-btn flat color="orange" @click="toggleEditMode">Save</v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card v-else>
+        <v-card-title primary-title>
+          <div>
+            <h3 class="headline mb-0">Paragraph &#35;{{order}}:</h3>
+            <div v-html="textArea"></div>
+          </div>
+        </v-card-title>
+        <v-card-actions>
+          <v-btn flat color="orange" @click="toggleEditMode">Edit</v-btn>
+          <v-btn v-if="order > 0" flat color="orange" @click="moveUp"><v-icon>arrow_upward</v-icon></v-btn>
+          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown"><v-icon>arrow_downward</v-icon></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 
-    <!--Here's how to make a preview (optional)-->
-    <h1>Preview</h1>
-    <hr>
+  
 
-    <div
-      class="tiptap-vuetify-editor__content"
-      v-html="content"
-    />
-  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-import { TiptapVuetify, Heading, Bold, Italic, Strike, Underline, Code, CodeBlock, Paragraph, BulletList, OrderedList,
-  ListItem, Link, Blockquote, HardBreak, HorizontalRule, History
-} from 'tiptap-vuetify';
+import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { VueEditor } from "vue2-editor";
 
 @Component({
     components: {
-        TiptapVuetify
+      VueEditor
     }
 })
 export default class LetterTextArea extends Vue {
   /** Item to display */
-  @Prop() id!: Number;
-  @Prop() order!: Number;
-  @Prop() textArea!: any;
+  @Prop() id!: number;
+  @Prop() order!: number;
+  @Prop() numItems!: number;
+  @Prop({ default: "" }) initialTextArea!: string;
+  @Prop({ default: false }) initialEditModeOn!: boolean;
 
-  extensions: any = [
-      // you can specify options for extension
-      new Heading({
-        levels: [1, 2, 3]
-      }),
-      new Bold({}),
-      new Italic({}),
-      new Strike({}),
-      new Underline({}),
-      new Code({}),
-      new CodeBlock({}),
-      new Paragraph({}),
-      new BulletList({}),
-      new OrderedList({}),
-      new ListItem({}),
-      new Link({}),
-      new Blockquote({}),
-      new HardBreak({}),
-      new HorizontalRule({}),
-      new History({})
-    ];
+  @Emit('move-up')
+  moveUp() {
+  }
 
-    // starting content for the editor
-    content: any = `
-      <h1>Yay Headlines!</h1>
-      <p>All these <strong>cool tags</strong> are working now.</p>
-    `
+  @Emit('move-down')
+  moveDown() {
+  }
 
+  editModeOn: boolean = this.initialEditModeOn;
+  textArea: string = this.initialTextArea;
+  // https://quilljs.com/docs/modules/toolbar/
+  customToolbar: any = [
+          ["bold", "italic", "underline", "blockquote"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          ["link"],
+          [{'align': []}],
+          ['clean']   
+  ];
 
+  get showMoveDown() {
+    return this.order < this.numItems - 1;
+  }
+
+  toggleEditMode() {
+    this.editModeOn = !this.editModeOn;
+  }
 
 }
 </script>
