@@ -4,23 +4,27 @@
       <v-card v-if="editModeOn">
         <v-card-title primary-title>
           <div>
-            <h3 class="headline mb-0">Paragraph &#35;{{order}}:</h3>
+            <h3 class="title font-weight-regular mb-2">Paragraph &#35;{{order+1}}:</h3>
             <vue-editor v-model="textArea" :editorToolbar="customToolbar"></vue-editor>
           </div>
         </v-card-title>
         <v-card-actions>
           <v-btn flat color="orange" @click="toggleEditMode">Save</v-btn>
+          <v-btn flat color="orange" @click="deleteParagraph">Delete</v-btn>
+          <v-btn v-if="order > 0" flat color="orange" @click="moveUp"><v-icon>arrow_upward</v-icon></v-btn>
+          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown"><v-icon>arrow_downward</v-icon></v-btn>
         </v-card-actions>
       </v-card>
       <v-card v-else>
         <v-card-title primary-title>
           <div>
-            <h3 class="headline mb-0">Paragraph &#35;{{order}}:</h3>
+            <h3 class="title font-weight-regular mb-2">Paragraph &#35;{{order+1}}:</h3>
             <div v-html="textArea"></div>
           </div>
         </v-card-title>
         <v-card-actions>
           <v-btn flat color="orange" @click="toggleEditMode">Edit</v-btn>
+          <v-btn flat color="orange" @click="deleteParagraph">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp"><v-icon>arrow_upward</v-icon></v-btn>
           <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown"><v-icon>arrow_downward</v-icon></v-btn>
         </v-card-actions>
@@ -55,6 +59,10 @@ export default class LetterTextArea extends Vue {
 
   @Emit('move-down')
   moveDown() {
+  }
+
+  @Emit('delete-paragraph')
+  deleteParagraph() {
   }
 
   editModeOn: boolean = this.initialEditModeOn;
