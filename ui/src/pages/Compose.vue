@@ -2,9 +2,15 @@
   <v-container>
     <h1 class="headline mb-3">{{ title }}</h1>
 
-    <h2 class="title font-weight-regular mb-1">Survey: <span class="font-weight-light">{{ surveyTitle }}</span></h2>
-    <h2 class="title font-weight-regular mb-5">Last Update: <span class="font-weight-light">{{ lastUpdate }}</span></h2>
-    <h2 class="title font-weight-regular mb-3">Content of Letter: </h2>
+    <h2 class="title font-weight-regular mb-1">
+      Survey:
+      <span class="font-weight-light">{{ surveyTitle }}</span>
+    </h2>
+    <h2 class="title font-weight-regular mb-5">
+      Last Update:
+      <span class="font-weight-light">{{ lastUpdate }}</span>
+    </h2>
+    <h2 class="title font-weight-regular mb-3">Content of Letter:</h2>
 
     <v-layout row wrap>
         <!--
@@ -70,22 +76,16 @@
 
             - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
     -->
-
-    
-
-
-    
-
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from 'axios';
-import { AxiosResponse } from 'axios';
+import axios from "axios";
+import { AxiosResponse } from "axios";
 import _ from "lodash";
 
-import LetterTextArea from "@/components/LetterTextArea.vue";
+import LetterTextArea from "../components/LetterTextArea.vue";
 import { TextBoxItemType } from "./text-box.types";
 import { LetterElementItemType, LetterElementEnum } from "./letter-element.types";
 
@@ -103,19 +103,19 @@ letterElements: LetterElementItemType[] = [];
 
 moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log('move up!', index);
+    console.log("move up!", index);
     let element: TextBoxItemType = this.elements[index];
     this.elements.splice(index,1);
-    this.elements.splice(index-1,0,element);
+    this.elements.splice(index - 1,0,element);
     this.resetOrderProperty();
     console.log(this.elements);
 }
 
-moveDown(index: number) {
+  moveDown(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log('move down!', index);
+    console.log("move down!", index);
     let element: TextBoxItemType = this.elements[index+1];
-    this.elements.splice(index+1,1);
+    this.elements.splice(index + 1,1);
     this.elements.splice(index,0,element);
     this.resetOrderProperty();
     console.log(this.elements);
@@ -134,20 +134,20 @@ resetOrderProperty() {
     for (let i = 0; i < this.elements.length; i++ ){
         this.elements[i].order = i;
     }
-}
+  }
 
 addElement(key: string) {
-    console.log('add: ', key);
+    console.log("add: ", key);
     let text: string = "";
     let editModeOn: boolean = true;
     if (key === LetterElementEnum.BOILERPLATE) {
-        console.log('boiler plate!');
+        console.log("boiler plate!");
         //editModeOn = true;
     } else {
-        console.log('not boiler plate');
+        console.log("not boiler plate");
         for (let letterElement of this.letterElements) {
             if (letterElement.key === key) {
-                console.log('got it! ', letterElement);
+                console.log("got it! ", letterElement);
                 text = letterElement.description;
                 editModeOn = false;
             }
@@ -181,27 +181,27 @@ get letterElement() {
     return "LetterTextArea";
 }
 
-// assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
-mounted () {
+  // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
+  mounted() {
     axios
-    .get('http://localhost:3000/letter-elements/')
-    .then((response: AxiosResponse) => {
+      .get("http://localhost:3000/letter-elements/")
+      .then((response: AxiosResponse) => {
         console.log(response);
         this.letterElements = response.data;
-    });
-    console.log('route param: ', this.$route.params.id);
+      });
+    console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
-        // do something 
+      // do something
     } else {
-        axios
-        .get('http://localhost:3000/letter-data/'+this.$route.params.id)
+      axios
+        .get("http://localhost:3000/letter-data/" + this.$route.params.id)
         .then((response: AxiosResponse) => {
             console.log(response);
             let localElements: TextBoxItemType[] = [];
             response.data.elements.forEach((element: any) => {
                 localElements.push(element);
             });
-            this.elements = _.orderBy(localElements,'order');
+            this.elements = _.orderBy(localElements,"order");
             // add two convenience properties to the elements....
             for (let box of this.elements) {
                 box.editModeOn = false;
@@ -214,6 +214,6 @@ mounted () {
             this.id = response.data.id;
         }); 
     }
-}
+  }
 }
 </script>

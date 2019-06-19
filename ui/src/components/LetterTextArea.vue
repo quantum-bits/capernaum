@@ -5,14 +5,18 @@
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">Paragraph &#35;{{order+1}}:</h3>
-            <vue-editor ref="editor" @text-change="onTextChange" v-model="textArea" ></vue-editor>
+            <vue-editor ref="editor" @text-change="onTextChange" v-model="textArea"></vue-editor>
           </div>
         </v-card-title>
         <v-card-actions>
           <v-btn flat color="orange" @click="toggleEditMode">Save</v-btn>
           <v-btn flat color="orange" @click="deleteParagraph">Delete</v-btn>
-          <v-btn v-if="order > 0" flat color="orange" @click="moveUp"><v-icon>arrow_upward</v-icon></v-btn>
-          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown"><v-icon>arrow_downward</v-icon></v-btn>
+          <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
+            <v-icon>arrow_upward</v-icon>
+          </v-btn>
+          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown">
+            <v-icon>arrow_downward</v-icon>
+          </v-btn>
         </v-card-actions>
       </v-card>
       <v-card v-else>
@@ -25,25 +29,27 @@
         <v-card-actions>
           <v-btn flat color="orange" @click="toggleEditMode">Edit</v-btn>
           <v-btn flat color="orange" @click="deleteParagraph">Delete</v-btn>
-          <v-btn v-if="order > 0" flat color="orange" @click="moveUp"><v-icon>arrow_upward</v-icon></v-btn>
-          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown"><v-icon>arrow_downward</v-icon></v-btn>
+          <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
+            <v-icon>arrow_upward</v-icon>
+          </v-btn>
+          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown">
+            <v-icon>arrow_downward</v-icon>
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>
   </v-layout>
-
-  
-
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
+import Delta from "quill-delta";
 
 @Component({
-    components: {
-      VueEditor
-    }
+  components: {
+    VueEditor
+  }
 })
 export default class LetterTextArea extends Vue {
   /** Item to display */
@@ -53,17 +59,14 @@ export default class LetterTextArea extends Vue {
   @Prop({ default: "" }) initialTextArea!: string;
   @Prop({ default: false }) initialEditModeOn!: boolean;
 
-  @Emit('move-up')
-  moveUp() {
-  }
+  @Emit("move-up")
+  moveUp() {}
 
-  @Emit('move-down')
-  moveDown() {
-  }
+  @Emit("move-down")
+  moveDown() {}
 
-  @Emit('delete-paragraph')
-  deleteParagraph() {
-  }
+  @Emit("delete-paragraph")
+  deleteParagraph() {}
 
   editModeOn: boolean = this.initialEditModeOn;
   textArea: string = this.initialTextArea;
@@ -77,7 +80,7 @@ export default class LetterTextArea extends Vue {
           [{ list: "ordered" }, { list: "bullet" }],
           ["link"],
           [{'align': []}],
-          ['clean']   
+          ['clean']
   ];
   */
 
@@ -85,13 +88,13 @@ export default class LetterTextArea extends Vue {
     return this.order < this.numItems - 1;
   }
 
-  onTextChange(delta, oldDelta, source) {
-    console.log(delta, oldDelta, source);//this is an Observer....
+  onTextChange(delta: Delta, oldDelta: Delta, source: string) {
+    console.log(delta, oldDelta, source); //this is an Observer....
   }
+
   toggleEditMode() {
     this.editModeOn = !this.editModeOn;
     //this.$refs.editor.quill.editor.delta;
   }
-
 }
 </script>
