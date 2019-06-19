@@ -24,7 +24,7 @@ export default new Router({
       component: () => import("./pages/Letters.vue")
     },
     {
-      path: "/compose/:id",
+      path: "/compose/:id?",
       name: "compose",
       component: () => import("./pages/Compose.vue")
     },

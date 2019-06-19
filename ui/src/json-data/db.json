@@ -4,6 +4,24 @@
       { "id": 2, "title": "Journaling", "info": "some information about journaling" },
       { "id": 3, "title": "Memorize", "info": "some information about memorization" }
     ],
+    "letter-elements": [
+        {
+            "key": "boilerplate",
+            "description": "Boilerplate Text"
+        },
+        {
+            "key": "spiritual-focus-chart",
+            "description": "Chart: Spiritual Foci for User"
+        },
+        {
+            "key": "spiritual-orientations-chart",
+            "description": "Chart: Spiritual Orientations for User"
+        },
+        {
+            "key": "boolean-calculation-results",
+            "description": "SE strategies for User"
+        }
+    ],
     "letter-data": [
         { 
             "id": 1,
@@ -11,6 +29,8 @@
             "lastUpdate": "2018-03-25",
             "survey-id": 1,
             "surveyTitle": "Christian Life Survey",
+            "isActive": false,
+            "isFrozen": false,
             "textBoxes": [
                 {
                     "id": 1,
@@ -35,6 +55,8 @@
             "lastUpdate": "2019-01-31",
             "survey-id": 2,
             "surveyTitle": "Christian Life Survey for College Students",
+            "isActive": true,
+            "isFrozen": true,
             "textBoxes": [
                 {
                     "id": 1,

@@ -5,7 +5,7 @@
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">Paragraph &#35;{{order+1}}:</h3>
-            <vue-editor v-model="textArea" :editorToolbar="customToolbar"></vue-editor>
+            <vue-editor ref="editor" @text-change="onTextChange" v-model="textArea" ></vue-editor>
           </div>
         </v-card-title>
         <v-card-actions>
@@ -67,7 +67,11 @@ export default class LetterTextArea extends Vue {
 
   editModeOn: boolean = this.initialEditModeOn;
   textArea: string = this.initialTextArea;
+
+  //delta = this.$refs;
+
   // https://quilljs.com/docs/modules/toolbar/
+  /*
   customToolbar: any = [
           ["bold", "italic", "underline", "blockquote"],
           [{ list: "ordered" }, { list: "bullet" }],
@@ -75,13 +79,18 @@ export default class LetterTextArea extends Vue {
           [{'align': []}],
           ['clean']   
   ];
+  */
 
   get showMoveDown() {
     return this.order < this.numItems - 1;
   }
 
+  onTextChange(delta, oldDelta, source) {
+    console.log(delta, oldDelta, source);//this is an Observer....
+  }
   toggleEditMode() {
     this.editModeOn = !this.editModeOn;
+    //this.$refs.editor.quill.editor.delta;
   }
 
 }
