@@ -2,12 +2,12 @@
  */
 export interface LetterElementItemType {
     key: string; // e.g., "boilerplate"
-    description: string: // e.g., "Boilerplate Text"
+    description: string; // e.g., "Boilerplate Text"
 }
 
 /** related enum
  */
-export enum LetterElement {
+export enum LetterElementEnum {
     BOILERPLATE = "boilerplate",
     SPIRITUAL_FOCUS_CHART = "spiritual-focus-chart",
     SPIRITUAL_ORIENTATIONS_CHART = "spiritual-orientations-chart",
