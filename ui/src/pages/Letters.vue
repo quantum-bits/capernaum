@@ -2,25 +2,22 @@
   <v-container>
     <h1 class="headline mb-5">Survey Follow-up Letters</h1>
 
-    <v-data-table
-        :headers="headers"
-        :items="surveyLetterSummary"
-        class="elevation-1"
-    >
-    <template v-slot:items="props">
-      <td>{{ props.item.title }}</td>
-      <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
-      <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
-      <td class="text-xs-right">
-          <button v-on:click="viewLetter(props.item)">View</button></td>
-    </template>
-  </v-data-table>
+    <v-data-table :headers="headers" :items="surveyLetterSummary" class="elevation-1">
+      <template v-slot:items="props">
+        <td>{{ props.item.title }}</td>
+        <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
+        <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
+        <td class="text-xs-right">
+          <button v-on:click="viewLetter(props.item)">View</button>
+        </td>
+      </template>
+    </v-data-table>
 
     <!--
 
         // named route
 router.push({ name: 'user', params: { userId: '123' } })
-    
+
     <CourseOfferingAdminActions
             v-bind:courseOffering="props.item"
             display-context="compact"
@@ -64,59 +61,54 @@ router.push({ name: 'user', params: { userId: '123' } })
     </v-layout>
 
     -->
-
-
-
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from 'axios';
-import { AxiosResponse } from 'axios';
+import axios from "axios";
+import { AxiosResponse } from "axios";
 
 @Component
 export default class Letters extends Vue {
-
-headers: any = [
+  headers: any = [
     {
-        text: 'Letter',
-        align: 'left',
-        sortable: false,
-        value: 'title'
+      text: "Letter",
+      align: "left",
+      sortable: false,
+      value: "title"
     },
-    { text: 'Last Update', value: 'lastUpdate'},
-    { text: 'Survey', value: 'surveyTitle' },
-    { text: 'Action', sortable: false },
-];
+    { text: "Last Update", value: "lastUpdate" },
+    { text: "Survey", value: "surveyTitle" },
+    { text: "Action", sortable: false }
+  ];
 
-surveyLetterSummary: any = [];
+  surveyLetterSummary: any = [];
 
-viewLetter(item: any) {
-    console.log('view letter: ', item);
-    this.$router.push({ name: 'compose', params: { id: item.id } });
-}
-mounted () {
+  viewLetter(item: any) {
+    console.log("view letter: ", item);
+    this.$router.push({ name: "compose", params: { id: item.id } });
+  }
+  mounted() {
     axios
       //.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .get('http://localhost:3000/letter-data')
+      .get("http://localhost:3000/letter-data")
       .then((response: AxiosResponse) => {
         console.log(response);
         response.data.map((val: any) => {
-            console.log(val.title);
-            this.surveyLetterSummary.push({
-                title: val.title,
-                surveyTitle: val.surveyTitle,
-                lastUpdate: val.lastUpdate,
-                id: val.id
-            });
-		});
+          console.log(val.title);
+          this.surveyLetterSummary.push({
+            title: val.title,
+            surveyTitle: val.surveyTitle,
+            lastUpdate: val.lastUpdate,
+            id: val.id
+          });
+        });
         //this.surveyLetterSummary = response.data.map((val: any) => ({
-		//		title: val.title,
-		//		surveyTitle: val.survey-title
-		//	}));
-		});
+        //		title: val.title,
+        //		surveyTitle: val.survey-title
+        //	}));
+      });
   }
-
 }
 </script>
