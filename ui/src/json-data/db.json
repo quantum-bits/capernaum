@@ -21,13 +21,27 @@
             "key": "boolean-calculation-results",
             "description": "SE strategies for User"
         }
+    ],
+    "survey-data": [
+        {
+            "id": 1,
+            "surveyTitle": "Christian Life Survey"
+        },
+        {
+            "id": 0,
+            "surveyTitle": "Christian Life Survey (<2018)"
+        },
+        {
+            "id": 2,
+            "surveyTitle": "Christian Life Survey for College Students"
+        }
     ],    
     "letter-data": [
         { 
             "id": 1,
             "title": "Christian Life Survey Follow-up Letter (Early 2020)",
             "lastUpdate": "2018-03-25",
-            "survey-id": 1,
+            "surveyId": 1,
             "surveyTitle": "Christian Life Survey",
             "isActive": false,
             "isFrozen": false,
@@ -80,7 +94,7 @@
             "id": 2,
             "title": "Christian Life Survey Letter for College Students (August, 2021)",
             "lastUpdate": "2019-01-31",
-            "survey-id": 2,
+            "surveyId": 2,
             "surveyTitle": "Christian Life Survey for College Students",
             "isActive": true,
             "isFrozen": true,

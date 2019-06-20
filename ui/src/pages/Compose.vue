@@ -1,24 +1,44 @@
 <template>
   <v-container>
-    <h1 class="headline mb-3">{{ title }}</h1>
-
-    <h2 class="title font-weight-regular mb-1">
-      Survey:
-      <span class="font-weight-light">{{ surveyTitle }}</span>
-    </h2>
-    <h2 class="title font-weight-regular mb-5">
-      Last Update:
-      <span class="font-weight-light">{{ lastUpdate }}</span>
-    </h2>
-    <h2 class="title font-weight-regular mb-3">Content of Letter:</h2>
+        <div v-if="!editModeOn">
+            <v-layout row wrap>
+                <v-flex xs7 offset-xs1>
+                    <h1 class="headline mb-3">{{ title }}</h1>
+                    <h2 class="title font-weight-regular mb-1">
+                    Survey:
+                    <span class="font-weight-light">{{ surveyTitle }}</span>
+                    </h2>
+                    <h2 class="title font-weight-regular mb-5">
+                    Last Update:
+                    <span class="font-weight-light">{{ lastUpdate }}</span>
+                    </h2>
+                </v-flex>
+                <v-flex v-if="elements.length > 0" xs3 class="text-xs-right">
+                    <v-btn
+                        color="primary"
+                        dark
+                        @click="toggleEditMode"
+                        >
+                        Edit
+                    </v-btn>
+                </v-flex>
+            </v-layout>
+        </div>
+        <div v-else>
+            <LetterInfoForm
+            :id="id"
+            :initialTitle="title"
+            :initialSurveyId="surveyId"
+            :isNew="isNew"
+            v-on:save-info="saveInfo" 
+            >
+            </LetterInfoForm>
+        </div>
 
     <v-layout row wrap>
-        <!--
-        <v-flex xs10 offset-xs1 class="text-xs-right">
-            <v-btn v-if="elements.length > 0" flat color="orange" @click="addTextArea">Add Paragraph</v-btn>
+        <v-flex xs10 offset-xs1>
+            <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
         </v-flex>
-        -->
-
         <v-flex xs10 offset-xs1 class="text-xs-right">
             <v-menu offset-y>
                 <template v-slot:activator="{ on }">
@@ -110,18 +130,22 @@ import _ from "lodash";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
+import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
 
 @Component({
-  components: { LetterTextArea, StaticLetterElement }
+  components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
 })
 export default class Compose extends Vue {
 
+isNew: boolean = false; // true if this is a new letter
+editModeOn: boolean = false;
 title: string = '';
 surveyTitle: string = '';
+surveyId: number = -1;
 lastUpdate: string = '';
-id: number = 0;
+id: number = -1;
 elements: LetterElementType[] = [];
 letterElements: LetterElementMenuItemType[] = [];
 
@@ -194,6 +218,14 @@ letterElement(key: string) {
     }
 }
 
+toggleEditMode() {
+    this.editModeOn = true;
+}
+
+saveInfo() {
+    // save the letter info (title, etc....maybe do this in the child component and reload the page?)
+    this.editModeOn = false;
+}
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
 mounted() {
     axios
@@ -204,7 +236,9 @@ mounted() {
       });
     console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
-      // do something
+      // launch form for creating a new letter
+        this.editModeOn = true;
+        this.isNew = true;
     } else {
       axios
         .get("http://localhost:3000/letter-data/" + this.$route.params.id)
@@ -225,6 +259,7 @@ mounted() {
             this.surveyTitle = response.data.surveyTitle;
             this.lastUpdate = response.data.lastUpdate;
             this.id = response.data.id;
+            this.surveyId = response.data.surveyId;
         }); 
     }
   }
