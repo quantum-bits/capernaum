@@ -19,7 +19,7 @@
                 </span>
             </div>
         </v-card-title>
-        <v-card-actions>
+        <v-card-actions v-if="!parentIsFrozen">
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
             <v-icon>arrow_upward</v-icon>
@@ -38,6 +38,7 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import axios from "axios";
 import { AxiosResponse } from "axios";
+import Delta from "quill-delta";
 
 import { LetterElementMenuItemType, LetterElementEnum } from "../pages/letter-element.types";
 
@@ -47,7 +48,7 @@ export default class StaticLetterElement extends Vue {
   @Prop() id!: number;
   @Prop() order!: number;
   @Prop() numItems!: number;
-  @Prop({ default: "" }) initialTextArea!: string; // not actually used in this component, but need to mirror the props of  LetterTextArea.vue
+  @Prop() initialTextDelta!: Delta; // not actually used in this component, but need to mirror the props of  LetterTextArea.vue
   @Prop({ default: false }) initialEditModeOn!: boolean; // not actually used in this component
   @Prop() letterElementKey!: string;
   @Prop() parentIsFrozen!: boolean;

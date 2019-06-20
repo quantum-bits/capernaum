@@ -85,7 +85,7 @@
                 <component v-bind:is="letterElement(element.key)" 
                 :id="element.id" 
                 :order="element.order" 
-                :initialTextArea="element.text" 
+                :initialTextDelta="element.textDelta" 
                 :initialEditModeOn="element.editModeOn" 
                 :numItems="elements.length" 
                 :letterElementKey="element.key"
@@ -208,7 +208,6 @@ resetOrderProperty() {
 
 addElement(key: string) {
     console.log("add: ", key);
-    let text: string = "";
     let numElements: number = this.elements.length;
     let maxId: number = 0;
     // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
@@ -222,7 +221,13 @@ addElement(key: string) {
         {
             id: maxId,//will eventually get assigned a value by the server, but use this value as a key for now....
             order: numElements,
-            text: text,
+            textDelta: {
+                        ops: [
+                            {
+                              insert: ""
+                            }
+                        ]
+                    },
             key: key,
             isNew: true,
             editModeOn: true

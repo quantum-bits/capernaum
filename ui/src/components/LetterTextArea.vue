@@ -5,7 +5,7 @@
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">{{description}}</h3>
-            <vue-editor ref="editor" @text-change="onTextChange" v-model="textArea"></vue-editor>
+            <vue-editor ref="editor" v-model="textArea"></vue-editor>
           </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
@@ -63,25 +63,20 @@ export default class LetterTextArea extends Vue {
   @Prop() id!: number;
   @Prop() order!: number;
   @Prop() numItems!: number;
-  @Prop({ default: "" }) initialTextArea!: string;
+  @Prop() initialTextDelta!: Delta;
   @Prop({ default: false }) initialEditModeOn!: boolean;
   @Prop() letterElementKey!: string;
   @Prop() parentIsFrozen!: boolean;
 
   letterElements: LetterElementMenuItemType[] = [];
   description: string = "";
+  
+  textDelta: any = this.initialTextDelta;
 
-  deltaOps: any =  [
-    {insert: "Hello\n"},
-    {insert: "This is colorful", attributes: {color: '#f00'}}
-  ];
- 
   cfg: any = {};
- 
-  converter: any = new QuillDeltaToHtmlConverter(this.deltaOps, this.cfg);
- 
-  html: any = this.converter.convert(); 
-
+  converter: any = new QuillDeltaToHtmlConverter(this.textDelta.ops, this.cfg);
+  textArea: string = this.converter.convert();
+  
   @Emit("move-up")
   moveUp() {}
 
@@ -92,13 +87,7 @@ export default class LetterTextArea extends Vue {
   deleteElement() {}
 
   editModeOn: boolean = this.initialEditModeOn;
-  textArea: string = this.initialTextArea;
-
   
-
-
-  //delta = this.$refs;
-
   // https://quilljs.com/docs/modules/toolbar/
   /*
   customToolbar: any = [
@@ -114,35 +103,28 @@ export default class LetterTextArea extends Vue {
     return this.order < this.numItems - 1;
   }
 
-  onTextChange(delta: Delta, oldDelta: Delta, source: string) {
-    //console.log(delta, oldDelta, source); //this is an Observer....
-    // do something
-  }
-
   save() {
     // save
     this.editModeOn = false;
-    //this.$refs.editor.quill.editor.delta.getContents().then(()=>console.log('hey!'));
     let delta: Delta = this.$refs.editor.quill.getContents();
-    console.log(delta);
-
-    
-
-
+    console.log('delta object to save: ', delta);
 
   }
 
   openEditor() {
     this.editModeOn = true;
+    // don't need to use setContents, since the editor is already tied to this.textArea via v-model....
+    /*
+    this works, in case we ever need to use setContents directly:
     this.$refs.editor.quill.setContents({
       ops: [
-        {insert: this.initialTextArea}
+        {insert: "some text"}
       ]
     });
+    */
   }
 
   mounted() {
-    console.log(this.html);
     axios
         .get("http://localhost:3000/letter-elements/")
         .then((response: AxiosResponse) => {

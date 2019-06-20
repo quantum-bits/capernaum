@@ -50,43 +50,67 @@
                     "id": 1,
                     "order": 1,
                     "key": "boilerplate",
-                    "text": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": 2,
                     "order": 0,
                     "key": "boilerplate",
-                    "text": "In congue vulputate elit, a feugiat leo venenatis nec. Phasellus quis semper sapien. Nullam enim nibh, commodo ut lacus eu, faucibus varius ligula. Nam fringilla lorem quis massa consequat vulputate. Nullam cursus pellentesque sapien a laoreet. Nulla sagittis mauris in augue tempus egestas. Ut risus ipsum, malesuada tincidunt varius sed, ultricies sed ante. Nam tempor, nisi quis gravida tristique, velit arcu luctus lacus, euismod tempor felis purus et ligula. Morbi efficitur tincidunt nunc at tristique. Praesent euismod lectus vel ligula porta pretium. Sed odio dui, bibendum vitae vulputate in, mollis placerat ipsum."
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                            }
+                        ]
+                    }                
                 },
                 {
                     "id": 3,
                     "order": 2,
                     "key": "spiritual-focus-chart",
-                    "text": ""
+                    "textDelta": {"ops":[]}
                 },
                 {
                     "id": 4,
                     "order": 3,
                     "key": "spiritual-orientations-chart",
-                    "text": ""
+                    "textDelta": {"ops":[]}
                 },
                 {
                     "id": 8,
                     "order": 4,
                     "key": "boilerplate",
-                    "text": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": 5,
                     "order": 5,
                     "key": "boolean-calculation-results",
-                    "text": ""
+                    "textDelta": {"ops":[]}
                 },
                 {
                     "id": 9,
                     "order": 8,
                     "key": "boilerplate",
-                    "text": "Some wrap-up text, urls, etc."
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -103,13 +127,25 @@
                     "id": 1,
                     "order": 1,
                     "key": "boilerplate",
-                    "text": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                            }
+                        ]
+                      }                
                 },
                 {
                     "id": 2,
                     "order": 2,
                     "key": "boilerplate",
-                    "text": "In congue vulputate elit, a feugiat leo venenatis nec. Phasellus quis semper sapien. Nullam enim nibh, commodo ut lacus eu, faucibus varius ligula. Nam fringilla lorem quis massa consequat vulputate. Nullam cursus pellentesque sapien a laoreet. Nulla sagittis mauris in augue tempus egestas. Ut risus ipsum, malesuada tincidunt varius sed, ultricies sed ante. Nam tempor, nisi quis gravida tristique, velit arcu luctus lacus, euismod tempor felis purus et ligula. Morbi efficitur tincidunt nunc at tristique. Praesent euismod lectus vel ligula porta pretium. Sed odio dui, bibendum vitae vulputate in, mollis placerat ipsum."
+                    "textDelta": {
+                        "ops": [
+                            {
+                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                            }
+                        ]
+                    }                
                 }
             ]
         }
