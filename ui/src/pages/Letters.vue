@@ -21,6 +21,7 @@
             <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
             <td class="text-xs-center">
               <span v-if="props.item.isFrozen">
+                <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
                 <v-icon color="success">check_circle</v-icon>
               </span>
             </td>

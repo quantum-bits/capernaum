@@ -1,5 +1,15 @@
 <template>
   <v-container>
+      <v-layout v-if="isFrozen" class="mb-3">
+        <v-flex xs10 offset-xs1>
+                <v-alert
+                    :value="true"
+                    type="info"
+                >
+                    Note that this letter has been frozen -- it is no longer editable.
+                </v-alert>
+        </v-flex>
+      </v-layout>
         <div v-if="!editModeOn">
             <v-layout row wrap>
                 <v-flex xs7 offset-xs1>
@@ -36,14 +46,6 @@
         </div>
 
     <v-layout row wrap>
-        <v-flex v-if="isFrozen" xs10 offset-xs1>
-            <v-alert
-                :value="true"
-                type="info"
-            >
-                Note that this letter has been frozen -- it is no longer editable.
-            </v-alert>
-        </v-flex>
         <v-flex xs10 offset-xs1>
             <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
         </v-flex>

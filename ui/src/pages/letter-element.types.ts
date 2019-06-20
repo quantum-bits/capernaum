@@ -22,5 +22,5 @@ export enum LetterElementEnum {
     BOILERPLATE = "boilerplate",
     SPIRITUAL_FOCUS_CHART = "spiritual-focus-chart",
     SPIRITUAL_ORIENTATIONS_CHART = "spiritual-orientations-chart",
-    BOOLEAN_CALCULATION_RESULTS= "boolean-calculation-results"
+    BOOLEAN_CALCULATION_RESULTS= "boolean-calculation-results",
 }

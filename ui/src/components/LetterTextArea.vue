@@ -1,7 +1,7 @@
 <template>
   <v-layout>
     <v-flex xs12 sm12>
-      <v-card v-if="editModeOn">
+      <v-card v-show="editModeOn">
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">{{description}}</h3>
@@ -9,7 +9,7 @@
           </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
-          <v-btn flat color="orange" @click="toggleEditMode">Save</v-btn>
+          <v-btn flat color="orange" @click="save">Save</v-btn>
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
             <v-icon>arrow_upward</v-icon>
@@ -19,7 +19,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <v-card v-else>
+      <v-card v-show="!editModeOn">
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">{{description}}</h3>
@@ -27,7 +27,7 @@
           </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
-          <v-btn flat color="orange" @click="toggleEditMode">Edit</v-btn>
+          <v-btn flat color="orange" @click="openEditor">Edit</v-btn>
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
             <v-icon>arrow_upward</v-icon>
@@ -45,6 +45,8 @@
 import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
 import Delta from "quill-delta";
+
+import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
 
 import axios from "axios";
 import { AxiosResponse } from "axios";
@@ -69,6 +71,17 @@ export default class LetterTextArea extends Vue {
   letterElements: LetterElementMenuItemType[] = [];
   description: string = "";
 
+  deltaOps: any =  [
+    {insert: "Hello\n"},
+    {insert: "This is colorful", attributes: {color: '#f00'}}
+  ];
+ 
+  cfg: any = {};
+ 
+  converter: any = new QuillDeltaToHtmlConverter(this.deltaOps, this.cfg);
+ 
+  html: any = this.converter.convert(); 
+
   @Emit("move-up")
   moveUp() {}
 
@@ -80,6 +93,9 @@ export default class LetterTextArea extends Vue {
 
   editModeOn: boolean = this.initialEditModeOn;
   textArea: string = this.initialTextArea;
+
+  
+
 
   //delta = this.$refs;
 
@@ -99,14 +115,34 @@ export default class LetterTextArea extends Vue {
   }
 
   onTextChange(delta: Delta, oldDelta: Delta, source: string) {
-    console.log(delta, oldDelta, source); //this is an Observer....
+    //console.log(delta, oldDelta, source); //this is an Observer....
+    // do something
   }
 
-  toggleEditMode() {
-    this.editModeOn = !this.editModeOn;
-    //this.$refs.editor.quill.editor.delta;
+  save() {
+    // save
+    this.editModeOn = false;
+    //this.$refs.editor.quill.editor.delta.getContents().then(()=>console.log('hey!'));
+    let delta: Delta = this.$refs.editor.quill.getContents();
+    console.log(delta);
+
+    
+
+
+
   }
+
+  openEditor() {
+    this.editModeOn = true;
+    this.$refs.editor.quill.setContents({
+      ops: [
+        {insert: this.initialTextArea}
+      ]
+    });
+  }
+
   mounted() {
+    console.log(this.html);
     axios
         .get("http://localhost:3000/letter-elements/")
         .then((response: AxiosResponse) => {
