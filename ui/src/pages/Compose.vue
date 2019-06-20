@@ -13,7 +13,7 @@
                     <span class="font-weight-light">{{ lastUpdate }}</span>
                     </h2>
                 </v-flex>
-                <v-flex v-if="elements.length > 0" xs3 class="text-xs-right">
+                <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
                     <v-btn
                         color="primary"
                         dark
@@ -36,11 +36,26 @@
         </div>
 
     <v-layout row wrap>
+        <v-flex v-if="isFrozen" xs10 offset-xs1>
+            <v-alert
+                :value="true"
+                type="info"
+            >
+                Note that this letter has been frozen -- it is no longer editable.
+            </v-alert>
+        </v-flex>
         <v-flex xs10 offset-xs1>
             <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
         </v-flex>
         <v-flex xs10 offset-xs1 class="text-xs-right">
-            <v-menu offset-y>
+            <v-btn
+                color="primary"
+                dark
+                @click="viewPDF"
+                >
+                View PDF
+            </v-btn>
+            <v-menu v-if="!isFrozen" offset-y>
                 <template v-slot:activator="{ on }">
                     <v-btn
                     color="primary"
@@ -72,19 +87,22 @@
                 :initialEditModeOn="element.editModeOn" 
                 :numItems="elements.length" 
                 :letterElementKey="element.key"
+                :parentIsFrozen="isFrozen"
                 v-on:move-up="moveUp(index)" 
                 v-on:move-down="moveDown(index)" 
                 v-on:delete-element="deleteElement(index)"
                 ></component>
             </div>
         </v-flex>
-        <!--
         <v-flex xs10 offset-xs1 class="text-xs-right">
-            <v-btn flat color="orange" @click="addTextArea">Add Paragraph</v-btn>
-        </v-flex>
-        -->
-        <v-flex v-if="elements.length > 0" xs10 offset-xs1 class="text-xs-right">
-            <v-menu offset-y>
+            <v-btn v-if="elements.length > 0"
+                color="primary"
+                dark
+                @click="viewPDF"
+                >
+                View PDF
+            </v-btn>
+            <v-menu v-if="elements.length > 0 && !isFrozen" offset-y>
                 <template v-slot:activator="{ on }">
                     <v-btn
                     color="primary"
@@ -105,6 +123,7 @@
                 </v-list>
             </v-menu>
         </v-flex>
+    
     </v-layout>
 
     <!--
@@ -112,12 +131,12 @@
             - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
             - might need to update the db every time a change is made (to the order, too)
             - validation: https://vuejsdevelopers.com/2018/08/27/vue-js-form-handling-vuelidate/
-            - add isActive flag to letter
-            - add isFrozen flag to letter; controls disappear; explanation appears
+
             - ordering within categories for letters (order by survey, and then more ordering below this level)
             - Quill to output json instead of html
 
             - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+            - add isFrozen and isActive flags to table
     -->
   </v-container>
 </template>
@@ -148,6 +167,7 @@ lastUpdate: string = '';
 id: number = -1;
 elements: LetterElementType[] = [];
 letterElements: LetterElementMenuItemType[] = [];
+isFrozen: boolean = false;
 
 moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
@@ -226,6 +246,10 @@ saveInfo() {
     // save the letter info (title, etc....maybe do this in the child component and reload the page?)
     this.editModeOn = false;
 }
+
+viewPDF() {
+    console.log('view sample pdf....');
+}
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
 mounted() {
     axios
@@ -260,6 +284,7 @@ mounted() {
             this.lastUpdate = response.data.lastUpdate;
             this.id = response.data.id;
             this.surveyId = response.data.surveyId;
+            this.isFrozen = response.data.isFrozen;
         }); 
     }
   }

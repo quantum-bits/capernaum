@@ -50,6 +50,7 @@ export default class StaticLetterElement extends Vue {
   @Prop({ default: "" }) initialTextArea!: string; // not actually used in this component, but need to mirror the props of  LetterTextArea.vue
   @Prop({ default: false }) initialEditModeOn!: boolean; // not actually used in this component
   @Prop() letterElementKey!: string;
+  @Prop() parentIsFrozen!: boolean;
 
   letterElements: LetterElementMenuItemType[] = [];
   description: string = "";

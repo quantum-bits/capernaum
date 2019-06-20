@@ -11,7 +11,7 @@
         >
             <v-text-field
                 v-model="title"
-                :counter="60"
+                :counter="80"
                 :rules="nameRules"
                 label="Title of Letter"
                 required
@@ -72,7 +72,7 @@ export default class LetterInfoForm extends Vue {
     name: string = '';
     nameRules: any = [
         (v: any) => !!v || 'Title is required',
-        (v: any) => (v && v.length <= 60) || 'Title of letter must be less than 60 characters'
+        (v: any) => (v && v.length <= 80) || 'Title of letter must be less than 80 characters'
     ];
     
     select: any = null;

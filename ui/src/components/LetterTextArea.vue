@@ -8,7 +8,7 @@
             <vue-editor ref="editor" @text-change="onTextChange" v-model="textArea"></vue-editor>
           </div>
         </v-card-title>
-        <v-card-actions>
+        <v-card-actions v-if="!parentIsFrozen">
           <v-btn flat color="orange" @click="toggleEditMode">Save</v-btn>
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
@@ -26,7 +26,7 @@
             <div v-html="textArea"></div>
           </div>
         </v-card-title>
-        <v-card-actions>
+        <v-card-actions v-if="!parentIsFrozen">
           <v-btn flat color="orange" @click="toggleEditMode">Edit</v-btn>
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
@@ -64,6 +64,7 @@ export default class LetterTextArea extends Vue {
   @Prop({ default: "" }) initialTextArea!: string;
   @Prop({ default: false }) initialEditModeOn!: boolean;
   @Prop() letterElementKey!: string;
+  @Prop() parentIsFrozen!: boolean;
 
   letterElements: LetterElementMenuItemType[] = [];
   description: string = "";
