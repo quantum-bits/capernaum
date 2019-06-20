@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../../api/src/QualtricsAPI";
+import QualtricsAPI from "../../qualtrics/qualtrics.client";
 import chalk from "chalk";
 import { table } from "table";
 

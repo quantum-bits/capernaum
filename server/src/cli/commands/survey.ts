@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../../api/src/QualtricsAPI";
+import QualtricsAPI from "../../qualtrics/qualtrics.client";
 import chalk from "chalk";
 import { table } from "table";
 import { format, parse, compareAsc } from "date-fns";
@@ -50,11 +50,11 @@ export default class Survey extends Command {
           this.error("`get` command requires a survey identifier");
         }
         api.getSurvey(args.surveyId).then(response => {
-          this.log(response.data);
+          this.log(response.data.result.name);
         });
         break;
       case SubCommand.List:
-        api.getSurvey().then(response => {
+        api.listSurveys().then(response => {
           const elements: ListSurveysResult[] = response.data.result.elements;
           const headers = ["Id", "Name", "Last Modified"].map(hdr =>
             chalk.greenBright(hdr)

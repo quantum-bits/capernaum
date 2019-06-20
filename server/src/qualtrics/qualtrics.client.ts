@@ -9,37 +9,6 @@ import {
 import debug from "debug";
 const apiDebug = debug("api");
 
-interface CreateResponseData {
-  format: string;
-  startDate?: string;
-  endDate?: string;
-}
-
-interface QualtricsResponse {
-  meta: {
-    requestId: string;
-    httpStatus: string;
-  };
-}
-
-type ResponseExportStatus = "inProgress" | "complete" | "failed";
-
-interface CreateResponseExportResponse extends QualtricsResponse {
-  result: {
-    progressId: string;
-    percentComplete: number;
-    status: ResponseExportStatus;
-  };
-}
-
-interface ResponseExportProgress extends QualtricsResponse {
-  result: {
-    percentComplete: number;
-    status: ResponseExportStatus;
-    fileId: string;
-  };
-}
-
 export default class QualtricsAPI {
   base_url: string = "";
   api_token: string = "";
@@ -80,18 +49,20 @@ export default class QualtricsAPI {
     });
   }
 
-  /** Get a survey with the given ID. If no ID, get them all. */
-  async getSurvey(surveyId?: string) {
-    if (surveyId) {
-      return this.get(this.makeUrl("surveys", surveyId));
-    } else {
-      return this.get(this.makeUrl("surveys"));
-    }
+  /** Get a survey with the given ID. */
+  async getSurvey(surveyId: string) {
+    return this.get<GetSurveyResponse>(this.makeUrl("surveys", surveyId));
+  }
+
+  async listSurveys() {
+    return this.get<ListSurveysResponse>(this.makeUrl("surveys"));
   }
 
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
-    return this.get(this.makeUrl("organizations", organizationId));
+    return this.get<GetOrganizationResponse>(
+      this.makeUrl("organizations", organizationId)
+    );
   }
 
   /** Raw methods to export responses from Qualtrics. */

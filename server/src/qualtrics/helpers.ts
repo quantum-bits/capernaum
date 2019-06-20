@@ -26,7 +26,7 @@ export function sleep(ms: number) {
  * ---------- Zip files ----------
  */
 
-class ZipFileEntry {
+export class ZipFileEntry {
   fileName: string = "";
   content: string = "";
 

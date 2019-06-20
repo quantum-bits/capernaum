@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../../api/src/QualtricsAPI";
+import QualtricsAPI from "../../qualtrics/qualtrics.client";
 
 interface ListSurveysResult {
   id: string;

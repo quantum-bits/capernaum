@@ -25,18 +25,38 @@
     "@nestjs/graphql": "^6.2.4",
     "@nestjs/platform-express": "^6.0.0",
     "apollo-server-express": "^2.6.3",
+    "axios": "^0.19.0",
+    "chalk": "^2.4.2",
+    "date-fns": "^1.30.1",
+    "debug": "^4.1.1",
+    "dotenv": "^8.0.0",
     "graphql": "^14.3.1",
     "graphql-tools": "^4.0.4",
+    "luxon": "^1.16.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3"
+    "rxjs": "^6.3.3",
+    "table": "^5.4.1",
+    "tslib": "^1.10.0",
+    "type-graphql": "^0.17.4",
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "@nestjs/testing": "^6.0.0",
+    "@oclif/command": "^1.5.14",
+    "@oclif/config": "^1.13.0",
+    "@oclif/dev-cli": "^1.22.0",
+    "@oclif/plugin-help": "^2.2.0",
+    "@types/debug": "^4.1.4",
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^4.16.0",
     "@types/jest": "^23.3.13",
-    "@types/node": "^10.12.18",
+    "@types/luxon": "^1.15.1",
+    "@types/node": "^12.0.8",
+    "@types/request": "^2.48.1",
     "@types/supertest": "^2.0.7",
+    "@types/table": "^4.0.5",
+    "@types/yauzl": "^2.9.1",
     "concurrently": "^4.1.0",
     "jest": "^23.6.0",
     "nodemon": "^1.18.9",
@@ -62,5 +82,18 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "files": [],
+  "oclif": {
+    "bin": "capcli",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "commands": "./src/cli/commands",
+    "hooks": {
+      "init": [
+        "./src/cli/hooks/init/env"
+      ]
+    }
   }
 }
