@@ -45,15 +45,16 @@
         <v-flex xs10 offset-xs1>
             <!-- https://www.youtube.com/watch?v=Y3S7KShrRX0 -->
             <div class="form-group ma-4" v-for="(element, index) in elements" :key="element.id">
-                <component v-bind:is="letterElement" 
+                <component v-bind:is="letterElement(element.key)" 
                 :id="element.id" 
                 :order="element.order" 
                 :initialTextArea="element.text" 
                 :initialEditModeOn="element.editModeOn" 
                 :numItems="elements.length" 
+                :letterElementKey="element.key"
                 v-on:move-up="moveUp(index)" 
                 v-on:move-down="moveDown(index)" 
-                v-on:delete-paragraph="deleteElement(index)"
+                v-on:delete-element="deleteElement(index)"
                 ></component>
             </div>
         </v-flex>
@@ -62,6 +63,28 @@
             <v-btn flat color="orange" @click="addTextArea">Add Paragraph</v-btn>
         </v-flex>
         -->
+        <v-flex v-if="elements.length > 0" xs10 offset-xs1 class="text-xs-right">
+            <v-menu offset-y>
+                <template v-slot:activator="{ on }">
+                    <v-btn
+                    color="primary"
+                    dark
+                    v-on="on"
+                    >
+                    Add Letter Element
+                    </v-btn>
+                </template>
+                <v-list>
+                    <v-list-tile
+                    v-for="item in letterElements"
+                    :key="item.key"
+                    @click="addElement(item.key)"
+                    >
+                    <v-list-tile-title>{{ item.description }}</v-list-tile-title>
+                    </v-list-tile>
+                </v-list>
+            </v-menu>
+        </v-flex>
     </v-layout>
 
     <!--
@@ -86,11 +109,12 @@ import { AxiosResponse } from "axios";
 import _ from "lodash";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
-import { TextBoxItemType } from "./text-box.types";
-import { LetterElementItemType, LetterElementEnum } from "./letter-element.types";
+import StaticLetterElement from "../components/StaticLetterElement.vue";
+
+import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
 
 @Component({
-  components: { LetterTextArea }
+  components: { LetterTextArea, StaticLetterElement }
 })
 export default class Compose extends Vue {
 
@@ -98,23 +122,23 @@ title: string = '';
 surveyTitle: string = '';
 lastUpdate: string = '';
 id: number = 0;
-elements: TextBoxItemType[] = [];
-letterElements: LetterElementItemType[] = [];
+elements: LetterElementType[] = [];
+letterElements: LetterElementMenuItemType[] = [];
 
 moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
     console.log("move up!", index);
-    let element: TextBoxItemType = this.elements[index];
+    let element: LetterElementType = this.elements[index];
     this.elements.splice(index,1);
     this.elements.splice(index - 1,0,element);
     this.resetOrderProperty();
     console.log(this.elements);
 }
 
-  moveDown(index: number) {
+moveDown(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
     console.log("move down!", index);
-    let element: TextBoxItemType = this.elements[index+1];
+    let element: LetterElementType = this.elements[index+1];
     this.elements.splice(index + 1,1);
     this.elements.splice(index,0,element);
     this.resetOrderProperty();
@@ -139,21 +163,6 @@ resetOrderProperty() {
 addElement(key: string) {
     console.log("add: ", key);
     let text: string = "";
-    let editModeOn: boolean = true;
-    if (key === LetterElementEnum.BOILERPLATE) {
-        console.log("boiler plate!");
-        //editModeOn = true;
-    } else {
-        console.log("not boiler plate");
-        for (let letterElement of this.letterElements) {
-            if (letterElement.key === key) {
-                console.log("got it! ", letterElement);
-                text = letterElement.description;
-                editModeOn = false;
-            }
-        }
-    }
-
     let numElements: number = this.elements.length;
     let maxId: number = 0;
     // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
@@ -170,19 +179,23 @@ addElement(key: string) {
             text: text,
             key: key,
             isNew: true,
-            editModeOn: editModeOn
+            editModeOn: true
         }
     );
     this.resetOrderProperty();
     console.log(this.elements);
 }
 
-get letterElement() {
-    return "LetterTextArea";
+letterElement(key: string) {
+    if (key === LetterElementEnum.BOILERPLATE) {
+        return "LetterTextArea";
+    } else {
+        return "StaticLetterElement";
+    }
 }
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
-  mounted() {
+mounted() {
     axios
       .get("http://localhost:3000/letter-elements/")
       .then((response: AxiosResponse) => {
@@ -197,7 +210,7 @@ get letterElement() {
         .get("http://localhost:3000/letter-data/" + this.$route.params.id)
         .then((response: AxiosResponse) => {
             console.log(response);
-            let localElements: TextBoxItemType[] = [];
+            let localElements: LetterElementType[] = [];
             response.data.elements.forEach((element: any) => {
                 localElements.push(element);
             });

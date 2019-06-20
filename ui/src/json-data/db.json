@@ -57,10 +57,22 @@
                     "text": ""
                 },
                 {
-                    "id": 5,
+                    "id": 8,
                     "order": 4,
+                    "key": "boilerplate",
+                    "text": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                },
+                {
+                    "id": 5,
+                    "order": 5,
                     "key": "boolean-calculation-results",
                     "text": ""
+                },
+                {
+                    "id": 9,
+                    "order": 8,
+                    "key": "boilerplate",
+                    "text": "Some wrap-up text, urls, etc."
                 }
             ]
         },
