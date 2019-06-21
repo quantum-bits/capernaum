@@ -49,6 +49,12 @@ export default class NavDrawer extends Vue {
         route: "letters",
         icon: "email",
         divider: true
+      },
+      {
+        title: "Boolean Association Tables",
+        route: "boolean-associations",
+        icon: "book",
+        divider: true
       }
     ];
   }

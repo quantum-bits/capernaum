@@ -159,5 +159,58 @@
             ]
         }
     ],
-    "profile": { "name": "typicode" }
+    "boolean-associations": [
+        { 
+            "id": 1,
+            "title": "General (<2019)",
+            "lastUpdate": "2018-03-25",
+            "surveyId": 1,
+            "surveyTitle": "Christian Life Survey",
+            "isActive": false,
+            "isFrozen": false,
+            "scriptureEngagementPractices": [
+                { 
+                    "id": 1, 
+                    "title": "Spirit-led", 
+                    "spiritualFociOrientationIds": [1, 3, 6] 
+                },
+                { 
+                    "id": 2, 
+                    "title": "Journaling", 
+                    "spiritualFociOrientationIds": [2, 3, 4] 
+                },
+                { 
+                    "id": 3, 
+                    "title": "Memorize", 
+                    "spiritualFociOrientationIds": [1, 2, 3, 5] 
+                }
+            ]
+        },
+        { 
+            "id": 2,
+            "title": "Millenials (2019-21)",
+            "lastUpdate": "2018-04-25",
+            "surveyId": 2,
+            "surveyTitle": "Christian Life Survey for College Students",
+            "isActive": true,
+            "isFrozen": true,
+            "scriptureEngagementPractices": [
+                { 
+                    "id": 1, 
+                    "title": "Spirit-led", 
+                    "spiritualFociOrientationIds": [1, 2, 3, 6] 
+                },
+                { 
+                    "id": 2, 
+                    "title": "Journaling", 
+                    "spiritualFociOrientationIds": [1, 2, 4] 
+                },
+                { 
+                    "id": 3, 
+                    "title": "Memorize", 
+                    "spiritualFociOrientationIds": [1, 2, 4, 5] 
+                }
+            ]
+        }
+    ]        
   }

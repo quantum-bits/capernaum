@@ -24,6 +24,11 @@ export default new Router({
       component: () => import("./pages/Letters.vue")
     },
     {
+      path: "/boolean-associations",
+      name: "boolean-associations",
+      component: () => import("./pages/BooleanAssociations.vue")
+    },
+    {
       path: "/compose/:id?",
       name: "compose",
       component: () => import("./pages/Compose.vue")
