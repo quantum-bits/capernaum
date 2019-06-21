@@ -1,4 +1,6 @@
-interface CreateResponseData {
+import { SurveyMetadata } from "./qualtrics.models";
+
+export interface CreateResponseData {
   format: string;
   startDate?: string;
   endDate?: string;
@@ -13,7 +15,7 @@ interface QualtricsResponse {
 
 type ResponseExportStatus = "inProgress" | "complete" | "failed";
 
-interface CreateResponseExportResponse extends QualtricsResponse {
+export interface CreateResponseExportResponse extends QualtricsResponse {
   result: {
     progressId: string;
     percentComplete: number;
@@ -21,7 +23,7 @@ interface CreateResponseExportResponse extends QualtricsResponse {
   };
 }
 
-interface ResponseExportProgress extends QualtricsResponse {
+export interface ResponseExportProgress extends QualtricsResponse {
   result: {
     percentComplete: number;
     status: ResponseExportStatus;
@@ -29,7 +31,7 @@ interface ResponseExportProgress extends QualtricsResponse {
   };
 }
 
-interface GetOrganizationResponse extends QualtricsResponse {
+export interface GetOrganizationResponse extends QualtricsResponse {
   result: {
     id: string;
     name: string;
@@ -42,23 +44,14 @@ interface GetOrganizationResponse extends QualtricsResponse {
   };
 }
 
-interface ListSurveysResponse extends QualtricsResponse {
+export interface ListSurveysResponse extends QualtricsResponse {
   result: {
-    elements: [
-      {
-        id: string;
-        name: string;
-        ownerId: string;
-        lastModified: string;
-        creationDate: string;
-        isActive: boolean;
-      }
-    ];
-    nextPage: string;
+    elements: SurveyMetadata[];
+    nextPage: string | null;
   };
 }
 
-interface GetSurveyResponse extends QualtricsResponse {
+export interface GetSurveyResponse extends QualtricsResponse {
   result: {
     id: string;
     name: string;
@@ -70,11 +63,11 @@ interface GetSurveyResponse extends QualtricsResponse {
     expiration: {
       startDate: string | null;
       endDate: string | null;
-    }
+    };
     questions: object;
     exportColumnMap: object;
     blocks: object;
     flow: object;
     embeddedData: object;
-  }
+  };
 }

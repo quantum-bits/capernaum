@@ -5,11 +5,21 @@ import {
   normalizeDateTime,
   sleep
 } from "./helpers";
+import {
+  GetSurveyResponse,
+  ListSurveysResponse,
+  GetOrganizationResponse,
+  CreateResponseExportResponse,
+  ResponseExportProgress,
+  CreateResponseData
+} from "./qualtrics.types";
+import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
 const apiDebug = debug("api");
 
-export default class QualtricsAPI {
+@Injectable()
+export class QualtricsService {
   base_url: string = "";
   api_token: string = "";
 
@@ -29,11 +39,11 @@ export default class QualtricsAPI {
 
   private makeUrl(...segments: string[]) {
     segments.unshift(this.base_url);
-    return segments.join("/");
+    return new URL(segments.join("/"));
   }
 
-  private async get<T>(url: string, moreConfig: object = {}) {
-    return axios.get<T>(url, {
+  private async get<T>(url: URL, moreConfig: object = {}) {
+    return axios.get<T>(url.href, {
       headers: {
         "x-api-token": this.api_token
       },
@@ -41,8 +51,8 @@ export default class QualtricsAPI {
     });
   }
 
-  private async post<T>(url: string, data: object) {
-    return axios.post<T>(url, data, {
+  private async post<T>(url: URL, data: object) {
+    return axios.post<T>(url.href, data, {
       headers: {
         "x-api-token": this.api_token
       }
@@ -54,8 +64,12 @@ export default class QualtricsAPI {
     return this.get<GetSurveyResponse>(this.makeUrl("surveys", surveyId));
   }
 
-  async listSurveys() {
-    return this.get<ListSurveysResponse>(this.makeUrl("surveys"));
+  async listSurveys(offset: string = undefined) {
+    const url = this.makeUrl("surveys");
+    if (offset) {
+      url.searchParams.set("offset", offset);
+    }
+    return this.get<ListSurveysResponse>(url);
   }
 
   /** Get an organization's details. */

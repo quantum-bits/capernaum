@@ -1,5 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../qualtrics/qualtrics.client";
+import { QualtricsService } from "../../qualtrics/qualtrics.service";
 
 interface ListSurveysResult {
   id: string;
@@ -16,7 +16,7 @@ const enum SubCommand {
   Complete = "complete"
 }
 
-export default class Response extends Command {
+export default class ResponseCommand extends Command {
   static description = "get survey response(s)";
 
   static args = [
@@ -53,8 +53,8 @@ export default class Response extends Command {
   };
 
   async run() {
-    const api = new QualtricsAPI();
-    const { args, flags } = this.parse(Response);
+    const api = new QualtricsService();
+    const { args, flags } = this.parse(ResponseCommand);
 
     switch (args.subcommand) {
       case SubCommand.Create:

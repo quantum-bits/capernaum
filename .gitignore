@@ -3,3 +3,4 @@ private/
 .env
 /dist
 /lib
+server/dist

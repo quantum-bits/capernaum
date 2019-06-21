@@ -1,7 +1,11 @@
 import { ObjectType, Field } from "type-graphql";
 
 @ObjectType()
-export class Survey {
-    @Field()
-    title: string;
+export class SurveyMetadata {
+  @Field() id: string;
+  @Field() name: string;
+  @Field() ownerId: string;
+  @Field() lastModified: string;
+  @Field() creationDate: string;
+  @Field() isActive: boolean;
 }

@@ -1,23 +1,16 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../qualtrics/qualtrics.client";
+import { QualtricsService } from "../../qualtrics/qualtrics.service";
 import chalk from "chalk";
 import { table } from "table";
 import { format, parse, compareAsc } from "date-fns";
-
-interface ListSurveysResult {
-  id: string;
-  isActive: boolean;
-  lastModified: string;
-  name: string;
-  ownerId: string;
-}
+import { SurveyMetadata } from "../../qualtrics/qualtrics.models";
 
 const enum SubCommand {
   Get = "get",
   List = "list"
 }
 
-export default class Survey extends Command {
+export default class SurveyCommand extends Command {
   static description = "get survey details";
 
   static args = [
@@ -41,8 +34,8 @@ export default class Survey extends Command {
   };
 
   async run() {
-    const api = new QualtricsAPI();
-    const { args, flags } = this.parse(Survey);
+    const api = new QualtricsService();
+    const { args, flags } = this.parse(SurveyCommand);
 
     switch (args.subcommand) {
       case SubCommand.Get:
@@ -55,15 +48,15 @@ export default class Survey extends Command {
         break;
       case SubCommand.List:
         api.listSurveys().then(response => {
-          const elements: ListSurveysResult[] = response.data.result.elements;
+          const elements: SurveyMetadata[] = response.data.result.elements;
           const headers = ["Id", "Name", "Last Modified"].map(hdr =>
             chalk.greenBright(hdr)
           );
           const data = [[...headers]];
           const sortFn = flags["by-date"]
-            ? (a: ListSurveysResult, b: ListSurveysResult) =>
+            ? (a: SurveyMetadata, b: SurveyMetadata) =>
                 compareAsc(parse(a.lastModified), parse(b.lastModified))
-            : (a: ListSurveysResult, b: ListSurveysResult) =>
+            : (a: SurveyMetadata, b: SurveyMetadata) =>
                 a.name.localeCompare(b.name);
           elements.sort(sortFn).map(elt => {
             const { id, name, lastModified } = elt;
