@@ -4,6 +4,15 @@
       { "id": 2, "title": "Journaling", "info": "some information about journaling" },
       { "id": 3, "title": "Memorize", "info": "some information about memorization" }
     ],
+    "spiritual-foci-orientations": [
+        {"id": 1, "order": 1, "abbr": "FOG", "title": "A Focus on God"},
+        {"id": 2, "order": 2, "abbr": "FOB", "title": "A Focus on the Bible"},
+        {"id": 3, "order": 3, "abbr": "FOO", "title": "A Focus on Others"},
+        {"id": 4, "order": 4, "abbr": "Connected", "title": "Connected"},
+        {"id": 5, "order": 5, "abbr": "Reflective", "title": "Reflective"},
+        {"id": 6, "order": 6, "abbr": "Evangelism", "title": "Evangelism"},
+        {"id": 7, "order": 7, "abbr": "Service", "title": "Service"}
+    ],
     "letter-elements": [
         {
             "key": "boilerplate",
@@ -107,7 +116,7 @@
                     "textDelta": {
                         "ops": [
                             {
-                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                              "insert": "Some closing text...."
                             }
                         ]
                     }
@@ -130,7 +139,7 @@
                     "textDelta": {
                         "ops": [
                             {
-                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                                "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
                             }
                         ]
                       }                
@@ -142,7 +151,7 @@
                     "textDelta": {
                         "ops": [
                             {
-                              "insert": "People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing:"
+                                "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
                             }
                         ]
                     }                
