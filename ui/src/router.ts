@@ -34,6 +34,11 @@ export default new Router({
       component: () => import("./pages/Compose.vue")
     },
     {
+      path: "/associate/:id?",
+      name: "associate",
+      component: () => import("./pages/AssociateFociPractice.vue")
+    },
+    {
       path: "/about-more",
       name: "about-more",
       component: () => import("./pages/About.vue")

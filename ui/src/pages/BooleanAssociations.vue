@@ -8,7 +8,7 @@
         <v-btn
             color="primary"
             dark
-            @click="newLetter"
+            @click="newAssociationTable"
             >
             New Association Table
         </v-btn>
@@ -31,7 +31,7 @@
               </span>
             </td>
             <td class="text-xs-right">
-              <button v-on:click="viewLetter(props.item)">View</button>
+              <button v-on:click="viewAssociationTable(props.item)">View</button>
             </td>
           </template>
         </v-data-table>
@@ -63,12 +63,12 @@ export default class BooleanAssociations extends Vue {
 
   booleanAssociationSummary: any = [];
 
-  viewLetter(item: any) {
-    this.$router.push({ name: "compose", params: { id: item.id } });
+  viewAssociationTable(item: any) {
+    this.$router.push({ name: "associate", params: { id: item.id } });
   }
 
-  newLetter() {
-    this.$router.push({ name: "compose" });
+  newAssociationTable() {
+    this.$router.push({ name: "associate" });
   }
 
   mounted() {
