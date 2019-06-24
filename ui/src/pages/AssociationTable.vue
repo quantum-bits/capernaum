@@ -266,7 +266,7 @@ mounted() {
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
         this.editModeOn = true;
-        this.tableEditModeOn = true;
+        this.tableEditModeOn = false;
         this.isNew = true;
         axios
             .get("http://localhost:3000/scripture-engagement-practices/")
