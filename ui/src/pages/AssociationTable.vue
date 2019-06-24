@@ -45,30 +45,82 @@
             </LetterInfoForm>
         </div>
 
-    <v-layout row wrap>
-        <v-flex xs10 offset-xs1>
+    <v-layout v-if="!tableEditModeOn" row wrap>
+        <v-flex xs9>
             <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
         </v-flex>
-        
-        <v-data-table
-            :headers="headers"
-            :items="tableData"
-            class="elevation-1"
-        >
-        <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
-            <template slot="items" slot-scope="myprops">
-                <td v-for="header in headers" :key="header.value" class="text-xs-center">
-                    <span v-if="header.value === 'practice'">
-                        {{ myprops.item[header.value] }}
-                    </span>
-                    <span v-else>
-                        <v-icon v-if="myprops.item[header.value]" color="success">check_circle</v-icon>
-                    </span>
-                </td>
-            </template>
-        </v-data-table>
-        
+        <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
+            <v-btn
+                color="primary"
+                dark
+                @click="editTable"
+                >
+                Edit Table
+            </v-btn>
+        </v-flex>
+        <v-flex xs12>
+            <v-data-table
+                :headers="headers"
+                :items="tableData"
+                :rows-per-page-items="rowsPerPageItems"
+                class="elevation-1"
+            >
+            <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
+                <template slot="items" slot-scope="myprops">
+                    <td v-for="header in headers" :key="header.value" class="text-xs-center">
+                        <span v-if="header.value === 'practice'">
+                            {{ myprops.item[header.value] }}
+                        </span>
+                        <span v-else>
+                            <v-icon v-if="myprops.item[header.value]" color="success">check_circle</v-icon>
+                        </span>
+                    </td>
+                </template>
+            </v-data-table>
+        </v-flex>
     </v-layout>
+
+    <v-layout v-if="tableEditModeOn" row wrap>
+        <v-flex xs9>
+            <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
+        </v-flex>
+        <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
+            <v-btn
+                color="success"
+                dark
+                @click="saveTableEdits"
+                >
+                Save Table Edits
+            </v-btn>
+        </v-flex>
+        <v-flex xs12>
+            <v-data-table
+                :headers="headers"
+                :items="tableData"
+                :rows-per-page-items="rowsPerPageItems"
+                class="elevation-1"
+            >
+            <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
+                <template slot="items" slot-scope="myprops">
+                    <td v-for="header in headers" :key="header.value" class="text-xs-center">
+                        <span v-if="header.value === 'practice'">
+                            {{ myprops.item[header.value] }}
+                        </span>
+                        <span v-else>
+                            <!-- note: deleted :input-value="myprops.item[header.value]", since it seemed superfluous with the addition of v-model -->
+                            <v-checkbox
+                                v-model="myprops.item[header.value]"
+                                color="primary"
+                                hide-details
+                                @change="onCheckboxChange"
+                            ></v-checkbox>
+                        </span>
+                    </td>
+                </template>
+            </v-data-table>
+        </v-flex>
+    </v-layout>
+
 
   </v-container>
 </template>
@@ -90,13 +142,21 @@ import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from 
 })
 export default class AssociationTable extends Vue {
 
+rowsPerPageItems: any = [
+    15,
+    30,
+    {"text":"$vuetify.dataIterator.rowsPerPageAll","value":-1}
+]
+
 spiritualFociOrientations: any = [];
 data: any = [];
 tableColumns: any = [];
 tableData: any = [];
 headers: any = [];
 
-isNew: boolean = false; // true if this is a new letter
+tableEditModeOn: boolean = false;
+
+isNew: boolean = false; // true if this is a new table association
 editModeOn: boolean = false;
 title: string = '';
 surveyTitle: string = '';
@@ -190,6 +250,21 @@ saveInfo() {
     this.editModeOn = false;
 }
 
+editTable() {
+    this.tableEditModeOn = true;
+}
+
+saveTableEdits() {
+    // save edits to db....
+    this.tableEditModeOn = false;
+    // the header value (e.g., "column-1", "column-2") contains the db key at the end...probably not the best way to store this
+    // the vuetify table seems to want a list of keys to iterate through; could look at the approach that explicitly uses <tr></tr>
+
+}
+
+onCheckboxChange() {
+    console.log(this.tableData);
+}
 constructTable() {
     axios
         .get("http://localhost:3000/spiritual-foci-orientations/")
