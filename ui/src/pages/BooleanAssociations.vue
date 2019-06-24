@@ -64,11 +64,11 @@ export default class BooleanAssociations extends Vue {
   booleanAssociationSummary: any = [];
 
   viewAssociationTable(item: any) {
-    this.$router.push({ name: "associate", params: { id: item.id } });
+    this.$router.push({ name: "association-table", params: { id: item.id } });
   }
 
   newAssociationTable() {
-    this.$router.push({ name: "associate" });
+    this.$router.push({ name: "association-table" });
   }
 
   mounted() {

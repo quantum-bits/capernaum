@@ -50,7 +50,24 @@
             <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
         </v-flex>
         
-    
+        <v-data-table
+            :headers="headers"
+            :items="tableData"
+            class="elevation-1"
+        >
+        <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
+            <template slot="items" slot-scope="myprops">
+                <td v-for="header in headers" :key="header.value" class="text-xs-center">
+                    <span v-if="header.value === 'practice'">
+                        {{ myprops.item[header.value] }}
+                    </span>
+                    <span v-else>
+                        <v-icon v-if="myprops.item[header.value]" color="success">check_circle</v-icon>
+                    </span>
+                </td>
+            </template>
+        </v-data-table>
+        
     </v-layout>
 
   </v-container>
@@ -71,7 +88,13 @@ import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from 
 @Component({
   components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
 })
-export default class AssociateFociPractice extends Vue {
+export default class AssociationTable extends Vue {
+
+spiritualFociOrientations: any = [];
+data: any = [];
+tableColumns: any = [];
+tableData: any = [];
+headers: any = [];
 
 isNew: boolean = false; // true if this is a new letter
 editModeOn: boolean = false;
@@ -167,6 +190,64 @@ saveInfo() {
     this.editModeOn = false;
 }
 
+constructTable() {
+    axios
+        .get("http://localhost:3000/spiritual-foci-orientations/")
+        .then((response: AxiosResponse) => {
+            this.tableColumns = _.orderBy(response.data,"order");
+            console.log('columns: ', this.tableColumns);
+            // construct rows of data table
+
+            // this.value.toLowerCase().replace(/\s/g, '')
+            // https://stackoverflow.com/questions/43208487/strip-spaces-and-make-string-lowercase-with-javascript?noredirect=1&lq=1
+            // either construct a column "key" from the column name (hopefully unique, but could be a problem), or use the
+            // id of the column and put that together with a string (e.g., keyName = 'column'+id)
+
+
+
+
+
+            let obj: any = {};
+            let key1: string = 'keyname';
+            obj[key1] = 'new val!';
+            console.log('object: ', obj);
+            // construct headers for data table
+            this.headers.push({
+                text: 'SE Practice',
+                align: 'left',
+                sortable: true,
+                value: 'practice'
+            });
+            for (let col of this.tableColumns) {
+                this.headers.push({
+                    text: col.abbr,
+                    align: 'left',
+                    sortable: true,
+                    value: 'column-'+col.id
+                });
+            }
+
+            let newDataRowObject: any = {};
+            let colKey: string = '';
+            for (let row of this.data) {
+                newDataRowObject = {};
+                newDataRowObject.practice = row.title;
+                for (let column of this.tableColumns) {
+                    newDataRowObject['column-'+column.id] = row.spiritualFociOrientationIds.includes(column.id);
+                }
+                this.tableData.push(newDataRowObject);
+            }
+
+
+            
+            
+            console.log('table: ', this.tableData);
+                
+        
+            console.log('headers: ', this.headers);
+        });
+}
+
 viewPDF() {
     console.log('view sample pdf....');
 }
@@ -185,26 +266,26 @@ mounted() {
         this.isNew = true;
     } else {
       axios
-        .get("http://localhost:3000/letter-data/" + this.$route.params.id)
+        .get("http://localhost:3000/boolean-associations/" + this.$route.params.id)
         .then((response: AxiosResponse) => {
             console.log(response);
-            let localElements: LetterElementType[] = [];
-            response.data.elements.forEach((element: any) => {
-                localElements.push(element);
+            let scriptureEngagementPractices: any = [];
+            response.data.scriptureEngagementPractices.forEach((practice: any) => {
+                scriptureEngagementPractices.push(practice);
             });
-            this.elements = _.orderBy(localElements,"order");
-            // add two convenience properties to the elements....
-            for (let box of this.elements) {
-                box.editModeOn = false;
-                box.isNew = false;
+            // add a convenience property to each row of data....
+            for (let row of scriptureEngagementPractices) {
+                row.editModeOn = false;
             }
-            this.resetOrderProperty();
+            this.data = _.orderBy(scriptureEngagementPractices,"order");
+            console.log('data for table rows: ', this.data);
             this.title = response.data.title;
             this.surveyTitle = response.data.surveyTitle;
             this.lastUpdate = response.data.lastUpdate;
             this.id = response.data.id;
             this.surveyId = response.data.surveyId;
             this.isFrozen = response.data.isFrozen;
+            this.constructTable();
         }); 
     }
   }
