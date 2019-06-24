@@ -72,7 +72,7 @@
                             {{ myprops.item[header.value] }}
                         </span>
                         <span v-else>
-                            <v-icon v-if="myprops.item[header.value]" color="success">check_circle</v-icon>
+                            <v-icon v-if="myprops.item.spiritualFocusOrientationIdDict[header.value]" color="success">check_circle</v-icon>
                         </span>
                     </td>
                 </template>
@@ -109,7 +109,7 @@
                         <span v-else>
                             <!-- note: deleted :input-value="myprops.item[header.value]", since it seemed superfluous with the addition of v-model -->
                             <v-checkbox
-                                v-model="myprops.item[header.value]"
+                                v-model="myprops.item.spiritualFocusOrientationIdDict[header.value]"
                                 color="primary"
                                 hide-details
                                 @change="onCheckboxChange"
@@ -136,6 +136,7 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
+import { ScriptureEngagementPractice, TableData, SpiritualFocusOrientation, AssociationTableHeader } from "./association-table.types";
 
 @Component({
   components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
@@ -148,11 +149,9 @@ rowsPerPageItems: any = [
     {"text":"$vuetify.dataIterator.rowsPerPageAll","value":-1}
 ]
 
-spiritualFociOrientations: any = [];
-data: any = [];
-tableColumns: any = [];
-tableData: any = [];
-headers: any = [];
+tableColumns: SpiritualFocusOrientation[] = [];
+tableData: TableData[] = [];
+headers: AssociationTableHeader[] = [];
 
 tableEditModeOn: boolean = false;
 
@@ -163,83 +162,8 @@ surveyTitle: string = '';
 surveyId: number = -1;
 lastUpdate: string = '';
 id: number = -1;
-elements: LetterElementType[] = [];
-letterElements: LetterElementMenuItemType[] = [];
+
 isFrozen: boolean = false;
-
-moveUp(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log("move up!", index);
-    let element: LetterElementType = this.elements[index];
-    this.elements.splice(index,1);
-    this.elements.splice(index - 1,0,element);
-    this.resetOrderProperty();
-    console.log(this.elements);
-}
-
-moveDown(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log("move down!", index);
-    let element: LetterElementType = this.elements[index+1];
-    this.elements.splice(index + 1,1);
-    this.elements.splice(index,0,element);
-    this.resetOrderProperty();
-    console.log(this.elements);
-}
-
-deleteElement(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log('delete!', index);
-    this.elements.splice(index,1);
-    this.resetOrderProperty();
-    console.log(this.elements);
-}
-
-resetOrderProperty() {
-    // cycles through the elements array and resets the 'order' property to reflect the current ordering of the text boxes
-    for (let i = 0; i < this.elements.length; i++ ){
-        this.elements[i].order = i;
-    }
-  }
-
-addElement(key: string) {
-    console.log("add: ", key);
-    let numElements: number = this.elements.length;
-    let maxId: number = 0;
-    // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
-    for (let box of this.elements) {
-        if (box.id > maxId) {
-            maxId = box.id;
-        }
-    }
-    maxId = maxId + 1;
-    this.elements.push(
-        {
-            id: maxId,//will eventually get assigned a value by the server, but use this value as a key for now....
-            order: numElements,
-            textDelta: {
-                        ops: [
-                            {
-                              insert: ""
-                            }
-                        ]
-                    },
-            key: key,
-            isNew: true,
-            editModeOn: true
-        }
-    );
-    this.resetOrderProperty();
-    console.log(this.elements);
-}
-
-letterElement(key: string) {
-    if (key === LetterElementEnum.BOILERPLATE) {
-        return "LetterTextArea";
-    } else {
-        return "StaticLetterElement";
-    }
-}
 
 toggleEditMode() {
     this.editModeOn = true;
@@ -257,20 +181,48 @@ editTable() {
 saveTableEdits() {
     // save edits to db....
     this.tableEditModeOn = false;
-    // the header value (e.g., "column-1", "column-2") contains the db key at the end...probably not the best way to store this
-    // the vuetify table seems to want a list of keys to iterate through; could look at the approach that explicitly uses <tr></tr>
-
+    //console.log(this.tableData);
+    let scriptureEngagementPracticeData: ScriptureEngagementPractice[] = [];
+    let spiritualFocusOrientationIds: number[] = [];
+    for (let tableRow of this.tableData) {
+        spiritualFocusOrientationIds = [];
+        //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
+        Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
+            ([key, value]) => {
+                //console.log(key, value);
+                if (value) {
+                    // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
+                    // (e.g., "columnId-2" means the focus/orientation id is 2);
+                    // if the value is true, the id is harvested from the key and saved to an array
+                    let id: number = +key.split("columnId-")[1];
+                    spiritualFocusOrientationIds.push(id);
+                }
+            }
+        );
+        scriptureEngagementPracticeData.push({
+            id: tableRow.practiceId,
+            order: tableRow.practiceOrder,
+            title: tableRow.practice,
+            spiritualFocusOrientationIds: spiritualFocusOrientationIds
+        });
+    }
+    console.log('data ready to be saved: ', scriptureEngagementPracticeData);
 }
 
 onCheckboxChange() {
-    console.log(this.tableData);
+    //console.log(this.tableData);
+    //could use this to save data every time a change is made....
 }
-constructTable() {
+constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
+    // the data come in from the db in ScriptureEngagementPractice[] format, but we need to create a new
+    // data type (TableData) in order to display the data conveniently in a table; when we go to save the data, we
+    // revert back to the ScriptureEngagementPractice[] data type; the source for truth (up to this point)
+    // in the page is this.tableData, which is of the TableData type
     axios
         .get("http://localhost:3000/spiritual-foci-orientations/")
         .then((response: AxiosResponse) => {
             this.tableColumns = _.orderBy(response.data,"order");
-            console.log('columns: ', this.tableColumns);
+            //console.log('columns: ', this.tableColumns);
             // construct rows of data table
 
             // this.value.toLowerCase().replace(/\s/g, '')
@@ -278,14 +230,6 @@ constructTable() {
             // either construct a column "key" from the column name (hopefully unique, but could be a problem), or use the
             // id of the column and put that together with a string (e.g., keyName = 'column'+id)
 
-
-
-
-
-            let obj: any = {};
-            let key1: string = 'keyname';
-            obj[key1] = 'new val!';
-            console.log('object: ', obj);
             // construct headers for data table
             this.headers.push({
                 text: 'SE Practice',
@@ -298,34 +242,30 @@ constructTable() {
                     text: col.abbr,
                     align: 'left',
                     sortable: true,
-                    value: 'column-'+col.id
+                    value: 'columnId-'+col.id
                 });
             }
 
             let newDataRowObject: any = {};
             let colKey: string = '';
-            for (let row of this.data) {
+            let idDict: any = {};
+            for (let row of scriptureEngagementPractices) {
                 newDataRowObject = {};
                 newDataRowObject.practice = row.title;
+                newDataRowObject.practiceId = row.id; // added so that we can figure out which practice this is when we go to save the data
+                newDataRowObject.practiceOrder = row.order; // added so we know the original ordering...not sure if we will allow this to change
+                idDict = {};
                 for (let column of this.tableColumns) {
-                    newDataRowObject['column-'+column.id] = row.spiritualFociOrientationIds.includes(column.id);
+                    idDict['columnId-'+column.id] = row.spiritualFocusOrientationIds.includes(column.id);
                 }
+                newDataRowObject.spiritualFocusOrientationIdDict = idDict;
                 this.tableData.push(newDataRowObject);
             }
-
-
-            
-            
             console.log('table: ', this.tableData);
-                
-        
             console.log('headers: ', this.headers);
         });
 }
 
-viewPDF() {
-    console.log('view sample pdf....');
-}
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
 mounted() {
     axios
@@ -343,24 +283,19 @@ mounted() {
       axios
         .get("http://localhost:3000/boolean-associations/" + this.$route.params.id)
         .then((response: AxiosResponse) => {
-            console.log(response);
-            let scriptureEngagementPractices: any = [];
+            //console.log(response);
+            let scriptureEngagementPractices: ScriptureEngagementPractice[] = [];
             response.data.scriptureEngagementPractices.forEach((practice: any) => {
                 scriptureEngagementPractices.push(practice);
             });
-            // add a convenience property to each row of data....
-            for (let row of scriptureEngagementPractices) {
-                row.editModeOn = false;
-            }
-            this.data = _.orderBy(scriptureEngagementPractices,"order");
-            console.log('data for table rows: ', this.data);
+            scriptureEngagementPractices = _.orderBy(scriptureEngagementPractices,"order");
             this.title = response.data.title;
             this.surveyTitle = response.data.surveyTitle;
             this.lastUpdate = response.data.lastUpdate;
             this.id = response.data.id;
             this.surveyId = response.data.surveyId;
             this.isFrozen = response.data.isFrozen;
-            this.constructTable();
+            this.constructTable(scriptureEngagementPractices);
         }); 
     }
   }
