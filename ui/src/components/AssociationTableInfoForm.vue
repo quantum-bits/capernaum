@@ -1,9 +1,9 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12 sm11 offset-sm1>
-      <h2 class="title font-weight-regular mb-3">Letter Information:</h2>
+    <v-flex xs12 sm12>
+      <h2 class="title font-weight-regular mb-3">Association Table Information:</h2>
     </v-flex>
-    <v-flex xs12 sm6 offset-sm2>
+    <v-flex xs12 sm8 offset-sm1>
         <v-form
             ref="form"
             v-model="valid"
@@ -13,7 +13,7 @@
                 v-model="title"
                 :counter="80"
                 :rules="nameRules"
-                label="Title of Letter"
+                label="Title of Association Table"
                 required
             ></v-text-field>
             <v-select

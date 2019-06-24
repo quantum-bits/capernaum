@@ -1,18 +1,18 @@
 <template>
   <v-container>
       <v-layout v-if="isFrozen" class="mb-3">
-        <v-flex xs10 offset-xs1>
+        <v-flex xs12>
                 <v-alert
                     :value="true"
                     type="info"
                 >
-                    Note that this letter has been frozen -- it is no longer editable.
+                    Note that this association table has been frozen -- it is no longer editable.
                 </v-alert>
         </v-flex>
       </v-layout>
         <div v-if="!editModeOn">
             <v-layout row wrap>
-                <v-flex xs7 offset-xs1>
+                <v-flex xs8>
                     <h1 class="headline mb-3">{{ title }}</h1>
                     <h2 class="title font-weight-regular mb-1">
                     Survey:
@@ -23,10 +23,11 @@
                     <span class="font-weight-light">{{ lastUpdate }}</span>
                     </h2>
                 </v-flex>
-                <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
+                <v-flex v-if="!isFrozen" xs4 class="text-xs-right">
                     <v-btn
                         color="primary"
-                        dark
+                        :disabled="tableEditModeOn"
+                        :dark="!tableEditModeOn"
                         @click="toggleEditMode"
                         >
                         Edit
@@ -35,14 +36,14 @@
             </v-layout>
         </div>
         <div v-else>
-            <LetterInfoForm
+            <AssociationTableInfoForm
             :id="id"
             :initialTitle="title"
             :initialSurveyId="surveyId"
             :isNew="isNew"
             v-on:save-info="saveInfo" 
             >
-            </LetterInfoForm>
+            </AssociationTableInfoForm>
         </div>
 
     <v-layout v-if="!tableEditModeOn" row wrap>
@@ -52,7 +53,8 @@
         <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
             <v-btn
                 color="primary"
-                dark
+                :disabled="editModeOn"
+                :dark="!editModeOn"
                 @click="editTable"
                 >
                 Edit Table
@@ -131,15 +133,15 @@ import axios from "axios";
 import { AxiosResponse } from "axios";
 import _ from "lodash";
 
-import LetterTextArea from "../components/LetterTextArea.vue";
-import StaticLetterElement from "../components/StaticLetterElement.vue";
-import LetterInfoForm from "../components/LetterInfoForm.vue";
+//import LetterTextArea from "../components/LetterTextArea.vue";
+//import StaticLetterElement from "../components/StaticLetterElement.vue";
+import AssociationTableInfoForm from "../components/AssociationTableInfoForm.vue";
 
-import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
+//import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
 import { ScriptureEngagementPractice, TableData, SpiritualFocusOrientation, AssociationTableHeader } from "./association-table.types";
 
 @Component({
-  components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
+  components: { AssociationTableInfoForm }
 })
 export default class AssociationTable extends Vue {
 
@@ -222,14 +224,6 @@ constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
         .get("http://localhost:3000/spiritual-foci-orientations/")
         .then((response: AxiosResponse) => {
             this.tableColumns = _.orderBy(response.data,"order");
-            //console.log('columns: ', this.tableColumns);
-            // construct rows of data table
-
-            // this.value.toLowerCase().replace(/\s/g, '')
-            // https://stackoverflow.com/questions/43208487/strip-spaces-and-make-string-lowercase-with-javascript?noredirect=1&lq=1
-            // either construct a column "key" from the column name (hopefully unique, but could be a problem), or use the
-            // id of the column and put that together with a string (e.g., keyName = 'column'+id)
-
             // construct headers for data table
             this.headers.push({
                 text: 'SE Practice',
@@ -268,17 +262,28 @@ constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
 mounted() {
-    axios
-      .get("http://localhost:3000/letter-elements/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.letterElements = response.data;
-      });
     console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
         this.editModeOn = true;
+        this.tableEditModeOn = true;
         this.isNew = true;
+        axios
+            .get("http://localhost:3000/scripture-engagement-practices/")
+            .then((response: AxiosResponse) => {
+                console.log(response.data);
+                let scriptureEngagementPractices: ScriptureEngagementPractice[] = [];
+                response.data.forEach((practice: any) => {
+                    scriptureEngagementPractices.push({
+                        id: practice.id,
+                        order: practice.order,
+                        title: practice.title,
+                        spiritualFocusOrientationIds: []
+                    });
+                });
+                scriptureEngagementPractices = _.orderBy(scriptureEngagementPractices,"order");
+                this.constructTable(scriptureEngagementPractices);
+            });
     } else {
       axios
         .get("http://localhost:3000/boolean-associations/" + this.$route.params.id)
