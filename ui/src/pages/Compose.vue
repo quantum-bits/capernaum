@@ -16,7 +16,12 @@
                     <h1 class="headline mb-3">{{ title }}</h1>
                     <h2 class="title font-weight-regular mb-1">
                     Survey:
-                    <span class="font-weight-light">{{ surveyTitle }}</span>
+                    <span class="font-weight-light">{{ survey.title }}</span>
+                    </h2>
+                    <h2 class="title font-weight-regular mb-1">
+                    Boolean Association Table:
+                    <span v-if="booleanAssociation !== null" class="font-weight-light">{{ booleanAssociation.title }}</span>
+                    <span v-else class="font-weight-light"> None </span>
                     </h2>
                     <h2 class="title font-weight-regular mb-5">
                     Last Update:
@@ -38,7 +43,8 @@
             <LetterInfoForm
             :id="id"
             :initialTitle="title"
-            :initialSurveyId="surveyId"
+            :initialSurveyId="survey.id"
+            :initialBooleanAssociation="booleanAssociation"
             :isNew="isNew"
             v-on:save-info="saveInfo" 
             >
@@ -72,6 +78,7 @@
                     v-for="item in letterElements"
                     :key="item.key"
                     @click="addElement(item.key)"
+                    :disabled="itemDisabled(item.key)"
                     >
                     <v-list-tile-title>{{ item.description }}</v-list-tile-title>
                     </v-list-tile>
@@ -132,13 +139,16 @@
         Next:
             - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
             - might need to update the db every time a change is made (to the order, too)
-            - validation: https://vuejsdevelopers.com/2018/08/27/vue-js-form-handling-vuelidate/
 
             - ordering within categories for letters (order by survey, and then more ordering below this level)
-            - Quill to output json instead of html
+ 
 
             - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-            - add isFrozen and isActive flags to table
+
+            - if the letter contains the "SE strategies for user" element, and the boolean association 
+            table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+            the user should get a warning message or something)
+
     -->
   </v-container>
 </template>
@@ -154,6 +164,13 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
+import { BooleanAssociationBriefType } from "./association-table.types";
+
+// brief format, for data returned from the db
+interface SurveyTypeBrief {
+    id: number | null;
+    title: string;
+}
 
 @Component({
   components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
@@ -163,13 +180,16 @@ export default class Compose extends Vue {
 isNew: boolean = false; // true if this is a new letter
 editModeOn: boolean = false;
 title: string = '';
-surveyTitle: string = '';
-surveyId: number = -1;
+survey: SurveyTypeBrief = {
+    id: null,
+    title: ""
+}
 lastUpdate: string = '';
-id: number = -1;
+id: number | null = null;
 elements: LetterElementType[] = [];
 letterElements: LetterElementMenuItemType[] = [];
 isFrozen: boolean = false;
+booleanAssociation: BooleanAssociationBriefType | null = null;
 
 moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
@@ -237,6 +257,11 @@ addElement(key: string) {
     console.log(this.elements);
 }
 
+itemDisabled(key: string) {
+    console.log("key: ",key);
+    return (key === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS) && (this.booleanAssociation === null);
+}
+
 letterElement(key: string) {
     if (key === LetterElementEnum.BOILERPLATE) {
         return "LetterTextArea";
@@ -287,11 +312,14 @@ mounted() {
             }
             this.resetOrderProperty();
             this.title = response.data.title;
-            this.surveyTitle = response.data.surveyTitle;
+            this.survey = {
+                id: response.data.survey.id,
+                title: response.data.survey.title
+            };
             this.lastUpdate = response.data.lastUpdate;
             this.id = response.data.id;
-            this.surveyId = response.data.surveyId;
             this.isFrozen = response.data.isFrozen;
+            this.booleanAssociation = response.data.booleanAssociation;
         }); 
     }
   }

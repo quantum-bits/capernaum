@@ -17,13 +17,24 @@
                 required
             ></v-text-field>
             <v-select
-                v-model="select"
+                v-model="surveySelect"
                 :items="surveys"
                 item-text="surveyTitle"
                 item-value="id"
                 :rules="[v => !!v || 'Survey is required']"
                 label="Survey"
                 required
+                persistent-hint
+                return-object
+                single-line
+            />
+            <v-select
+                v-model="booleanAssociationSelect"
+                :items="booleanAssociations"
+                item-text="title"
+                item-value="id"
+                label="Boolean Association Table"
+                clearable
                 persistent-hint
                 return-object
                 single-line
@@ -46,9 +57,18 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
 
+import { BooleanAssociationBriefType } from "../pages/association-table.types";
+
 interface SurveyItemType {
     id: number; // id of the survey in our db
     title: string; // e.g., "Christian Life Survey"
+}
+
+// used for data returned from the db (for the list used in the drop-down)
+interface BooleanAssociationType {
+    id: number; // id of the association table in our db
+    title: string; // e.g., "General (<2019)"
+    [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
 }
 
 @Component({
@@ -60,9 +80,11 @@ export default class LetterInfoForm extends Vue {
     @Prop() id!: number;
     @Prop() initialTitle!: string;
     @Prop() initialSurveyId!: number;
+    @Prop({default: null}) initialBooleanAssociation!: BooleanAssociationBriefType | null;
     @Prop() isNew!: boolean;
 
     surveys: SurveyItemType[] = [];
+    booleanAssociations: BooleanAssociationType[] = [];
     title: string = this.initialTitle;
 
     valid: boolean = true;
@@ -72,11 +94,14 @@ export default class LetterInfoForm extends Vue {
         (v: any) => (v && v.length <= 80) || 'Title of letter must be less than 80 characters'
     ];
     
-    select: any = null;
+    surveySelect: any = null;
+    booleanAssociationSelect: any = null;
 
     submit() {
         if (this.$refs.form.validate()) {
           console.log('save info');
+          console.log('survey: ', this.surveySelect);
+          console.log('boolean association table: ', this.booleanAssociationSelect);
           this.saveInfo();
         }
     }
@@ -87,15 +112,29 @@ export default class LetterInfoForm extends Vue {
     }
 
     mounted() {
+        console.log('boolean association: ', this.initialBooleanAssociation);
         axios
             .get("http://localhost:3000/survey-data/")
             .then((response: AxiosResponse) => {
-                console.log(response);
+                console.log('surveys: ',response);
                 this.surveys = response.data;
                 if (!this.isNew){
                     for (let survey of this.surveys) {
                         if (survey.id === this.initialSurveyId) {
-                            this.select = survey;
+                            this.surveySelect = survey;
+                        }
+                    }
+                }
+            });
+        axios
+            .get("http://localhost:3000/boolean-associations/")
+            .then((response: AxiosResponse) => {
+                console.log(response);
+                this.booleanAssociations = response.data;
+                if (!this.isNew && (this.initialBooleanAssociation !== null)){
+                    for (let booleanAssociation of this.booleanAssociations) {
+                        if (booleanAssociation.id === this.initialBooleanAssociation.id) {
+                            this.booleanAssociationSelect = booleanAssociation;
                         }
                     }
                 }

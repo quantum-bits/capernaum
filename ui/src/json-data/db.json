@@ -50,10 +50,16 @@
             "id": 1,
             "title": "Christian Life Survey Follow-up Letter (Early 2020)",
             "lastUpdate": "2018-03-25",
-            "surveyId": 1,
-            "surveyTitle": "Christian Life Survey",
+            "survey": {
+                "id": 1,
+                "title": "Christian Life Survey"
+            },
             "isActive": false,
             "isFrozen": false,
+            "booleanAssociation": {
+                "id": 1,
+                "title": "General (<2019)"
+            },
             "elements": [
                 {
                     "id": 1,
@@ -127,10 +133,51 @@
             "id": 2,
             "title": "Christian Life Survey Letter for College Students (August, 2021)",
             "lastUpdate": "2019-01-31",
-            "surveyId": 2,
-            "surveyTitle": "Christian Life Survey for College Students",
+            "survey": {
+                "id": 2,
+                "title": "Christian Life Survey for College Students"
+            },
+            "isActive": false,
+            "isFrozen": false,
+            "booleanAssociation": null,
+            "elements": [
+                {
+                    "id": 1,
+                    "order": 1,
+                    "key": "boilerplate",
+                    "textDelta": {
+                        "ops": [
+                            {
+                                "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                            }
+                        ]
+                      }                
+                },
+                {
+                    "id": 2,
+                    "order": 2,
+                    "key": "boilerplate",
+                    "textDelta": {
+                        "ops": [
+                            {
+                                "insert": "Morbi placerat malesuada tortor sed mollis. Donec varius facilisis lectus et auctor. Donec posuere hendrerit sem. Etiam consequat scelerisque dictum. Aenean in neque lacinia, condimentum eros at, fringilla elit. Donec suscipit nunc a eros suscipit vehicula. Sed maximus orci quis libero consequat, sed malesuada libero varius. Ut consequat et erat in finibus."
+                            }
+                        ]
+                    }                
+                }
+            ]
+        },
+        { 
+            "id": 3,
+            "title": "Christian Life Survey Letter for College Students (August, 2021)",
+            "lastUpdate": "2019-01-31",
+            "survey": {
+                "id": 2,
+                "title": "Christian Life Survey for College Students"
+            },
             "isActive": true,
             "isFrozen": true,
+            "booleanAssociation": null,
             "elements": [
                 {
                     "id": 1,
