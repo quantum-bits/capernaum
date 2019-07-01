@@ -1,5 +1,5 @@
-query getSurveys {
-  surveys(includeInactive: $includeInactive = false) {
+query getSurveys($includeInactive: Boolean) {
+  surveys(includeInactive: $includeInactive) {
     id
     ownerId
     name

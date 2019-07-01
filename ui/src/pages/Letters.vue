@@ -2,15 +2,11 @@
   <v-container>
     <h1 class="headline mb-5">Survey Follow-up Letters</h1>
 
-    <v-data-table
-      :headers="headers"
-      :items="surveyLetterSummary"
-      class="elevation-1"
-    >
+    <v-data-table :headers="headers" :items="surveys" class="elevation-1">
       <template v-slot:items="props">
-        <td>{{ props.item.title }}</td>
-        <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
-        <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
+        <td>Letter Name Here</td>
+        <td class="text-xs-right">{{ props.item.lastModified }}</td>
+        <td class="text-xs-right">{{ props.item.name }}</td>
         <td class="text-xs-right">
           <button v-on:click="viewLetter(props.item)">View</button>
         </td>
@@ -76,11 +72,14 @@ import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
 
 @Component({
   apollo: {
-    surveyList: require("../graphql/getSurveys.gql")
+    surveys: {
+      query: require("../graphql/getSurveys.gql"),
+      variables: { includeInactive: true }
+    }
   }
 })
 export default class Letters extends Vue {
-  surveyList: any[] = [];
+  surveys: any[] = [];
 
   headers: any = [
     {
@@ -94,34 +93,9 @@ export default class Letters extends Vue {
     { text: "Action", sortable: false }
   ];
 
-  surveyLetterSummary: any = [];
-
   viewLetter(item: any) {
     console.log("view letter: ", item);
     this.$router.push({ name: "compose", params: { id: item.id } });
   }
-  /*
-  mounted() {
-    axios
-      //.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .get("http://localhost:3000/letter-data")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        response.data.map((val: any) => {
-          console.log(val.title);
-          this.surveyLetterSummary.push({
-            title: val.title,
-            surveyTitle: val.surveyTitle,
-            lastUpdate: val.lastUpdate,
-            id: val.id
-          });
-        });
-        //this.surveyLetterSummary = response.data.map((val: any) => ({
-        //		title: val.title,
-        //		surveyTitle: val.survey-title
-        //	}));
-      });
-  }
-  */
 }
 </script>
