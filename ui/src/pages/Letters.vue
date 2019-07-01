@@ -74,7 +74,7 @@ import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
   apollo: {
     surveys: {
       query: require("../graphql/getSurveys.gql"),
-      variables: { includeInactive: true }
+      variables: { includeInactive: false }
     }
   }
 })
