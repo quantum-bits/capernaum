@@ -2,7 +2,11 @@
   <v-container>
     <h1 class="headline mb-5">Survey Follow-up Letters</h1>
 
-    <v-data-table :headers="headers" :items="surveyLetterSummary" class="elevation-1">
+    <v-data-table
+      :headers="headers"
+      :items="surveyLetterSummary"
+      class="elevation-1"
+    >
       <template v-slot:items="props">
         <td>{{ props.item.title }}</td>
         <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
@@ -68,9 +72,16 @@ router.push({ name: 'user', params: { userId: '123' } })
 import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
+import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
 
-@Component
+@Component({
+  apollo: {
+    surveyList: require("../graphql/getSurveys.gql")
+  }
+})
 export default class Letters extends Vue {
+  surveyList: any[] = [];
+
   headers: any = [
     {
       text: "Letter",
@@ -89,6 +100,7 @@ export default class Letters extends Vue {
     console.log("view letter: ", item);
     this.$router.push({ name: "compose", params: { id: item.id } });
   }
+  /*
   mounted() {
     axios
       //.get('https://api.coindesk.com/v1/bpi/currentprice.json')
@@ -110,5 +122,6 @@ export default class Letters extends Vue {
         //	}));
       });
   }
+  */
 }
 </script>
