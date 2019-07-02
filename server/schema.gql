@@ -16,12 +16,21 @@ type Letter {
   isFrozen: Boolean!
 }
 
+input LetterUpdateInput {
+  id: Int!
+  name: String
+  isFrozen: Boolean
+}
+
 type Mutation {
-  addLetter(name: String!): Letter!
+  createLetter(name: String!): Letter!
+  updateLetter(letterData: LetterUpdateInput!): Letter!
+  deleteLetter(id: Int!): Int!
 }
 
 type Query {
   letters: [Letter!]!
+  letter(id: Int!): Letter!
   surveys(includeInactive: Boolean = false): [SurveyMetadata!]!
 }
 

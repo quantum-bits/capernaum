@@ -1,5 +1,11 @@
-import { Field, Int, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 
 @Entity()
 @ObjectType()
@@ -23,4 +29,11 @@ export class Letter {
   @Field()
   @Column()
   isFrozen: boolean = false;
+}
+
+@InputType()
+export class LetterUpdateInput {
+  @Field(type => Int) id: number;
+  @Field({ nullable: true }) name: string;
+  @Field({ nullable: true }) isFrozen: boolean;
 }

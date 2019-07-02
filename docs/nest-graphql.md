@@ -69,3 +69,13 @@
     name?: string;
     type: () => any;
     ```
+Examples
+  * Just let GraphQL know the field name; infer the type to be `string`
+  ```ts
+  @Args("name") name: string
+  ```
+  * Clarify the type to be `Int` and not just the generic `number`.
+    This requires using the object format for the argument
+  ```ts
+  @Args({ name: "id", type: () => Int }) id: number
+  ```
