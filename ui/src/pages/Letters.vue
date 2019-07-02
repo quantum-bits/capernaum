@@ -10,11 +10,11 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table :headers="headers" :items="surveys" class="elevation-1">
+        <v-data-table :headers="headers" :items="letters" class="elevation-1">
           <template v-slot:items="props">
-            <td>Letter Title Here</td>
-            <td class="text-xs-right">{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.lastModified }}</td>
+            <td>{{ props.item.name }}</td>
+            <td class="text-xs-right">[Survey Name Here]</td>
+            <td class="text-xs-right">{{ props.item.updated }}</td>
             <td class="text-xs-center">
               <span v-if="props.item.isFrozen">
                 <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
@@ -41,17 +41,28 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
 import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
+import gql from "graphql-tag";
 
 @Component({
   apollo: {
-    surveys: {
-      query: require("../graphql/getSurveys.gql"),
+    letters: {
+      query: gql`
+        query allLetters {
+          letters {
+            id
+            name
+            created
+            updated
+            isFrozen
+          }
+        }
+      `,
       variables: { includeInactive: false }
     }
   }
 })
 export default class Letters extends Vue {
-  surveys: any[] = [];
+  letters: any[] = [];
 
   headers: any = [
     {

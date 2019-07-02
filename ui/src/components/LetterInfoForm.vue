@@ -15,7 +15,7 @@
         <v-select
           v-model="surveySelect"
           :items="surveys"
-          item-text="surveyTitle"
+          item-text="name"
           item-value="id"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
@@ -48,12 +48,14 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 
 import axios from "axios";
 import { AxiosResponse } from "axios";
+import gql from "graphql-tag";
 
 import { BooleanAssociationBriefType } from "../pages/association-table.types";
 
 interface SurveyItemType {
   id: number; // id of the survey in our db
-  title: string; // e.g., "Christian Life Survey"
+  name: string; // e.g., "Christian Life Survey"
+  isActive: boolean;
 }
 
 // used for data returned from the db (for the list used in the drop-down)
@@ -64,7 +66,19 @@ interface BooleanAssociationType {
 }
 
 @Component({
-  components: {}
+  apollo: {
+    surveys: {
+      query: gql`
+        query allSurveys {
+          surveys(includeInactive: false) {
+            id
+            name
+            isActive
+          }
+        }
+      `
+    }
+  }
 })
 export default class LetterInfoForm extends Vue {
   /** Form to create/update Letter Info (e.g., title, etc.) */
@@ -92,10 +106,25 @@ export default class LetterInfoForm extends Vue {
 
   submit() {
     if (this.$refs.form.validate()) {
+      this.$apollo.mutate({
+        mutation: gql`
+          mutation addLetter($name: String!) {
+            createLetter(name: $name) {
+              id
+              name
+            }
+          }
+        `,
+        variables: {
+          name: this.name
+        }
+      });
+      /*
       console.log("save info");
       console.log("survey: ", this.surveySelect);
       console.log("boolean association table: ", this.booleanAssociationSelect);
       this.saveInfo();
+      */
     }
   }
 
