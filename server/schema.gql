@@ -3,7 +3,25 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type Letter {
+  id: Int!
+  name: String!
+  created: DateTime!
+  updated: DateTime!
+  isFrozen: Boolean!
+}
+
+type Mutation {
+  addLetter(name: String!): Letter!
+}
+
 type Query {
+  letters: [Letter!]!
   surveys(includeInactive: Boolean = false): [SurveyMetadata!]!
 }
 

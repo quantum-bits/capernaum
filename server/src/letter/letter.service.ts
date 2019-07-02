@@ -1,7 +1,7 @@
-import { Injectable, Inject } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Letter } from "./letter.entity";
+import { Letter } from "./letter.entities";
 
 @Injectable()
 export class LetterService {
@@ -10,7 +10,12 @@ export class LetterService {
     private readonly letterRepository: Repository<Letter>
   ) {}
 
-  async findAll(): Promise<Letter[]> {
-    return await this.letterRepository.find();
+  findAll() {
+    return this.letterRepository.find();
+  }
+
+  createLetter(name: string) {
+    const newLetter = this.letterRepository.create({ name });
+    return this.letterRepository.save(newLetter);
   }
 }

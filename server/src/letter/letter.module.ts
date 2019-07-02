@@ -1,10 +1,11 @@
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Letter } from "./letter.entities";
+import { LetterResolver } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
-import { Letter } from "./letter.entity";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Letter])],
-  providers: [LetterService]
+  providers: [LetterService, LetterResolver]
 })
 export class LetterModule {}

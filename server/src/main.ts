@@ -1,4 +1,4 @@
-// Import configuration to environment.
+// Import configuration from environment.
 import { config } from "dotenv";
 config();
 
