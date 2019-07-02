@@ -1,13 +1,13 @@
 import { Command, flags } from "@oclif/command";
-import QualtricsAPI from "../../../api/src/QualtricsAPI";
+import { QualtricsService } from "../../qualtrics/qualtrics.service";
 import chalk from "chalk";
 import { table } from "table";
 
-export default class Org extends Command {
+export default class OrgCommand extends Command {
   static description = "get organization details";
 
   async run() {
-    const api = new QualtricsAPI();
+    const api = new QualtricsService();
 
     if (process.env.CAP_ORG_ID) {
       api.getOrganization(process.env.CAP_ORG_ID).then(response => {

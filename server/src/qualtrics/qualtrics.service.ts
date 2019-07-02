@@ -5,42 +5,21 @@ import {
   normalizeDateTime,
   sleep
 } from "./helpers";
+import {
+  GetSurveyResponse,
+  ListSurveysResponse,
+  GetOrganizationResponse,
+  CreateResponseExportResponse,
+  ResponseExportProgress,
+  CreateResponseData
+} from "./qualtrics.types";
+import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
 const apiDebug = debug("api");
 
-interface CreateResponseData {
-  format: string;
-  startDate?: string;
-  endDate?: string;
-}
-
-interface QualtricsResponse {
-  meta: {
-    requestId: string;
-    httpStatus: string;
-  };
-}
-
-type ResponseExportStatus = "inProgress" | "complete" | "failed";
-
-interface CreateResponseExportResponse extends QualtricsResponse {
-  result: {
-    progressId: string;
-    percentComplete: number;
-    status: ResponseExportStatus;
-  };
-}
-
-interface ResponseExportProgress extends QualtricsResponse {
-  result: {
-    percentComplete: number;
-    status: ResponseExportStatus;
-    fileId: string;
-  };
-}
-
-export default class QualtricsAPI {
+@Injectable()
+export class QualtricsService {
   base_url: string = "";
   api_token: string = "";
 
@@ -60,11 +39,11 @@ export default class QualtricsAPI {
 
   private makeUrl(...segments: string[]) {
     segments.unshift(this.base_url);
-    return segments.join("/");
+    return new URL(segments.join("/"));
   }
 
-  private async get<T>(url: string, moreConfig: object = {}) {
-    return axios.get<T>(url, {
+  private async get<T>(url: URL, moreConfig: object = {}) {
+    return axios.get<T>(url.href, {
       headers: {
         "x-api-token": this.api_token
       },
@@ -72,26 +51,32 @@ export default class QualtricsAPI {
     });
   }
 
-  private async post<T>(url: string, data: object) {
-    return axios.post<T>(url, data, {
+  private async post<T>(url: URL, data: object) {
+    return axios.post<T>(url.href, data, {
       headers: {
         "x-api-token": this.api_token
       }
     });
   }
 
-  /** Get a survey with the given ID. If no ID, get them all. */
-  async getSurvey(surveyId?: string) {
-    if (surveyId) {
-      return this.get(this.makeUrl("surveys", surveyId));
-    } else {
-      return this.get(this.makeUrl("surveys"));
+  /** Get a survey with the given ID. */
+  async getSurvey(surveyId: string) {
+    return this.get<GetSurveyResponse>(this.makeUrl("surveys", surveyId));
+  }
+
+  async listSurveys(offset: string = undefined) {
+    const url = this.makeUrl("surveys");
+    if (offset) {
+      url.searchParams.set("offset", offset);
     }
+    return this.get<ListSurveysResponse>(url);
   }
 
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
-    return this.get(this.makeUrl("organizations", organizationId));
+    return this.get<GetOrganizationResponse>(
+      this.makeUrl("organizations", organizationId)
+    );
   }
 
   /** Raw methods to export responses from Qualtrics. */

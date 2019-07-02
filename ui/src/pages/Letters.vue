@@ -5,20 +5,16 @@
         <h1 class="headline mb-5">Survey Follow-up Letters</h1>
       </v-flex>
       <v-flex xs3 class="text-xs-right">
-        <v-btn
-            color="primary"
-            dark
-            @click="newLetter"
-            >
-            New Letter
+        <v-btn color="primary" dark @click="newLetter">
+          New Letter
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table :headers="headers" :items="surveyLetterSummary" class="elevation-1">
+        <v-data-table :headers="headers" :items="surveys" class="elevation-1">
           <template v-slot:items="props">
-            <td>{{ props.item.title }}</td>
-            <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
-            <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
+            <td>Letter Title Here</td>
+            <td class="text-xs-right">{{ props.item.name }}</td>
+            <td class="text-xs-right">{{ props.item.lastModified }}</td>
             <td class="text-xs-center">
               <span v-if="props.item.isFrozen">
                 <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
@@ -44,9 +40,19 @@
 import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
+import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
 
-@Component
+@Component({
+  apollo: {
+    surveys: {
+      query: require("../graphql/getSurveys.gql"),
+      variables: { includeInactive: false }
+    }
+  }
+})
 export default class Letters extends Vue {
+  surveys: any[] = [];
+
   headers: any = [
     {
       text: "Letter",
@@ -56,12 +62,10 @@ export default class Letters extends Vue {
     },
     { text: "Survey", value: "surveyTitle" },
     { text: "Last Update", value: "lastUpdate" },
-    { text: "Frozen?", value: "isFrozen"},
-    { text: "Active?", value: "isActive"},
+    { text: "Frozen?", value: "isFrozen" },
+    { text: "Active?", value: "isActive" },
     { text: "Action", sortable: false }
   ];
-
-  surveyLetterSummary: any = [];
 
   viewLetter(item: any) {
     this.$router.push({ name: "compose", params: { id: item.id } });
@@ -69,26 +73,6 @@ export default class Letters extends Vue {
 
   newLetter() {
     this.$router.push({ name: "compose" });
-  }
-
-  mounted() {
-    axios
-      //.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .get("http://localhost:3000/letter-data")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        response.data.map((val: any) => {
-          console.log(val.title);
-          this.surveyLetterSummary.push({
-            title: val.title,
-            surveyTitle: val.surveyTitle,
-            lastUpdate: val.lastUpdate,
-            id: val.id,
-            isFrozen: val.isFrozen,
-            isActive: val.isActive
-          });
-        });
-      });
   }
 }
 </script>

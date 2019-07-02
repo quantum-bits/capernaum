@@ -1,0 +1,10 @@
+query getSurveys($includeInactive: Boolean) {
+  surveys(includeInactive: $includeInactive) {
+    id
+    ownerId
+    name
+    lastModified
+    isActive
+    creationDate
+  }
+}
