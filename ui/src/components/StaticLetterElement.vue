@@ -3,21 +3,25 @@
     <v-flex xs12 sm12>
       <v-card>
         <v-card-title primary-title>
-            <div>
-                <h3 class="title font-weight-regular mb-2">{{description}}</h3>
-                <!-- https://github.com/vuetifyjs/vuetify-loader/issues/12 -->
-                <v-img v-if = "displaySpiritualFoci"
-                :src="require('@/images/spiritual-foci.png')"
-                :width="400"
-                ></v-img>
-                <v-img v-if = "displaySpiritualOrientations"
-                :src="require('@/images/spiritual-orientations.png')"
-                :width="400"
-                ></v-img>
-                <span v-if = "displaySEStrategies">
-                    Auto-generated list of Scripture Engagement strategies that the user may find to be helpful.
-                </span>
-            </div>
+          <div>
+            <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
+            <!-- https://github.com/vuetifyjs/vuetify-loader/issues/12 -->
+            <v-img
+              v-if="displaySpiritualFoci"
+              :src="require('@/images/spiritual-foci.png')"
+              :width="400"
+            ></v-img>
+
+            <v-img
+              v-if="displaySpiritualOrientations"
+              :src="require('@/images/spiritual-orientations.png')"
+              :width="400"
+            ></v-img>
+            <span v-if="displaySEStrategies">
+              Auto-generated list of Scripture Engagement strategies that the
+              user may find to be helpful.
+            </span>
+          </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
@@ -40,7 +44,10 @@ import axios from "axios";
 import { AxiosResponse } from "axios";
 import Delta from "quill-delta";
 
-import { LetterElementMenuItemType, LetterElementEnum } from "../pages/letter-element.types";
+import {
+  LetterElementMenuItemType,
+  LetterElementEnum
+} from "../pages/letter-element.types";
 
 @Component({})
 export default class StaticLetterElement extends Vue {
@@ -70,30 +77,33 @@ export default class StaticLetterElement extends Vue {
   }
 
   get displaySpiritualFoci() {
-      return this.letterElementKey === LetterElementEnum.SPIRITUAL_FOCUS_CHART;
+    return this.letterElementKey === LetterElementEnum.SPIRITUAL_FOCUS_CHART;
   }
 
   get displaySpiritualOrientations() {
-      return this.letterElementKey === LetterElementEnum.SPIRITUAL_ORIENTATIONS_CHART;
+    return (
+      this.letterElementKey === LetterElementEnum.SPIRITUAL_ORIENTATIONS_CHART
+    );
   }
 
   get displaySEStrategies() {
-      return this.letterElementKey === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS;
+    return (
+      this.letterElementKey === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS
+    );
   }
 
   mounted() {
     axios
-        .get("http://localhost:3000/letter-elements/")
-        .then((response: AxiosResponse) => {
-          console.log(response);
-          this.letterElements = response.data;
-          for (let letterElement of this.letterElements) {
-              if (letterElement.key === this.letterElementKey) {
-                  this.description = letterElement.description;
-              }
+      .get("http://localhost:3000/letter-elements/")
+      .then((response: AxiosResponse) => {
+        console.log(response);
+        this.letterElements = response.data;
+        for (let letterElement of this.letterElements) {
+          if (letterElement.key === this.letterElementKey) {
+            this.description = letterElement.description;
           }
-        });
+        }
+      });
   }
-
 }
 </script>

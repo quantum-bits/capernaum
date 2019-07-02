@@ -5,16 +5,16 @@
         <h1 class="headline mb-5">Boolean Association Tables</h1>
       </v-flex>
       <v-flex xs3 class="text-xs-right">
-        <v-btn
-            color="primary"
-            dark
-            @click="newAssociationTable"
-            >
-            New Association Table
+        <v-btn color="primary" dark @click="newAssociationTable">
+          New Association Table
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table :headers="headers" :items="booleanAssociationSummary" class="elevation-1">
+        <v-data-table
+          :headers="headers"
+          :items="booleanAssociationSummary"
+          class="elevation-1"
+        >
           <template v-slot:items="props">
             <td>{{ props.item.title }}</td>
             <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
@@ -31,7 +31,9 @@
               </span>
             </td>
             <td class="text-xs-right">
-              <button v-on:click="viewAssociationTable(props.item)">View</button>
+              <button v-on:click="viewAssociationTable(props.item)">
+                View
+              </button>
             </td>
           </template>
         </v-data-table>
@@ -56,8 +58,8 @@ export default class BooleanAssociations extends Vue {
     },
     { text: "Survey", value: "surveyTitle" },
     { text: "Last Update", value: "lastUpdate" },
-    { text: "Frozen?", value: "isFrozen"},
-    { text: "Active?", value: "isActive"},
+    { text: "Frozen?", value: "isFrozen" },
+    { text: "Active?", value: "isActive" },
     { text: "Action", sortable: false }
   ];
 

@@ -4,7 +4,7 @@
       <v-card v-show="editModeOn">
         <v-card-title primary-title>
           <div>
-            <h3 class="title font-weight-regular mb-2">{{description}}</h3>
+            <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
             <vue-editor ref="editor" v-model="textArea"></vue-editor>
           </div>
         </v-card-title>
@@ -22,7 +22,7 @@
       <v-card v-show="!editModeOn">
         <v-card-title primary-title>
           <div>
-            <h3 class="title font-weight-regular mb-2">{{description}}</h3>
+            <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
             <div v-html="textArea"></div>
           </div>
         </v-card-title>
@@ -46,12 +46,15 @@ import { Vue, Component, Prop, Emit } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
 import Delta from "quill-delta";
 
-import { QuillDeltaToHtmlConverter } from 'quill-delta-to-html';
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import axios from "axios";
 import { AxiosResponse } from "axios";
 
-import { LetterElementMenuItemType, LetterElementEnum } from "../pages/letter-element.types";
+import {
+  LetterElementMenuItemType,
+  LetterElementEnum
+} from "../pages/letter-element.types";
 
 @Component({
   components: {
@@ -70,13 +73,13 @@ export default class LetterTextArea extends Vue {
 
   letterElements: LetterElementMenuItemType[] = [];
   description: string = "";
-  
+
   textDelta: any = this.initialTextDelta;
 
   cfg: any = {};
   converter: any = new QuillDeltaToHtmlConverter(this.textDelta.ops, this.cfg);
   textArea: string = this.converter.convert();
-  
+
   @Emit("move-up")
   moveUp() {}
 
@@ -87,7 +90,7 @@ export default class LetterTextArea extends Vue {
   deleteElement() {}
 
   editModeOn: boolean = this.initialEditModeOn;
-  
+
   // https://quilljs.com/docs/modules/toolbar/
   /*
   customToolbar: any = [
@@ -107,8 +110,7 @@ export default class LetterTextArea extends Vue {
     // save
     this.editModeOn = false;
     let delta: Delta = this.$refs.editor.quill.getContents();
-    console.log('delta object to save: ', delta);
-
+    console.log("delta object to save: ", delta);
   }
 
   openEditor() {
@@ -126,17 +128,16 @@ export default class LetterTextArea extends Vue {
 
   mounted() {
     axios
-        .get("http://localhost:3000/letter-elements/")
-        .then((response: AxiosResponse) => {
-          console.log(response);
-          this.letterElements = response.data;
-          for (let letterElement of this.letterElements) {
-              if (letterElement.key === this.letterElementKey) {
-                  this.description = letterElement.description;
-              }
+      .get("http://localhost:3000/letter-elements/")
+      .then((response: AxiosResponse) => {
+        console.log(response);
+        this.letterElements = response.data;
+        for (let letterElement of this.letterElements) {
+          if (letterElement.key === this.letterElementKey) {
+            this.description = letterElement.description;
           }
-        });
+        }
+      });
   }
-
 }
 </script>
