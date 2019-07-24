@@ -6,7 +6,7 @@
     <v-flex xs12 sm6 offset-sm2>
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-text-field
-          v-model="title"
+          v-model="name"
           :counter="80"
           :rules="nameRules"
           label="Title of Letter"
@@ -91,10 +91,10 @@ export default class LetterInfoForm extends Vue {
 
   surveys: SurveyItemType[] = [];
   booleanAssociations: BooleanAssociationType[] = [];
-  title: string = this.initialTitle;
+  name: string = this.initialTitle;
 
   valid: boolean = true;
-  name: string = "";
+  //name: string = "";
   nameRules: any = [
     (v: any) => !!v || "Title is required",
     (v: any) =>
@@ -106,6 +106,8 @@ export default class LetterInfoForm extends Vue {
 
   submit() {
     if (this.$refs.form.validate()) {
+
+      console.log('name is: ', this.name)
       this.$apollo.mutate({
         mutation: gql`
           mutation addLetter($name: String!) {

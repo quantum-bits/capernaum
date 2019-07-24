@@ -10,7 +10,7 @@
     <div v-if="!editModeOn">
       <v-layout row wrap>
         <v-flex xs7 offset-xs1>
-          <h1 class="headline mb-3">{{ title }}</h1>
+          <h1 class="headline mb-3">{{ name }}</h1>
           <h2 class="title font-weight-regular mb-1">
             Survey:
             <span class="font-weight-light">{{ survey.title }}</span>
@@ -119,7 +119,6 @@
         </v-menu>
       </v-flex>
     </v-layout>
-
     <!--
         Next:
             - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
@@ -142,6 +141,8 @@
 import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
+import gql from "graphql-tag";
+
 import _ from "lodash";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
@@ -161,8 +162,25 @@ interface SurveyTypeBrief {
   title: string;
 }
 
+
 @Component({
-  components: { LetterTextArea, StaticLetterElement, LetterInfoForm }
+  components: { LetterTextArea, StaticLetterElement, LetterInfoForm },
+  apollo: {
+    oneLetter: {
+      query: gql`
+        query oneLetter($letterId: Int!) {
+          letter(id: $letterId) {
+            id
+            name
+            isFrozen
+          }
+        }
+      `
+    },
+    variables: {
+      letterId: 4//hard-code for now....
+    }
+  }
 })
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
@@ -172,6 +190,9 @@ export default class Compose extends Vue {
     id: null,
     title: ""
   };
+
+  oneLetter: any = null;
+
   lastUpdate: string = "";
   id: number | null = null;
   elements: LetterElementType[] = [];
