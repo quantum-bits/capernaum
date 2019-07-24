@@ -1,3 +1,4 @@
+import { parse } from "date-fns";
 import { Command, flags } from "@oclif/command";
 import { QualtricsService } from "../../qualtrics/qualtrics.service";
 
@@ -77,7 +78,13 @@ export default class ResponseCommand extends Command {
       case SubCommand.Get:
         api
           .getResponseExportFile(args.surveyId, args.extraId)
-          .then(entries => console.log("ENTRIES", entries))
+          .then(entries => {
+            return entries.map(entry => ({
+              fileName: entry.fileName,
+              content: JSON.parse(entry.content)
+            }));
+          })
+          .then(result => console.log(JSON.stringify(result, null, 2)))
           .catch(err => this.error(err));
         break;
 

@@ -30,6 +30,9 @@ export default class SurveyCommand extends Command {
   static flags = {
     "by-date": flags.boolean({
       description: "Sort by date (default by name)"
+    }),
+    verbose: flags.boolean({
+      description: "Show details"
     })
   };
 
@@ -43,7 +46,11 @@ export default class SurveyCommand extends Command {
           this.error("`get` command requires a survey identifier");
         }
         api.getSurvey(args.surveyId).then(response => {
-          this.log(response.data.result.name);
+          if (flags.verbose) {
+            this.log(JSON.stringify(response.data.result, null, 2));
+          } else {
+            this.log(response.data.result.name);
+          }
         });
         break;
       case SubCommand.List:

@@ -56,8 +56,7 @@ import gql from "graphql-tag";
             isFrozen
           }
         }
-      `,
-      variables: { includeInactive: false }
+      `
     }
   }
 })
