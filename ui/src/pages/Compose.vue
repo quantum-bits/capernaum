@@ -12,6 +12,10 @@
         <v-flex xs7 offset-xs1>
           <h1 class="headline mb-3">{{ name }}</h1>
           <h2 class="title font-weight-regular mb-1">
+            Letter:
+            <span class="font-weight-light">{{ letter.name }}</span>
+          </h2>
+          <h2 class="title font-weight-regular mb-1">
             Survey:
             <span class="font-weight-light">{{ survey.title }}</span>
           </h2>
@@ -162,11 +166,10 @@ interface SurveyTypeBrief {
   title: string;
 }
 
-
 @Component({
   components: { LetterTextArea, StaticLetterElement, LetterInfoForm },
   apollo: {
-    oneLetter: {
+    letter: {
       query: gql`
         query oneLetter($letterId: Int!) {
           letter(id: $letterId) {
@@ -175,10 +178,10 @@ interface SurveyTypeBrief {
             isFrozen
           }
         }
-      `
-    },
-    variables: {
-      letterId: 4//hard-code for now....
+      `,
+      variables: {
+        letterId: 9 // hard-code for now....
+      }
     }
   }
 })
@@ -191,7 +194,7 @@ export default class Compose extends Vue {
     title: ""
   };
 
-  oneLetter: any = null;
+  letter: any = null;
 
   lastUpdate: string = "";
   id: number | null = null;
