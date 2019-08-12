@@ -82,7 +82,7 @@ export default class LetterInfoForm extends Vue {
 
   mounted() {
     axios
-      .get("http://localhost:3000/survey-data/")
+      .get("http://localhost:4000/survey-data/")
       .then((response: AxiosResponse) => {
         console.log(response);
         this.surveys = response.data;

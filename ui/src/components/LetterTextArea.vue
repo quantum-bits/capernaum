@@ -128,7 +128,7 @@ export default class LetterTextArea extends Vue {
 
   mounted() {
     axios
-      .get("http://localhost:3000/letter-elements/")
+      .get("http://localhost:4000/letter-elements/")
       .then((response: AxiosResponse) => {
         console.log(response);
         this.letterElements = response.data;

@@ -75,7 +75,7 @@ export default class BooleanAssociations extends Vue {
 
   mounted() {
     axios
-      .get("http://localhost:3000/boolean-associations")
+      .get("http://localhost:4000/boolean-associations")
       .then((response: AxiosResponse) => {
         console.log(response);
         response.data.map((val: any) => {

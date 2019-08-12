@@ -138,7 +138,7 @@ export default class LetterInfoForm extends Vue {
   mounted() {
     console.log("boolean association: ", this.initialBooleanAssociation);
     axios
-      .get("http://localhost:3000/survey-data/")
+      .get("http://localhost:4000/survey-data/")
       .then((response: AxiosResponse) => {
         console.log("surveys: ", response);
         this.surveys = response.data;
@@ -150,8 +150,9 @@ export default class LetterInfoForm extends Vue {
           }
         }
       });
+    // json-server -p 4000 --watch db.json
     axios
-      .get("http://localhost:3000/boolean-associations/")
+      .get("http://localhost:4000/boolean-associations/")
       .then((response: AxiosResponse) => {
         console.log(response);
         this.booleanAssociations = response.data;

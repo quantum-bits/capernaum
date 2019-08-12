@@ -233,7 +233,7 @@ export default class AssociationTable extends Vue {
     // revert back to the ScriptureEngagementPractice[] data type; the source for truth (up to this point)
     // in the page is this.tableData, which is of the TableData type
     axios
-      .get("http://localhost:3000/spiritual-foci-orientations/")
+      .get("http://localhost:4000/spiritual-foci-orientations/")
       .then((response: AxiosResponse) => {
         this.tableColumns = _.orderBy(response.data, "order");
         // construct headers for data table
@@ -283,7 +283,7 @@ export default class AssociationTable extends Vue {
       this.tableEditModeOn = false;
       this.isNew = true;
       axios
-        .get("http://localhost:3000/scripture-engagement-practices/")
+        .get("http://localhost:4000/scripture-engagement-practices/")
         .then((response: AxiosResponse) => {
           console.log(response.data);
           let scriptureEngagementPractices: ScriptureEngagementPractice[] = [];
@@ -304,7 +304,7 @@ export default class AssociationTable extends Vue {
     } else {
       axios
         .get(
-          "http://localhost:3000/boolean-associations/" + this.$route.params.id
+          "http://localhost:4000/boolean-associations/" + this.$route.params.id
         )
         .then((response: AxiosResponse) => {
           //console.log(response);

@@ -18,7 +18,7 @@ export default class About extends Vue {
   mounted() {
     axios
       //.get('https://api.coindesk.com/v1/bpi/currentprice.json')
-      .get("http://localhost:3000/scripture-engagement-practices")
+      .get("http://localhost:4000/scripture-engagement-practices")
       .then((response: AxiosResponse) => {
         console.log(response);
       });

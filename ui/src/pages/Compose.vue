@@ -298,7 +298,7 @@ export default class Compose extends Vue {
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
     axios
-      .get("http://localhost:3000/letter-elements/")
+      .get("http://localhost:4000/letter-elements/")
       .then((response: AxiosResponse) => {
         console.log(response);
         this.letterElements = response.data;
@@ -310,7 +310,7 @@ export default class Compose extends Vue {
       this.isNew = true;
     } else {
       axios
-        .get("http://localhost:3000/letter-data/" + this.$route.params.id)
+        .get("http://localhost:4000/letter-data/" + this.$route.params.id)
         .then((response: AxiosResponse) => {
           console.log(response);
           let localElements: LetterElementType[] = [];
