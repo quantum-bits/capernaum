@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-layout row wrap>
+    <v-layout wrap>
       <v-flex xs9>
         <h1 class="headline mb-5">Survey Follow-up Letters</h1>
       </v-flex>
@@ -11,24 +11,25 @@
       </v-flex>
       <v-flex xs12>
         <v-data-table :headers="headers" :items="letters" class="elevation-1">
-          <template v-slot:items="props">
-            <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">[Survey Name Here]</td>
-            <td class="text-xs-right">{{ props.item.updated }}</td>
-            <td class="text-xs-center">
-              <span v-if="props.item.isFrozen">
-                <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
-                <v-icon color="success">check_circle</v-icon>
-              </span>
-            </td>
-            <td class="text-xs-center">
-              <span v-if="props.item.isActive">
-                <v-icon color="success">check_circle</v-icon>
-              </span>
-            </td>
-            <td class="text-xs-right">
-              <button v-on:click="viewLetter(props.item)">View</button>
-            </td>
+          <template v-slot:item="{ item }">
+            <tr>
+              <td>{{ item.name }}</td>
+              <td class="text-xs-right">[Survey Name Here]</td>
+              <td class="text-xs-right">{{ item.updated }}</td>
+              <td class="text-xs-center">
+                <span v-if="item.isFrozen">
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-center">
+                <span v-if="item.isActive">
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-right">
+                <v-btn text v-on:click="viewLetter(item)">View</v-btn>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-flex>

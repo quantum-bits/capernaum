@@ -72,7 +72,8 @@ export default Vue.extend({
 
   methods: {
     submit() {
-      if (this.$refs.form.validate()) {
+      // FIXME: Replace the `as any` hack.
+      if ((this.$refs.form as any).validate()) {
         console.log("save info");
         this.saveInfo();
       }

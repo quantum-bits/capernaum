@@ -14,7 +14,8 @@ import { Letter } from "./letter/letter.entities";
       username: process.env.PG_USERNAME,
       password: process.env.PG_PASSWORD,
       entities: [Letter],
-      synchronize: true
+      synchronize: true,
+      logging: true
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "schema.gql"
