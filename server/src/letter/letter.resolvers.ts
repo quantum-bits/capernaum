@@ -1,6 +1,10 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Letter, LetterUpdateInput } from "./letter.entities";
-import { LetterService } from "./letter.service";
+import {
+  Letter,
+  LetterElementType,
+  LetterUpdateInput
+} from "./letter.entities";
+import { LetterElementTypeService, LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
 
@@ -32,5 +36,17 @@ export class LetterResolver {
   async deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
     const result: DeleteResult = await this.letterService.deleteLetter(id);
     return result.affected;
+  }
+}
+
+@Resolver(of => LetterElementType)
+export class LetterElementTypeResolver {
+  constructor(
+    private readonly letterElementTypeService: LetterElementTypeService
+  ) {}
+
+  @Query(returns => [LetterElementType])
+  async letterElementTypes() {
+    return await this.letterElementTypeService.letterElementTypes();
   }
 }

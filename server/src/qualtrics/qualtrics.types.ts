@@ -1,4 +1,4 @@
-import { SurveyMetadata } from "./qualtrics.models";
+import { QualtricsSurveyMetadata } from "./qualtrics.models";
 
 export interface CreateResponseData {
   format: string;
@@ -46,7 +46,7 @@ export interface GetOrganizationResponse extends QualtricsResponse {
 
 export interface ListSurveysResponse extends QualtricsResponse {
   result: {
-    elements: SurveyMetadata[];
+    elements: QualtricsSurveyMetadata[];
     nextPage: string | null;
   };
 }

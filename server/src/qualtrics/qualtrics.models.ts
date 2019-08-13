@@ -1,7 +1,7 @@
 import { ObjectType, Field } from "type-graphql";
 
 @ObjectType()
-export class SurveyMetadata {
+export class QualtricsSurveyMetadata {
   @Field() id: string = "";
   @Field() name: string = "";
   @Field() ownerId: string = "";

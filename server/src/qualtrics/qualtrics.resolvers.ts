@@ -1,12 +1,12 @@
-import { SurveyMetadata } from "./qualtrics.models";
-import { Resolver, Query, Args } from "@nestjs/graphql";
+import { QualtricsSurveyMetadata } from "./qualtrics.models";
+import { Args, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
 
-@Resolver(of => SurveyMetadata)
+@Resolver(of => QualtricsSurveyMetadata)
 export class SurveyResolver {
   constructor(private readonly qualtricsService: QualtricsService) {}
 
-  @Query(returns => [SurveyMetadata])
+  @Query(returns => [QualtricsSurveyMetadata])
   async surveys(
     @Args({
       name: "includeInactive",
@@ -16,7 +16,7 @@ export class SurveyResolver {
     })
     includeInactive: boolean
   ) {
-    let surveyList: SurveyMetadata[] = [];
+    let surveyList: QualtricsSurveyMetadata[] = [];
     let fetchMore = true;
     let offset: string = undefined;
     while (fetchMore) {

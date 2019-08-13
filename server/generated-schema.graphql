@@ -34,17 +34,24 @@ type Mutation {
   deleteLetter(id: Int!): Int!
 }
 
-type Query {
-  letters: [Letter!]!
-  letter(id: Int!): Letter!
-  surveys(includeInactive: Boolean = false): [SurveyMetadata!]!
-}
-
-type SurveyMetadata {
+type QualtricsSurveyMetadata {
   id: String!
   name: String!
   ownerId: String!
   lastModified: String!
   creationDate: String!
   isActive: Boolean!
+}
+
+type Query {
+  letters: [Letter!]!
+  letter(id: Int!): Letter!
+  letterElementTypes: [LetterElementType!]!
+  surveys(includeInactive: Boolean = false): [QualtricsSurveyMetadata!]!
+}
+
+type Survey {
+  id: Int!
+  qualtricsId: String!
+  title: String!
 }

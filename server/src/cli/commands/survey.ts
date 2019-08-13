@@ -2,8 +2,8 @@ import { Command, flags } from "@oclif/command";
 import { QualtricsService } from "../../qualtrics/qualtrics.service";
 import chalk from "chalk";
 import { table } from "table";
-import { format, parse, compareAsc } from "date-fns";
-import { SurveyMetadata } from "../../qualtrics/qualtrics.models";
+import { compareAsc, format, parse } from "date-fns";
+import { QualtricsSurveyMetadata } from "../../qualtrics/qualtrics.models";
 
 const enum SubCommand {
   Get = "get",
@@ -55,15 +55,16 @@ export default class SurveyCommand extends Command {
         break;
       case SubCommand.List:
         api.listSurveys().then(response => {
-          const elements: SurveyMetadata[] = response.data.result.elements;
+          const elements: QualtricsSurveyMetadata[] =
+            response.data.result.elements;
           const headers = ["Id", "Name", "Last Modified"].map(hdr =>
             chalk.greenBright(hdr)
           );
           const data = [[...headers]];
           const sortFn = flags["by-date"]
-            ? (a: SurveyMetadata, b: SurveyMetadata) =>
+            ? (a: QualtricsSurveyMetadata, b: QualtricsSurveyMetadata) =>
                 compareAsc(parse(a.lastModified), parse(b.lastModified))
-            : (a: SurveyMetadata, b: SurveyMetadata) =>
+            : (a: QualtricsSurveyMetadata, b: QualtricsSurveyMetadata) =>
                 a.name.localeCompare(b.name);
           elements.sort(sortFn).map(elt => {
             const { id, name, lastModified } = elt;
