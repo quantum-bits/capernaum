@@ -20,32 +20,32 @@ const apiDebug = debug("api");
 
 @Injectable()
 export class QualtricsService {
-  base_url: string = "";
-  api_token: string = "";
+  baseUrl: string = "";
+  apiToken: string = "";
 
   constructor() {
     if (process.env.CAP_BASE_URL) {
-      this.base_url = process.env.CAP_BASE_URL;
+      this.baseUrl = process.env.CAP_BASE_URL;
     } else {
       throw new Error("No base URL configured in environment");
     }
 
     if (process.env.CAP_API_TOKEN) {
-      this.api_token = process.env.CAP_API_TOKEN;
+      this.apiToken = process.env.CAP_API_TOKEN;
     } else {
       throw new Error("No API token configured in environment");
     }
   }
 
   private makeUrl(...segments: string[]) {
-    segments.unshift(this.base_url);
+    segments.unshift(this.baseUrl);
     return new URL(segments.join("/"));
   }
 
   private async get<T>(url: URL, moreConfig: object = {}) {
     return axios.get<T>(url.href, {
       headers: {
-        "x-api-token": this.api_token
+        "x-api-token": this.apiToken
       },
       ...moreConfig
     });
@@ -54,7 +54,7 @@ export class QualtricsService {
   private async post<T>(url: URL, data: object) {
     return axios.post<T>(url.href, data, {
       headers: {
-        "x-api-token": this.api_token
+        "x-api-token": this.apiToken
       }
     });
   }

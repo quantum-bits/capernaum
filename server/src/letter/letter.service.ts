@@ -1,6 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Letter, LetterUpdateInput } from "./letter.entities";
+import {
+  Letter,
+  LetterElementType,
+  LetterUpdateInput
+} from "./letter.entities";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -36,5 +40,33 @@ export class LetterService {
 
   deleteLetter(id: number) {
     return this.letterRepository.delete(id);
+  }
+}
+
+@Injectable()
+export class LetterElementTypeService {
+  constructor(
+    @InjectRepository(LetterElementType)
+    private readonly letterElementTypeRepository: Repository<LetterElementType>
+  ) {}
+
+  createLetterElementType(key: string, description: string) {
+    const newLetterElementType = this.letterElementTypeRepository.create({
+      key,
+      description
+    });
+    return this.letterElementTypeRepository.save(newLetterElementType);
+  }
+
+  letterElementType(id: number) {
+    return this.letterElementTypeRepository.findOne(id);
+  }
+
+  letterElementTypes() {
+    return this.letterElementTypeRepository.find();
+  }
+
+  deleteLetterElementType(id: number) {
+    return this.letterElementTypeRepository.delete(id);
   }
 }

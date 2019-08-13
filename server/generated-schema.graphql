@@ -16,6 +16,12 @@ type Letter {
   isFrozen: Boolean!
 }
 
+type LetterElementType {
+  id: Int!
+  key: String!
+  description: String!
+}
+
 input LetterUpdateInput {
   id: Int!
   name: String
