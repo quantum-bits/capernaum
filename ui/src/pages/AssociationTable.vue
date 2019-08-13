@@ -62,7 +62,6 @@
         <v-data-table
           :headers="headers"
           :items="tableData"
-          :rows-per-page-items="rowsPerPageItems"
           class="elevation-1"
         >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
@@ -103,7 +102,6 @@
         <v-data-table
           :headers="headers"
           :items="tableData"
-          :rows-per-page-items="rowsPerPageItems"
           class="elevation-1"
         >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
@@ -157,11 +155,6 @@ import {
   components: { AssociationTableInfoForm }
 })
 export default class AssociationTable extends Vue {
-  rowsPerPageItems: any = [
-    15,
-    30,
-    { text: "$vuetify.dataIterator.rowsPerPageAll", value: -1 }
-  ];
 
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];

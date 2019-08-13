@@ -29,6 +29,11 @@ export default new Router({
       component: () => import("./pages/BooleanAssociations.vue")
     },
     {
+      path: "/survey-dimensions",
+      name: "survey-dimensions",
+      component: () => import("./pages/SurveyDimensions.vue")
+    },
+    {
       path: "/compose/:id?",
       name: "compose",
       component: () => import("./pages/Compose.vue")

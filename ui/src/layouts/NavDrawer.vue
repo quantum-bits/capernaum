@@ -104,7 +104,13 @@ export default Vue.extend({
         route: "boolean-associations",
         icon: "book",
         divider: true
-      }
+      },
+      {
+        title: "Survey Dimensions",
+        route: "survey-dimensions",
+        icon: "book",
+        divider: true
+      },
     ];
     return {
       drawerVisible: this.initialVisibility,
