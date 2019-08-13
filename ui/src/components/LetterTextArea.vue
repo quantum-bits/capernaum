@@ -44,13 +44,14 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
-import Delta from "quill-delta";
 
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import axios, { AxiosResponse } from "axios";
 
 import { LetterElementMenuItemType } from "@/pages/letter-element.types";
+import Delta from "quill-delta/dist/Delta";
+import Quill from "quill";
 
 @Component({
   components: {
@@ -89,23 +90,29 @@ export default class LetterTextArea extends Vue {
 
   // https://quilljs.com/docs/modules/toolbar/
   /*
-        customToolbar: any = [
-                ["bold", "italic", "underline", "blockquote"],
-                [{ list: "ordered" }, { list: "bullet" }],
-                ["link"],
-                [{'align': []}],
-                ['clean']
-        ];
-        */
+                    customToolbar: any = [
+                            ["bold", "italic", "underline", "blockquote"],
+                            [{ list: "ordered" }, { list: "bullet" }],
+                            ["link"],
+                            [{'align': []}],
+                            ['clean']
+                    ];
+                    */
 
   get showMoveDown() {
     return this.order < this.numItems - 1;
   }
 
+  // Fetch a properly typed Quill.
+  // FIXME: Refactor this egregious type hack.
+  get quillEditor() {
+    return (this.$refs.editor as Vue & { quill: Quill }).quill;
+  }
+
   save() {
     // save
     this.editModeOn = false;
-    let delta: Delta = this.$refs.editor.quill.getContents();
+    let delta: Delta = this.quillEditor.getContents();
     console.log("delta object to save: ", delta);
   }
 
@@ -113,13 +120,13 @@ export default class LetterTextArea extends Vue {
     this.editModeOn = true;
     // don't need to use setContents, since the editor is already tied to this.textArea via v-model....
     /*
-            this works, in case we ever need to use setContents directly:
-            this.$refs.editor.quill.setContents({
-              ops: [
-                {insert: "some text"}
-              ]
-            });
-            */
+                            this works, in case we ever need to use setContents directly:
+                            this.$refs.editor.quill.setContents({
+                              ops: [
+                                {insert: "some text"}
+                              ]
+                            });
+                            */
   }
 
   mounted() {

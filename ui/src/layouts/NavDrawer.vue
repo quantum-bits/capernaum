@@ -4,10 +4,10 @@
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title class="title">
-          Designer
+          Admin
         </v-list-item-title>
         <v-list-item-subtitle>
-          Faraday
+          Capernaum
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
@@ -73,36 +73,36 @@ export default Vue.extend({
       {
         title: "Home",
         route: "home",
-        icon: "home",
+        icon: "mdi-home",
         divider: true
       },
       {
         title: "About",
         route: "about",
-        icon: "school",
+        icon: "mdi-school",
         children: [
           {
             title: "This project",
             route: "about-more",
-            icon: "autorenew"
+            icon: "mdi-autorenew"
           },
           {
             title: "The Center for Scripture Engagement",
             route: "about-even-more",
-            icon: "dashboard"
+            icon: "mdi-view-dashboard"
           }
         ]
       },
       {
         title: "Letters",
         route: "letters",
-        icon: "email",
+        icon: "mdi-email",
         divider: true
       },
       {
         title: "Boolean Association Tables",
         route: "boolean-associations",
-        icon: "book",
+        icon: "mdi-book",
         divider: true
       },
       {

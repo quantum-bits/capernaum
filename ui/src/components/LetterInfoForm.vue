@@ -98,7 +98,8 @@ export default class LetterInfoForm extends Vue {
   booleanAssociationSelect: any = null;
 
   submit() {
-    if (this.$refs.form.validate()) {
+    // FIXME: Replace the `as any` hack.
+    if ((this.$refs.form as any).validate()) {
       console.log("name is: ", this.name);
       this.$apollo.mutate({
         mutation: ADD_LETTER_MUTATION,
