@@ -67,14 +67,14 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-tile
+            <v-list-item
               v-for="item in letterElements"
               :key="item.key"
               @click="addElement(item.key)"
               :disabled="itemDisabled(item.key)"
             >
-              <v-list-tile-title>{{ item.description }}</v-list-tile-title>
-            </v-list-tile>
+              <v-list-item-title>{{ item.description }}</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
       </v-flex>
@@ -112,40 +112,38 @@
             </v-btn>
           </template>
           <v-list>
-            <v-list-tile
+            <v-list-item
               v-for="item in letterElements"
               :key="item.key"
               @click="addElement(item.key)"
             >
-              <v-list-tile-title>{{ item.description }}</v-list-tile-title>
-            </v-list-tile>
+              <v-list-item-title>{{ item.description }}</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
       </v-flex>
     </v-layout>
     <!--
-        Next:
-            - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-            - might need to update the db every time a change is made (to the order, too)
-
-            - ordering within categories for letters (order by survey, and then more ordering below this level)
-
-
-            - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-
-            - if the letter contains the "SE strategies for user" element, and the boolean association
-            table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-            the user should get a warning message or something)
-
-    -->
+            Next:
+                - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+                - might need to update the db every time a change is made (to the order, too)
+    
+                - ordering within categories for letters (order by survey, and then more ordering below this level)
+    
+    
+                - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+    
+                - if the letter contains the "SE strategies for user" element, and the boolean association
+                table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+                the user should get a warning message or something)
+    
+        -->
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
-import { AxiosResponse } from "axios";
-import gql from "graphql-tag";
+import axios, { AxiosResponse } from "axios";
 
 import _ from "lodash";
 
@@ -154,11 +152,12 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import {
+  LetterElementEnum,
   LetterElementMenuItemType,
-  LetterElementType,
-  LetterElementEnum
+  LetterElementType
 } from "./letter-element.types";
 import { BooleanAssociationBriefType } from "./association-table.types";
+import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 
 // brief format, for data returned from the db
 interface SurveyTypeBrief {
@@ -170,15 +169,7 @@ interface SurveyTypeBrief {
   components: { LetterTextArea, StaticLetterElement, LetterInfoForm },
   apollo: {
     letter: {
-      query: gql`
-        query oneLetter($letterId: Int!) {
-          letter(id: $letterId) {
-            id
-            name
-            isFrozen
-          }
-        }
-      `,
+      query: ONE_LETTER_QUERY,
       variables: {
         letterId: 9 // hard-code for now....
       }
@@ -295,6 +286,7 @@ export default class Compose extends Vue {
   viewPDF() {
     console.log("view sample pdf....");
   }
+
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
     axios

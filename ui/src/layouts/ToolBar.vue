@@ -2,22 +2,24 @@
   <div>
     <NavDrawer ref="drawer" />
 
-    <v-toolbar app>
-      <v-toolbar-side-icon v-on:click="toggleNavDrawer"></v-toolbar-side-icon>
+    <v-app-bar app>
+      <v-app-bar-nav-icon v-on:click="toggleNavDrawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title class="headline text-uppercase">
         <span>Capernaum</span>
         <span class="font-weight-light">Admin</span>
       </v-toolbar-title>
+
       <v-spacer></v-spacer>
+
       <v-btn
-        flat
-        href="https://github.com/faraday-effect/faraday"
+        text
+        href="https://github.com/quantum-bits/capernaum"
         target="_blank"
       >
-        <span class="mr-2">GitHub</span>
+        <v-icon color="grey">mdi-github-circle</v-icon>
       </v-btn>
-    </v-toolbar>
+    </v-app-bar>
   </div>
 </template>
 

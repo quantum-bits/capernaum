@@ -1,1 +1,1 @@
-declare module 'vue2-editor';
+declare module "vue2-editor";

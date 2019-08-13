@@ -9,8 +9,8 @@
 </template>
 
 <script lang="ts">
-import ToolBar from "./ToolBar.vue";
 import { Vue, Component } from "vue-property-decorator";
+import ToolBar from "./ToolBar.vue";
 
 @Component({
   components: {

@@ -38,25 +38,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
-import { AxiosResponse } from "axios";
-import { SurveyMetadata } from "../../../server/src/qualtrics/qualtrics.models";
-import gql from "graphql-tag";
+import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
 @Component({
   apollo: {
     letters: {
-      query: gql`
-        query allLetters {
-          letters {
-            id
-            name
-            created
-            updated
-            isFrozen
-          }
-        }
-      `
+      query: ALL_LETTERS_QUERY
     }
   }
 })

@@ -106,8 +106,7 @@ export default class LetterInfoForm extends Vue {
 
   submit() {
     if (this.$refs.form.validate()) {
-
-      console.log('name is: ', this.name)
+      console.log("name is: ", this.name);
       this.$apollo.mutate({
         mutation: gql`
           mutation addLetter($name: String!) {

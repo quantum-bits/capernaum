@@ -1,6 +1,7 @@
 node_modules/
 private/
 .env
+.idea/
 /dist
 /lib
 server/dist
