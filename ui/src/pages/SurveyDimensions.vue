@@ -37,23 +37,15 @@
 -->
 
 <template>
-    <v-container>
-        <v-layout row wrap>
-            <v-flex xs12 sm12>
-                <template>
-
-
-                    <v-treeview
-                        rounded
-                        hoverable
-                        activatable
-                        :items="items"
-                    ></v-treeview>
-                </template>
-
-            </v-flex>
-        </v-layout>
-    </v-container>
+  <v-container>
+    <v-layout row wrap>
+      <v-flex xs12 sm12>
+        <template>
+          <v-treeview rounded hoverable activatable :items="items"></v-treeview>
+        </template>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -89,84 +81,85 @@ export default Vue.extend({
           (v && v.length <= 80) ||
           "Title of letter must be less than 80 characters"
       ],
-        items: [
+      items: [
         {
           id: 1,
-          name: 'Applications :',
+          name: "Applications :",
           children: [
-            { id: 2, name: 'Calendar : app' },
-            { id: 3, name: 'Chrome : app' },
-            { id: 4, name: 'Webstorm : app' },
-          ],
+            { id: 2, name: "Calendar : app" },
+            { id: 3, name: "Chrome : app" },
+            { id: 4, name: "Webstorm : app" }
+          ]
         },
         {
           id: 5,
-          name: 'Documents :',
+          name: "Documents :",
           children: [
             {
               id: 6,
-              name: 'vuetify :',
+              name: "vuetify :",
               children: [
                 {
                   id: 7,
-                  name: 'src :',
+                  name: "src :",
                   children: [
-                    { id: 8, name: 'index : ts' },
-                    { id: 9, name: 'bootstrap : ts' },
-                  ],
-                },
-              ],
+                    { id: 8, name: "index : ts" },
+                    { id: 9, name: "bootstrap : ts" }
+                  ]
+                }
+              ]
             },
             {
               id: 10,
-              name: 'material2 :',
+              name: "material2 :",
               children: [
                 {
                   id: 11,
-                  name: 'src :',
+                  name: "src :",
                   children: [
-                    { id: 12, name: 'v-btn : ts' },
-                    { id: 13, name: 'v-card : ts' },
-                    { id: 14, name: 'v-window : ts' },
-                  ],
-                },
-              ],
-            },
-          ],
+                    { id: 12, name: "v-btn : ts" },
+                    { id: 13, name: "v-card : ts" },
+                    { id: 14, name: "v-window : ts" }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           id: 15,
-          name: 'Downloads :',
+          name: "Downloads :",
           children: [
-            { id: 16, name: 'October : pdf' },
-            { id: 17, name: 'November : pdf' },
-            { id: 18, name: 'Tutorial : html' },
-          ],
+            { id: 16, name: "October : pdf" },
+            { id: 17, name: "November : pdf" },
+            { id: 18, name: "Tutorial : html" }
+          ]
         },
         {
           id: 19,
-          name: 'Videos :',
+          name: "Videos :",
           children: [
             {
               id: 20,
-              name: 'Tutorials :',
+              name: "Tutorials :",
               children: [
-                { id: 21, name: 'Basic layouts : mp4' },
-                { id: 22, name: 'Advanced techniques : mp4' },
-                { id: 23, name: 'All about app : dir' },
-              ],
+                { id: 21, name: "Basic layouts : mp4" },
+                { id: 22, name: "Advanced techniques : mp4" },
+                { id: 23, name: "All about app : dir" }
+              ]
             },
-            { id: 24, name: 'Intro : mov' },
-            { id: 25, name: 'Conference introduction : avi' },
-          ],
-        },
+            { id: 24, name: "Intro : mov" },
+            { id: 25, name: "Conference introduction : avi" }
+          ]
+        }
       ]
     };
   },
 
   methods: {
     submit() {
-      if (this.$refs.form.validate()) {
+      // FIXME: Replace the `as any` hack.
+      if ((this.$refs.form as any).validate()) {
         console.log("save info");
         this.saveInfo();
       }

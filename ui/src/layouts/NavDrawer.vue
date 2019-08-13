@@ -108,9 +108,9 @@ export default Vue.extend({
       {
         title: "Survey Dimensions",
         route: "survey-dimensions",
-        icon: "book",
+        icon: "mdi-file-tree",
         divider: true
-      },
+      }
     ];
     return {
       drawerVisible: this.initialVisibility,
