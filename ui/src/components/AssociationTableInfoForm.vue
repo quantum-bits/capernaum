@@ -35,50 +35,62 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
-
-import axios from "axios";
-import { AxiosResponse } from "axios";
+import { validationMixin } from "vuelidate";
+import axios, { AxiosResponse } from "axios";
+import Vue from "vue";
 
 interface SurveyItemType {
   id: number; // id of the survey in our db
   title: string; // e.g., "Christian Life Survey"
 }
 
-@Component({
-  components: {}
-})
-export default class LetterInfoForm extends Vue {
+export default Vue.extend({
   /** Form to create/update Letter Info (e.g., title, etc.) */
-  @Prop() id!: number;
-  @Prop() initialTitle!: string;
-  @Prop() initialSurveyId!: number;
-  @Prop() isNew!: boolean;
+  name: "AssociationTableInfoForm",
 
-  surveys: SurveyItemType[] = [];
-  title: string = this.initialTitle;
+  mixins: [validationMixin],
 
-  valid: boolean = true;
-  name: string = "";
-  nameRules: any = [
-    (v: any) => !!v || "Title is required",
-    (v: any) =>
-      (v && v.length <= 80) || "Title of letter must be less than 80 characters"
-  ];
+  props: {
+    id: Number,
+    initialTitle: String,
+    initialSurveyId: Number,
+    isNew: Boolean
+  },
 
-  select: any = null;
+  data() {
+    return {
+      surveys: [] as SurveyItemType[],
+      title: this.initialTitle,
+      valid: true,
+      select: null as any,
+      name: "",
+      nameRules: [
+        (v: any) => !!v || "Title is required",
+        (v: any) =>
+          (v && v.length <= 80) ||
+          "Title of letter must be less than 80 characters"
+      ]
+    };
+  },
 
-  submit() {
-    if (this.$refs.form.validate()) {
-      console.log("save info");
-      this.saveInfo();
+  validations: {},
+
+  methods: {
+    submit() {
+      // See https://vuelidate.netlify.com/#sub-form-submission
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+        // error state
+      } else {
+        console.log("save info");
+        this.saveInfo();
+      }
+    },
+
+    saveInfo() {
+      // need to redirect or something, depending on if this is a new letter....
     }
-  }
-
-  @Emit("save-info")
-  saveInfo() {
-    // need to redirect or something, depending on if this is a new letter....
-  }
+  },
 
   mounted() {
     axios
@@ -95,5 +107,5 @@ export default class LetterInfoForm extends Vue {
         }
       });
   }
-}
+});
 </script>

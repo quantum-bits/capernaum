@@ -42,19 +42,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
 import Delta from "quill-delta";
 
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-import axios from "axios";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
-import {
-  LetterElementMenuItemType,
-  LetterElementEnum
-} from "../pages/letter-element.types";
+import { LetterElementMenuItemType } from "@/pages/letter-element.types";
 
 @Component({
   components: {
@@ -93,14 +89,14 @@ export default class LetterTextArea extends Vue {
 
   // https://quilljs.com/docs/modules/toolbar/
   /*
-  customToolbar: any = [
-          ["bold", "italic", "underline", "blockquote"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["link"],
-          [{'align': []}],
-          ['clean']
-  ];
-  */
+        customToolbar: any = [
+                ["bold", "italic", "underline", "blockquote"],
+                [{ list: "ordered" }, { list: "bullet" }],
+                ["link"],
+                [{'align': []}],
+                ['clean']
+        ];
+        */
 
   get showMoveDown() {
     return this.order < this.numItems - 1;
@@ -117,13 +113,13 @@ export default class LetterTextArea extends Vue {
     this.editModeOn = true;
     // don't need to use setContents, since the editor is already tied to this.textArea via v-model....
     /*
-    this works, in case we ever need to use setContents directly:
-    this.$refs.editor.quill.setContents({
-      ops: [
-        {insert: "some text"}
-      ]
-    });
-    */
+            this works, in case we ever need to use setContents directly:
+            this.$refs.editor.quill.setContents({
+              ops: [
+                {insert: "some text"}
+              ]
+            });
+            */
   }
 
   mounted() {

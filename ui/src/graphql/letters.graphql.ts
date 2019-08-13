@@ -21,3 +21,12 @@ export const ALL_LETTERS_QUERY = gql`
     }
   }
 `;
+
+export const ADD_LETTER_MUTATION = gql`
+  mutation addLetter($name: String!) {
+    createLetter(name: $name) {
+      id
+      name
+    }
+  }
+`;

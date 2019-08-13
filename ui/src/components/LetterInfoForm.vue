@@ -44,13 +44,14 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
-import axios from "axios";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
-import { BooleanAssociationBriefType } from "../pages/association-table.types";
+import { BooleanAssociationBriefType } from "@/pages/association-table.types";
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";
 
 interface SurveyItemType {
   id: number; // id of the survey in our db
@@ -68,15 +69,7 @@ interface BooleanAssociationType {
 @Component({
   apollo: {
     surveys: {
-      query: gql`
-        query allSurveys {
-          surveys(includeInactive: false) {
-            id
-            name
-            isActive
-          }
-        }
-      `
+      query: ALL_SURVEYS_QUERY
     }
   }
 })
@@ -105,27 +98,23 @@ export default class LetterInfoForm extends Vue {
   booleanAssociationSelect: any = null;
 
   submit() {
-    if (this.$refs.form.validate()) {
+    this.$v.$touch();
+    if (this.$v.$invalid) {
+      // error
+    } else {
       console.log("name is: ", this.name);
       this.$apollo.mutate({
-        mutation: gql`
-          mutation addLetter($name: String!) {
-            createLetter(name: $name) {
-              id
-              name
-            }
-          }
-        `,
+        mutation: ADD_LETTER_MUTATION,
         variables: {
           name: this.name
         }
       });
       /*
-      console.log("save info");
-      console.log("survey: ", this.surveySelect);
-      console.log("boolean association table: ", this.booleanAssociationSelect);
-      this.saveInfo();
-      */
+                console.log("save info");
+                console.log("survey: ", this.surveySelect);
+                console.log("boolean association table: ", this.booleanAssociationSelect);
+                this.saveInfo();
+                */
     }
   }
 
