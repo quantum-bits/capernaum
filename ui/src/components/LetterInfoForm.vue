@@ -98,10 +98,7 @@ export default class LetterInfoForm extends Vue {
   booleanAssociationSelect: any = null;
 
   submit() {
-    this.$v.$touch();
-    if (this.$v.$invalid) {
-      // error
-    } else {
+    if (this.$refs.form.validate()) {
       console.log("name is: ", this.name);
       this.$apollo.mutate({
         mutation: ADD_LETTER_MUTATION,

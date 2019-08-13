@@ -35,7 +35,6 @@
 </template>
 
 <script lang="ts">
-import { validationMixin } from "vuelidate";
 import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
@@ -47,8 +46,6 @@ interface SurveyItemType {
 export default Vue.extend({
   /** Form to create/update Letter Info (e.g., title, etc.) */
   name: "AssociationTableInfoForm",
-
-  mixins: [validationMixin],
 
   props: {
     id: Number,
@@ -73,15 +70,9 @@ export default Vue.extend({
     };
   },
 
-  validations: {},
-
   methods: {
     submit() {
-      // See https://vuelidate.netlify.com/#sub-form-submission
-      this.$v.$touch();
-      if (this.$v.$invalid) {
-        // error state
-      } else {
+      if (this.$refs.form.validate()) {
         console.log("save info");
         this.saveInfo();
       }
