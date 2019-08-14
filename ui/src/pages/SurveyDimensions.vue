@@ -106,12 +106,30 @@
           </div>
         </template>
       </v-flex>
-      <v-flex xs12 sm12>
-        <h2 class="title font-weight-regular mb-3">
-          Survey Dimensions:
-        </h2>
+      <v-flex xs10 offset-xs1>
+        <h1 class="headline mb-5">Survey Dimensions</h1>
       </v-flex>
-      <v-flex xs12 sm12>
+      <v-flex xs7 offset-xs1>
+        <v-select
+          v-model="surveySelect"
+          :items="surveys"
+          item-text="name"
+          item-value="id"
+          :rules="[v => !!v || 'Survey is required']"
+          label="Survey"
+          required
+          persistent-hint
+          return-object
+          single-line
+        />
+      </v-flex>
+      <v-flex xs10 offset-xs1 class="text-right">
+        <v-btn color="primary" @click="addSurveyDimension()"
+          >Add Survey Dimension</v-btn
+        >
+      </v-flex>
+      </v-flex>
+      <v-flex xs10 offset-xs1>
         <template>
           <v-treeview dense rounded hoverable :items="surveyDimensionData">
             <template v-slot:prepend="{ item, open }">
@@ -155,11 +173,6 @@
           </v-treeview>
         </template>
       </v-flex>
-      <v-flex xs12 sm12>
-        <v-btn color="primary" @click="addSurveyDimension()"
-          >Add Survey Dimension</v-btn
-        >
-      </v-flex>
     </v-layout>
   </v-container>
 </template>
@@ -199,6 +212,7 @@ export default Vue.extend({
       surveys: [] as SurveyItemType[],
       //title: this.initialTitle,
       valid: true,
+      surveySelect: null as any,
       //select: null as any,
       //name: "",
       nameRules: [
