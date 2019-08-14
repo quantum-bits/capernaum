@@ -1,8 +1,8 @@
 import { QualtricsService } from "./qualtrics.service";
-import { SurveyResolver } from "./qualtrics.resolvers";
+import { QualtricsResolver } from "./qualtrics.resolvers";
 import { Module } from "@nestjs/common";
 
 @Module({
-  providers: [SurveyResolver, QualtricsService]
+  providers: [QualtricsResolver, QualtricsService]
 })
 export class QualtricsModule {}

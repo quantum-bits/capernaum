@@ -5,6 +5,7 @@ import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { Letter, LetterElementType } from "./letter/letter.entities";
 import { Survey } from "./survey/survey.entities";
+import { SurveyModule } from "./survey/survey.module";
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { Survey } from "./survey/survey.entities";
       autoSchemaFile: "generated-schema.graphql"
     }),
     LetterModule,
-    QualtricsModule
+    QualtricsModule,
+    SurveyModule
   ]
 })
 export class AppModule {}

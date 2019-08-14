@@ -7,6 +7,7 @@ import {
 import { LetterElementTypeService, LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
+import { Logger } from "@nestjs/common";
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -19,6 +20,7 @@ export class LetterResolver {
 
   @Query(returns => [Letter])
   async letters() {
+    console.error(`LETTERS!`);
     return await this.letterService.letters();
   }
 

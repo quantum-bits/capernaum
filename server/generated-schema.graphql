@@ -32,6 +32,8 @@ type Mutation {
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
+  createSurvey(input: SurveyCreateInput!): Survey!
+  deleteSurvey(id: Int!): Int!
 }
 
 type QualtricsSurveyMetadata {
@@ -47,11 +49,29 @@ type Query {
   letters: [Letter!]!
   letter(id: Int!): Letter!
   letterElementTypes: [LetterElementType!]!
-  surveys(includeInactive: Boolean = false): [QualtricsSurveyMetadata!]!
+  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyMetadata!]!
+  surveys: [Survey!]!
+  survey(id: Int!): Survey!
 }
 
 type Survey {
   id: Int!
   qualtricsId: String!
+  title: String!
+}
+
+input SurveyCreateInput {
+  qualtricsId: String!
+  title: String!
+}
+
+type SurveyDimension {
+  id: Int!
+  abbreviation: String!
+  title: String!
+}
+
+input SurveyDimensionCreateInput {
+  abbreviation: String!
   title: String!
 }

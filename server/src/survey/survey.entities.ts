@@ -26,3 +26,35 @@ export class Survey {
   @Column()
   title: string;
 }
+
+@InputType()
+export class SurveyCreateInput implements Partial<Survey> {
+  @Field() qualtricsId: string;
+  @Field() title: string;
+}
+
+/**
+ * SurveyDimension
+ */
+
+@Entity()
+@ObjectType()
+export class SurveyDimension {
+  @PrimaryGeneratedColumn()
+  @Field(type => Int)
+  id: number;
+
+  @Field()
+  @Column()
+  abbreviation: string;
+
+  @Field()
+  @Column()
+  title: string;
+}
+
+@InputType()
+export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
+  @Field() abbreviation: string;
+  @Field() title: string;
+}

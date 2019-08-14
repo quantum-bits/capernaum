@@ -3,11 +3,11 @@ import { Args, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
 
 @Resolver(of => QualtricsSurveyMetadata)
-export class SurveyResolver {
+export class QualtricsResolver {
   constructor(private readonly qualtricsService: QualtricsService) {}
 
   @Query(returns => [QualtricsSurveyMetadata])
-  async surveys(
+  async qualtricsSurveys(
     @Args({
       name: "includeInactive",
       type: () => Boolean,
