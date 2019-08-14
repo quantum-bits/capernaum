@@ -39,6 +39,105 @@
 <template>
   <v-container>
     <v-layout row wrap>
+      <v-flex xs12>
+        <template>
+              <div>
+                <v-row justify="center">
+                    <v-dialog
+                        persistent
+                        v-model="surveyIndexDialog"
+                        max-width="800"
+                    >
+                        <v-card>
+
+                            <v-card-title class="headline">
+                              {{surveyIndexDialogTitle}}
+                            </v-card-title>
+
+                            <v-card-text>
+                              <v-text-field
+                                v-model="surveyIndexText"
+                                label="Survey Index"
+                                :hint="surveyIndexDialogHint"
+                                outlined
+                                persistent-hint
+                              ></v-text-field>
+                            </v-card-text>
+                          
+                            <v-card-text>
+                            Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
+                            </v-card-text>
+
+                            <v-card-actions>
+                            <v-spacer></v-spacer>
+
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="cancelIndexDialog()"
+                            >
+                                Cancel
+                            </v-btn>
+
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="submitNewSurveyIndex()"
+                            >
+                                Submit
+                            </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog
+                        persistent
+                        v-model="surveyDimensionDialog"
+                        max-width="800"
+                    >
+                        <v-card>
+                            <v-card-title class="headline">
+                              {{surveyDimensionDialogTitle}}
+                            </v-card-title>
+
+                            <v-card-text>
+                              <v-text-field
+                                v-model="surveyDimensionText"
+                                label="Survey Dimension"
+                                :hint="surveyDimensionDialogHint"
+                                outlined
+                                persistent-hint
+                              ></v-text-field>
+                            </v-card-text>
+
+                            <v-card-actions>
+                            <v-spacer></v-spacer>
+
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="cancelDimensionDialog()"
+                            >
+                                Cancel
+                            </v-btn>
+
+                            <v-btn
+                                color="green darken-1"
+                                text
+                                @click="submitNewSurveyDimension()"
+                            >
+                                Submit
+                            </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
+
+                </v-row>
+              </div>
+            </template>
+
+
+      </v-flex>
       <v-flex xs12 sm12>
         <h2 class="title font-weight-regular mb-3">
           Survey Dimensions:
@@ -51,6 +150,8 @@
             rounded 
             hoverable 
             :items="items">
+
+            
             <template v-slot:prepend="{ item, open }">
                 <v-icon v-if="item.type == surveyDimensionEnum.SURVEY_ITEM">
                     {{'mdi-comment-outline'}}
@@ -69,18 +170,29 @@
                         </v-icon>
                     </a>
                 </span>
-                
-                <a v-else-if="item.type == surveyDimensionEnum.SURVEY_DIMENSION" @click=deleteDimension(item.id)>
-                    <v-icon> 
-                        {{ 'mdi-close-circle' }}
-                    </v-icon>
-                </a>
-                </template>
+                <span v-else-if="item.type == surveyDimensionEnum.SURVEY_DIMENSION">
+                    <a @click=addSurveyIndex(item.id)>
+                        <v-icon> 
+                            {{ 'mdi-plus-circle' }}
+                        </v-icon>
+                    </a>
+                    <a @click=editSurveyDimension(item.id)>
+                        <v-icon> 
+                            {{ 'mdi-pencil' }}
+                        </v-icon>
+                    </a>
+                    <a @click=deleteDimension(item.id)>
+                        <v-icon> 
+                            {{ 'mdi-close-circle' }}
+                        </v-icon>
+                    </a>
+                </span>  
+              </template>
             </v-treeview>
         </template>
       </v-flex>
       <v-flex xs12 sm12>
-        <v-btn color="primary">Add Survey Dimension</v-btn>
+        <v-btn color="primary" @click="addSurveyDimension()">Add Survey Dimension</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
@@ -112,7 +224,15 @@ export default Vue.extend({
 
   data() {
     return {
-        surveyDimensionEnum: SurveyDimensionEnum,
+      surveyDimensionEnum: SurveyDimensionEnum,
+      surveyIndexDialog: false,
+      surveyDimensionDialog: false,
+      surveyDimensionText: '' as string,
+      surveyDimensionDialogTitle: '' as string,
+      surveyDimensionDialogHint: '' as string,
+      surveyIndexText: '' as string,
+      surveyIndexDialogTitle: '' as string,
+      surveyIndexDialogHint: '' as string,
       surveys: [] as SurveyItemType[],
       title: this.initialTitle,
       valid: true,
@@ -211,19 +331,54 @@ export default Vue.extend({
   },
 
   methods: {
+      addSurveyDimension() {
+        this.surveyDimensionDialog = true;
+        this.surveyDimensionText = "";
+        this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
+        this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+      },
+      editSurveyDimension(dimensionId: number) {
+        this.surveyDimensionDialog = true;
+        this.surveyDimensionText = "Focal Dimension";
+      },
+      deleteDimension(dimensionId: number) {
+          console.log('delete dimension!', dimensionId);
+          console.log(typeof(dimensionId));
+      },
+      cancelDimensionDialog() {
+        this.surveyDimensionDialog = false;
+      },
+      submitNewSurveyDimension() {
+        this.surveyDimensionDialog = false;
+        console.log('save: ', this.surveyDimensionText);
+        // save to db, etc.
+      },
+      addSurveyIndex(dimensionId: number) {
+        this.surveyIndexDialog = true;
+        this.surveyIndexText = "";
+        this.surveyIndexDialogTitle = "Add a New Survey Index";
+        this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
+      },
       editIndex(indexId: number) {
           console.log('edit index!', indexId);
           console.log(typeof(indexId));
+          this.surveyIndexDialog = true;
+          this.surveyIndexText = "A Focus on God";
+          console.log(this.dialog);
       },
       deleteIndex(indexId: number) {
           console.log('delete index!', indexId);
           console.log(typeof(indexId));
       },
-
-      deleteDimension(dimensionId: number) {
-          console.log('delete dimension!', dimensionId);
-          console.log(typeof(dimensionId));
+      cancelIndexDialog() {
+        this.surveyIndexDialog = false;
       },
+      submitNewSurveyIndex() {
+        this.surveyIndexDialog = false;
+        console.log('save: ', this.surveyIndexText);
+        // save to db, etc.
+      },
+
     submit() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
