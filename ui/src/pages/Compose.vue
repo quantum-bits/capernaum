@@ -10,7 +10,7 @@
     <div v-if="!editModeOn">
       <v-layout row wrap>
         <v-flex xs7 offset-xs1>
-          <h1 class="headline mb-3">{{ name }}</h1>
+          <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
             <span class="font-weight-light">{{ letter.name }}</span>

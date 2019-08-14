@@ -122,20 +122,22 @@ export default class LetterInfoForm extends Vue {
   }
 
   mounted() {
+    console.log('name: ', this.name);
+    console.log(typeof(this.name));
     console.log("boolean association: ", this.initialBooleanAssociation);
-    axios
-      .get("http://localhost:4000/survey-data/")
-      .then((response: AxiosResponse) => {
-        console.log("surveys: ", response);
-        this.surveys = response.data;
-        if (!this.isNew) {
-          for (let survey of this.surveys) {
-            if (survey.id === this.initialSurveyId) {
-              this.surveySelect = survey;
-            }
-          }
-        }
-      });
+    //axios
+    //  .get("http://localhost:4000/survey-data/")
+    //  .then((response: AxiosResponse) => {
+    //    console.log("surveys: ", response);
+    //    //this.surveys = response.data;
+    //    if (!this.isNew) {
+    //      for (let survey of this.surveys) {
+    //        if (survey.id === this.initialSurveyId) {
+    //          this.surveySelect = survey;
+    //        }
+    //      }
+    //    }
+    //  });
     // json-server -p 4000 --watch db.json
     axios
       .get("http://localhost:4000/boolean-associations/")
