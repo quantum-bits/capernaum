@@ -28,9 +28,16 @@ export class Survey {
 }
 
 @InputType()
-export class SurveyCreateInput implements Partial<Survey> {
+export class SurveyCreateInput {
   @Field() qualtricsId: string;
   @Field() title: string;
+}
+
+@InputType()
+export class SurveyUpdateInput {
+  @Field(type => Int) id: number;
+  @Field({ nullable: true }) qualtricsId?: string;
+  @Field({ nullable: true }) title?: string;
 }
 
 /**
