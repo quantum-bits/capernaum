@@ -14,9 +14,7 @@
         ></v-text-field>
         <v-select
           v-model="surveySelect"
-          :items="surveys"
-          item-text="name"
-          item-value="id"
+          :items="selections"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
           required
@@ -50,14 +48,9 @@ import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
 import { BooleanAssociationBriefType } from "@/pages/association-table.types";
+import { SurveyItem, SurveySelection } from "@/pages/survey-dimension.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";
-
-interface SurveyItemType {
-  id: number; // id of the survey in our db
-  name: string; // e.g., "Christian Life Survey"
-  isActive: boolean;
-}
 
 // used for data returned from the db (for the list used in the drop-down)
 interface BooleanAssociationType {
@@ -82,7 +75,7 @@ export default class LetterInfoForm extends Vue {
   initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
 
-  surveys: SurveyItemType[] = [];
+  surveys: SurveyItem[] = [];
   booleanAssociations: BooleanAssociationType[] = [];
   name: string = this.initialTitle;
 
@@ -120,6 +113,16 @@ export default class LetterInfoForm extends Vue {
   saveInfo() {
     // need to redirect or something, depending on if this is a new letter....
   }
+
+  // using a getter, which is apparently the way to do a computed property when using vue property decorators:
+  // https://github.com/kaorun343/vue-property-decorator/issues/85
+  get selections(): SurveySelection[] {
+    return this.surveys.map(survey => ({
+      text: survey.name,
+      value: survey.id
+    }));
+  }
+
 
   mounted() {
     console.log('name: ', this.name);

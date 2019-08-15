@@ -27,9 +27,7 @@
                             <v-col cols="12" sm="12">
                               <v-select
                                 v-model="selectedSurveyItems"
-                                :items="surveyItems"
-                                :item-text="'name'"
-                                :item-value="'id'"
+                                :items="surveys"
                                 label="Choose Survey Items"
                                 multiple
                                 chips
@@ -181,12 +179,9 @@
 import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
-interface SurveyItemType {
-  id: number; // id of the survey in our db
-  title: string; // e.g., "Christian Life Survey"
-}
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 
-import { SurveyDimensionEnum } from "./survey-dimension.types";
+import { SurveyItem, SurveySelection, SurveyDimensionEnum } from "./survey-dimension.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
@@ -209,7 +204,7 @@ export default Vue.extend({
       surveyIndexDialogHint: "" as string,
       surveyIndexId: null as number, //id of the survey index currently being edited
       selectedSurveyItems: [] as any,
-      surveys: [] as SurveyItemType[],
+      surveys: [] as SurveyItem[],
       //title: this.initialTitle,
       valid: true,
       surveySelect: null as any,
@@ -453,13 +448,23 @@ export default Vue.extend({
     }
   },
 
+  apollo: {
+    surveys: {
+      query: ALL_SURVEYS_QUERY
+    }
+  },
+
+  computed: {
+    selections(): SurveySelection[] {
+      return this.surveys.map(survey => ({
+        text: survey.name,
+        value: survey.id
+      }));
+    }
+  },
+
   mounted() {
-    axios
-      .get("http://localhost:4000/survey-data/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.surveys = response.data;
-      });
+    console.log('mounted....');
   }
 });
 </script>

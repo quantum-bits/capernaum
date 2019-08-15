@@ -15,26 +15,28 @@
           :items="booleanAssociationSummary"
           class="elevation-1"
         >
-          <template v-slot:items="props">
-            <td>{{ props.item.title }}</td>
-            <td class="text-xs-right">{{ props.item.surveyTitle }}</td>
-            <td class="text-xs-right">{{ props.item.lastUpdate }}</td>
-            <td class="text-xs-center">
-              <span v-if="props.item.isFrozen">
-                <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
-                <v-icon color="success">check_circle</v-icon>
-              </span>
-            </td>
-            <td class="text-xs-center">
-              <span v-if="props.item.isActive">
-                <v-icon color="success">check_circle</v-icon>
-              </span>
-            </td>
-            <td class="text-xs-right">
-              <button v-on:click="viewAssociationTable(props.item)">
-                View
-              </button>
-            </td>
+          <template v-slot:item="{ item }">
+            <tr>
+              <td>{{ item.title }}</td>
+              <td class="text-xs-right">{{ item.surveyTitle }}</td>
+              <td class="text-xs-right">{{ item.lastUpdate }}</td>
+              <td class="text-xs-center">
+                <span v-if="item.isFrozen">
+                  <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-center">
+                <span v-if="item.isActive">
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-right">
+                <v-btn text v-on:click="viewAssociationTable(item)">
+                  View
+                </v-btn>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-flex>
