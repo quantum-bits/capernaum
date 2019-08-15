@@ -110,9 +110,7 @@
       <v-flex xs7 offset-xs1>
         <v-select
           v-model="surveySelect"
-          :items="surveys"
-          item-text="name"
-          item-value="id"
+          :items="selections"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
           required
@@ -121,11 +119,12 @@
           single-line
         />
       </v-flex>
+    </v-layout>
+    <v-layout v-if="surveySelect" row wrap>
       <v-flex xs10 offset-xs1 class="text-right">
         <v-btn color="primary" @click="addSurveyDimension()"
           >Add Survey Dimension</v-btn
         >
-      </v-flex>
       </v-flex>
       <v-flex xs10 offset-xs1>
         <template>
@@ -181,14 +180,17 @@ import Vue from "vue";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 
-import { SurveyItem, SurveySelection, SurveyDimensionEnum } from "./survey-dimension.types";
+import {
+  SurveyItem,
+  SurveySelection,
+  SurveyDimensionEnum
+} from "./survey-dimension.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
   name: "SurveyDimensions",
 
-  props: {
-  },
+  props: {},
 
   data() {
     return {
@@ -352,7 +354,7 @@ export default Vue.extend({
       this.surveyDimensionText = "";
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
-      console.log('valid? ', this.valid);
+      console.log("valid? ", this.valid);
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
         (this.$refs.form as any).resetValidation();
@@ -374,7 +376,7 @@ export default Vue.extend({
       // FIXME: Replace the `as any` hack.
       (this.$refs.form as any).resetValidation();
       console.log(this.$refs.form);
-      console.log('valid? ', this.valid);
+      console.log("valid? ", this.valid);
     },
     submitSurveyDimension() {
       // FIXME: Replace the `as any` hack.
@@ -463,8 +465,15 @@ export default Vue.extend({
     }
   },
 
+  watch: {
+    surveySelect: function() {
+      console.log("selection! ", this.surveySelect);
+      // do query for data for selected survey....
+    }
+  },
+
   mounted() {
-    console.log('mounted....');
+    console.log("mounted....");
   }
 });
 </script>

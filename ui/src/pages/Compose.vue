@@ -170,8 +170,15 @@ interface SurveyTypeBrief {
   apollo: {
     letter: {
       query: ONE_LETTER_QUERY,
-      variables: {
-        letterId: 9 // hard-code for now....
+      variables() {
+        if (this.$route.params.id !== undefined) {
+          return {
+            letterId: this.$route.params.id
+          };
+        }
+      },
+      skip() {
+        return this.$route.params.id === undefined;
       }
     }
   }
