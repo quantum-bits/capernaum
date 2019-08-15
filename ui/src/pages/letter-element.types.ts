@@ -16,6 +16,15 @@ export interface LetterElementType {
   editModeOn?: boolean; // are we editing this item at the moment? useful in the form
 }
 
+/**
+ * letter
+ */
+export interface Letter {
+  id: number;
+  isFrozen: boolean;
+  name: string;
+}
+
 /** related enum
  */
 export enum LetterElementEnum {
