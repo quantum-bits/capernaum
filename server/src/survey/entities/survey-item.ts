@@ -18,7 +18,7 @@ export class SurveyItem {
   })
   surveyIndex?: SurveyIndex;
 
-  @Column("integer")
+  @Column("integer", { default: -1 })
   @Field(type => Int)
   sequence: number;
 
@@ -33,7 +33,7 @@ export class SurveyItem {
 
 @InputType()
 export class SurveyItemCreateInput {
-  @Field(type => Int, { defaultValue: -1 }) sequence: number;
+  @Field(type => Int, { defaultValue: -1 }) sequence?: number;
   @Field() qualtricsId: string;
   @Field() qualtricsText: string;
 }

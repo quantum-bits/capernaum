@@ -8,9 +8,9 @@ import {
 import {
   CreateResponseData,
   CreateResponseExportResponse,
-  GetOrganizationResponse,
-  GetSurveyResponse,
-  ListSurveysResponse,
+  QualtricsOrganization,
+  QualtricsSurvey,
+  QualtricsSurveyList,
   ResponseExportProgress
 } from "./qualtrics.types";
 import { Injectable } from "@nestjs/common";
@@ -62,7 +62,7 @@ export class QualtricsService {
 
   /** Get a survey with the given ID. */
   async getSurvey(surveyId: string) {
-    return this.get<GetSurveyResponse>(this.makeUrl("surveys", surveyId));
+    return this.get<QualtricsSurvey>(this.makeUrl("surveys", surveyId));
   }
 
   async listSurveys(offset: string = undefined) {
@@ -70,12 +70,12 @@ export class QualtricsService {
     if (offset) {
       url.searchParams.set("offset", offset);
     }
-    return this.get<ListSurveysResponse>(url);
+    return this.get<QualtricsSurveyList>(url);
   }
 
   /** Get an organization's details. */
   async getOrganization(organizationId: string) {
-    return this.get<GetOrganizationResponse>(
+    return this.get<QualtricsOrganization>(
       this.makeUrl("organizations", organizationId)
     );
   }

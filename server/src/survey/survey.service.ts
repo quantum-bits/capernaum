@@ -3,6 +3,7 @@ import {
   Survey,
   SurveyCreateInput,
   SurveyItem,
+  SurveyItemCreateInput,
   SurveyUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -45,8 +46,8 @@ export class SurveyItemService extends BaseService<SurveyItem> {
     super(surveyItemRepository);
   }
 
-  readBySurvey(survey: Survey) {
-    console.log("SURVEY 2", survey);
-    return this.surveyItemRepository.find({ survey: survey });
+  create(createInput: SurveyItemCreateInput) {
+    const newSurvey = this.surveyItemRepository.create(createInput);
+    return this.surveyItemRepository.save(newSurvey);
   }
 }

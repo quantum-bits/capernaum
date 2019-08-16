@@ -31,7 +31,7 @@ export interface ResponseExportProgress extends QualtricsResponse {
   };
 }
 
-export interface GetOrganizationResponse extends QualtricsResponse {
+export interface QualtricsOrganization extends QualtricsResponse {
   result: {
     id: string;
     name: string;
@@ -44,14 +44,36 @@ export interface GetOrganizationResponse extends QualtricsResponse {
   };
 }
 
-export interface ListSurveysResponse extends QualtricsResponse {
+export interface QualtricsSurveyList extends QualtricsResponse {
   result: {
     elements: QualtricsSurveyMetadata[];
     nextPage: string | null;
   };
 }
 
-export interface GetSurveyResponse extends QualtricsResponse {
+export interface QualtricsQuestion {
+  questionType: {
+    type: string;
+    selector: string;
+    subSelector: string;
+  };
+  questionText: string;
+  questionLabel: string | null;
+  validation: object;
+  questionName: string;
+  choices?: {
+    [key: string]: {
+      recode: string;
+      description: string;
+      choiceText: string;
+      imageDescription: string | null;
+      variableName: string | null;
+      analyze: boolean;
+    };
+  };
+}
+
+export interface QualtricsSurvey extends QualtricsResponse {
   result: {
     id: string;
     name: string;
@@ -64,7 +86,9 @@ export interface GetSurveyResponse extends QualtricsResponse {
       startDate: string | null;
       endDate: string | null;
     };
-    questions: object;
+    questions: {
+      [key: string]: QualtricsQuestion;
+    };
     exportColumnMap: object;
     blocks: object;
     flow: object;

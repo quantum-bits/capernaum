@@ -41,3 +41,9 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) qualtricsName: string;
   @Field({ nullable: true }) qualtricsModDate: string;
 }
+
+@InputType()
+export class QualtricsImportInput {
+  @Field() qualtricsId: string;
+  @Field() title: string;
+}
