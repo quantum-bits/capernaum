@@ -12,21 +12,21 @@ export function BaseResolver<EntityType extends ClassType>(
 
   @Resolver(of => EntityObject, { isAbstract: true })
   abstract class BaseResolver {
-    constructor(private readonly service: any) {}
+    constructor(private readonly baseService: any) {}
 
     @Query(returns => [EntityObject], { name: pluralEntityName })
     readAll() {
-      return this.service.readAll();
+      return this.baseService.readAll();
     }
 
     @Query(returns => EntityObject, { name: singularEntityName })
     readOne(@Args({ name: "id", type: () => Int }) id: number) {
-      return this.service.readOne(id);
+      return this.baseService.readOne(id);
     }
 
     @Mutation(returns => Int, { name: `delete${entityName}` })
     async delete(@Args({ name: "id", type: () => Int }) id: number) {
-      const result: DeleteResult = await this.service.delete(id);
+      const result: DeleteResult = await this.baseService.delete(id);
       return result.affected;
     }
   }

@@ -1,6 +1,6 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { SurveyItem } from "./survey-item";
+import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 
 @Entity()
@@ -25,11 +25,12 @@ export class Survey {
 }
 
 @InputType()
-export class SurveyCreateInput implements Partial<Survey> {
+export class SurveyCreateInput {
   @Field() title: string;
   @Field() qualtricsId: string;
   @Field() qualtricsName: string;
   @Field() qualtricsModDate: string;
+  @Field(type => [SurveyItemCreateInput]) surveyItems: SurveyItemCreateInput[];
 }
 
 @InputType()

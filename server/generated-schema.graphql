@@ -66,11 +66,11 @@ type Survey {
 }
 
 input SurveyCreateInput {
-  foo: [String!]!
   title: String!
   qualtricsId: String!
   qualtricsName: String!
   qualtricsModDate: String!
+  surveyItems: [SurveyItemCreateInput!]!
 }
 
 type SurveyDimension {
@@ -93,6 +93,12 @@ type SurveyIndex {
 type SurveyItem {
   id: Int!
   sequence: Int!
+  qualtricsId: String!
+  qualtricsText: String!
+}
+
+input SurveyItemCreateInput {
+  sequence: Int = -1
   qualtricsId: String!
   qualtricsText: String!
 }

@@ -3,17 +3,17 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export class BaseService<EntityType> {
-  constructor(private readonly repository: Repository<EntityType>) {}
+  constructor(private readonly baseRepository: Repository<EntityType>) {}
 
   readOne(id: number): Promise<EntityType> {
-    return this.repository.findOne(id);
+    return this.baseRepository.findOne(id);
   }
 
   readAll(): Promise<EntityType[]> {
-    return this.repository.find();
+    return this.baseRepository.find();
   }
 
   delete(id: number) {
-    return this.repository.delete(id);
+    return this.baseRepository.delete(id);
   }
 }
