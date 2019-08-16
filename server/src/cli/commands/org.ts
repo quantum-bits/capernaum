@@ -1,6 +1,5 @@
-import { Command, flags } from "@oclif/command";
+import { Command } from "@oclif/command";
 import { QualtricsService } from "../../qualtrics/qualtrics.service";
-import chalk from "chalk";
 import { table } from "table";
 
 export default class OrgCommand extends Command {

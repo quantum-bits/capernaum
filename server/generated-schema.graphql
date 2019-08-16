@@ -29,12 +29,12 @@ input LetterUpdateInput {
 }
 
 type Mutation {
-  createSURVEY(createInput: SurveyCreateInput!): Survey!
-  updateSURVEY(updateInput: SurveyUpdateInput!): Survey!
-  deleteSURVEY(id: Int!): Int!
+  deleteSurvey(id: Int!): Int!
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
+  createSurvey(createInput: SurveyCreateInput!): Survey!
+  updateSurvey(updateInput: SurveyUpdateInput!): Survey!
 }
 
 type QualtricsSurveyMetadata {
@@ -47,8 +47,8 @@ type QualtricsSurveyMetadata {
 }
 
 type Query {
-  readAllSURVEY: [Survey!]!
-  readOneSURVEY(id: Int!): Survey!
+  surveys: [Survey!]!
+  survey(id: Int!): Survey!
   letters: [Letter!]!
   letter(id: Int!): Letter!
   letterElementTypes: [LetterElementType!]!
@@ -57,19 +57,27 @@ type Query {
 
 type Survey {
   id: Int!
-  qualtricsId: String!
+  surveyItems: [SurveyItem!]!
+  surveyDimensions: [SurveyDimension!]!
   title: String!
+  qualtricsId: String!
+  qualtricsName: String!
+  qualtricsModDate: String!
 }
 
 input SurveyCreateInput {
-  qualtricsId: String!
+  foo: [String!]!
   title: String!
+  qualtricsId: String!
+  qualtricsName: String!
+  qualtricsModDate: String!
 }
 
 type SurveyDimension {
   id: Int!
   abbreviation: String!
   title: String!
+  sequence: Int!
 }
 
 input SurveyDimensionCreateInput {
@@ -77,8 +85,22 @@ input SurveyDimensionCreateInput {
   title: String!
 }
 
+type SurveyIndex {
+  id: Int!
+  title: String!
+}
+
+type SurveyItem {
+  id: Int!
+  sequence: Int!
+  qualtricsId: String!
+  qualtricsText: String!
+}
+
 input SurveyUpdateInput {
   id: Int!
-  qualtricsId: String
   title: String
+  qualtricsId: String
+  qualtricsName: String
+  qualtricsModDate: String
 }

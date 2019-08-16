@@ -6,16 +6,17 @@ import {
   sleep
 } from "./helpers";
 import {
+  CreateResponseData,
+  CreateResponseExportResponse,
+  GetOrganizationResponse,
   GetSurveyResponse,
   ListSurveysResponse,
-  GetOrganizationResponse,
-  CreateResponseExportResponse,
-  ResponseExportProgress,
-  CreateResponseData
+  ResponseExportProgress
 } from "./qualtrics.types";
 import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
+
 const apiDebug = debug("api");
 
 @Injectable()
@@ -166,7 +167,7 @@ export class QualtricsService {
     // Fetch the export data itself. Returns a Promise of ZipEntry objects.
     return this.getResponseExportFile(
       surveyId,
-      exportResult!.data.result.fileId
+      exportResult.data.result.fileId
     );
   }
 }

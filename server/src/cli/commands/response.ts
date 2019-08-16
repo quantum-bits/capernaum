@@ -1,4 +1,3 @@
-import { parse } from "date-fns";
 import { Command, flags } from "@oclif/command";
 import { QualtricsService } from "../../qualtrics/qualtrics.service";
 

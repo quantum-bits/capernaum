@@ -4,8 +4,13 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { Letter, LetterElementType } from "./letter/letter.entities";
-import { Survey } from "./survey/survey.entities";
 import { SurveyModule } from "./survey/survey.module";
+import {
+  SurveyDimension,
+  Survey,
+  SurveyIndex,
+  SurveyItem
+} from "./survey/entities";
 
 @Module({
   imports: [
@@ -15,7 +20,14 @@ import { SurveyModule } from "./survey/survey.module";
       database: process.env.PG_DATABASE,
       username: process.env.PG_USERNAME,
       password: process.env.PG_PASSWORD,
-      entities: [Letter, LetterElementType, Survey],
+      entities: [
+        Letter,
+        LetterElementType,
+        SurveyDimension,
+        Survey,
+        SurveyIndex,
+        SurveyItem
+      ],
       synchronize: true,
       logging: true
     }),
