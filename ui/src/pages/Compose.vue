@@ -40,10 +40,10 @@
         </v-flex>
       </v-layout>
     </div>
-    <div v-else>
+    <div v-if="letterExistsAndEditModeOn()">
       <LetterInfoForm
         :id="id"
-        :initialTitle="title"
+        :initialTitle="letter.name"
         :initialSurveyId="survey.id"
         :initialBooleanAssociation="booleanAssociation"
         :isNew="isNew"
@@ -194,7 +194,6 @@ interface SurveyTypeBrief {
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
-  title: string = "";
   survey: SurveyTypeBrief = {
     id: null,
     title: ""
@@ -221,6 +220,14 @@ export default class Compose extends Vue {
   letterExistsAndEditModeOff() {
     if (this.letter !== null) {
       return !this.editModeOn;
+    } else {
+      return false;
+    }
+  }
+
+  letterExistsAndEditModeOn() {
+    if (this.letter !== null) {
+      return this.editModeOn;
     } else {
       return false;
     }
@@ -349,7 +356,6 @@ export default class Compose extends Vue {
             box.isNew = false;
           }
           this.resetOrderProperty();
-          this.title = response.data.title;
           this.survey = {
             id: response.data.survey.id,
             title: response.data.survey.title
