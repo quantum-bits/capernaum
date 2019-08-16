@@ -180,6 +180,8 @@ interface SurveyTypeBrief {
         }
       },
       update(data) {
+        // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
+        // manipulation, can use a computed property instead
         console.log('data: ', data);
         return data.letter;
       },

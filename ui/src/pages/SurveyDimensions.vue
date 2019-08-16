@@ -27,7 +27,9 @@
                             <v-col cols="12" sm="12">
                               <v-select
                                 v-model="selectedSurveyItems"
-                                :items="surveys"
+                                :items="surveyItems"
+                                :item-text="'name'"
+                                :item-value="'id'"
                                 label="Choose Survey Items"
                                 multiple
                                 chips
@@ -179,6 +181,15 @@ import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql"; // won't need this, eventually...just using it now for testing purposes
+
+//FIXME: delete Letter stuff once we no longer need it....
+import {
+  Letter,
+  LetterElementEnum,
+  LetterElementMenuItemType,
+  LetterElementType
+} from "./letter-element.types";
 
 import {
   SurveyItem,
@@ -194,6 +205,7 @@ export default Vue.extend({
 
   data() {
     return {
+      letter: null as Letter | null,
       surveyDimensionEnum: SurveyDimensionEnum,
       surveyIndexDialog: false,
       surveyDimensionDialog: false,
@@ -209,6 +221,7 @@ export default Vue.extend({
       surveys: [] as SurveyItem[],
       //title: this.initialTitle,
       valid: true,
+      //FIXME: make surveySelect of the appropriate type
       surveySelect: null as any,
       //select: null as any,
       //name: "",
@@ -453,6 +466,36 @@ export default Vue.extend({
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY
+    },
+    /**
+     * the following query will eventually be used to get survey dimension data, not letter data;
+     * I was just putting the structure in place to make sure that it was reactive in the right way;
+     * seems to work!
+     */
+    // the following query runs automatically when this.surveySelect is updates (i.e., when something is chosen from the drop-down)
+    letter: {
+      query: ONE_LETTER_QUERY,
+      variables() {
+        console.log('survey select: ',this.surveySelect);
+        console.log('qualtricsId (to use fetch survey dimension data): ', this.surveySelect.value);
+        /*
+        if (this.$route.params.id !== undefined) {
+          return {
+            letterId: 3
+          };
+        }
+        */
+        return {
+          letterId: 3
+        };
+      },
+      update(data) {
+        console.log('data: ', data);
+        return data.letter;
+      },
+      skip() {
+        return this.surveySelect === null;
+      }
     }
   },
 
@@ -462,13 +505,6 @@ export default Vue.extend({
         text: survey.name,
         value: survey.id
       }));
-    }
-  },
-
-  watch: {
-    surveySelect: function() {
-      console.log("selection! ", this.surveySelect);
-      // do query for data for selected survey....
     }
   },
 
