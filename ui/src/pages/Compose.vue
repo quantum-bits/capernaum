@@ -182,6 +182,13 @@ interface SurveyTypeBrief {
       update(data) {
         // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
         // manipulation, can use a computed property instead
+        /**
+         * FIXME: eventually isFrozen will be on SurveyLetter instead of on Letter; if it is frozen, so will everything else be below it.
+         * That means that other pages will need to go up the chain to check if SurveyLetter is frozen or not.
+         * ...at this point, we are assuming that each combo of survey-tables-letter is standalone, so if SurveyLetter is frozen, they all are.
+         * ...in the future, we may want to allow for copying from these when making a new SurveyLetter, but that gets tricky, since the Qualtrics
+         * survey may have been edited in the meantime...!
+         */
         console.log('data: ', data);
         return data.letter;
       },
