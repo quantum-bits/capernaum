@@ -38,8 +38,8 @@ export class SurveyUpdateInput {
   @Field(type => Int) id: number;
   @Field({ nullable: true }) title?: string;
   @Field({ nullable: true }) qualtricsId?: string;
-  @Field({ nullable: true }) qualtricsName: string;
-  @Field({ nullable: true }) qualtricsModDate: string;
+  @Field({ nullable: true }) qualtricsName?: string;
+  @Field({ nullable: true }) qualtricsModDate?: string;
 }
 
 @InputType()

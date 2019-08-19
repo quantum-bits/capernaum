@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SurveyResolver } from "./survey.resolvers";
-import { SurveyItemService, SurveyService } from "./survey.service";
+import { SurveyService } from "./survey.service";
 import { Survey, SurveyDimension, SurveyIndex, SurveyItem } from "./entities";
 import { QualtricsModule } from "../qualtrics/qualtrics.module";
 
@@ -15,6 +15,6 @@ import { QualtricsModule } from "../qualtrics/qualtrics.module";
     ]),
     QualtricsModule
   ],
-  providers: [SurveyService, SurveyResolver, SurveyItemService]
+  providers: [SurveyService, SurveyResolver]
 })
 export class SurveyModule {}

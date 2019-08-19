@@ -21,7 +21,7 @@ export class QualtricsResolver {
     let offset: string = undefined;
     while (fetchMore) {
       const response = await this.qualtricsService.listSurveys(offset);
-      const { elements, nextPage } = response.data.result;
+      const { elements, nextPage } = response;
 
       elements.forEach(element => {
         if (element.isActive || includeInactive) {

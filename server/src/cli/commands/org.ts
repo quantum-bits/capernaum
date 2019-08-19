@@ -9,13 +9,12 @@ export default class OrgCommand extends Command {
     const api = new QualtricsService();
 
     if (process.env.CAP_ORG_ID) {
-      api.getOrganization(process.env.CAP_ORG_ID).then(response => {
-        const result = response.data.result;
+      api.getOrganization(process.env.CAP_ORG_ID).then(organization => {
         const data = [
-          ["Id", result.id],
-          ["Name", result.name],
-          ["Type", result.type],
-          ["Status", result.status]
+          ["Id", organization.id],
+          ["Name", organization.name],
+          ["Type", organization.type],
+          ["Status", organization.status]
         ];
         const options = {
           drawHorizontalLine: (index: number, size: number) => {

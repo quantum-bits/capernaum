@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
+  QualtricsImportInput,
   Survey,
   SurveyCreateInput,
   SurveyItem,
@@ -8,46 +9,84 @@ import {
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { BaseService } from "../base/base.service";
+import {
+  QualtricsQuestion,
+  QualtricsSurvey
+} from "../qualtrics/qualtrics.types";
 
 @Injectable()
-export class SurveyService extends BaseService<Survey> {
+export class SurveyService {
   constructor(
     @InjectRepository(Survey)
-    private readonly repository: Repository<Survey>
-  ) {
-    super(repository);
-  }
+    private readonly surveyRepo: Repository<Survey>,
+    @InjectRepository(SurveyItem)
+    private readonly surveyItemRepo: Repository<SurveyItem>
+  ) {}
 
   create(createInput: SurveyCreateInput) {
-    const newEntity = this.repository.create(createInput);
-    return this.repository.save(newEntity);
+    return this.surveyRepo.insert(createInput);
   }
 
-  async update(updateInput: SurveyUpdateInput & { id: number }) {
-    const oldEntity = await this.repository.findOne(updateInput.id);
+  readAll() {
+    return this.surveyRepo.find();
+  }
 
-    for (let prop of Object.keys(updateInput)) {
-      if (prop !== "id") {
-        oldEntity[prop] = updateInput[prop];
+  readOne(id: number) {
+    return this.surveyRepo.findOne(id);
+  }
+
+  update(updateInput: SurveyUpdateInput) {
+    return this.surveyRepo.update(updateInput.id, updateInput);
+  }
+
+  itemsForSurvey(survey: Survey) {
+    return this.surveyItemRepo.find({ survey });
+  }
+
+  private static dumpQualtricsQuestion(
+    questionId: string,
+    question: QualtricsQuestion
+  ) {
+    console.log(
+      `${questionId} - ${JSON.stringify(question.questionType)} - ${
+        question.questionText
+      }`
+    );
+  }
+
+  async importQualtricsSurvey(
+    qualtricsImportInput: QualtricsImportInput,
+    qualtricsSurvey: QualtricsSurvey
+  ) {
+    // Create a list of survey items.
+    const newSurveyItems: SurveyItem[] = [];
+    for (let [questionId, question] of Object.entries(
+      qualtricsSurvey.questions
+    )) {
+      if (
+        question.questionType.type === "MC" &&
+        question.choices &&
+        Object.keys(question.choices).length == 7
+      ) {
+        // Looks like a valid survey question.
+        newSurveyItems.push(
+          this.surveyItemRepo.create({
+            qualtricsId: questionId,
+            qualtricsText: question.questionText.trim()
+          })
+        );
       }
     }
+    await this.surveyItemRepo.save(newSurveyItems);
 
-    return this.repository.save(oldEntity);
-  }
-}
-
-@Injectable()
-export class SurveyItemService extends BaseService<SurveyItem> {
-  constructor(
-    @InjectRepository(SurveyItem)
-    private readonly surveyItemRepository: Repository<SurveyItem>
-  ) {
-    super(surveyItemRepository);
-  }
-
-  create(createInput: SurveyItemCreateInput) {
-    const newSurvey = this.surveyItemRepository.create(createInput);
-    return this.surveyItemRepository.save(newSurvey);
+    // Construct the survey.
+    const newSurvey = this.surveyRepo.create({
+      title: qualtricsImportInput.title,
+      qualtricsId: qualtricsSurvey.id,
+      qualtricsName: qualtricsSurvey.name,
+      qualtricsModDate: qualtricsSurvey.lastModifiedDate,
+      surveyItems: newSurveyItems
+    });
+    return this.surveyRepo.save(newSurvey);
   }
 }

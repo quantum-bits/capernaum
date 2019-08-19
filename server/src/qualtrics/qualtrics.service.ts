@@ -9,6 +9,7 @@ import {
   CreateResponseData,
   CreateResponseExportResponse,
   QualtricsOrganization,
+  QualtricsResponse,
   QualtricsSurvey,
   QualtricsSurveyList,
   ResponseExportProgress
@@ -43,41 +44,69 @@ export class QualtricsService {
     return new URL(segments.join("/"));
   }
 
-  private async get<T>(url: URL, moreConfig: object = {}) {
+  /**
+   * Do an Axios get operation.
+   * @param url
+   * @param moreConfig - additional parameters for the Axios config object
+   */
+  private axiosGet<T>(url: URL, moreConfig: object = {}) {
     return axios.get<T>(url.href, {
-      headers: {
-        "x-api-token": this.apiToken
-      },
+      headers: { "x-api-token": this.apiToken },
       ...moreConfig
     });
   }
 
-  private async post<T>(url: URL, data: object) {
-    return axios.post<T>(url.href, data, {
-      headers: {
-        "x-api-token": this.apiToken
+  /**
+   * Get data from Qualtrics. Wraps the axiosGet method, awaits the response, and extracts the Qualtrics result.
+   * @param url
+   * @param moreConfig
+   */
+  private async qualtricsGet<T>(url: URL, moreConfig: object = {}) {
+    const axiosResponse = await this.axiosGet<QualtricsResponse<T>>(
+      url,
+      moreConfig
+    );
+    return axiosResponse.data.result;
+  }
+
+  /**
+   * Post data to Qualtrics.
+   * @param url
+   * @param data
+   */
+  private async qualtricsPost<T>(url: URL, data: object) {
+    const axiosResponse = await axios.post<QualtricsResponse<T>>(
+      url.href,
+      data,
+      {
+        headers: {
+          "x-api-token": this.apiToken
+        }
       }
-    });
+    );
+    return axiosResponse.data.result;
+  }
+
+  /** Get an organization's details. */
+  getOrganization(organizationId: string) {
+    return this.qualtricsGet<QualtricsOrganization>(
+      this.makeUrl("organizations", organizationId)
+    );
   }
 
   /** Get a survey with the given ID. */
-  async getSurvey(surveyId: string) {
-    return this.get<QualtricsSurvey>(this.makeUrl("surveys", surveyId));
+  getSurvey(surveyId: string) {
+    return this.qualtricsGet<QualtricsSurvey>(
+      this.makeUrl("surveys", surveyId)
+    );
   }
 
-  async listSurveys(offset: string = undefined) {
+  listSurveys(offset: string = undefined) {
     const url = this.makeUrl("surveys");
     if (offset) {
       url.searchParams.set("offset", offset);
     }
-    return this.get<QualtricsSurveyList>(url);
-  }
-
-  /** Get an organization's details. */
-  async getOrganization(organizationId: string) {
-    return this.get<QualtricsOrganization>(
-      this.makeUrl("organizations", organizationId)
-    );
+    return this.qualtricsGet<QualtricsSurveyList>(url);
   }
 
   /** Raw methods to export responses from Qualtrics. */
@@ -108,20 +137,20 @@ export class QualtricsService {
 
     apiDebug("postData %O", postData);
 
-    return this.post<CreateResponseExportResponse>(
+    return this.qualtricsPost<CreateResponseExportResponse>(
       this.makeUrl("surveys", surveyId, "export-responses"),
       postData
     );
   }
 
-  async getResponseExportProgress(surveyId: string, progressId: string) {
-    return this.get<ResponseExportProgress>(
+  getResponseExportProgress(surveyId: string, progressId: string) {
+    return this.qualtricsGet<ResponseExportProgress>(
       this.makeUrl("surveys", surveyId, "export-responses", progressId)
     );
   }
 
   async getResponseExportFile(surveyId: string, fileId: string) {
-    return this.get<string>(
+    return this.axiosGet<string>(
       this.makeUrl("surveys", surveyId, "export-responses", fileId, "file"),
       {
         responseType: "arraybuffer"
@@ -144,30 +173,28 @@ export class QualtricsService {
       startDate,
       endDate
     );
-    apiDebug("createResult %O", createResult.data);
+    apiDebug("createResult %O", createResult);
 
     // Await completion of the export.
-    let exportResult: AxiosResponse<ResponseExportProgress>;
+    let exportResult: ResponseExportProgress;
     let awaitingResponse = true;
+    apiDebug("Await response");
     while (awaitingResponse) {
-      apiDebug("Waiting for response");
       exportResult = await this.getResponseExportProgress(
         surveyId,
-        createResult.data.result.progressId
+        createResult.progressId
       );
-      apiDebug("exportResult %O", exportResult.data);
+      apiDebug("exportResult %O", exportResult);
 
-      if (exportResult.data.result.status === "complete") {
+      if (exportResult.status === "complete") {
         awaitingResponse = false;
       } else {
         await sleep(2000);
       }
     }
+    apiDebug("Result available %O", exportResult);
 
     // Fetch the export data itself. Returns a Promise of ZipEntry objects.
-    return this.getResponseExportFile(
-      surveyId,
-      exportResult.data.result.fileId
-    );
+    return this.getResponseExportFile(surveyId, exportResult.fileId);
   }
 }

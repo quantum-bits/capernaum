@@ -29,7 +29,6 @@ input LetterUpdateInput {
 }
 
 type Mutation {
-  deleteSurvey(id: Int!): Int!
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
@@ -53,12 +52,12 @@ type QualtricsSurveyMetadata {
 }
 
 type Query {
-  surveys: [Survey!]!
-  survey(id: Int!): Survey!
   letters: [Letter!]!
   letter(id: Int!): Letter!
   letterElementTypes: [LetterElementType!]!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyMetadata!]!
+  surveys: [Survey!]!
+  survey(id: Int!): Survey!
 }
 
 type Survey {
