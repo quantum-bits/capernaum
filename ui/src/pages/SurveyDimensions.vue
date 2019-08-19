@@ -1,25 +1,118 @@
-<!--
 <template>
-  <v-layout row wrap>
-    <v-flex xs12 sm12>
-      <h2 class="title font-weight-regular mb-3">
-        Association Table Information:
-      </h2>
-    </v-flex>
-    <v-flex xs12 sm8 offset-sm1>
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <v-text-field
-          v-model="title"
-          :counter="80"
-          :rules="nameRules"
-          label="Title of Association Table"
-          required
-        ></v-text-field>
+  <v-container>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <template>
+          <div>
+            <v-row justify="center">
+              <v-dialog persistent v-model="surveyIndexDialog" max-width="800">
+                <v-card>
+                  <v-card-title class="headline">
+                    {{ surveyIndexDialogTitle }}
+                  </v-card-title>
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-card-text>
+                      <v-text-field
+                        v-model="surveyIndexText"
+                        label="Survey Index"
+                        :hint="surveyIndexDialogHint"
+                        :rules="nameRules"
+                        outlined
+                        persistent-hint
+                      ></v-text-field>
+
+                      <template>
+                        <v-container fluid>
+                          <v-row align="center">
+                            <v-col cols="12" sm="12">
+                              <v-select
+                                v-model="selectedSurveyItems"
+                                :items="surveyItems"
+                                :item-text="'name'"
+                                :item-value="'id'"
+                                label="Choose Survey Items"
+                                multiple
+                                chips
+                              ></v-select>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </template>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+
+                      <v-btn color="success" text @click="cancelIndexDialog()">
+                        Cancel
+                      </v-btn>
+                      <v-btn
+                        :disabled="!valid"
+                        color="success"
+                        text
+                        @click="submitSurveyIndex()"
+                      >
+                        Submit
+                      </v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+              </v-dialog>
+              <v-dialog
+                persistent
+                v-model="surveyDimensionDialog"
+                max-width="800"
+              >
+                <v-card>
+                  <v-card-title class="headline">
+                    {{ surveyDimensionDialogTitle }}
+                  </v-card-title>
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-card-text>
+                      <v-text-field
+                        v-model="surveyDimensionText"
+                        label="Survey Dimension"
+                        :hint="surveyDimensionDialogHint"
+                        :rules="nameRules"
+                        outlined
+                        persistent-hint
+                      ></v-text-field>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+
+                      <v-btn
+                        color="success"
+                        text
+                        @click="cancelDimensionDialog()"
+                      >
+                        Cancel
+                      </v-btn>
+
+                      <v-btn
+                        :disabled="!valid"
+                        color="success"
+                        text
+                        @click="submitSurveyDimension()"
+                      >
+                        Submit
+                      </v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+              </v-dialog>
+            </v-row>
+          </div>
+        </template>
+      </v-flex>
+      <v-flex xs10 offset-xs1>
+        <h1 class="headline mb-5">Survey Dimensions</h1>
+      </v-flex>
+      <v-flex xs7 offset-xs1>
         <v-select
-          v-model="select"
-          :items="surveys"
-          item-text="surveyTitle"
-          item-value="id"
+          v-model="surveySelect"
+          :items="selections"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
           required
@@ -27,21 +120,56 @@
           return-object
           single-line
         />
-        <v-btn :disabled="!valid" color="success" @click="submit">
-          Submit
-        </v-btn>
-      </v-form>
-    </v-flex>
-  </v-layout>
-</template>
--->
-
-<template>
-  <v-container>
-    <v-layout row wrap>
-      <v-flex xs12 sm12>
+      </v-flex>
+    </v-layout>
+    <v-layout v-if="surveySelect" row wrap>
+      <v-flex xs10 offset-xs1 class="text-right">
+        <v-btn color="primary" @click="addSurveyDimension()"
+          >Add Survey Dimension</v-btn
+        >
+      </v-flex>
+      <v-flex xs10 offset-xs1>
         <template>
-          <v-treeview rounded hoverable activatable :items="items"></v-treeview>
+          <v-treeview dense rounded hoverable :items="surveyDimensionData">
+            <template v-slot:prepend="{ item, open }">
+              <v-icon v-if="item.type == surveyDimensionEnum.SURVEY_ITEM">
+                {{ "mdi-comment-outline" }}
+              </v-icon>
+            </template>
+            <template v-slot:append="{ item, open }">
+              <span v-if="item.type == surveyDimensionEnum.SURVEY_INDEX">
+                <a @click="editIndex(item)">
+                  <v-icon>
+                    {{ "mdi-pencil" }}
+                  </v-icon>
+                </a>
+                <a @click="deleteIndex(item)">
+                  <v-icon>
+                    {{ "mdi-close-circle" }}
+                  </v-icon>
+                </a>
+              </span>
+              <span
+                v-else-if="item.type == surveyDimensionEnum.SURVEY_DIMENSION"
+              >
+                <a @click="addSurveyIndex(item)">
+                  <v-icon>
+                    {{ "mdi-plus-circle" }}
+                  </v-icon>
+                </a>
+                <a @click="editSurveyDimension(item)">
+                  <v-icon>
+                    {{ "mdi-pencil" }}
+                  </v-icon>
+                </a>
+                <a @click="deleteDimension(item)">
+                  <v-icon>
+                    {{ "mdi-close-circle" }}
+                  </v-icon>
+                </a>
+              </span>
+            </template>
+          </v-treeview>
         </template>
       </v-flex>
     </v-layout>
@@ -52,117 +180,282 @@
 import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
-interface SurveyItemType {
-  id: number; // id of the survey in our db
-  title: string; // e.g., "Christian Life Survey"
-}
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql"; // won't need this, eventually...just using it now for testing purposes
+
+//FIXME: delete Letter stuff once we no longer need it....
+import {
+  Letter,
+  LetterElementEnum,
+  LetterElementMenuItemType,
+  LetterElementType
+} from "./letter-element.types";
+
+import {
+  SurveyItem,
+  SurveySelection,
+  SurveyDimensionEnum
+} from "./survey-dimension.types";
 
 export default Vue.extend({
-  /** Form to create/update Letter Info (e.g., title, etc.) */
+  /** page to create/update survey dimensions and indexes */
   name: "SurveyDimensions",
 
-  props: {
-    id: Number,
-    initialTitle: String,
-    initialSurveyId: Number,
-    isNew: Boolean
-  },
+  props: {},
 
   data() {
     return {
-      surveys: [] as SurveyItemType[],
-      title: this.initialTitle,
+      letter: null as Letter | null,
+      surveyDimensionEnum: SurveyDimensionEnum,
+      surveyIndexDialog: false,
+      surveyDimensionDialog: false,
+      surveyDimensionText: "" as string,
+      surveyDimensionDialogTitle: "" as string,
+      surveyDimensionDialogHint: "" as string,
+      surveyDimensionId: null as number, //id of the survey dimension currently being edited
+      surveyIndexText: "" as string,
+      surveyIndexDialogTitle: "" as string,
+      surveyIndexDialogHint: "" as string,
+      surveyIndexId: null as number, //id of the survey index currently being edited
+      selectedSurveyItems: [] as any,
+      surveys: [] as SurveyItem[],
+      //title: this.initialTitle,
       valid: true,
-      select: null as any,
-      name: "",
+      //FIXME: make surveySelect of the appropriate type
+      surveySelect: null as any,
+      //select: null as any,
+      //name: "",
       nameRules: [
-        (v: any) => !!v || "Title is required",
-        (v: any) =>
-          (v && v.length <= 80) ||
-          "Title of letter must be less than 80 characters"
+        (v: any) => !!v || "Title is required" //,
+        //(v: any) =>
+        //  (v && v.length <= 80) ||
+        //  "Title of letter must be less than 80 characters"
       ],
-      items: [
+      surveyItems: [
         {
-          id: 1,
-          name: "Applications :",
-          children: [
-            { id: 2, name: "Calendar : app" },
-            { id: 3, name: "Chrome : app" },
-            { id: 4, name: "Webstorm : app" }
-          ]
+          id: 20,
+          name: "I live in ways that help others as much as myself"
         },
         {
-          id: 5,
-          name: "Documents :",
+          id: 21,
+          name:
+            "I go out of my way to discover the people in need around me that I normally wouldn’t see"
+        },
+        {
+          id: 22,
+          name: "I have tremendous love for people I don’t know"
+        },
+        {
+          id: 23,
+          name:
+            "I think about strangers’ well-being and want what is best for them"
+        },
+        {
+          id: 30,
+          name:
+            "I believe the Bible has decisive authority over what I say and do"
+        },
+        {
+          id: 31,
+          name:
+            "As I go through the normal day I think of Bible passages relevant to what I am doing"
+        },
+        {
+          id: 32,
+          name: "I talk about Bible passages with my friends"
+        },
+        {
+          id: 40,
+          name: "What God says is what is true, right, and good"
+        }
+      ],
+      surveyDimensionData: [
+        {
+          id: 1,
+          name: "Focal Dimension",
+          type: "survey-dimension",
           children: [
             {
-              id: 6,
-              name: "vuetify :",
+              id: 2,
+              parentId: 1,
+              name: "A Focus on Others",
+              type: "survey-index",
               children: [
                 {
-                  id: 7,
-                  name: "src :",
-                  children: [
-                    { id: 8, name: "index : ts" },
-                    { id: 9, name: "bootstrap : ts" }
-                  ]
+                  id: 20,
+                  name: "I live in ways that help others as much as myself",
+                  type: "survey-item"
+                },
+                {
+                  id: 21,
+                  name:
+                    "I go out of my way to discover the people in need around me that I normally wouldn’t see",
+                  type: "survey-item"
+                },
+                {
+                  id: 22,
+                  name: "I have tremendous love for people I don’t know",
+                  type: "survey-item"
+                },
+                {
+                  id: 23,
+                  name:
+                    "I think about strangers’ well-being and want what is best for them",
+                  type: "survey-item"
                 }
               ]
             },
             {
-              id: 10,
-              name: "material2 :",
+              id: 3,
+              parentId: 1,
+              name: "A Focus on the Bible",
+              type: "survey-index",
               children: [
                 {
-                  id: 11,
-                  name: "src :",
-                  children: [
-                    { id: 12, name: "v-btn : ts" },
-                    { id: 13, name: "v-card : ts" },
-                    { id: 14, name: "v-window : ts" }
-                  ]
+                  id: 30,
+                  name:
+                    "I believe the Bible has decisive authority over what I say and do",
+                  type: "survey-item"
+                },
+                {
+                  id: 31,
+                  name:
+                    "As I go through the normal day I think of Bible passages relevant to what I am doing",
+                  type: "survey-item"
+                },
+                {
+                  id: 32,
+                  name: "I talk about Bible passages with my friends",
+                  type: "survey-item"
+                }
+              ]
+            },
+            {
+              id: 4,
+              parentId: 1,
+              name: "A Focus on God",
+              type: "survey-index",
+              children: [
+                {
+                  id: 40,
+                  name: "What God says is what is true, right, and good",
+                  type: "survey-item"
                 }
               ]
             }
           ]
         },
         {
-          id: 15,
-          name: "Downloads :",
-          children: [
-            { id: 16, name: "October : pdf" },
-            { id: 17, name: "November : pdf" },
-            { id: 18, name: "Tutorial : html" }
-          ]
+          id: 5,
+          name: "Orientation Dimension",
+          type: "survey-dimension",
+          children: []
         },
         {
-          id: 19,
-          name: "Videos :",
-          children: [
-            {
-              id: 20,
-              name: "Tutorials :",
-              children: [
-                { id: 21, name: "Basic layouts : mp4" },
-                { id: 22, name: "Advanced techniques : mp4" },
-                { id: 23, name: "All about app : dir" }
-              ]
-            },
-            { id: 24, name: "Intro : mov" },
-            { id: 25, name: "Conference introduction : avi" }
-          ]
+          id: 15,
+          name: "Scripture Engagement Dimension",
+          type: "survey-dimension",
+          children: []
         }
       ]
     };
   },
 
   methods: {
-    submit() {
+    addSurveyDimension() {
+      this.surveyDimensionDialog = true;
+      this.surveyDimensionText = "";
+      this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
+      this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+      console.log("valid? ", this.valid);
+      if (this.$refs.form) {
+        // FIXME: Replace the `as any` hack.
+        (this.$refs.form as any).resetValidation();
+      }
+    },
+    editSurveyDimension(dimension: any) {
+      this.surveyDimensionDialog = true;
+      this.surveyDimensionText = dimension.name;
+      this.surveyDimensionDialogTitle = "Edit Survey Dimension";
+      this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+    },
+    deleteDimension(dimension: any) {
+      console.log("delete dimension!", dimension);
+      // delete....
+    },
+    cancelDimensionDialog() {
+      this.surveyDimensionDialog = false;
+      //this.valid = true;
+      // FIXME: Replace the `as any` hack.
+      (this.$refs.form as any).resetValidation();
+      console.log(this.$refs.form);
+      console.log("valid? ", this.valid);
+    },
+    submitSurveyDimension() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("save info");
-        this.saveInfo();
+        // FIXME: Replace the `as any` hack.
+        (this.$refs.form as any).resetValidation();
+        //save info
+        //if all is well, reset validation on form, close dialog (or maybe just call the cancel method)
       }
+      //this.surveyDimensionDialog = false;
+      console.log("save: ", this.surveyDimensionText);
+      // save to db, etc.
+    },
+    addSurveyIndex(dimension: any) {
+      this.surveyDimensionId = dimension.id; // will use this when saving the new survey index
+      this.surveyIndexDialog = true;
+      this.surveyIndexText = "";
+      this.selectedSurveyItems = [];
+      this.surveyIndexDialogTitle = "Add a New Survey Index";
+      this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
+      if (this.$refs.form) {
+        // FIXME: Replace the `as any` hack.
+        (this.$refs.form as any).resetValidation();
+      }
+    },
+    editIndex(indexItem: any) {
+      // specify the type(!)
+      console.log("edit index!", indexItem);
+      this.surveyIndexId = indexItem.id;
+      this.dimensionIndexId = indexItem.parentId;
+      this.selectedSurveyItems = [];
+      indexItem.children.forEach(surveyItem => {
+        this.selectedSurveyItems.push({
+          id: surveyItem.id,
+          name: surveyItem.name
+        });
+      });
+      this.surveyIndexDialog = true;
+      this.surveyIndexText = indexItem.name;
+      this.surveyIndexDialogTitle = "Edit Survey Index";
+      this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
+    },
+    deleteIndex(indexItem: any) {
+      console.log("delete index!", indexItem);
+      // can use the parentId to make sure things are done correctly
+    },
+    cancelIndexDialog() {
+      this.surveyIndexDialog = false;
+      //this.valid = true;
+      // FIXME: Replace the `as any` hack.
+      (this.$refs.form as any).resetValidation();
+    },
+    submitSurveyIndex() {
+      // FIXME: Replace the `as any` hack.
+      if ((this.$refs.form as any).validate()) {
+        console.log("save info");
+        // FIXME: Replace the `as any` hack.
+        (this.$refs.form as any).resetValidation();
+        //save info
+        //if all is well, reset validation on form, close dialog (or maybe just call the cancel method)
+      }
+      //this.surveyIndexDialog = false;
+      console.log("save: ", this.surveyIndexText);
+      console.log("survey items: ", this.selectedSurveyItems);
+      // save to db, etc.
     },
 
     saveInfo() {
@@ -170,20 +463,53 @@ export default Vue.extend({
     }
   },
 
-  mounted() {
-    axios
-      .get("http://localhost:4000/survey-data/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.surveys = response.data;
-        if (!this.isNew) {
-          for (let survey of this.surveys) {
-            if (survey.id === this.initialSurveyId) {
-              this.select = survey;
-            }
-          }
+  apollo: {
+    surveys: {
+      query: ALL_SURVEYS_QUERY
+    },
+    /**
+     * the following query will eventually be used to get survey dimension data, not letter data;
+     * I was just putting the structure in place to make sure that it was reactive in the right way;
+     * seems to work!
+     */
+    // the following query runs automatically when this.surveySelect is updates (i.e., when something is chosen from the drop-down)
+    letter: {
+      query: ONE_LETTER_QUERY,
+      variables() {
+        console.log('survey select: ',this.surveySelect);
+        console.log('qualtricsId (to use fetch survey dimension data): ', this.surveySelect.value);
+        /*
+        if (this.$route.params.id !== undefined) {
+          return {
+            letterId: 3
+          };
         }
-      });
+        */
+        return {
+          letterId: 3
+        };
+      },
+      update(data) {
+        console.log('data: ', data);
+        return data.letter;
+      },
+      skip() {
+        return this.surveySelect === null;
+      }
+    }
+  },
+
+  computed: {
+    selections(): SurveySelection[] {
+      return this.surveys.map(survey => ({
+        text: survey.name,
+        value: survey.id
+      }));
+    }
+  },
+
+  mounted() {
+    console.log("mounted....");
   }
 });
 </script>

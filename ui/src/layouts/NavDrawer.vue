@@ -110,6 +110,12 @@ export default Vue.extend({
         route: "survey-dimensions",
         icon: "mdi-file-tree",
         divider: true
+      },
+      {
+        title: "Import Qualtrics Survey",
+        route: "import-qualtrics-survey",
+        icon: "mdi-download",
+        divider: true
       }
     ];
     return {

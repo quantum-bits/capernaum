@@ -1,16 +1,16 @@
 <template>
   <v-container>
-    <v-layout v-if="isFrozen" class="mb-3">
+    <v-layout v-if="letterExistsAndIsFrozen()" class="mb-3">
       <v-flex xs10 offset-xs1>
         <v-alert :value="true" type="info">
           Note that this letter has been frozen -- it is no longer editable.
         </v-alert>
       </v-flex>
     </v-layout>
-    <div v-if="!editModeOn">
+    <div v-if="letterExistsAndEditModeOff()">
       <v-layout row wrap>
         <v-flex xs7 offset-xs1>
-          <h1 class="headline mb-3">{{ name }}</h1>
+          <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
             <span class="font-weight-light">{{ letter.name }}</span>
@@ -40,10 +40,10 @@
         </v-flex>
       </v-layout>
     </div>
-    <div v-else>
+    <div v-if="letterExistsAndEditModeOn()">
       <LetterInfoForm
         :id="id"
-        :initialTitle="title"
+        :initialTitle="letter.name"
         :initialSurveyId="survey.id"
         :initialBooleanAssociation="booleanAssociation"
         :isNew="isNew"
@@ -152,6 +152,7 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import {
+  Letter,
   LetterElementEnum,
   LetterElementMenuItemType,
   LetterElementType
@@ -170,8 +171,29 @@ interface SurveyTypeBrief {
   apollo: {
     letter: {
       query: ONE_LETTER_QUERY,
-      variables: {
-        letterId: 9 // hard-code for now....
+      variables() {
+        // FIXME: this should eventually fetch not just the letter, but all of the related stuff (i.e., it should be a more complicated query)
+        if (this.$route.params.id !== undefined) {
+          return {
+            letterId: this.$route.params.id
+          };
+        }
+      },
+      update(data) {
+        // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
+        // manipulation, can use a computed property instead
+        /**
+         * FIXME: eventually isFrozen will be on SurveyLetter instead of on Letter; if it is frozen, so will everything else be below it.
+         * That means that other pages will need to go up the chain to check if SurveyLetter is frozen or not.
+         * ...at this point, we are assuming that each combo of survey-tables-letter is standalone, so if SurveyLetter is frozen, they all are.
+         * ...in the future, we may want to allow for copying from these when making a new SurveyLetter, but that gets tricky, since the Qualtrics
+         * survey may have been edited in the meantime...!
+         */
+        console.log('data: ', data);
+        return data.letter;
+      },
+      skip() {
+        return this.$route.params.id === undefined;
       }
     }
   }
@@ -179,13 +201,12 @@ interface SurveyTypeBrief {
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
-  title: string = "";
   survey: SurveyTypeBrief = {
     id: null,
     title: ""
   };
 
-  letter: any = null;
+  letter: Letter | null = null;
 
   lastUpdate: string = "";
   id: number | null = null;
@@ -193,6 +214,31 @@ export default class Compose extends Vue {
   letterElements: LetterElementMenuItemType[] = [];
   isFrozen: boolean = false;
   booleanAssociation: BooleanAssociationBriefType | null = null;
+
+  letterExistsAndIsFrozen(){
+    if (this.letter !== null) {
+      return this.letter.isFrozen;
+    } else {
+      return false;
+    }
+    // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
+  }
+
+  letterExistsAndEditModeOff() {
+    if (this.letter !== null) {
+      return !this.editModeOn;
+    } else {
+      return false;
+    }
+  }
+
+  letterExistsAndEditModeOn() {
+    if (this.letter !== null) {
+      return this.editModeOn;
+    } else {
+      return false;
+    }
+  }
 
   moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
@@ -300,6 +346,7 @@ export default class Compose extends Vue {
       // launch form for creating a new letter
       this.editModeOn = true;
       this.isNew = true;
+      console.log('new letter....');
     } else {
       axios
         .get("http://localhost:4000/letter-data/" + this.$route.params.id)
@@ -316,7 +363,6 @@ export default class Compose extends Vue {
             box.isNew = false;
           }
           this.resetOrderProperty();
-          this.title = response.data.title;
           this.survey = {
             id: response.data.survey.id,
             title: response.data.survey.title

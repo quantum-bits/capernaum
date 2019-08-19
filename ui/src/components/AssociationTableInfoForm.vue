@@ -17,7 +17,7 @@
         <v-select
           v-model="select"
           :items="surveys"
-          item-text="surveyTitle"
+          item-text="name"
           item-value="id"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"

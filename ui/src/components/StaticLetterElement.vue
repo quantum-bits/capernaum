@@ -24,12 +24,12 @@
           </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
-          <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
-            <v-icon>arrow_upward</v-icon>
+          <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
+          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+            <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
-          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown">
-            <v-icon>arrow_downward</v-icon>
+          <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
+            <v-icon>mdi-arrow-down</v-icon>
           </v-btn>
         </v-card-actions>
       </v-card>

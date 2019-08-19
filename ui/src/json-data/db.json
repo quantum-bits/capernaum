@@ -34,15 +34,15 @@
     "survey-data": [
         {
             "id": 1,
-            "surveyTitle": "Christian Life Survey"
+            "name": "Christian Life Survey"
         },
         {
             "id": 0,
-            "surveyTitle": "Christian Life Survey (<2018)"
+            "name": "Christian Life Survey (<2018)"
         },
         {
             "id": 2,
-            "surveyTitle": "Christian Life Survey for College Students"
+            "name": "Christian Life Survey for College Students"
         }
     ],    
     "letter-data": [

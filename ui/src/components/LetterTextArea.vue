@@ -9,13 +9,13 @@
           </div>
         </v-card-title>
         <v-card-actions v-if="!parentIsFrozen">
-          <v-btn flat color="orange" @click="save">Save</v-btn>
-          <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
-            <v-icon>arrow_upward</v-icon>
+          <v-btn text color="orange" @click="save">Save</v-btn>
+          <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
+          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+            <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
-          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown">
-            <v-icon>arrow_downward</v-icon>
+          <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
+            <v-icon>mdi-arrow-down</v-icon>
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -23,17 +23,19 @@
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
-            <div v-html="textArea"></div>
           </div>
         </v-card-title>
+        <v-card-text>
+          <div v-html="textArea"></div>
+        </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
-          <v-btn flat color="orange" @click="openEditor">Edit</v-btn>
-          <v-btn flat color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" flat color="orange" @click="moveUp">
-            <v-icon>arrow_upward</v-icon>
+          <v-btn text color="orange" @click="openEditor">Edit</v-btn>
+          <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
+          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+            <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
-          <v-btn v-if="showMoveDown" flat color="orange" @click="moveDown">
-            <v-icon>arrow_downward</v-icon>
+          <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
+            <v-icon>mdi-arrow-down</v-icon>
           </v-btn>
         </v-card-actions>
       </v-card>

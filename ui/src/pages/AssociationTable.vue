@@ -65,25 +65,26 @@
           class="elevation-1"
         >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
-          <template slot="items" slot-scope="myprops">
-            <td
-              v-for="header in headers"
-              :key="header.value"
-              class="text-xs-center"
-            >
-              <span v-if="header.value === 'practice'">
-                {{ myprops.item[header.value] }}
-              </span>
-              <span v-else>
-                <v-icon
-                  v-if="
-                    myprops.item.spiritualFocusOrientationIdDict[header.value]
-                  "
-                  color="success"
-                  >check_circle</v-icon
-                >
-              </span>
-            </td>
+          <template v-slot:item="{ item, headers }">
+            <tr>
+              <td
+                v-for="header in headers"
+                :key="header.value"
+                class="text-xs-center"
+              >
+                <span v-if="header.value === 'practice'">
+                  {{ item[header.value] }}
+                </span>
+                <span v-else>
+                  <v-icon
+                    v-if="
+                      item.spiritualFocusOrientationIdDict[header.value]
+                    "
+                    color="success"
+                    >mdi-check-circle</v-icon>
+                </span>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-flex>
@@ -105,27 +106,29 @@
           class="elevation-1"
         >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
-          <template slot="items" slot-scope="myprops">
-            <td
-              v-for="header in headers"
-              :key="header.value"
-              class="text-xs-center"
-            >
-              <span v-if="header.value === 'practice'">
-                {{ myprops.item[header.value] }}
-              </span>
-              <span v-else>
-                <!-- note: deleted :input-value="myprops.item[header.value]", since it seemed superfluous with the addition of v-model -->
-                <v-checkbox
-                  v-model="
-                    myprops.item.spiritualFocusOrientationIdDict[header.value]
-                  "
-                  color="primary"
-                  hide-details
-                  @change="onCheckboxChange"
-                ></v-checkbox>
-              </span>
-            </td>
+          <template v-slot:item="{ item, headers }">
+            <tr>
+              <td
+                v-for="header in headers"
+                :key="header.value"
+                class="text-xs-center"
+              >
+                <span v-if="header.value === 'practice'">
+                  {{ item[header.value] }}
+                </span>
+                <span v-else>
+                  <!-- note: deleted :input-value="myprops.item[header.value]", since it seemed superfluous with the addition of v-model -->
+                  <v-checkbox
+                    v-model="
+                      item.spiritualFocusOrientationIdDict[header.value]
+                    "
+                    color="primary"
+                    hide-details
+                    @change="onCheckboxChange"
+                  ></v-checkbox>
+                </span>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-flex>
