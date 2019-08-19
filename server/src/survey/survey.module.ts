@@ -9,8 +9,8 @@ import { QualtricsModule } from "../qualtrics/qualtrics.module";
   imports: [
     TypeOrmModule.forFeature([
       Survey,
-      SurveyDimension,
       SurveyIndex,
+      SurveyDimension,
       SurveyItem
     ]),
     QualtricsModule
