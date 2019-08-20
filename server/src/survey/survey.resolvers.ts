@@ -15,6 +15,7 @@ import {
   SurveyDimensionUpdateInput,
   SurveyIndex,
   SurveyIndexCreateInput,
+  SurveyIndexUpdateInput,
   SurveyItem,
   SurveyUpdateInput
 } from "./entities";
@@ -34,14 +35,26 @@ export class SurveyResolver {
     return this.surveyService.createSurvey(createInput);
   }
 
-  @Query(returns => [Survey])
-  surveys() {
-    return this.surveyService.readAll();
+  @Mutation(returns => SurveyDimension)
+  createSurveyDimension(
+    @Args("createInput") createInput: SurveyDimensionCreateInput
+  ) {
+    return this.surveyService.createDimension(createInput);
+  }
+
+  @Mutation(returns => SurveyIndex)
+  createSurveyIndex(@Args("createInput") createInput: SurveyIndexCreateInput) {
+    return this.surveyService.createIndex(createInput);
   }
 
   @Query(returns => Survey)
   survey(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.readOne(id);
+  }
+
+  @Query(returns => [Survey])
+  surveys() {
+    return this.surveyService.readAll();
   }
 
   @Mutation(returns => Survey)
@@ -56,6 +69,11 @@ export class SurveyResolver {
     return this.surveyService.updateSurveyDimension(updateInput);
   }
 
+  @Mutation(returns => SurveyIndex)
+  updateSurveyIndex(@Args("updateInput") updateInput: SurveyIndexUpdateInput) {
+    return this.surveyService.updateSurveyIndex(updateInput);
+  }
+
   @ResolveProperty(type => [SurveyItem])
   surveyItems(@Parent() survey: Survey) {
     return this.surveyService.findItemsForSurvey(survey);
@@ -64,18 +82,6 @@ export class SurveyResolver {
   @ResolveProperty(type => [SurveyDimension])
   surveyDimensions(@Parent() survey: Survey) {
     return this.surveyService.findDimensionsForSurvey(survey);
-  }
-
-  @Mutation(returns => SurveyDimension)
-  createSurveyDimension(
-    @Args("createInput") createInput: SurveyDimensionCreateInput
-  ) {
-    return this.surveyService.createDimension(createInput);
-  }
-
-  @Mutation(returns => SurveyIndex)
-  createSurveyIndex(@Args("createInput") createInput: SurveyIndexCreateInput) {
-    return this.surveyService.createIndex(createInput);
   }
 
   @Mutation(returns => Survey, {

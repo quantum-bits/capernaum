@@ -16,7 +16,7 @@ export class SurveyItem {
   @ManyToOne(type => SurveyIndex, surveyIndex => surveyIndex.surveyItems, {
     nullable: true
   })
-  surveyIndex?: SurveyIndex;
+  surveyIndex: SurveyIndex;
 
   @Column("integer", { default: -1 })
   @Field(type => Int)

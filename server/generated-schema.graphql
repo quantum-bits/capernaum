@@ -33,10 +33,11 @@ type Mutation {
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
   createSurvey(createInput: SurveyCreateInput!): Survey!
-  updateSurvey(updateInput: SurveyUpdateInput!): Survey!
-  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
   createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
   createSurveyIndex(createInput: SurveyIndexCreateInput!): SurveyIndex!
+  updateSurvey(updateInput: SurveyUpdateInput!): Survey!
+  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
+  updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
 
   """Import a survey from Qualtrics"""
   importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
@@ -61,8 +62,8 @@ type Query {
   letter(id: Int!): Letter!
   letterElementTypes: [LetterElementType!]!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  surveys: [Survey!]!
   survey(id: Int!): Survey!
+  surveys: [Survey!]!
 }
 
 type Survey {
@@ -115,6 +116,12 @@ input SurveyIndexCreateInput {
   dimensionId: Int!
   itemIds: [Int!]!
   title: String!
+}
+
+input SurveyIndexUpdateInput {
+  id: Int!
+  itemIds: [Int!]
+  title: String
 }
 
 type SurveyItem {

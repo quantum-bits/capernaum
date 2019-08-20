@@ -31,3 +31,10 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
   @Field(type => [Int]) itemIds: number[];
   @Field() title: string;
 }
+
+@InputType()
+export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
+  @Field(type => Int) id: number;
+  @Field(type => [Int], { nullable: true }) itemIds?: number[];
+  @Field({ nullable: true }) title?: string;
+}

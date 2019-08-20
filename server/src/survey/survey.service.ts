@@ -8,6 +8,7 @@ import {
   SurveyDimensionUpdateInput,
   SurveyIndex,
   SurveyIndexCreateInput,
+  SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemCreateInput,
   SurveyUpdateInput
@@ -60,11 +61,11 @@ export class SurveyService {
       })
     );
 
-    createInput.itemIds.forEach(async itemId => {
+    for (const itemId of createInput.itemIds) {
       const item = await this.surveyItemRepo.findOneOrFail(itemId);
       item.surveyIndex = newIndex;
-      this.surveyItemRepo.save(item);
-    });
+      await this.surveyItemRepo.save(item);
+    }
 
     return newIndex;
   }
@@ -75,16 +76,6 @@ export class SurveyService {
 
   readOne(id: number) {
     return this.surveyRepo.findOne(id);
-  }
-
-  async updateSurvey(updateInput: SurveyUpdateInput) {
-    const preload = await this.surveyRepo.preload(updateInput);
-    return this.surveyRepo.save(preload);
-  }
-
-  async updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
-    const preload = await this.surveyDimensionRepo.preload(updateInput);
-    return this.surveyDimensionRepo.save(preload);
   }
 
   findItemsForSurvey(survey: Survey) {
@@ -101,6 +92,66 @@ export class SurveyService {
 
   findItemsForIndex(surveyIndex: SurveyIndex) {
     return this.surveyItemRepo.find({ surveyIndex });
+  }
+
+  async updateSurvey(updateInput: SurveyUpdateInput) {
+    const preload = await this.surveyRepo.preload(updateInput);
+    return this.surveyRepo.save(preload);
+  }
+
+  async updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
+    const preload = await this.surveyDimensionRepo.preload(updateInput);
+    return this.surveyDimensionRepo.save(preload);
+  }
+
+  private removeItemsFromIndex(index: SurveyIndex) {
+    console.log("REMOVE ITEMS");
+    const itemIds = index.surveyItems.map(item => item.id);
+
+    return this.surveyItemRepo
+      .createQueryBuilder()
+      .update(SurveyItem)
+      .set({ surveyIndex: null })
+      .where("id IN (:...ids)", { ids: itemIds })
+      .execute();
+  }
+
+  private setItemsForIndex(itemIds: number[], index: SurveyIndex) {
+    console.log("SET ITEMS");
+    return this.surveyItemRepo
+      .createQueryBuilder()
+      .update(SurveyItem)
+      .set({ surveyIndex: index })
+      .where("id IN (:...ids)", { ids: itemIds })
+      .execute();
+  }
+
+  async updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
+    const index = await this.surveyIndexRepo.findOneOrFail(updateInput.id, {
+      relations: ["surveyItems"]
+    });
+    console.log("INDEX", index);
+
+    if (updateInput.title) {
+      // Update the title.
+      index.title = updateInput.title;
+    }
+    if (updateInput.itemIds.length > 0) {
+      // Update the related items.
+
+      console.log("AAA");
+      // Remove any existing associations.
+      await this.removeItemsFromIndex(index);
+
+      console.log("BBB");
+      // Make new associations.
+      await this.setItemsForIndex(updateInput.itemIds, index);
+    }
+
+    console.log("CCC");
+    const foo = await this.surveyIndexRepo.save(index);
+    console.log("THIS JUST UNDID SOME STUFF");
+    return foo;
   }
 
   private static dumpQualtricsQuestion(
