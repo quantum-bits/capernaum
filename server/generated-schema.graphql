@@ -32,21 +32,47 @@ type Mutation {
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
-  createSurvey(createInput: SurveyCreateInput!): Survey!
+
+  """Create a new survey."""
+  createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
+
+  """Create a survey dimension."""
   createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
+
+  """Create a survey index. Can add survey items directly by item ID."""
   createSurveyIndex(createInput: SurveyIndexCreateInput!): SurveyIndex!
   updateSurvey(updateInput: SurveyUpdateInput!): Survey!
   updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
+
+  """
+  Update an index. Field values will replaces existing values in the object.
+        (e.g., if you give a value for itemIds, it will replace the current list.
+  """
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
+
+  """
+  Delete a dimension. Also deletes indices associated with this dimension.
+      Each index is removed using the equivalent of deleteSurveyIndex.
+      Returns details of everything that was deleted.
+  """
   deleteSurveyDimension(id: Int!): SurveyDimensionDeleteOutput!
+
+  """
+  Delete an index. Also removes associations with items; the items are not removed.
+  """
   deleteSurveyIndex(id: Float!): SurveyIndexDeleteOutput!
 
-  """Import a survey from Qualtrics"""
+  """
+  Import a survey from Qualtrics. Always use this to create a Capernaum survey.
+  """
   importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
 }
 
 input QualtricsImportInput {
+  """Qualtrics unique identifier"""
   qualtricsId: String!
+
+  """Title for associated Capernaum survey"""
   title: String!
 }
 
@@ -68,13 +94,28 @@ type Query {
   surveys: [Survey!]!
 }
 
+"""All information about a survey imported from Qualtrics"""
 type Survey {
   id: Int!
+
+  """
+  All the Qualtrics items for this survey; for groupings, see survey dimension and index.
+  """
   surveyItems: [SurveyItem!]!
+
+  """Dimensions for this survey; groups indices, which group items."""
   surveyDimensions: [SurveyDimension!]!
+
+  """Title for this survey in Capernaum"""
   title: String!
+
+  """Unique identifier for this survey on Qualtrics"""
   qualtricsId: String!
+
+  """Name of this survey on Qualtrics"""
   qualtricsName: String!
+
+  """Date and time at which this survey was modified on Qualtrics"""
   qualtricsModDate: String!
 }
 
@@ -86,14 +127,26 @@ input SurveyCreateInput {
   surveyItems: [SurveyItemCreateInput!]!
 }
 
+"""Top-level grouping of questions in Capernaum; contains indices"""
 type SurveyDimension {
   id: Int!
+
+  """Abbreviation for this dimension (e.g., 'FOG')"""
   abbreviation: String!
+
+  """Title of this dimension (e.g., 'Focus on Prayer')"""
   title: String!
+
+  """Sequence number; dimension are displayed in this order."""
   sequence: Int!
+
+  """List of survey index entries for this dimension."""
   surveyIndices: [SurveyIndex!]!
 }
 
+"""
+Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.
+"""
 input SurveyDimensionCreateInput {
   surveyId: Int!
   abbreviation: String!
@@ -102,8 +155,13 @@ input SurveyDimensionCreateInput {
 }
 
 type SurveyDimensionDeleteOutput {
+  """ID of deleted dimension"""
   deletedDimensionId: Int!
+
+  """IDs of all deleted indices"""
   deletedIndexIds: [Int!]!
+
+  """IDs of all items no longer associated with any deleted index"""
   deletedItemIds: [Int!]!
 }
 
@@ -114,20 +172,33 @@ input SurveyDimensionUpdateInput {
   sequence: Int
 }
 
+"""Collection of survey items, grouped for analysis"""
 type SurveyIndex {
   id: Int!
+
+  """Title of this index"""
   title: String!
+
+  """List of survey items for this index"""
   surveyItems: [SurveyItem!]!
 }
 
 input SurveyIndexCreateInput {
+  """ID of the dimension to contain this index"""
   dimensionId: Int!
+
+  """List of IDs of the items to include in this index."""
   itemIds: [Int!]!
+
+  """Title of this index within the dimension"""
   title: String!
 }
 
 type SurveyIndexDeleteOutput {
+  """ID of deleted index"""
   deletedIndexId: Int!
+
+  """IDs of items removed from the deleted index"""
   deletedItemIds: [Int!]!
 }
 
@@ -137,10 +208,17 @@ input SurveyIndexUpdateInput {
   title: String
 }
 
+"""One item (question) from a survey"""
 type SurveyItem {
   id: Int!
+
+  """Sequence number; items will be displayed in this order"""
   sequence: Int!
+
+  """Qualtrics identifier for this question"""
   qualtricsId: String!
+
+  """Text of this question from Qualtrics"""
   qualtricsText: String!
 }
 

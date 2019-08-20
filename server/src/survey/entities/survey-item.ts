@@ -4,7 +4,7 @@ import { SurveyIndex } from "./survey-index";
 import { Survey } from "./survey";
 
 @Entity()
-@ObjectType()
+@ObjectType({ description: "One item (question) from a survey" })
 export class SurveyItem {
   @PrimaryGeneratedColumn()
   @Field(type => Int)
@@ -19,15 +19,17 @@ export class SurveyItem {
   surveyIndex: SurveyIndex;
 
   @Column("integer", { default: -1 })
-  @Field(type => Int)
+  @Field(type => Int, {
+    description: "Sequence number; items will be displayed in this order"
+  })
   sequence: number;
 
   @Column()
-  @Field()
+  @Field({ description: "Qualtrics identifier for this question" })
   qualtricsId: string;
 
   @Column()
-  @Field()
+  @Field({ description: "Text of this question from Qualtrics" })
   qualtricsText: string;
 }
 

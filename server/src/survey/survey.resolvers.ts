@@ -32,19 +32,27 @@ export class SurveyResolver {
     private readonly qualtricsService: QualtricsService
   ) {}
 
-  @Mutation(returns => Survey)
+  @Mutation(returns => Survey, {
+    description: "Create a new survey.",
+    deprecationReason: "Should only create surveys from Qualtrics"
+  })
   createSurvey(@Args("createInput") createInput: SurveyCreateInput) {
     return this.surveyService.createSurvey(createInput);
   }
 
-  @Mutation(returns => SurveyDimension)
+  @Mutation(returns => SurveyDimension, {
+    description: "Create a survey dimension."
+  })
   createSurveyDimension(
     @Args("createInput") createInput: SurveyDimensionCreateInput
   ) {
     return this.surveyService.createDimension(createInput);
   }
 
-  @Mutation(returns => SurveyIndex)
+  @Mutation(returns => SurveyIndex, {
+    description:
+      "Create a survey index. Can add survey items directly by item ID."
+  })
   createSurveyIndex(@Args("createInput") createInput: SurveyIndexCreateInput) {
     return this.surveyService.createIndex(createInput);
   }
@@ -71,17 +79,27 @@ export class SurveyResolver {
     return this.surveyService.updateSurveyDimension(updateInput);
   }
 
-  @Mutation(returns => SurveyIndex)
+  @Mutation(returns => SurveyIndex, {
+    description: `Update an index. Field values will replaces existing values in the object.
+      (e.g., if you give a value for itemIds, it will replace the current list.`
+  })
   updateSurveyIndex(@Args("updateInput") updateInput: SurveyIndexUpdateInput) {
     return this.surveyService.updateSurveyIndex(updateInput);
   }
 
-  @Mutation(returns => SurveyDimensionDeleteOutput)
+  @Mutation(returns => SurveyDimensionDeleteOutput, {
+    description: `Delete a dimension. Also deletes indices associated with this dimension.
+    Each index is removed using the equivalent of deleteSurveyIndex.
+    Returns details of everything that was deleted.`
+  })
   deleteSurveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.deleteSurveyDimension(id);
   }
 
-  @Mutation(returns => SurveyIndexDeleteOutput)
+  @Mutation(returns => SurveyIndexDeleteOutput, {
+    description:
+      "Delete an index. Also removes associations with items; the items are not removed."
+  })
   deleteSurveyIndex(@Args("id") id: number) {
     return this.surveyService.deleteSurveyIndex(id);
   }
@@ -97,7 +115,8 @@ export class SurveyResolver {
   }
 
   @Mutation(returns => Survey, {
-    description: "Import a survey from Qualtrics"
+    description:
+      "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
   })
   async importQualtricsSurvey(
     @Args("importInput") qualtricsImportInput: QualtricsImportInput
@@ -119,7 +138,9 @@ export class SurveyResolver {
 export class SurveyDimensionResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveProperty(type => [SurveyIndex])
+  @ResolveProperty(type => [SurveyIndex], {
+    description: "List of survey index entries for this dimension."
+  })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
     return this.surveyService.findIndicesForDimension(surveyDimension);
   }
@@ -129,7 +150,9 @@ export class SurveyDimensionResolver {
 export class SurveyIndexResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveProperty(type => [SurveyItem])
+  @ResolveProperty(type => [SurveyItem], {
+    description: "List of survey items for this index"
+  })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.findItemsForIndex(surveyIndex);
   }

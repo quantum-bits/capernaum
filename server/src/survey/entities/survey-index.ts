@@ -10,7 +10,7 @@ import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
 
 @Entity()
-@ObjectType()
+@ObjectType({ description: "Collection of survey items, grouped for analysis" })
 export class SurveyIndex {
   @PrimaryGeneratedColumn()
   @Field(type => Int)
@@ -22,14 +22,23 @@ export class SurveyIndex {
   @OneToMany(type => SurveyItem, item => item.surveyIndex)
   surveyItems: SurveyItem[];
 
-  @Column() @Field() title: string;
+  @Column() @Field({ description: "Title of this index" }) title: string;
 }
 
 @InputType()
 export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
-  @Field(type => Int) dimensionId: number;
-  @Field(type => [Int]) itemIds: number[];
-  @Field() title: string;
+  @Field(type => Int, {
+    description: "ID of the dimension to contain this index"
+  })
+  dimensionId: number;
+
+  @Field(type => [Int], {
+    description: "List of IDs of the items to include in this index."
+  })
+  itemIds: number[];
+
+  @Field({ description: "Title of this index within the dimension" })
+  title: string;
 }
 
 @InputType()
@@ -41,6 +50,11 @@ export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
 
 @ObjectType()
 export class SurveyIndexDeleteOutput {
-  @Field(type => Int) deletedIndexId: number;
-  @Field(type => [Int]) deletedItemIds: number[];
+  @Field(type => Int, { description: "ID of deleted index" })
+  deletedIndexId: number;
+
+  @Field(type => [Int], {
+    description: "IDs of items removed from the deleted index"
+  })
+  deletedItemIds: number[];
 }

@@ -4,24 +4,45 @@ import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 
 @Entity()
-@ObjectType()
+@ObjectType({
+  description: "All information about a survey imported from Qualtrics"
+})
 export class Survey {
   @PrimaryGeneratedColumn()
   @Field(type => Int)
   id: number;
 
   @OneToMany(type => SurveyItem, item => item.survey)
-  @Field(type => [SurveyItem])
+  @Field(type => [SurveyItem], {
+    description:
+      "All the Qualtrics items for this survey; for groupings, see survey dimension and index."
+  })
   surveyItems: SurveyItem[];
 
   @OneToMany(type => SurveyDimension, dimension => dimension.survey)
-  @Field(type => [SurveyDimension])
+  @Field(type => [SurveyDimension], {
+    description:
+      "Dimensions for this survey; groups indices, which group items."
+  })
   surveyDimensions: SurveyDimension[];
 
-  @Field() @Column() title: string;
-  @Field() @Column() qualtricsId: string;
-  @Field() @Column() qualtricsName: string;
-  @Field() @Column() qualtricsModDate: string;
+  @Column()
+  @Field({ description: "Title for this survey in Capernaum" })
+  title: string;
+
+  @Column()
+  @Field({ description: "Unique identifier for this survey on Qualtrics" })
+  qualtricsId: string;
+
+  @Column()
+  @Field({ description: "Name of this survey on Qualtrics" })
+  qualtricsName: string;
+
+  @Column()
+  @Field({
+    description: "Date and time at which this survey was modified on Qualtrics"
+  })
+  qualtricsModDate: string;
 }
 
 @InputType()
@@ -44,6 +65,8 @@ export class SurveyUpdateInput {
 
 @InputType()
 export class QualtricsImportInput {
-  @Field() qualtricsId: string;
-  @Field() title: string;
+  @Field({ description: "Qualtrics unique identifier" })
+  qualtricsId: string;
+  @Field({ description: "Title for associated Capernaum survey" })
+  title: string;
 }
