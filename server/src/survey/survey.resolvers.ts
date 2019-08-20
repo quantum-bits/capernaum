@@ -10,6 +10,7 @@ import {
   QualtricsImportInput,
   Survey,
   SurveyCreateInput,
+  SurveyDimension,
   SurveyItem,
   SurveyUpdateInput
 } from "./entities";
@@ -49,7 +50,14 @@ export class SurveyResolver {
     return this.surveyService.itemsForSurvey(survey);
   }
 
-  @Mutation(returns => Survey)
+  @ResolveProperty(type => [SurveyDimension])
+  surveyDimensions(@Parent() survey) {
+    return this.surveyService.dimensionsForSurvey(survey);
+  }
+
+  @Mutation(returns => Survey, {
+    description: "Import a survey from Qualtrics"
+  })
   async importQualtricsSurvey(
     @Args("importInput") qualtricsImportInput: QualtricsImportInput
   ) {

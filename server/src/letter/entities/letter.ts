@@ -7,10 +7,6 @@ import {
   UpdateDateColumn
 } from "typeorm";
 
-/**
- * Letter
- */
-
 @Entity()
 @ObjectType()
 export class Letter {
@@ -40,24 +36,4 @@ export class LetterUpdateInput {
   @Field(type => Int) id: number;
   @Field({ nullable: true }) name: string;
   @Field({ nullable: true }) isFrozen: boolean;
-}
-
-/**
- * LetterElementType
- */
-
-@Entity()
-@ObjectType()
-export class LetterElementType {
-  @PrimaryGeneratedColumn()
-  @Field(type => Int)
-  id: number;
-
-  @Field()
-  @Column()
-  key: string;
-
-  @Field()
-  @Column()
-  description: string;
 }

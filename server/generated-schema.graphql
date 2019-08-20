@@ -34,6 +34,8 @@ type Mutation {
   deleteLetter(id: Int!): Int!
   createSurvey(createInput: SurveyCreateInput!): Survey!
   updateSurvey(updateInput: SurveyUpdateInput!): Survey!
+
+  """Import a survey from Qualtrics"""
   importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
 }
 

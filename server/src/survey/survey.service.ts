@@ -3,6 +3,7 @@ import {
   QualtricsImportInput,
   Survey,
   SurveyCreateInput,
+  SurveyDimension,
   SurveyItem,
   SurveyItemCreateInput,
   SurveyUpdateInput
@@ -20,7 +21,9 @@ export class SurveyService {
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyItem)
-    private readonly surveyItemRepo: Repository<SurveyItem>
+    private readonly surveyItemRepo: Repository<SurveyItem>,
+    @InjectRepository(SurveyDimension)
+    private readonly surveyDimensionRepo: Repository<SurveyDimension>
   ) {}
 
   create(createInput: SurveyCreateInput) {
@@ -41,6 +44,10 @@ export class SurveyService {
 
   itemsForSurvey(survey: Survey) {
     return this.surveyItemRepo.find({ survey });
+  }
+
+  dimensionsForSurvey(survey: Survey) {
+    return this.surveyDimensionRepo.find({ survey });
   }
 
   private static dumpQualtricsQuestion(
