@@ -105,7 +105,6 @@ export class SurveyService {
   }
 
   private removeItemsFromIndex(index: SurveyIndex) {
-    console.log("REMOVE ITEMS");
     const itemIds = index.surveyItems.map(item => item.id);
 
     return this.surveyItemRepo
@@ -117,7 +116,6 @@ export class SurveyService {
   }
 
   private setItemsForIndex(itemIds: number[], index: SurveyIndex) {
-    console.log("SET ITEMS");
     return this.surveyItemRepo
       .createQueryBuilder()
       .update(SurveyItem)
@@ -130,7 +128,6 @@ export class SurveyService {
     const index = await this.surveyIndexRepo.findOneOrFail(updateInput.id, {
       relations: ["surveyItems"]
     });
-    console.log("INDEX", index);
 
     if (updateInput.title) {
       // Update the title.
@@ -138,20 +135,13 @@ export class SurveyService {
     }
     if (updateInput.itemIds.length > 0) {
       // Update the related items.
-
-      console.log("AAA");
-      // Remove any existing associations.
-      await this.removeItemsFromIndex(index);
-
-      console.log("BBB");
-      // Make new associations.
-      await this.setItemsForIndex(updateInput.itemIds, index);
+      await this.removeItemsFromIndex(index); // Remove any existing associations.
+      await this.setItemsForIndex(updateInput.itemIds, index); // Make new associations.
     }
 
-    console.log("CCC");
-    const foo = await this.surveyIndexRepo.save(index);
-    console.log("THIS JUST UNDID SOME STUFF");
-    return foo;
+    // Don't do a .save() on the index; it will undo what we've done manually.
+    // Note that only the associated items have been changed; not the index itself.
+    return index;
   }
 
   private static dumpQualtricsQuestion(
