@@ -42,20 +42,20 @@ input QualtricsImportInput {
   title: String!
 }
 
-type QualtricsSurveyMetadata {
-  id: String!
-  name: String!
-  ownerId: String!
-  lastModified: String!
-  creationDate: String!
-  isActive: Boolean!
+type QualtricsSurveyListItem {
+  qualtricsId: String!
+  qualtricsName: String!
+  qualtricsOwnerId: String!
+  qualtricsModDate: String!
+  qualtricsCreationDate: String!
+  qualtricsIsActive: Boolean!
 }
 
 type Query {
   letters: [Letter!]!
   letter(id: Int!): Letter!
   letterElementTypes: [LetterElementType!]!
-  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyMetadata!]!
+  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   surveys: [Survey!]!
   survey(id: Int!): Survey!
 }

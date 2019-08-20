@@ -1,5 +1,3 @@
-import { QualtricsSurveyMetadata } from "./qualtrics.models";
-
 export interface QualtricsResponse<T> {
   result: T;
   meta: {
@@ -39,11 +37,6 @@ export interface QualtricsOrganization {
   stats: object;
 }
 
-export interface QualtricsSurveyList {
-  elements: QualtricsSurveyMetadata[];
-  nextPage: string | null;
-}
-
 export interface QualtricsQuestion {
   questionType: {
     type: string;
@@ -64,6 +57,20 @@ export interface QualtricsQuestion {
       analyze: boolean;
     };
   };
+}
+
+export interface QualtricsSurveyMetadata {
+  id: string;
+  name: string;
+  ownerId: string;
+  lastModified: string;
+  creationDate: string;
+  isActive: boolean;
+}
+
+export interface QualtricsSurveyList {
+  elements: QualtricsSurveyMetadata[];
+  nextPage: string | null;
 }
 
 export interface QualtricsSurvey {

@@ -3,7 +3,7 @@ import { QualtricsService } from "../../qualtrics/qualtrics.service";
 import chalk from "chalk";
 import { table } from "table";
 import { compareAsc, format, parse } from "date-fns";
-import { QualtricsSurveyMetadata } from "../../qualtrics/qualtrics.models";
+import { QualtricsSurveyMetadata } from "../../qualtrics/qualtrics.types";
 
 const enum SubCommand {
   Get = "get",
