@@ -4,6 +4,10 @@ import {
   Survey,
   SurveyCreateInput,
   SurveyDimension,
+  SurveyDimensionCreateInput,
+  SurveyDimensionUpdateInput,
+  SurveyIndex,
+  SurveyIndexCreateInput,
   SurveyItem,
   SurveyItemCreateInput,
   SurveyUpdateInput
@@ -20,14 +24,49 @@ export class SurveyService {
   constructor(
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
-    @InjectRepository(SurveyItem)
-    private readonly surveyItemRepo: Repository<SurveyItem>,
     @InjectRepository(SurveyDimension)
-    private readonly surveyDimensionRepo: Repository<SurveyDimension>
+    private readonly surveyDimensionRepo: Repository<SurveyDimension>,
+    @InjectRepository(SurveyIndex)
+    private readonly surveyIndexRepo: Repository<SurveyIndex>,
+    @InjectRepository(SurveyItem)
+    private readonly surveyItemRepo: Repository<SurveyItem>
   ) {}
 
-  create(createInput: SurveyCreateInput) {
-    return this.surveyRepo.insert(createInput);
+  createSurvey(createInput: SurveyCreateInput) {
+    return this.surveyRepo.save(this.surveyRepo.create(createInput));
+  }
+
+  async createDimension(createInput: SurveyDimensionCreateInput) {
+    const survey = await this.surveyRepo.findOneOrFail(createInput.surveyId);
+    return this.surveyDimensionRepo.save(
+      this.surveyDimensionRepo.create({
+        survey,
+        abbreviation: createInput.abbreviation,
+        title: createInput.title,
+        sequence: createInput.sequence
+      })
+    );
+  }
+
+  async createIndex(createInput: SurveyIndexCreateInput) {
+    const dimension = await this.surveyDimensionRepo.findOneOrFail(
+      createInput.dimensionId
+    );
+
+    const newIndex = await this.surveyIndexRepo.save(
+      this.surveyIndexRepo.create({
+        surveyDimension: dimension,
+        title: createInput.title
+      })
+    );
+
+    createInput.itemIds.forEach(async itemId => {
+      const item = await this.surveyItemRepo.findOneOrFail(itemId);
+      item.surveyIndex = newIndex;
+      this.surveyItemRepo.save(item);
+    });
+
+    return newIndex;
   }
 
   readAll() {
@@ -38,16 +77,30 @@ export class SurveyService {
     return this.surveyRepo.findOne(id);
   }
 
-  update(updateInput: SurveyUpdateInput) {
-    return this.surveyRepo.update(updateInput.id, updateInput);
+  async updateSurvey(updateInput: SurveyUpdateInput) {
+    const preload = await this.surveyRepo.preload(updateInput);
+    return this.surveyRepo.save(preload);
   }
 
-  itemsForSurvey(survey: Survey) {
+  async updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
+    const preload = await this.surveyDimensionRepo.preload(updateInput);
+    return this.surveyDimensionRepo.save(preload);
+  }
+
+  findItemsForSurvey(survey: Survey) {
     return this.surveyItemRepo.find({ survey });
   }
 
-  dimensionsForSurvey(survey: Survey) {
+  findDimensionsForSurvey(survey: Survey) {
     return this.surveyDimensionRepo.find({ survey });
+  }
+
+  findIndicesForDimension(surveyDimension: SurveyDimension) {
+    return this.surveyIndexRepo.find({ surveyDimension });
+  }
+
+  findItemsForIndex(surveyIndex: SurveyIndex) {
+    return this.surveyItemRepo.find({ surveyIndex });
   }
 
   private static dumpQualtricsQuestion(

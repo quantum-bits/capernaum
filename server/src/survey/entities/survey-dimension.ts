@@ -41,6 +41,16 @@ export class SurveyDimension {
 
 @InputType()
 export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
+  @Field(type => Int) surveyId: number;
   @Field() abbreviation: string;
   @Field() title: string;
+  @Field(type => Int) sequence: number;
+}
+
+@InputType()
+export class SurveyDimensionUpdateInput implements Partial<SurveyDimension> {
+  @Field(type => Int) id: number;
+  @Field({ nullable: true }) abbreviation?: string;
+  @Field({ nullable: true }) title?: string;
+  @Field(type => Int, { nullable: true }) sequence?: number;
 }

@@ -11,6 +11,10 @@ import {
   Survey,
   SurveyCreateInput,
   SurveyDimension,
+  SurveyDimensionCreateInput,
+  SurveyDimensionUpdateInput,
+  SurveyIndex,
+  SurveyIndexCreateInput,
   SurveyItem,
   SurveyUpdateInput
 } from "./entities";
@@ -27,7 +31,7 @@ export class SurveyResolver {
 
   @Mutation(returns => Survey)
   createSurvey(@Args("createInput") createInput: SurveyCreateInput) {
-    return this.surveyService.create(createInput);
+    return this.surveyService.createSurvey(createInput);
   }
 
   @Query(returns => [Survey])
@@ -42,17 +46,36 @@ export class SurveyResolver {
 
   @Mutation(returns => Survey)
   updateSurvey(@Args("updateInput") updateInput: SurveyUpdateInput) {
-    return this.surveyService.update(updateInput);
+    return this.surveyService.updateSurvey(updateInput);
+  }
+
+  @Mutation(returns => SurveyDimension)
+  updateSurveyDimension(
+    @Args("updateInput") updateInput: SurveyDimensionUpdateInput
+  ) {
+    return this.surveyService.updateSurveyDimension(updateInput);
   }
 
   @ResolveProperty(type => [SurveyItem])
-  surveyItems(@Parent() survey) {
-    return this.surveyService.itemsForSurvey(survey);
+  surveyItems(@Parent() survey: Survey) {
+    return this.surveyService.findItemsForSurvey(survey);
   }
 
   @ResolveProperty(type => [SurveyDimension])
-  surveyDimensions(@Parent() survey) {
-    return this.surveyService.dimensionsForSurvey(survey);
+  surveyDimensions(@Parent() survey: Survey) {
+    return this.surveyService.findDimensionsForSurvey(survey);
+  }
+
+  @Mutation(returns => SurveyDimension)
+  createSurveyDimension(
+    @Args("createInput") createInput: SurveyDimensionCreateInput
+  ) {
+    return this.surveyService.createDimension(createInput);
+  }
+
+  @Mutation(returns => SurveyIndex)
+  createSurveyIndex(@Args("createInput") createInput: SurveyIndexCreateInput) {
+    return this.surveyService.createIndex(createInput);
   }
 
   @Mutation(returns => Survey, {
@@ -71,5 +94,25 @@ export class SurveyResolver {
       qualtricsImportInput,
       qualtricsSurvey
     );
+  }
+}
+
+@Resolver(of => SurveyDimension)
+export class SurveyDimensionResolver {
+  constructor(private readonly surveyService: SurveyService) {}
+
+  @ResolveProperty(type => [SurveyIndex])
+  surveyIndices(@Parent() surveyDimension: SurveyDimension) {
+    return this.surveyService.findIndicesForDimension(surveyDimension);
+  }
+}
+
+@Resolver(of => SurveyIndex)
+export class SurveyIndexResolver {
+  constructor(private readonly surveyService: SurveyService) {}
+
+  @ResolveProperty(type => [SurveyItem])
+  surveyItems(@Parent() surveyIndex: SurveyIndex) {
+    return this.surveyService.findItemsForIndex(surveyIndex);
   }
 }

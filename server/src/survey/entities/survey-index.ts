@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
@@ -23,4 +23,11 @@ export class SurveyIndex {
   surveyItems: SurveyItem[];
 
   @Column() @Field() title: string;
+}
+
+@InputType()
+export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
+  @Field(type => Int) dimensionId: number;
+  @Field(type => [Int]) itemIds: number[];
+  @Field() title: string;
 }
