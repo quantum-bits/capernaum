@@ -54,3 +54,10 @@ export class SurveyDimensionUpdateInput implements Partial<SurveyDimension> {
   @Field({ nullable: true }) title?: string;
   @Field(type => Int, { nullable: true }) sequence?: number;
 }
+
+@ObjectType()
+export class SurveyDimensionDeleteOutput {
+  @Field(type => Int) deletedDimensionId: number;
+  @Field(type => [Int]) deletedIndexIds: number[];
+  @Field(type => [Int]) deletedItemIds: number[];
+}

@@ -5,9 +5,11 @@ import {
   SurveyCreateInput,
   SurveyDimension,
   SurveyDimensionCreateInput,
+  SurveyDimensionDeleteOutput,
   SurveyDimensionUpdateInput,
   SurveyIndex,
   SurveyIndexCreateInput,
+  SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemCreateInput,
@@ -19,6 +21,7 @@ import {
   QualtricsQuestion,
   QualtricsSurvey
 } from "../qualtrics/qualtrics.types";
+import { Field, Int, ObjectType } from "type-graphql";
 
 @Injectable()
 export class SurveyService {
@@ -104,15 +107,20 @@ export class SurveyService {
     return this.surveyDimensionRepo.save(preload);
   }
 
-  private removeItemsFromIndex(index: SurveyIndex) {
+  private async removeItemsFromIndex(index: SurveyIndex) {
     const itemIds = index.surveyItems.map(item => item.id);
 
-    return this.surveyItemRepo
-      .createQueryBuilder()
-      .update(SurveyItem)
-      .set({ surveyIndex: null })
-      .where("id IN (:...ids)", { ids: itemIds })
-      .execute();
+    if (index.surveyItems) {
+      // Yes, there are some to remove.
+      await this.surveyItemRepo
+        .createQueryBuilder()
+        .update(SurveyItem)
+        .set({ surveyIndex: null })
+        .where("id IN (:...ids)", { ids: itemIds })
+        .execute();
+    }
+
+    return itemIds;
   }
 
   private setItemsForIndex(itemIds: number[], index: SurveyIndex) {
@@ -142,6 +150,48 @@ export class SurveyService {
     // Don't do a .save() on the index; it will undo what we've done manually.
     // Note that only the associated items have been changed; not the index itself.
     return index;
+  }
+
+  async deleteSurveyDimension(
+    dimensionId: number
+  ): Promise<SurveyDimensionDeleteOutput> {
+    const dimension = await this.surveyDimensionRepo.findOneOrFail(
+      dimensionId,
+      { relations: ["surveyIndices"] }
+    );
+
+    const dimensionDeleteOutput: SurveyDimensionDeleteOutput = {
+      deletedDimensionId: dimensionId,
+      deletedIndexIds: [],
+      deletedItemIds: []
+    };
+
+    for (const index of dimension.surveyIndices) {
+      const indexDeleteOutput = await this.deleteSurveyIndex(index.id);
+      dimensionDeleteOutput.deletedIndexIds.push(
+        indexDeleteOutput.deletedIndexId
+      );
+      dimensionDeleteOutput.deletedItemIds = dimensionDeleteOutput.deletedItemIds.concat(
+        indexDeleteOutput.deletedItemIds
+      );
+    }
+
+    await this.surveyDimensionRepo.remove(dimension);
+
+    return dimensionDeleteOutput;
+  }
+
+  async deleteSurveyIndex(id: number): Promise<SurveyIndexDeleteOutput> {
+    const index = await this.surveyIndexRepo.findOneOrFail(id, {
+      relations: ["surveyItems"]
+    });
+    const removedItemIds = await this.removeItemsFromIndex(index);
+    await this.surveyIndexRepo.remove(index);
+
+    return {
+      deletedIndexId: id,
+      deletedItemIds: removedItemIds
+    };
   }
 
   private static dumpQualtricsQuestion(

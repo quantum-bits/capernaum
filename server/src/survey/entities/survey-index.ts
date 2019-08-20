@@ -38,3 +38,9 @@ export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
   @Field(type => [Int], { nullable: true }) itemIds?: number[];
   @Field({ nullable: true }) title?: string;
 }
+
+@ObjectType()
+export class SurveyIndexDeleteOutput {
+  @Field(type => Int) deletedIndexId: number;
+  @Field(type => [Int]) deletedItemIds: number[];
+}

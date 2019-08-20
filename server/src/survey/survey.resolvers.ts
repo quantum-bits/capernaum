@@ -12,9 +12,11 @@ import {
   SurveyCreateInput,
   SurveyDimension,
   SurveyDimensionCreateInput,
+  SurveyDimensionDeleteOutput,
   SurveyDimensionUpdateInput,
   SurveyIndex,
   SurveyIndexCreateInput,
+  SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyUpdateInput
@@ -72,6 +74,16 @@ export class SurveyResolver {
   @Mutation(returns => SurveyIndex)
   updateSurveyIndex(@Args("updateInput") updateInput: SurveyIndexUpdateInput) {
     return this.surveyService.updateSurveyIndex(updateInput);
+  }
+
+  @Mutation(returns => SurveyDimensionDeleteOutput)
+  deleteSurveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyService.deleteSurveyDimension(id);
+  }
+
+  @Mutation(returns => SurveyIndexDeleteOutput)
+  deleteSurveyIndex(@Args("id") id: number) {
+    return this.surveyService.deleteSurveyIndex(id);
   }
 
   @ResolveProperty(type => [SurveyItem])

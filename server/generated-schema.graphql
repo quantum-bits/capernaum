@@ -38,6 +38,8 @@ type Mutation {
   updateSurvey(updateInput: SurveyUpdateInput!): Survey!
   updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
+  deleteSurveyDimension(id: Int!): SurveyDimensionDeleteOutput!
+  deleteSurveyIndex(id: Float!): SurveyIndexDeleteOutput!
 
   """Import a survey from Qualtrics"""
   importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
@@ -99,6 +101,12 @@ input SurveyDimensionCreateInput {
   sequence: Int!
 }
 
+type SurveyDimensionDeleteOutput {
+  deletedDimensionId: Int!
+  deletedIndexIds: [Int!]!
+  deletedItemIds: [Int!]!
+}
+
 input SurveyDimensionUpdateInput {
   id: Int!
   abbreviation: String
@@ -116,6 +124,11 @@ input SurveyIndexCreateInput {
   dimensionId: Int!
   itemIds: [Int!]!
   title: String!
+}
+
+type SurveyIndexDeleteOutput {
+  deletedIndexId: Int!
+  deletedItemIds: [Int!]!
 }
 
 input SurveyIndexUpdateInput {
