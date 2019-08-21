@@ -3,12 +3,12 @@ import gql from "graphql-tag";
 export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
   query QualtricsSurveys($includeInactive: Boolean) {
     qualtricsSurveys(includeInactive: $includeInactive) {
-      id
-      ownerId
-      name
-      lastModified
-      isActive
-      creationDate
+      qualtricsId
+      qualtricsOwnerId
+      qualtricsName
+      qualtricsModDate
+      qualtricsIsActive
+      qualtricsCreationDate
     }
   }
 `;
@@ -40,6 +40,29 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
   }
 `;
 
+export const ADD_DIMENSION_MUTATION = gql`
+  mutation AddDimension($surveyId: Int!, $abbreviation: String!, $title: String!, $sequence: Int!) {
+    createSurveyDimension(
+      createInput: {
+        surveyId: $surveyId
+        abbreviation: $abbreviation
+        title: $title
+        sequence: $sequence
+      }
+    ) {
+      abbreviation
+      id
+      title
+      surveyIndices {
+        title
+        surveyItems {
+          qualtricsId
+          qualtricsText
+        }
+      }
+    }
+  }
+`;
 
 
 const a = gql`

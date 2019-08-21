@@ -132,8 +132,8 @@ export default Vue.extend({
   computed: {
     selections(): SurveySelection[] {
       return this.qualtricsSurveys.map(survey => ({
-        text: survey.name,
-        value: survey.id
+        text: survey.qualtricsName,
+        value: survey.qualtricsId
       }));
     }
   },
