@@ -77,6 +77,17 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
+                      <v-text-field
+                        v-model="surveyDimensionAbbrev"
+                        label="Survey Dimension Abbreviation"
+                        :hint="surveyDimensionAbbrevHint"
+                        :rules="abbrevRules"
+                        outlined
+                        persistent-hint
+                      ></v-text-field>
+                      <div v-if="serverError" class="red--text text-center">
+                        Sorry, there appears to have been an error.  Please try again later.
+                      </div>
                     </v-card-text>
 
                     <v-card-actions>
@@ -180,7 +191,7 @@
 import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ADD_DIMENSION_MUTATION, ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql"; // won't need this, eventually...just using it now for testing purposes
 
 //FIXME: delete Letter stuff once we no longer need it....
@@ -205,13 +216,16 @@ export default Vue.extend({
 
   data() {
     return {
+      serverError: false as boolean,
       letter: null as Letter | null,
       surveyDimensionEnum: SurveyDimensionEnum,
       surveyIndexDialog: false,
       surveyDimensionDialog: false,
       surveyDimensionText: "" as string,
+      surveyDimensionAbbrev: "" as string,
       surveyDimensionDialogTitle: "" as string,
       surveyDimensionDialogHint: "" as string,
+      surveyDimensionAbbrevHint: "" as string,
       surveyDimensionId: null as number, //id of the survey dimension currently being edited
       surveyIndexText: "" as string,
       surveyIndexDialogTitle: "" as string,
@@ -230,6 +244,9 @@ export default Vue.extend({
         //(v: any) =>
         //  (v && v.length <= 80) ||
         //  "Title of letter must be less than 80 characters"
+      ],
+      abbrevRules: [
+        (v: any) => !!v || "Abbreviation is required" //,
       ],
       surveyItems: [
         {
@@ -367,6 +384,7 @@ export default Vue.extend({
       this.surveyDimensionText = "";
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+      this.surveyDimensionAbbrevHint = "e.g., 'FD'";
       console.log("valid? ", this.valid);
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
@@ -378,6 +396,7 @@ export default Vue.extend({
       this.surveyDimensionText = dimension.name;
       this.surveyDimensionDialogTitle = "Edit Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+      this.surveyDimensionAbbrevHint = "e.g., 'FD'";
     },
     deleteDimension(dimension: any) {
       console.log("delete dimension!", dimension);
@@ -390,18 +409,46 @@ export default Vue.extend({
       (this.$refs.form as any).resetValidation();
       console.log(this.$refs.form);
       console.log("valid? ", this.valid);
+      this.serverError = false;
     },
     submitSurveyDimension() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("save info");
-        // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
+
+        this.$apollo
+          .mutate({
+            mutation: ADD_DIMENSION_MUTATION,
+            variables: {
+              surveyId: parseInt(this.surveySelect.value, 10),
+              abbreviation: this.surveyDimensionAbbrev,
+              title: this.surveyDimensionText,
+              // FIXME: sequence should not be hard-coded
+              sequence: 10
+            }
+          })
+          .then(({ data }) => {
+            console.log('done!', data);
+             // FIXME: Replace the `as any` hack.
+            (this.$refs.form as any).resetValidation();
+            this.surveyDimensionDialog = false;
+          })
+          .catch((error) => {
+            console.log('there appears to have been an error: ', error);
+            (this.$refs.form as any).resetValidation();
+            this.serverError = true;
+            //this.serverError = true
+
+          });
+
+       
+
+
         //save info
         //if all is well, reset validation on form, close dialog (or maybe just call the cancel method)
       }
       //this.surveyDimensionDialog = false;
-      console.log("save: ", this.surveyDimensionText);
+      
       // save to db, etc.
     },
     addSurveyIndex(dimension: any) {
@@ -442,6 +489,7 @@ export default Vue.extend({
       //this.valid = true;
       // FIXME: Replace the `as any` hack.
       (this.$refs.form as any).resetValidation();
+      this.serverError = false;
     },
     submitSurveyIndex() {
       // FIXME: Replace the `as any` hack.
@@ -502,7 +550,7 @@ export default Vue.extend({
   computed: {
     selections(): SurveySelection[] {
       return this.surveys.map(survey => ({
-        text: survey.name,
+        text: survey.title,
         value: survey.id
       }));
     }
