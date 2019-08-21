@@ -1,13 +1,8 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import {
-  Letter,
-  LetterElementType,
-  LetterUpdateInput
-} from "./letter.entities";
+import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
 import { LetterElementTypeService, LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
-import { Logger } from "@nestjs/common";
 
 @Resolver(of => Letter)
 export class LetterResolver {

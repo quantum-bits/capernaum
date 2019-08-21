@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Letter, LetterElementType } from "./letter.entities";
+import { Letter, LetterElementType } from "./entities";
 import { LetterElementTypeResolver, LetterResolver } from "./letter.resolvers";
 import { LetterElementTypeService, LetterService } from "./letter.service";
 

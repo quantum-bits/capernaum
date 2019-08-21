@@ -3,7 +3,7 @@ import { QualtricsService } from "../../qualtrics/qualtrics.service";
 import chalk from "chalk";
 import { table } from "table";
 import { compareAsc, format, parse } from "date-fns";
-import { QualtricsSurveyMetadata } from "../../qualtrics/qualtrics.models";
+import { QualtricsSurveyMetadata } from "../../qualtrics/qualtrics.types";
 
 const enum SubCommand {
   Get = "get",
@@ -45,18 +45,17 @@ export default class SurveyCommand extends Command {
         if (!args.surveyId) {
           this.error("`get` command requires a survey identifier");
         }
-        api.getSurvey(args.surveyId).then(response => {
+        api.getSurvey(args.surveyId).then(survey => {
           if (flags.verbose) {
-            this.log(JSON.stringify(response.data.result, null, 2));
+            this.log(JSON.stringify(survey, null, 2));
           } else {
-            this.log(response.data.result.name);
+            this.log(survey.name);
           }
         });
         break;
       case SubCommand.List:
-        api.listSurveys().then(response => {
-          const elements: QualtricsSurveyMetadata[] =
-            response.data.result.elements;
+        api.listSurveys().then(surveyList => {
+          const elements: QualtricsSurveyMetadata[] = surveyList.elements;
           const headers = ["Id", "Name", "Last Modified"].map(hdr =>
             chalk.greenBright(hdr)
           );

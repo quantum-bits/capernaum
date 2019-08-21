@@ -1,12 +1,13 @@
-import { QualtricsSurveyMetadata } from "./qualtrics.models";
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
+import { QualtricsSurveyListItem } from "./qualtrics.entities";
+import { Field } from "type-graphql";
 
-@Resolver(of => QualtricsSurveyMetadata)
+@Resolver()
 export class QualtricsResolver {
   constructor(private readonly qualtricsService: QualtricsService) {}
 
-  @Query(returns => [QualtricsSurveyMetadata])
+  @Query(returns => [QualtricsSurveyListItem])
   async qualtricsSurveys(
     @Args({
       name: "includeInactive",
@@ -16,16 +17,23 @@ export class QualtricsResolver {
     })
     includeInactive: boolean
   ) {
-    let surveyList: QualtricsSurveyMetadata[] = [];
+    let surveyList: QualtricsSurveyListItem[] = [];
     let fetchMore = true;
     let offset: string = undefined;
     while (fetchMore) {
       const response = await this.qualtricsService.listSurveys(offset);
-      const { elements, nextPage } = response.data.result;
+      const { elements, nextPage } = response;
 
       elements.forEach(element => {
         if (element.isActive || includeInactive) {
-          surveyList.push(element);
+          surveyList.push({
+            qualtricsId: element.id,
+            qualtricsName: element.name,
+            qualtricsOwnerId: element.ownerId,
+            qualtricsModDate: element.lastModified,
+            qualtricsCreationDate: element.creationDate,
+            qualtricsIsActive: element.isActive
+          });
         }
       });
 

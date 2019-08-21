@@ -1,10 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import {
-  Letter,
-  LetterElementType,
-  LetterUpdateInput
-} from "./letter.entities";
+import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
 import { Repository } from "typeorm";
 
 @Injectable()

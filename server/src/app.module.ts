@@ -3,11 +3,11 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
-import { Letter, LetterElementType } from "./letter/letter.entities";
+import { Letter, LetterElementType } from "./letter/entities";
 import { SurveyModule } from "./survey/survey.module";
 import {
-  SurveyDimension,
   Survey,
+  SurveyDimension,
   SurveyIndex,
   SurveyItem
 } from "./survey/entities";

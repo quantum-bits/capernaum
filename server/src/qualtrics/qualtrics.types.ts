@@ -1,4 +1,10 @@
-import { QualtricsSurveyMetadata } from "./qualtrics.models";
+export interface QualtricsResponse<T> {
+  result: T;
+  meta: {
+    requestId: string;
+    httpStatus: string;
+  };
+}
 
 export interface CreateResponseData {
   format: string;
@@ -6,49 +12,29 @@ export interface CreateResponseData {
   endDate?: string;
 }
 
-interface QualtricsResponse {
-  meta: {
-    requestId: string;
-    httpStatus: string;
-  };
-}
-
 type ResponseExportStatus = "inProgress" | "complete" | "failed";
 
-export interface CreateResponseExportResponse extends QualtricsResponse {
-  result: {
-    progressId: string;
-    percentComplete: number;
-    status: ResponseExportStatus;
-  };
+export interface CreateResponseExportResponse {
+  progressId: string;
+  percentComplete: number;
+  status: ResponseExportStatus;
 }
 
-export interface ResponseExportProgress extends QualtricsResponse {
-  result: {
-    percentComplete: number;
-    status: ResponseExportStatus;
-    fileId: string;
-  };
+export interface ResponseExportProgress {
+  percentComplete: number;
+  status: ResponseExportStatus;
+  fileId: string;
 }
 
-export interface QualtricsOrganization extends QualtricsResponse {
-  result: {
-    id: string;
-    name: string;
-    baseUrl: string;
-    type: string;
-    status: string;
-    creationDate: string;
-    expirationDate: string;
-    stats: object;
-  };
-}
-
-export interface QualtricsSurveyList extends QualtricsResponse {
-  result: {
-    elements: QualtricsSurveyMetadata[];
-    nextPage: string | null;
-  };
+export interface QualtricsOrganization {
+  id: string;
+  name: string;
+  baseUrl: string;
+  type: string;
+  status: string;
+  creationDate: string;
+  expirationDate: string;
+  stats: object;
 }
 
 export interface QualtricsQuestion {
@@ -73,25 +59,37 @@ export interface QualtricsQuestion {
   };
 }
 
-export interface QualtricsSurvey extends QualtricsResponse {
-  result: {
-    id: string;
-    name: string;
-    ownerId: string;
-    organizationId: string;
-    isActive: boolean;
-    creationDate: string;
-    lastModifiedDate: string;
-    expiration: {
-      startDate: string | null;
-      endDate: string | null;
-    };
-    questions: {
-      [key: string]: QualtricsQuestion;
-    };
-    exportColumnMap: object;
-    blocks: object;
-    flow: object;
-    embeddedData: object;
+export interface QualtricsSurveyMetadata {
+  id: string;
+  name: string;
+  ownerId: string;
+  lastModified: string;
+  creationDate: string;
+  isActive: boolean;
+}
+
+export interface QualtricsSurveyList {
+  elements: QualtricsSurveyMetadata[];
+  nextPage: string | null;
+}
+
+export interface QualtricsSurvey {
+  id: string;
+  name: string;
+  ownerId: string;
+  organizationId: string;
+  isActive: boolean;
+  creationDate: string;
+  lastModifiedDate: string;
+  expiration: {
+    startDate: string | null;
+    endDate: string | null;
   };
+  questions: {
+    [key: string]: QualtricsQuestion;
+  };
+  exportColumnMap: object;
+  blocks: object;
+  flow: object;
+  embeddedData: object;
 }
