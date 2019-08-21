@@ -112,8 +112,8 @@ export default Vue.extend({
         divider: true
       },
       {
-        title: "Import Qualtrics Survey",
-        route: "import-qualtrics-survey",
+        title: "Imported Surveys",
+        route: "imported-surveys",
         icon: "mdi-download",
         divider: true
       }

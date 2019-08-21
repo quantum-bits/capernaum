@@ -33,13 +33,28 @@
         </v-form>
       </v-flex>
     </v-layout>
+    <v-layout v-if="serverError">
+      <v-flex  class="red--text text-center" pa-10 xs7 offset-xs1>
+          Sorry, there appears to have been an error.  Please try again later.
+      </v-flex>
+    </v-layout>
+    <v-layout v-if="serverError">
+      <v-flex  xs6 offset-xs6>
+        <v-btn color="success" @click="returnToSurveys">
+            Return to Surveys
+        </v-btn>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import {
+  IMPORT_QUALTRICS_SURVEY,
+  ALL_QUALTRICS_SURVEYS_QUERY
+} from "@/graphql/surveys.graphql";
 
 import {
   SurveyItem,
@@ -55,9 +70,10 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as SurveyItem[],
+      qualtricsSurveys: [] as SurveyItem[],
       title: "" as string,
       valid: true,
+      serverError: false,
       //FIXME: make surveySelect of the appropriate type
       surveySelect: null as any,
       //select: null as any,
@@ -72,32 +88,50 @@ export default Vue.extend({
   },
 
   methods: {
+    returnToSurveys() {
+      this.$router.push({ name: "imported-surveys" });
+    },
     submit() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("title is: ", this.title);
-        console.log("selected survey: ", this.surveySelect);
-        /*
-            this.$apollo.mutate({
-            mutation: ADD_LETTER_MUTATION,
+        console.log("selected survey: ", this.surveySelect); //this.surveySelect.value
+
+        this.$apollo
+          .mutate({
+            mutation: IMPORT_QUALTRICS_SURVEY,
             variables: {
-                name: this.name
+              qualtricsImportInput: {
+                qualtricsId: this.surveySelect.value,
+                title: this.title
+              }
             }
-            });
-            */
+          })
+          .then(({ data }) => {
+            console.log('done!', data);
+            this.$router.push({ name: "imported-surveys" });
+            // FIXME: at the moment, when we go back to the imported surveys page, the new survey isn't there...?!?
+            // maybe need to force a page reload or put a subscription on that page so that it keeps checking to see if there are 
+            // more surveys...?
+          })
+          .catch((error) => {
+            console.log('there appears to have been an error: ', error);
+            this.serverError = true
+
+          });
       }
     }
   },
 
   apollo: {
-    surveys: {
-      query: ALL_SURVEYS_QUERY
+    qualtricsSurveys: {
+      query: ALL_QUALTRICS_SURVEYS_QUERY
     }
   },
 
   computed: {
     selections(): SurveySelection[] {
-      return this.surveys.map(survey => ({
+      return this.qualtricsSurveys.map(survey => ({
         text: survey.name,
         value: survey.id
       }));
