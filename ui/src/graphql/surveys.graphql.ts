@@ -64,29 +64,82 @@ export const ADD_DIMENSION_MUTATION = gql`
   }
 `;
 
-
-const a = gql`
-  query {
-    survey(id: 42) {
-      items {
-        id
-        name
+export const UPDATE_DIMENSION_MUTATION = gql`
+  mutation ChangeDimension($id: Int!, $abbreviation: String!, $title: String!, $sequence: Int!) {
+    updateSurveyDimension(
+      updateInput: { id: $id, title: $title, abbreviation: $abbreviation, sequence: $sequence }
+    ) {
+      abbreviation
+      title
+      sequence
+      surveyIndices {
+        title
+        surveyItems {
+          qualtricsText
+        }
       }
     }
   }
 `;
 
-const b = gql`
-  query {
-    surveyDimension {
+export const ADD_INDEX_MUTATION = gql`
+  mutation AddIndex($dimensionId: Int!, $itemIds: [Int!]!, $title: String!) {
+    createSurveyIndex(
+      createInput: {
+        dimensionId: $dimensionId,
+        itemIds: $itemIds,
+        title: $title
+      }
+    ) {
       id
-      name
-      surveyIndex {
+      title
+      surveyItems {
+        qualtricsText
+      }
+    }
+  }
+`;
+
+export const UPDATE_INDEX_MUTATION = gql`
+  mutation UpdateIndex($id: Int!, $itemIds: [Int!]!, $title: String!) {
+    updateSurveyIndex(
+      updateInput: { id: $id, title: $title, itemIds: $itemIds }
+    ) {
+      id
+      title
+      surveyItems {
         id
-        name
-        surveyItem {
+        qualtricsId
+        qualtricsText
+      }
+    }
+  }
+`;
+
+export const ONE_SURVEY_QUERY = gql`
+  query OneSurvey($surveyId: Int!) {
+    survey(id: $surveyId) {
+      id
+      title
+      surveyItems {
+        id
+        sequence
+        qualtricsId
+        qualtricsText
+      }
+      surveyDimensions {
+        id
+        abbreviation
+        title
+        sequence
+        surveyIndices {
           id
-          name
+          title
+          surveyItems {
+            id
+            qualtricsId
+            qualtricsText
+          }
         }
       }
     }
