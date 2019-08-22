@@ -29,10 +29,6 @@ export class SurveyDimension {
   surveyIndices: SurveyIndex[];
 
   @Column()
-  @Field({ description: "Abbreviation for this dimension (e.g., 'FOG')" })
-  abbreviation: string;
-
-  @Column()
   @Field({ description: "Title of this dimension (e.g., 'Focus on Prayer')" })
   title: string;
 
@@ -49,7 +45,6 @@ export class SurveyDimension {
 })
 export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
   @Field(type => Int) surveyId: number;
-  @Field() abbreviation: string;
   @Field() title: string;
   @Field(type => Int) sequence: number;
 }
@@ -57,7 +52,6 @@ export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
 @InputType()
 export class SurveyDimensionUpdateInput implements Partial<SurveyDimension> {
   @Field(type => Int) id: number;
-  @Field({ nullable: true }) abbreviation?: string;
   @Field({ nullable: true }) title?: string;
   @Field(type => Int, { nullable: true }) sequence?: number;
 }

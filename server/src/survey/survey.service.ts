@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import {
   QualtricsImportInput,
   Survey,
@@ -12,20 +12,20 @@ import {
   SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
-  SurveyItemCreateInput,
   SurveyUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { EntityManager, Repository, Transaction } from "typeorm";
 import {
   QualtricsQuestion,
   QualtricsSurvey
 } from "../qualtrics/qualtrics.types";
-import { Field, Int, ObjectType } from "type-graphql";
+import { assign, pick, difference } from "lodash";
 
 @Injectable()
 export class SurveyService {
   constructor(
+    private readonly entityManager: EntityManager,
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
@@ -45,7 +45,6 @@ export class SurveyService {
     return this.surveyDimensionRepo.save(
       this.surveyDimensionRepo.create({
         survey,
-        abbreviation: createInput.abbreviation,
         title: createInput.title,
         sequence: createInput.sequence
       })
@@ -60,7 +59,8 @@ export class SurveyService {
     const newIndex = await this.surveyIndexRepo.save(
       this.surveyIndexRepo.create({
         surveyDimension: dimension,
-        title: createInput.title
+        title: createInput.title,
+        abbreviation: createInput.abbreviation
       })
     );
 
@@ -73,11 +73,19 @@ export class SurveyService {
     return newIndex;
   }
 
-  readAll() {
+  readAllSurveys() {
     return this.surveyRepo.find();
   }
 
-  readOne(id: number) {
+  readAllSurveyDimensions() {
+    return this.surveyDimensionRepo.find();
+  }
+
+  readAllSurveyIndices() {
+    return this.surveyIndexRepo.find();
+  }
+
+  readOneSurvey(id: number) {
     return this.surveyRepo.findOne(id);
   }
 
@@ -107,49 +115,45 @@ export class SurveyService {
     return this.surveyDimensionRepo.save(preload);
   }
 
-  private async removeItemsFromIndex(index: SurveyIndex) {
-    const itemIds = index.surveyItems.map(item => item.id);
+  updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
+    return this.entityManager.transaction(async manager => {
+      // N.B., can also use the manager directly.
+      const surveyIndexRepo = manager.getRepository(SurveyIndex);
+      const surveyItemRepo = manager.getRepository(SurveyItem);
 
-    if (index.surveyItems) {
-      // Yes, there are some to remove.
-      await this.surveyItemRepo
-        .createQueryBuilder()
-        .update(SurveyItem)
-        .set({ surveyIndex: null })
-        .where("id IN (:...ids)", { ids: itemIds })
-        .execute();
-    }
+      const index = await surveyIndexRepo.findOneOrFail(updateInput.id, {
+        relations: ["surveyItems"]
+      });
 
-    return itemIds;
-  }
+      // Assign scalar updates, if any. Only those props listed will be updated,
+      // and then only if present in updateInput.
+      assign(index, pick(updateInput, ["title", "abbreviation"]));
 
-  private setItemsForIndex(itemIds: number[], index: SurveyIndex) {
-    return this.surveyItemRepo
-      .createQueryBuilder()
-      .update(SurveyItem)
-      .set({ surveyIndex: index })
-      .where("id IN (:...ids)", { ids: itemIds })
-      .execute();
-  }
+      // Fetch survey items specified by the update.
+      const updateItems = await surveyItemRepo.findByIds(updateInput.itemIds);
+      const validUpdateItemIds = updateItems.map(item => item.id);
 
-  async updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
-    const index = await this.surveyIndexRepo.findOneOrFail(updateInput.id, {
-      relations: ["surveyItems"]
+      // Check that all specified items actually exist.
+      const bogusItemIds = difference(updateInput.itemIds, validUpdateItemIds);
+      console.log(
+        `UPDATE ${updateInput.itemIds} VALID ${validUpdateItemIds} BOGUS ${bogusItemIds}`
+      );
+      if (bogusItemIds.length > 0) {
+        throw new Error(
+          `Survey items with these IDs don't exist: ${bogusItemIds
+            .sort()
+            .join(", ")}`
+        );
+      }
+
+      // Update the list of survey items.
+      index.surveyItems = updateItems;
+
+      // Save changes to database.
+      //   (+) Simple, obvious, and wraps everything in a transaction
+      //   (-) Much less efficient than a handcrafted query (or QueryBuilder).
+      return surveyIndexRepo.save(index);
     });
-
-    if (updateInput.title) {
-      // Update the title.
-      index.title = updateInput.title;
-    }
-    if (updateInput.itemIds.length > 0) {
-      // Update the related items.
-      await this.removeItemsFromIndex(index); // Remove any existing associations.
-      await this.setItemsForIndex(updateInput.itemIds, index); // Make new associations.
-    }
-
-    // Don't do a .save() on the index; it will undo what we've done manually.
-    // Note that only the associated items have been changed; not the index itself.
-    return index;
   }
 
   async deleteSurveyDimension(
@@ -185,7 +189,13 @@ export class SurveyService {
     const index = await this.surveyIndexRepo.findOneOrFail(id, {
       relations: ["surveyItems"]
     });
-    const removedItemIds = await this.removeItemsFromIndex(index);
+
+    // Clear FK references from items to this index.
+    const removedItemIds = index.surveyItems.map(item => item.id);
+    for (let id of removedItemIds) {
+      await this.surveyItemRepo.update(id, { surveyIndex: null });
+    }
+
     await this.surveyIndexRepo.remove(index);
 
     return {

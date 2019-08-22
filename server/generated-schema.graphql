@@ -92,18 +92,14 @@ type Query {
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   survey(id: Int!): Survey!
   surveys: [Survey!]!
+  surveyDimensions: [SurveyDimension!]!
+  surveyIndices: [SurveyIndex!]!
 }
 
 """All information about a survey imported from Qualtrics"""
 type Survey {
   id: Int!
-
-  """
-  All the Qualtrics items for this survey; for groupings, see survey dimension and index.
-  """
   surveyItems: [SurveyItem!]!
-
-  """Dimensions for this survey; groups indices, which group items."""
   surveyDimensions: [SurveyDimension!]!
 
   """Title for this survey in Capernaum"""
@@ -131,9 +127,6 @@ input SurveyCreateInput {
 type SurveyDimension {
   id: Int!
 
-  """Abbreviation for this dimension (e.g., 'FOG')"""
-  abbreviation: String!
-
   """Title of this dimension (e.g., 'Focus on Prayer')"""
   title: String!
 
@@ -149,7 +142,6 @@ Data to create a new dimension. Does not embed indices. Add them with createSurv
 """
 input SurveyDimensionCreateInput {
   surveyId: Int!
-  abbreviation: String!
   title: String!
   sequence: Int!
 }
@@ -167,7 +159,6 @@ type SurveyDimensionDeleteOutput {
 
 input SurveyDimensionUpdateInput {
   id: Int!
-  abbreviation: String
   title: String
   sequence: Int
 }
@@ -175,6 +166,9 @@ input SurveyDimensionUpdateInput {
 """Collection of survey items, grouped for analysis"""
 type SurveyIndex {
   id: Int!
+
+  """Abbreviation for this index (e.g., 'FOG')"""
+  abbreviation: String!
 
   """Title of this index"""
   title: String!
@@ -189,6 +183,9 @@ input SurveyIndexCreateInput {
 
   """List of IDs of the items to include in this index."""
   itemIds: [Int!]!
+
+  """Abbreviation for this index (e.g., 'FOG')"""
+  abbreviation: String!
 
   """Title of this index within the dimension"""
   title: String!
@@ -205,6 +202,7 @@ type SurveyIndexDeleteOutput {
 input SurveyIndexUpdateInput {
   id: Int!
   itemIds: [Int!]
+  abbreviation: String
   title: String
 }
 
