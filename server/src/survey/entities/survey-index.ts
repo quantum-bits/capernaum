@@ -22,7 +22,13 @@ export class SurveyIndex {
   @OneToMany(type => SurveyItem, item => item.surveyIndex)
   surveyItems: SurveyItem[];
 
-  @Column() @Field({ description: "Title of this index" }) title: string;
+  @Column()
+  @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })
+  abbreviation: string;
+
+  @Column()
+  @Field({ description: "Title of this index" })
+  title: string;
 }
 
 @InputType()
@@ -37,6 +43,9 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
   })
   itemIds: number[];
 
+  @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })
+  abbreviation: string;
+
   @Field({ description: "Title of this index within the dimension" })
   title: string;
 }
@@ -45,6 +54,7 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
 export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
   @Field(type => Int) id: number;
   @Field(type => [Int], { nullable: true }) itemIds?: number[];
+  @Field({ nullable: true }) abbreviation?: string;
   @Field({ nullable: true }) title?: string;
 }
 

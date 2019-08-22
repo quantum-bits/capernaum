@@ -59,12 +59,22 @@ export class SurveyResolver {
 
   @Query(returns => Survey)
   survey(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.readOne(id);
+    return this.surveyService.readOneSurvey(id);
   }
 
   @Query(returns => [Survey])
   surveys() {
-    return this.surveyService.readAll();
+    return this.surveyService.readAllSurveys();
+  }
+
+  @Query(returns => [SurveyDimension])
+  surveyDimensions() {
+    return this.surveyService.readAllSurveyDimensions();
+  }
+
+  @Query(returns => [SurveyIndex])
+  surveyIndices() {
+    return this.surveyService.readAllSurveyIndices();
   }
 
   @Mutation(returns => Survey)
@@ -104,13 +114,13 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyIndex(id);
   }
 
-  @ResolveProperty(type => [SurveyItem])
-  surveyItems(@Parent() survey: Survey) {
+  @ResolveProperty("surveyItems", type => [SurveyItem])
+  resolveSurveyItems(@Parent() survey: Survey) {
     return this.surveyService.findItemsForSurvey(survey);
   }
 
-  @ResolveProperty(type => [SurveyDimension])
-  surveyDimensions(@Parent() survey: Survey) {
+  @ResolveProperty("surveyDimensions", type => [SurveyDimension])
+  resolveSurveyDimensions(@Parent() survey: Survey) {
     return this.surveyService.findDimensionsForSurvey(survey);
   }
 
