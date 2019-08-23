@@ -39,6 +39,11 @@ export default new Router({
       component: () => import("./pages/ImportQualtricsSurvey.vue")
     },
     {
+      path: "/imported-surveys",
+      name: "imported-surveys",
+      component: () => import("./pages/ImportedSurveys.vue")
+    },
+    {
       path: "/compose/:id?",
       name: "compose",
       component: () => import("./pages/Compose.vue")

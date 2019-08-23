@@ -2,10 +2,21 @@
   <v-container>
     <v-layout row wrap>
       <v-flex xs12>
+        <ConfirmDeleteDialog
+          v-model="showConfirmDeleteDialog"
+          v-on:delete-is-confirmed="deleteIsConfirmed()"
+          :customText="deleteItemDialogText"
+          :customTitle="deleteItemDialogTitle"
+        ></ConfirmDeleteDialog>
         <template>
           <div>
             <v-row justify="center">
-              <v-dialog persistent v-model="surveyIndexDialog" max-width="800">
+              <v-dialog
+                v-if="surveyData"
+                persistent
+                v-model="surveyIndexDialog"
+                max-width="800"
+              >
                 <v-card>
                   <v-card-title class="headline">
                     {{ surveyIndexDialogTitle }}
@@ -17,6 +28,14 @@
                         label="Survey Index"
                         :hint="surveyIndexDialogHint"
                         :rules="nameRules"
+                        outlined
+                        persistent-hint
+                      ></v-text-field>
+                      <v-text-field
+                        v-model="surveyIndexAbbrev"
+                        label="Survey Index Abbreviation"
+                        :hint="surveyIndexAbbrevHint"
+                        :rules="abbrevRules"
                         outlined
                         persistent-hint
                       ></v-text-field>
@@ -77,6 +96,10 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
+                      <div v-if="serverError" class="red--text text-center">
+                        Sorry, there appears to have been an error. Please try
+                        again later.
+                      </div>
                     </v-card-text>
 
                     <v-card-actions>
@@ -128,9 +151,12 @@
           >Add Survey Dimension</v-btn
         >
       </v-flex>
-      <v-flex xs10 offset-xs1>
+      <v-flex v-if="surveyData" xs10 offset-xs1>
         <template>
-          <v-treeview dense rounded hoverable :items="surveyDimensionData">
+          <v-treeview dense rounded hoverable :items="surveyDimensions">
+            <template v-slot:label="{ item }">
+              <div v-html="item.name"></div>
+            </template>
             <template v-slot:prepend="{ item, open }">
               <v-icon v-if="item.type == surveyDimensionEnum.SURVEY_ITEM">
                 {{ "mdi-comment-outline" }}
@@ -180,16 +206,18 @@
 import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql"; // won't need this, eventually...just using it now for testing purposes
+import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
 
-//FIXME: delete Letter stuff once we no longer need it....
 import {
-  Letter,
-  LetterElementEnum,
-  LetterElementMenuItemType,
-  LetterElementType
-} from "./letter-element.types";
+  ONE_SURVEY_QUERY,
+  ADD_DIMENSION_MUTATION,
+  UPDATE_DIMENSION_MUTATION,
+  ADD_INDEX_MUTATION,
+  UPDATE_INDEX_MUTATION,
+  ALL_SURVEYS_QUERY,
+  DELETE_DIMENSION,
+  DELETE_INDEX
+} from "@/graphql/surveys.graphql";
 
 import {
   SurveyItem,
@@ -202,20 +230,32 @@ export default Vue.extend({
   name: "SurveyDimensions",
 
   props: {},
-
+  components: {
+    ConfirmDeleteDialog
+  },
   data() {
     return {
-      letter: null as Letter | null,
+      showConfirmDeleteDialog: false,
+      deleteItemType: "" as string, // will be set to the type of element that will be deleted (e.g., surveyDimensionEnum.SURVEY_INDEX)
+      deleteItemId: null as number, // id of the dimension or index to be deleted
+      deleteItemDialogTitle: "" as string, // custom title sent to the confirm delete dialog
+      deleteItemDialogText: "" as string, // custom text sent to the confirm delete dialog
+      serverError: false as boolean,
+      surveyData: null as any,
       surveyDimensionEnum: SurveyDimensionEnum,
-      surveyIndexDialog: false,
+      surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
       surveyDimensionText: "" as string,
       surveyDimensionDialogTitle: "" as string,
       surveyDimensionDialogHint: "" as string,
       surveyDimensionId: null as number, //id of the survey dimension currently being edited
+      surveyIndexEditOn: false, // true when editing a survey index (as opposed to adding a new one)
+      surveyIndexDialog: false,
       surveyIndexText: "" as string,
+      surveyIndexAbbrev: "" as string,
       surveyIndexDialogTitle: "" as string,
       surveyIndexDialogHint: "" as string,
+      surveyIndexAbbrevHint: "" as string,
       surveyIndexId: null as number, //id of the survey index currently being edited
       selectedSurveyItems: [] as any,
       surveys: [] as SurveyItem[],
@@ -225,143 +265,55 @@ export default Vue.extend({
       surveySelect: null as any,
       //select: null as any,
       //name: "",
-      nameRules: [
-        (v: any) => !!v || "Title is required" //,
-        //(v: any) =>
-        //  (v && v.length <= 80) ||
-        //  "Title of letter must be less than 80 characters"
-      ],
-      surveyItems: [
-        {
-          id: 20,
-          name: "I live in ways that help others as much as myself"
-        },
-        {
-          id: 21,
-          name:
-            "I go out of my way to discover the people in need around me that I normally wouldn’t see"
-        },
-        {
-          id: 22,
-          name: "I have tremendous love for people I don’t know"
-        },
-        {
-          id: 23,
-          name:
-            "I think about strangers’ well-being and want what is best for them"
-        },
-        {
-          id: 30,
-          name:
-            "I believe the Bible has decisive authority over what I say and do"
-        },
-        {
-          id: 31,
-          name:
-            "As I go through the normal day I think of Bible passages relevant to what I am doing"
-        },
-        {
-          id: 32,
-          name: "I talk about Bible passages with my friends"
-        },
-        {
-          id: 40,
-          name: "What God says is what is true, right, and good"
-        }
-      ],
-      surveyDimensionData: [
-        {
-          id: 1,
-          name: "Focal Dimension",
-          type: "survey-dimension",
-          children: [
-            {
-              id: 2,
-              parentId: 1,
-              name: "A Focus on Others",
-              type: "survey-index",
-              children: [
-                {
-                  id: 20,
-                  name: "I live in ways that help others as much as myself",
-                  type: "survey-item"
-                },
-                {
-                  id: 21,
-                  name:
-                    "I go out of my way to discover the people in need around me that I normally wouldn’t see",
-                  type: "survey-item"
-                },
-                {
-                  id: 22,
-                  name: "I have tremendous love for people I don’t know",
-                  type: "survey-item"
-                },
-                {
-                  id: 23,
-                  name:
-                    "I think about strangers’ well-being and want what is best for them",
-                  type: "survey-item"
-                }
-              ]
-            },
-            {
-              id: 3,
-              parentId: 1,
-              name: "A Focus on the Bible",
-              type: "survey-index",
-              children: [
-                {
-                  id: 30,
-                  name:
-                    "I believe the Bible has decisive authority over what I say and do",
-                  type: "survey-item"
-                },
-                {
-                  id: 31,
-                  name:
-                    "As I go through the normal day I think of Bible passages relevant to what I am doing",
-                  type: "survey-item"
-                },
-                {
-                  id: 32,
-                  name: "I talk about Bible passages with my friends",
-                  type: "survey-item"
-                }
-              ]
-            },
-            {
-              id: 4,
-              parentId: 1,
-              name: "A Focus on God",
-              type: "survey-index",
-              children: [
-                {
-                  id: 40,
-                  name: "What God says is what is true, right, and good",
-                  type: "survey-item"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 5,
-          name: "Orientation Dimension",
-          type: "survey-dimension",
-          children: []
-        },
-        {
-          id: 15,
-          name: "Scripture Engagement Dimension",
-          type: "survey-dimension",
-          children: []
-        }
-      ]
+      nameRules: [(v: any) => !!v || "Title is required"],
+      abbrevRules: [(v: any) => !!v || "Abbreviation is required"]
     };
   },
 
   methods: {
+    refetchSurveyData() {
+      this.$apollo.queries.surveyData.refetch()
+              .then(({data}) => {
+                console.log('survey data refetched! ', data);
+              });
+    },
+    deleteIsConfirmed() {
+      console.log("delete is confirmed!");
+      if (this.deleteItemType === this.surveyDimensionEnum.SURVEY_DIMENSION) {
+        console.log('deleting dimension....');
+        this.$apollo
+          .mutate({
+            mutation: DELETE_DIMENSION,
+            variables: {
+              id: this.deleteItemId
+            }
+          })
+          .then(({ data }) => {
+            console.log("item(s) deleted!", data);
+            this.refetchSurveyData();
+          })
+          .catch(error => {
+            console.log("there appears to have been an error: ", error);
+          });
+      } else if (this.deleteItemType === this.surveyDimensionEnum.SURVEY_INDEX) {
+        console.log('deleting index....');
+        this.$apollo
+          .mutate({
+            mutation: DELETE_INDEX,
+            variables: {
+              id: this.deleteItemId
+            }
+          })
+          .then(({ data }) => {
+            console.log("item(s) deleted!", data);
+            this.refetchSurveyData();
+          })
+          .catch(error => {
+            console.log("there appears to have been an error: ", error);
+          });
+      }
+      console.log('There appears to be a problem -- it is not clear which type of item to delete....');
+    },
     addSurveyDimension() {
       this.surveyDimensionDialog = true;
       this.surveyDimensionText = "";
@@ -375,42 +327,97 @@ export default Vue.extend({
     },
     editSurveyDimension(dimension: any) {
       this.surveyDimensionDialog = true;
+      this.surveyDimensionEditOn = true;
+      this.surveyDimensionId = dimension.id;
       this.surveyDimensionText = dimension.name;
       this.surveyDimensionDialogTitle = "Edit Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
     },
     deleteDimension(dimension: any) {
       console.log("delete dimension!", dimension);
-      // delete....
+      this.deleteItemDialogTitle = "Really delete the dimension "+"'"+dimension.name+"'?";
+      this.deleteItemDialogText = "Doing so will also delete any associated indexes.";
+      this.showConfirmDeleteDialog = true;
+      this.deleteItemType = this.surveyDimensionEnum.SURVEY_DIMENSION;
+      this.deleteItemId = dimension.id;
     },
     cancelDimensionDialog() {
       this.surveyDimensionDialog = false;
       //this.valid = true;
       // FIXME: Replace the `as any` hack.
       (this.$refs.form as any).resetValidation();
-      console.log(this.$refs.form);
-      console.log("valid? ", this.valid);
+      this.serverError = false;
+      this.surveyDimensionEditOn = false;
     },
     submitSurveyDimension() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("save info");
-        // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
-        //save info
-        //if all is well, reset validation on form, close dialog (or maybe just call the cancel method)
+        if (!this.surveyDimensionEditOn) {
+          //adding a new dimension
+          console.log("adding a new dimension");
+          console.log("survey ID: ", parseInt(this.surveySelect.value, 10));
+          console.log("title: ", this.surveyDimensionText);
+          this.$apollo
+            .mutate({
+              mutation: ADD_DIMENSION_MUTATION,
+              variables: {
+                surveyId: parseInt(this.surveySelect.value, 10),
+                title: this.surveyDimensionText,
+                // FIXME: sequence should not be hard-coded
+                sequence: 10
+              }
+            })
+            .then(({ data }) => {
+              console.log("done!", data);
+              this.cancelDimensionDialog();
+              this.refetchSurveyData();
+            })
+            .catch(error => {
+              console.log("there appears to have been an error: ", error);
+              (this.$refs.form as any).resetValidation();
+              this.serverError = true;
+              //this.serverError = true
+            });
+        } else {
+          //editing an existing dimension
+          console.log("updating....");
+          this.$apollo
+            .mutate({
+              mutation: UPDATE_DIMENSION_MUTATION,
+              variables: {
+                id: this.surveyDimensionId,
+                title: this.surveyDimensionText,
+                // FIXME: sequence should not be hard-coded
+                sequence: 10
+              }
+            })
+            .then(({ data }) => {
+              console.log("done!", data);
+              this.cancelDimensionDialog();
+              this.refetchSurveyData();
+            })
+            .catch(error => {
+              console.log("there appears to have been an error: ", error);
+              (this.$refs.form as any).resetValidation();
+              this.serverError = true;
+              //this.serverError = true
+            });
+        }
+      } else {
+        console.log("there appears to be a problem with the form....");
       }
-      //this.surveyDimensionDialog = false;
-      console.log("save: ", this.surveyDimensionText);
-      // save to db, etc.
     },
     addSurveyIndex(dimension: any) {
       this.surveyDimensionId = dimension.id; // will use this when saving the new survey index
       this.surveyIndexDialog = true;
       this.surveyIndexText = "";
+      this.surveyIndexAbbrev = "";
       this.selectedSurveyItems = [];
-      this.surveyIndexDialogTitle = "Add a New Survey Index";
+      this.surveyIndexDialogTitle =
+        "Add a New Survey Index for " + "'" + dimension.name + "'";
       this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
+      this.surveyIndexAbbrevHint = "e.g., 'FOO'";
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
         (this.$refs.form as any).resetValidation();
@@ -419,8 +426,9 @@ export default Vue.extend({
     editIndex(indexItem: any) {
       // specify the type(!)
       console.log("edit index!", indexItem);
+      this.surveyIndexEditOn = true;
       this.surveyIndexId = indexItem.id;
-      this.dimensionIndexId = indexItem.parentId;
+      this.surveyDimensionId = indexItem.parentId;
       this.selectedSurveyItems = [];
       indexItem.children.forEach(surveyItem => {
         this.selectedSurveyItems.push({
@@ -430,11 +438,19 @@ export default Vue.extend({
       });
       this.surveyIndexDialog = true;
       this.surveyIndexText = indexItem.name;
-      this.surveyIndexDialogTitle = "Edit Survey Index";
+      this.surveyIndexAbbrev = indexItem.abbrev;
+      this.surveyIndexDialogTitle =
+        "Edit Survey Index for " + "'" + indexItem.parentName + "'";
       this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
+      this.surveyIndexAbbrevHint = "e.g., 'FOO'";
     },
     deleteIndex(indexItem: any) {
       console.log("delete index!", indexItem);
+      this.deleteItemDialogTitle = "Really delete the index "+"'"+indexItem.name+"'?";
+      this.deleteItemDialogText = "This action is not reversible.";
+      this.showConfirmDeleteDialog = true;
+      this.deleteItemType = this.surveyDimensionEnum.SURVEY_INDEX;
+      this.deleteItemId = indexItem.id;
       // can use the parentId to make sure things are done correctly
     },
     cancelIndexDialog() {
@@ -442,24 +458,73 @@ export default Vue.extend({
       //this.valid = true;
       // FIXME: Replace the `as any` hack.
       (this.$refs.form as any).resetValidation();
+      this.serverError = false;
+      this.surveyIndexEditOn = true;
     },
     submitSurveyIndex() {
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("save info");
-        // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
-        //save info
-        //if all is well, reset validation on form, close dialog (or maybe just call the cancel method)
+
+        if (!this.surveyIndexEditOn) {
+          //adding a new index
+          console.log("adding a new index");
+          this.$apollo
+            .mutate({
+              mutation: ADD_INDEX_MUTATION,
+              variables: {
+                dimensionId: this.surveyDimensionId,
+                abbreviation: this.surveyIndexAbbrev,
+                title: this.surveyIndexText,
+                itemIds: this.selectedSurveyItems
+              }
+            })
+            .then(({ data }) => {
+              console.log("done!", data);
+              this.cancelIndexDialog();
+              this.refetchSurveyData();
+            })
+            .catch(error => {
+              console.log("there appears to have been an error: ", error);
+              (this.$refs.form as any).resetValidation();
+              this.serverError = true;
+              //this.serverError = true
+            });
+        } else {
+          //editing an existing dimension
+          console.log("updating....");
+          this.$apollo
+            .mutate({
+              mutation: UPDATE_INDEX_MUTATION,
+              variables: {
+                id: this.surveyIndexId,
+                abbreviation: this.surveyIndexAbbrev,
+                title: this.surveyIndexText,
+                itemIds: this.selectedSurveyItems
+              }
+            })
+            .then(({ data }) => {
+              console.log("done!", data);
+              this.cancelIndexDialog();
+              this.refetchSurveyData();
+            })
+            .catch(error => {
+              console.log("there appears to have been an error: ", error);
+              (this.$refs.form as any).resetValidation();
+              this.serverError = true;
+              //this.serverError = true
+            });
+        }
+      } else {
+        console.log("there appears to be a problem with the form....");
       }
       //this.surveyIndexDialog = false;
       console.log("save: ", this.surveyIndexText);
       console.log("survey items: ", this.selectedSurveyItems);
+      this.selectedSurveyItems.forEach(sI => {
+        console.log(typeof sI);
+      });
       // save to db, etc.
-    },
-
-    saveInfo() {
-      // need to redirect or something, depending on if this is a new letter....
     }
   },
 
@@ -467,31 +532,22 @@ export default Vue.extend({
     surveys: {
       query: ALL_SURVEYS_QUERY
     },
-    /**
-     * the following query will eventually be used to get survey dimension data, not letter data;
-     * I was just putting the structure in place to make sure that it was reactive in the right way;
-     * seems to work!
-     */
     // the following query runs automatically when this.surveySelect is updates (i.e., when something is chosen from the drop-down)
-    letter: {
-      query: ONE_LETTER_QUERY,
+    surveyData: {
+      query: ONE_SURVEY_QUERY,
       variables() {
-        console.log('survey select: ',this.surveySelect);
-        console.log('qualtricsId (to use fetch survey dimension data): ', this.surveySelect.value);
-        /*
-        if (this.$route.params.id !== undefined) {
-          return {
-            letterId: 3
-          };
-        }
-        */
+        console.log("survey select: ", this.surveySelect);
+        console.log(
+          "qualtricsId (to use fetch survey dimension data): ",
+          this.surveySelect.value
+        );
         return {
-          letterId: 3
+          surveyId: this.surveySelect.value
         };
       },
       update(data) {
-        console.log('data: ', data);
-        return data.letter;
+        console.log("data: ", data);
+        return data.survey;
       },
       skip() {
         return this.surveySelect === null;
@@ -502,8 +558,35 @@ export default Vue.extend({
   computed: {
     selections(): SurveySelection[] {
       return this.surveys.map(survey => ({
-        text: survey.name,
+        text: survey.title,
         value: survey.id
+      }));
+    },
+    surveyDimensions() {
+      return this.surveyData.surveyDimensions.map(dimension => ({
+        id: dimension.id,
+        name: dimension.title,
+        //abbrev: dimension.abbreviation,
+        type: "survey-dimension",
+        children: dimension.surveyIndices.map(index => ({
+          id: index.id,
+          parentId: dimension.id,
+          parentName: dimension.title,
+          name: index.title,
+          abbrev: index.abbreviation,
+          type: "survey-index",
+          children: index.surveyItems.map(surveyItem => ({
+            id: surveyItem.id,
+            name: surveyItem.qualtricsText,
+            type: "survey-item"
+          }))
+        }))
+      }));
+    },
+    surveyItems() {
+      return this.surveyData.surveyItems.map(item => ({
+        id: item.id,
+        name: item.qualtricsText
       }));
     }
   },
