@@ -1,17 +1,14 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
+import { BaseEntity } from "../../shared/base-entity";
 
 @Entity()
 @ObjectType({
   description: "All information about a survey imported from Qualtrics"
 })
-export class Survey {
-  @PrimaryGeneratedColumn()
-  @Field(type => Int)
-  id: number;
-
+export class Survey extends BaseEntity {
   @OneToMany(type => SurveyItem, item => item.survey)
   @Field(type => [SurveyItem], {
     description:
