@@ -60,7 +60,7 @@ type Mutation {
   """
   Delete an index. Also removes associations with items; the items are not removed.
   """
-  deleteSurveyIndex(id: Float!): SurveyIndexDeleteOutput!
+  deleteSurveyIndex(id: Int!): SurveyIndexDeleteOutput!
 
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.

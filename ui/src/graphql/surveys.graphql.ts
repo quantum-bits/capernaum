@@ -146,3 +146,22 @@ export const ONE_SURVEY_QUERY = gql`
     }
   }
 `;
+
+export const DELETE_DIMENSION = gql`
+  mutation TossSurveyDimension($id: Int!) {
+    deleteSurveyDimension(id: $id) {
+      deletedDimensionId
+      deletedIndexIds
+      deletedItemIds
+    }
+  }
+`;
+
+export const DELETE_INDEX = gql`
+  mutation TossSurveyIndex($id: Int!) {
+    deleteSurveyIndex(id: $id) {
+      deletedIndexId
+      deletedItemIds
+    }
+  }
+`;
