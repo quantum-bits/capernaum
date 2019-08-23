@@ -75,6 +75,7 @@ type Mutation {
 
 """Scripture engagement predictions for one survey"""
 type PredictionTable {
+  """Unique ID for this entity"""
   id: Int!
   entries: [PredictionTableEntry!]!
   title: String!
@@ -133,6 +134,7 @@ type Query {
 
 """Scripture engagement practice"""
 type ScriptureEngagementPractice {
+  """Unique ID for this entity"""
   id: Int!
   title: String!
   description: String!
