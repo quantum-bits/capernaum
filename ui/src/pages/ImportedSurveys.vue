@@ -87,23 +87,23 @@ export default Vue.extend({
 
   apollo: {
     surveys: {
-      query: ALL_SURVEYS_QUERY
+      query: ALL_SURVEYS_QUERY,
+      update (data) {
+        console.log('inside update: ',data);
+        return data.surveys;
+      }
     }
   },
 
-  computed: {
-    /*
-    selections(): SurveySelection[] {
-      return this.surveys.map(survey => ({
-        text: survey.name,
-        value: survey.id
-      }));
-    }
-    */
-  },
+  computed: {},
 
   mounted() {
     console.log("mounted....");
+    this.surveys ? console.log("surveys exist!") : console.log("surveys do not yet exist....");
+    this.$apollo.queries.surveys.refetch()
+      .then(({ data }) => {
+            console.log("item(s) refetched!", data);
+      });
   }
 });
 </script>
