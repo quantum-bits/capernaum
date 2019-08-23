@@ -11,6 +11,11 @@ import {
   SurveyIndex,
   SurveyItem
 } from "./survey/entities";
+import {
+  PredictionTable,
+  PredictionTableEntry,
+  ScriptureEngagementPractice
+} from "./prediction/entities";
 
 @Module({
   imports: [
@@ -26,7 +31,10 @@ import {
         SurveyDimension,
         Survey,
         SurveyIndex,
-        SurveyItem
+        SurveyItem,
+        ScriptureEngagementPractice,
+        PredictionTable,
+        PredictionTableEntry
       ],
       synchronize: true,
       logging: true
