@@ -9,10 +9,6 @@ import {
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 
-/**
- * SurveyDimension
- */
-
 @Entity()
 @ObjectType({
   description: "Top-level grouping of questions in Capernaum; contains indices"
@@ -23,9 +19,13 @@ export class SurveyDimension {
   id: number;
 
   @ManyToOne(type => Survey, survey => survey.surveyDimensions)
+  @Field(type => Survey)
   survey: Survey;
+  @Column("integer")
+  surveyId: number;
 
   @OneToMany(type => SurveyIndex, index => index.surveyDimension)
+  @Field(type => [SurveyIndex])
   surveyIndices: SurveyIndex[];
 
   @Column()

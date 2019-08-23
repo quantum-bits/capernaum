@@ -77,6 +77,11 @@ export class SurveyResolver {
     return this.surveyService.readAllSurveyIndices();
   }
 
+  @Query(returns => [SurveyItem], { description: "Retrieve all survey items" })
+  surveyItems() {
+    return this.surveyService.readAllSurveyItems();
+  }
+
   @Mutation(returns => Survey)
   updateSurvey(@Args("updateInput") updateInput: SurveyUpdateInput) {
     return this.surveyService.updateSurvey(updateInput);
@@ -116,11 +121,13 @@ export class SurveyResolver {
 
   @ResolveProperty("surveyItems", type => [SurveyItem])
   resolveSurveyItems(@Parent() survey: Survey) {
+    console.log(`** Resolve 'surveyItems' for survey ${survey.id}`);
     return this.surveyService.findItemsForSurvey(survey);
   }
 
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])
   resolveSurveyDimensions(@Parent() survey: Survey) {
+    console.log(`** Resolve 'surveyDimensions' for survey ${survey.id}`);
     return this.surveyService.findDimensionsForSurvey(survey);
   }
 
@@ -148,10 +155,19 @@ export class SurveyResolver {
 export class SurveyDimensionResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
+  @ResolveProperty(type => Survey)
+  survey(@Parent() surveyDimension: SurveyDimension) {
+    console.log(`** Resolve 'survey' for dimension ${surveyDimension.id}`);
+    return this.surveyService.readOneSurvey(surveyDimension.surveyId);
+  }
+
   @ResolveProperty(type => [SurveyIndex], {
     description: "List of survey index entries for this dimension."
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
+    console.log(
+      `** Resolve 'surveyIndices' for dimension ${surveyDimension.id}`
+    );
     return this.surveyService.findIndicesForDimension(surveyDimension);
   }
 }
@@ -164,6 +180,12 @@ export class SurveyIndexResolver {
     description: "List of survey items for this index"
   })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
+    console.log(`** Resolve 'surveyItems' for survey index ${surveyIndex.id}`);
     return this.surveyService.findItemsForIndex(surveyIndex);
+  }
+
+  @ResolveProperty(type => SurveyDimension)
+  surveyDimension(@Parent() surveyIndex: SurveyIndex) {
+    return this.surveyService.readOneDimension(surveyIndex.surveyDimensionId);
   }
 }

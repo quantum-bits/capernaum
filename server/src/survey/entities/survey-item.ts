@@ -11,11 +11,13 @@ export class SurveyItem {
   id: number;
 
   @ManyToOne(type => Survey, survey => survey.surveyItems)
+  @Field(type => Survey)
   survey: Survey;
 
   @ManyToOne(type => SurveyIndex, surveyIndex => surveyIndex.surveyItems, {
     nullable: true
   })
+  @Field(type => SurveyIndex, { nullable: true })
   surveyIndex: SurveyIndex;
 
   @Column("integer", { default: -1 })

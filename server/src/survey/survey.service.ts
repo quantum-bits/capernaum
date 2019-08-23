@@ -85,8 +85,16 @@ export class SurveyService {
     return this.surveyIndexRepo.find();
   }
 
+  readAllSurveyItems() {
+    return this.surveyItemRepo.find();
+  }
+
   readOneSurvey(id: number) {
     return this.surveyRepo.findOne(id);
+  }
+
+  readOneDimension(id: number) {
+    return this.surveyDimensionRepo.findOneOrFail(id);
   }
 
   findItemsForSurvey(survey: Survey) {
@@ -98,12 +106,17 @@ export class SurveyService {
   }
 
   findIndicesForDimension(surveyDimension: SurveyDimension) {
+    console.log("**", surveyDimension);
     return this.surveyIndexRepo.find({ surveyDimension });
   }
 
   findItemsForIndex(surveyIndex: SurveyIndex) {
     return this.surveyItemRepo.find({ surveyIndex });
   }
+
+  // findSurveyForItem(surveyItem: SurveyItem) {
+  //   return this.surveyRepo.find({ surveyItem });
+  // }
 
   async updateSurvey(updateInput: SurveyUpdateInput) {
     const preload = await this.surveyRepo.preload(updateInput);
