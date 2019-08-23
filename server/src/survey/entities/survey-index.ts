@@ -17,9 +17,13 @@ export class SurveyIndex {
   id: number;
 
   @ManyToOne(type => SurveyDimension, dimension => dimension.surveyIndices)
+  @Field(type => SurveyDimension)
   surveyDimension: SurveyDimension;
+  @Column("integer")
+  surveyDimensionId: number;
 
   @OneToMany(type => SurveyItem, item => item.surveyIndex)
+  @Field(type => [SurveyItem])
   surveyItems: SurveyItem[];
 
   @Column()

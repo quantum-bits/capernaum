@@ -121,6 +121,9 @@ type Query {
   surveys: [Survey!]!
   surveyDimensions: [SurveyDimension!]!
   surveyIndices: [SurveyIndex!]!
+
+  """Retrieve all survey items"""
+  surveyItems: [SurveyItem!]!
 }
 
 """Scripture engagement practice"""
@@ -174,15 +177,14 @@ input SurveyCreateInput {
 """Top-level grouping of questions in Capernaum; contains indices"""
 type SurveyDimension {
   id: Int!
+  survey: Survey!
+  surveyIndices: [SurveyIndex!]!
 
   """Title of this dimension (e.g., 'Focus on Prayer')"""
   title: String!
 
   """Sequence number; dimension are displayed in this order."""
   sequence: Int!
-
-  """List of survey index entries for this dimension."""
-  surveyIndices: [SurveyIndex!]!
 }
 
 """
@@ -214,15 +216,14 @@ input SurveyDimensionUpdateInput {
 """Collection of survey items, grouped for analysis"""
 type SurveyIndex {
   id: Int!
+  surveyDimension: SurveyDimension!
+  surveyItems: [SurveyItem!]!
 
   """Abbreviation for this index (e.g., 'FOG')"""
   abbreviation: String!
 
   """Title of this index"""
   title: String!
-
-  """List of survey items for this index"""
-  surveyItems: [SurveyItem!]!
 }
 
 input SurveyIndexCreateInput {
@@ -257,6 +258,8 @@ input SurveyIndexUpdateInput {
 """One item (question) from a survey"""
 type SurveyItem {
   id: Int!
+  survey: Survey!
+  surveyIndex: SurveyIndex
 
   """Sequence number; items will be displayed in this order"""
   sequence: Int!
