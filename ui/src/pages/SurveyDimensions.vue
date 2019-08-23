@@ -129,9 +129,11 @@
           </div>
         </template>
       </v-flex>
+
       <v-flex xs10 offset-xs1>
         <h1 class="headline mb-5">Survey Dimensions</h1>
       </v-flex>
+
       <v-flex xs7 offset-xs1>
         <v-select
           v-model="surveySelect"
@@ -145,6 +147,7 @@
         />
       </v-flex>
     </v-layout>
+
     <v-layout v-if="surveySelect" row wrap>
       <v-flex xs10 offset-xs1 class="text-right">
         <v-btn color="primary" @click="addSurveyDimension()"
@@ -157,13 +160,15 @@
             <template v-slot:label="{ item }">
               <div v-html="item.name"></div>
             </template>
+
             <template v-slot:prepend="{ item, open }">
-              <v-icon v-if="item.type == surveyDimensionEnum.SURVEY_ITEM">
+              <v-icon v-if="item.type == SurveyDimensionEnum.SURVEY_ITEM">
                 {{ "mdi-comment-outline" }}
               </v-icon>
             </template>
+
             <template v-slot:append="{ item, open }">
-              <span v-if="item.type == surveyDimensionEnum.SURVEY_INDEX">
+              <span v-if="item.type == SurveyDimensionEnum.SURVEY_INDEX">
                 <a @click="editIndex(item)">
                   <v-icon>
                     {{ "mdi-pencil" }}
@@ -176,7 +181,7 @@
                 </a>
               </span>
               <span
-                v-else-if="item.type == surveyDimensionEnum.SURVEY_DIMENSION"
+                v-else-if="item.type == SurveyDimensionEnum.SURVEY_DIMENSION"
               >
                 <a @click="addSurveyIndex(item)">
                   <v-icon>
@@ -221,8 +226,13 @@ import {
 
 import {
   SurveyItem,
-  SurveySelection,
-  SurveyDimensionEnum
+  SelectedSurveyItem,
+  SurveyDimensionEnum,
+  Survey,
+  SurveyDimension,
+  SurveyDimensionView,
+  SurveyItemView,
+  SurveyIndexView
 } from "./survey-dimension.types";
 
 export default Vue.extend({
@@ -236,29 +246,28 @@ export default Vue.extend({
   data() {
     return {
       showConfirmDeleteDialog: false,
-      deleteItemType: "" as string, // will be set to the type of element that will be deleted (e.g., surveyDimensionEnum.SURVEY_INDEX)
-      deleteItemId: null as number, // id of the dimension or index to be deleted
-      deleteItemDialogTitle: "" as string, // custom title sent to the confirm delete dialog
-      deleteItemDialogText: "" as string, // custom text sent to the confirm delete dialog
+      deleteItemType: "", // will be set to the type of element that will be deleted (e.g., surveyDimensionEnum.SURVEY_INDEX)
+      deleteItemId: -1, // id of the dimension or index to be deleted
+      deleteItemDialogTitle: "", // custom title sent to the confirm delete dialog
+      deleteItemDialogText: "", // custom text sent to the confirm delete dialog
       serverError: false as boolean,
-      surveyData: null as any,
-      surveyDimensionEnum: SurveyDimensionEnum,
+      surveyData: {} as Survey,
       surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
-      surveyDimensionText: "" as string,
-      surveyDimensionDialogTitle: "" as string,
-      surveyDimensionDialogHint: "" as string,
-      surveyDimensionId: null as number, //id of the survey dimension currently being edited
+      surveyDimensionText: "",
+      surveyDimensionDialogTitle: "",
+      surveyDimensionDialogHint: "",
+      surveyDimensionId: -1, //id of the survey dimension currently being edited
       surveyIndexEditOn: false, // true when editing a survey index (as opposed to adding a new one)
       surveyIndexDialog: false,
-      surveyIndexText: "" as string,
-      surveyIndexAbbrev: "" as string,
-      surveyIndexDialogTitle: "" as string,
-      surveyIndexDialogHint: "" as string,
-      surveyIndexAbbrevHint: "" as string,
-      surveyIndexId: null as number, //id of the survey index currently being edited
-      selectedSurveyItems: [] as any,
-      surveys: [] as SurveyItem[],
+      surveyIndexText: "",
+      surveyIndexAbbrev: "",
+      surveyIndexDialogTitle: "",
+      surveyIndexDialogHint: "",
+      surveyIndexAbbrevHint: "",
+      surveyIndexId: -1, //id of the survey index currently being edited
+      selectedSurveyItems: [] as SurveyItemView[],
+      surveys: [] as Survey[],
       //title: this.initialTitle,
       valid: true,
       //FIXME: make surveySelect of the appropriate type
@@ -272,15 +281,14 @@ export default Vue.extend({
 
   methods: {
     refetchSurveyData() {
-      this.$apollo.queries.surveyData.refetch()
-              .then(({data}) => {
-                console.log('survey data refetched! ', data);
-              });
+      this.$apollo.queries.surveyData.refetch().then(({ data }) => {
+        console.log("survey data refetched! ", data);
+      });
     },
     deleteIsConfirmed() {
       console.log("delete is confirmed!");
-      if (this.deleteItemType === this.surveyDimensionEnum.SURVEY_DIMENSION) {
-        console.log('deleting dimension....');
+      if (this.deleteItemType === SurveyDimensionEnum.SURVEY_DIMENSION) {
+        console.log("deleting dimension....");
         this.$apollo
           .mutate({
             mutation: DELETE_DIMENSION,
@@ -295,8 +303,8 @@ export default Vue.extend({
           .catch(error => {
             console.log("there appears to have been an error: ", error);
           });
-      } else if (this.deleteItemType === this.surveyDimensionEnum.SURVEY_INDEX) {
-        console.log('deleting index....');
+      } else if (this.deleteItemType === SurveyDimensionEnum.SURVEY_INDEX) {
+        console.log("deleting index....");
         this.$apollo
           .mutate({
             mutation: DELETE_INDEX,
@@ -312,7 +320,9 @@ export default Vue.extend({
             console.log("there appears to have been an error: ", error);
           });
       }
-      console.log('There appears to be a problem -- it is not clear which type of item to delete....');
+      console.log(
+        "There appears to be a problem -- it is not clear which type of item to delete...."
+      );
     },
     addSurveyDimension() {
       this.surveyDimensionDialog = true;
@@ -335,10 +345,12 @@ export default Vue.extend({
     },
     deleteDimension(dimension: any) {
       console.log("delete dimension!", dimension);
-      this.deleteItemDialogTitle = "Really delete the dimension "+"'"+dimension.name+"'?";
-      this.deleteItemDialogText = "Doing so will also delete any associated indexes.";
+      this.deleteItemDialogTitle =
+        "Really delete the dimension " + "'" + dimension.name + "'?";
+      this.deleteItemDialogText =
+        "Doing so will also delete any associated indexes.";
       this.showConfirmDeleteDialog = true;
-      this.deleteItemType = this.surveyDimensionEnum.SURVEY_DIMENSION;
+      this.deleteItemType = SurveyDimensionEnum.SURVEY_DIMENSION;
       this.deleteItemId = dimension.id;
     },
     cancelDimensionDialog() {
@@ -423,7 +435,7 @@ export default Vue.extend({
         (this.$refs.form as any).resetValidation();
       }
     },
-    editIndex(indexItem: any) {
+    editIndex(indexItem: SurveyIndexView) {
       // specify the type(!)
       console.log("edit index!", indexItem);
       this.surveyIndexEditOn = true;
@@ -446,10 +458,11 @@ export default Vue.extend({
     },
     deleteIndex(indexItem: any) {
       console.log("delete index!", indexItem);
-      this.deleteItemDialogTitle = "Really delete the index "+"'"+indexItem.name+"'?";
+      this.deleteItemDialogTitle =
+        "Really delete the index " + "'" + indexItem.name + "'?";
       this.deleteItemDialogText = "This action is not reversible.";
       this.showConfirmDeleteDialog = true;
-      this.deleteItemType = this.surveyDimensionEnum.SURVEY_INDEX;
+      this.deleteItemType = SurveyDimensionEnum.SURVEY_INDEX;
       this.deleteItemId = indexItem.id;
       // can use the parentId to make sure things are done correctly
     },
@@ -556,13 +569,13 @@ export default Vue.extend({
   },
 
   computed: {
-    selections(): SurveySelection[] {
+    selections(): SelectedSurveyItem[] {
       return this.surveys.map(survey => ({
         text: survey.title,
         value: survey.id
       }));
     },
-    surveyDimensions() {
+    surveyDimensions(): SurveyDimensionView[] {
       return this.surveyData.surveyDimensions.map(dimension => ({
         id: dimension.id,
         name: dimension.title,
@@ -583,7 +596,7 @@ export default Vue.extend({
         }))
       }));
     },
-    surveyItems() {
+    surveyItems(): SurveyItemView[] {
       return this.surveyData.surveyItems.map(item => ({
         id: item.id,
         name: item.qualtricsText

@@ -123,10 +123,9 @@ export default class LetterInfoForm extends Vue {
     }));
   }
 
-
   mounted() {
-    console.log('name: ', this.name);
-    console.log(typeof(this.name));
+    console.log("name: ", this.name);
+    console.log(typeof this.name);
     console.log("boolean association: ", this.initialBooleanAssociation);
     //axios
     //  .get("http://localhost:4000/survey-data/")

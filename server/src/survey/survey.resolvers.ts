@@ -146,6 +146,17 @@ export class SurveyResolver {
     })
     whichItems: WhichItems
   ) {
+    /*
+    const conditions = {
+      where: {
+        survey: survey
+      },
+      order: {
+        surveyIndex: "ASC"
+      }
+    };
+*/
+
     const conditions = { survey };
 
     switch (whichItems) {

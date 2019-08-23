@@ -34,14 +34,14 @@
       </v-flex>
     </v-layout>
     <v-layout v-if="serverError">
-      <v-flex  class="red--text text-center" pa-10 xs7 offset-xs1>
-          Sorry, there appears to have been an error.  Please try again later.
+      <v-flex class="red--text text-center" pa-10 xs7 offset-xs1>
+        Sorry, there appears to have been an error. Please try again later.
       </v-flex>
     </v-layout>
     <v-layout v-if="serverError">
-      <v-flex  xs6 offset-xs6>
+      <v-flex xs6 offset-xs6>
         <v-btn color="success" @click="returnToSurveys">
-            Return to Surveys
+          Return to Surveys
         </v-btn>
       </v-flex>
     </v-layout>
@@ -108,16 +108,15 @@ export default Vue.extend({
             }
           })
           .then(({ data }) => {
-            console.log('done!', data);
+            console.log("done!", data);
             this.$router.push({ name: "imported-surveys" });
             // FIXME: at the moment, when we go back to the imported surveys page, the new survey isn't there...?!?
-            // maybe need to force a page reload or put a subscription on that page so that it keeps checking to see if there are 
+            // maybe need to force a page reload or put a subscription on that page so that it keeps checking to see if there are
             // more surveys...?
           })
-          .catch((error) => {
-            console.log('there appears to have been an error: ', error);
-            this.serverError = true
-
+          .catch(error => {
+            console.log("there appears to have been an error: ", error);
+            this.serverError = true;
           });
       }
     }

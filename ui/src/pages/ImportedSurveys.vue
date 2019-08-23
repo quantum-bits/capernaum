@@ -46,12 +46,8 @@ import {
   SurveyDimensionEnum
 } from "./survey-dimension.types";
 
-
-
 // WORKING HERE: fix...where are the qualtrics survey titles?!?
 // Next: make the divs open-able, with the questions inside(?)
-
-
 
 export default Vue.extend({
   /** page to choose a Qualtrics survey so that it can be downloaded */
@@ -73,7 +69,6 @@ export default Vue.extend({
         { text: "Last Update", value: "lastUpdate" },
         { text: "Frozen?", value: "isFrozen" },
         { text: "Active?", value: "isActive" }
-
       ] as any
     };
   },
@@ -88,8 +83,8 @@ export default Vue.extend({
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      update (data) {
-        console.log('inside update: ',data);
+      update(data) {
+        console.log("inside update: ", data);
         return data.surveys;
       }
     }
@@ -99,11 +94,12 @@ export default Vue.extend({
 
   mounted() {
     console.log("mounted....");
-    this.surveys ? console.log("surveys exist!") : console.log("surveys do not yet exist....");
-    this.$apollo.queries.surveys.refetch()
-      .then(({ data }) => {
-            console.log("item(s) refetched!", data);
-      });
+    this.surveys
+      ? console.log("surveys exist!")
+      : console.log("surveys do not yet exist....");
+    this.$apollo.queries.surveys.refetch().then(({ data }) => {
+      console.log("item(s) refetched!", data);
+    });
   }
 });
 </script>
