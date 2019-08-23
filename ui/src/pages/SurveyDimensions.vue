@@ -85,6 +85,7 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
+                      <!--
                       <v-text-field
                         v-model="surveyDimensionAbbrev"
                         label="Survey Dimension Abbreviation"
@@ -93,6 +94,7 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
+                      -->
                       <div v-if="serverError" class="red--text text-center">
                         Sorry, there appears to have been an error. Please try
                         again later.
@@ -242,10 +244,10 @@ export default Vue.extend({
       surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
       surveyDimensionText: "" as string,
-      surveyDimensionAbbrev: "" as string,
+      //surveyDimensionAbbrev: "" as string,
       surveyDimensionDialogTitle: "" as string,
       surveyDimensionDialogHint: "" as string,
-      surveyDimensionAbbrevHint: "" as string,
+      //surveyDimensionAbbrevHint: "" as string,
       surveyDimensionId: null as number, //id of the survey dimension currently being edited
       surveyIndexEditOn: false, // true when editing a survey index (as opposed to adding a new one)
       surveyIndexDialog: false,
@@ -370,7 +372,7 @@ export default Vue.extend({
       this.surveyDimensionText = "";
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
-      this.surveyDimensionAbbrevHint = "e.g., 'FD'";
+      //this.surveyDimensionAbbrevHint = "e.g., 'FD'";
       console.log("valid? ", this.valid);
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
@@ -382,10 +384,10 @@ export default Vue.extend({
       this.surveyDimensionEditOn = true;
       this.surveyDimensionId = dimension.id;
       this.surveyDimensionText = dimension.name;
-      this.surveyDimensionAbbrev = dimension.abbrev;
+      //this.surveyDimensionAbbrev = dimension.abbrev;
       this.surveyDimensionDialogTitle = "Edit Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
-      this.surveyDimensionAbbrevHint = "e.g., 'FD'";
+      //this.surveyDimensionAbbrevHint = "e.g., 'FD'";
     },
     deleteDimension(dimension: any) {
       console.log("delete dimension!", dimension);
@@ -405,12 +407,14 @@ export default Vue.extend({
         console.log("save info");
         if (!this.surveyDimensionEditOn) {//adding a new dimension
           console.log('adding a new dimension');
+          console.log('survey ID: ', parseInt(this.surveySelect.value, 10));
+          console.log('title: ', this.surveyDimensionText);
           this.$apollo
             .mutate({
               mutation: ADD_DIMENSION_MUTATION,
               variables: {
                 surveyId: parseInt(this.surveySelect.value, 10),
-                abbreviation: this.surveyDimensionAbbrev,
+                //abbreviation: this.surveyDimensionAbbrev,
                 title: this.surveyDimensionText,
                 // FIXME: sequence should not be hard-coded
                 sequence: 10
@@ -433,7 +437,7 @@ export default Vue.extend({
               mutation: UPDATE_DIMENSION_MUTATION,
               variables: {
                 id: this.surveyDimensionId,
-                abbreviation: this.surveyDimensionAbbrev,
+                //abbreviation: this.surveyDimensionAbbrev,
                 title: this.surveyDimensionText,
                 // FIXME: sequence should not be hard-coded
                 sequence: 10
@@ -458,6 +462,7 @@ export default Vue.extend({
       this.surveyDimensionId = dimension.id; // will use this when saving the new survey index
       this.surveyIndexDialog = true;
       this.surveyIndexText = "";
+      this.surveyIndexAbbrev = "";
       this.selectedSurveyItems = [];
       this.surveyIndexDialogTitle = "Add a New Survey Index for "+"'"+dimension.name+"'";
       this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
@@ -511,14 +516,14 @@ export default Vue.extend({
               mutation: ADD_INDEX_MUTATION,
               variables: {
                 dimensionId: this.surveyDimensionId,
-                //abbreviation: this.surveyDimensionAbbrev,
+                abbreviation: this.surveyIndexAbbrev,
                 title: this.surveyIndexText,
                 itemIds: this.selectedSurveyItems
               }
             })
             .then(({ data }) => {
               console.log("done!", data);
-              this.cancelDimensionDialog();
+              this.cancelIndexDialog();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
@@ -533,14 +538,14 @@ export default Vue.extend({
               mutation: UPDATE_INDEX_MUTATION,
               variables: {
                 id: this.surveyIndexId,
-                //abbreviation: this.surveyDimensionAbbrev,
+                abbreviation: this.surveyIndexAbbrev,
                 title: this.surveyIndexText,
                 itemIds: this.selectedSurveyItems
               }
             })
             .then(({ data }) => {
               console.log("done!", data);
-              this.cancelDimensionDialog();
+              this.cancelIndexDialog();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
@@ -622,7 +627,7 @@ export default Vue.extend({
       return this.surveyData.surveyDimensions.map(dimension => ({
         id: dimension.id,
         name: dimension.title,
-        abbrev: dimension.abbreviation,
+        //abbrev: dimension.abbreviation,
         type: "survey-dimension",
         children: dimension.surveyIndices.map(index => ({
           id: index.id,
