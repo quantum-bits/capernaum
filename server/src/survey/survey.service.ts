@@ -15,12 +15,19 @@ import {
   SurveyUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntityManager, Repository, Transaction } from "typeorm";
+import {
+  EntityManager,
+  FindConditions,
+  ObjectType,
+  Repository,
+  Transaction
+} from "typeorm";
 import {
   QualtricsQuestion,
   QualtricsSurvey
 } from "../qualtrics/qualtrics.types";
 import { assign, pick, difference } from "lodash";
+import { BaseEntity } from "../shared/base-entity";
 
 @Injectable()
 export class SurveyService {
@@ -52,71 +59,47 @@ export class SurveyService {
   }
 
   async createIndex(createInput: SurveyIndexCreateInput) {
-    const dimension = await this.surveyDimensionRepo.findOneOrFail(
-      createInput.dimensionId
-    );
+    return this.entityManager.transaction(async manager => {
+      const surveyDimensionRepo = manager.getRepository(SurveyDimension);
+      const surveyIndexRepo = manager.getRepository(SurveyIndex);
+      const surveyItemRepo = manager.getRepository(SurveyItem);
 
-    const newIndex = await this.surveyIndexRepo.save(
-      this.surveyIndexRepo.create({
-        surveyDimension: dimension,
-        title: createInput.title,
-        abbreviation: createInput.abbreviation
-      })
-    );
+      const dimension = await surveyDimensionRepo.findOneOrFail(
+        createInput.dimensionId
+      );
 
-    for (const itemId of createInput.itemIds) {
-      const item = await this.surveyItemRepo.findOneOrFail(itemId);
-      item.surveyIndex = newIndex;
-      await this.surveyItemRepo.save(item);
-    }
+      const newIndex = await surveyIndexRepo.save(
+        surveyIndexRepo.create({
+          surveyDimension: dimension,
+          title: createInput.title,
+          abbreviation: createInput.abbreviation
+        })
+      );
 
-    return newIndex;
+      for (const itemId of createInput.itemIds) {
+        const item = await surveyItemRepo.findOneOrFail(itemId);
+        item.surveyIndex = newIndex;
+        await surveyItemRepo.save(item);
+      }
+
+      return newIndex;
+    });
   }
 
-  readAllSurveys() {
-    return this.surveyRepo.find();
+  readAll(entity: ObjectType<BaseEntity>) {
+    return this.entityManager.find(entity);
   }
 
-  readAllSurveyDimensions() {
-    return this.surveyDimensionRepo.find();
+  readOne(entity: ObjectType<BaseEntity>, id: number) {
+    return this.entityManager.findOne(entity, id);
   }
 
-  readAllSurveyIndices() {
-    return this.surveyIndexRepo.find();
+  find<Entity>(
+    entityClass: ObjectType<Entity>,
+    conditions: FindConditions<Entity>
+  ) {
+    return this.entityManager.find(entityClass, conditions);
   }
-
-  readAllSurveyItems() {
-    return this.surveyItemRepo.find();
-  }
-
-  readOneSurvey(id: number) {
-    return this.surveyRepo.findOne(id);
-  }
-
-  readOneDimension(id: number) {
-    return this.surveyDimensionRepo.findOneOrFail(id);
-  }
-
-  findItemsForSurvey(survey: Survey) {
-    return this.surveyItemRepo.find({ survey });
-  }
-
-  findDimensionsForSurvey(survey: Survey) {
-    return this.surveyDimensionRepo.find({ survey });
-  }
-
-  findIndicesForDimension(surveyDimension: SurveyDimension) {
-    console.log("**", surveyDimension);
-    return this.surveyIndexRepo.find({ surveyDimension });
-  }
-
-  findItemsForIndex(surveyIndex: SurveyIndex) {
-    return this.surveyItemRepo.find({ surveyIndex });
-  }
-
-  // findSurveyForItem(surveyItem: SurveyItem) {
-  //   return this.surveyRepo.find({ surveyItem });
-  // }
 
   async updateSurvey(updateInput: SurveyUpdateInput) {
     const preload = await this.surveyRepo.preload(updateInput);
@@ -148,9 +131,6 @@ export class SurveyService {
 
       // Check that all specified items actually exist.
       const bogusItemIds = difference(updateInput.itemIds, validUpdateItemIds);
-      console.log(
-        `UPDATE ${updateInput.itemIds} VALID ${validUpdateItemIds} BOGUS ${bogusItemIds}`
-      );
       if (bogusItemIds.length > 0) {
         throw new Error(
           `Survey items with these IDs don't exist: ${bogusItemIds
@@ -169,52 +149,68 @@ export class SurveyService {
     });
   }
 
-  async deleteSurveyDimension(
-    dimensionId: number
-  ): Promise<SurveyDimensionDeleteOutput> {
-    const dimension = await this.surveyDimensionRepo.findOneOrFail(
-      dimensionId,
-      { relations: ["surveyIndices"] }
-    );
-
-    const dimensionDeleteOutput: SurveyDimensionDeleteOutput = {
-      deletedDimensionId: dimensionId,
-      deletedIndexIds: [],
-      deletedItemIds: []
-    };
-
-    for (const index of dimension.surveyIndices) {
-      const indexDeleteOutput = await this.deleteSurveyIndex(index.id);
-      dimensionDeleteOutput.deletedIndexIds.push(
-        indexDeleteOutput.deletedIndexId
-      );
-      dimensionDeleteOutput.deletedItemIds = dimensionDeleteOutput.deletedItemIds.concat(
-        indexDeleteOutput.deletedItemIds
-      );
-    }
-
-    await this.surveyDimensionRepo.remove(dimension);
-
-    return dimensionDeleteOutput;
-  }
-
-  async deleteSurveyIndex(id: number): Promise<SurveyIndexDeleteOutput> {
-    const index = await this.surveyIndexRepo.findOneOrFail(id, {
+  // This is a helper method to avoid nested transactions; do not call directly.
+  private async _deleteSurveyIndex(
+    manager: EntityManager,
+    id: number
+  ): Promise<SurveyIndexDeleteOutput> {
+    const index = await manager.findOneOrFail(SurveyIndex, id, {
       relations: ["surveyItems"]
     });
 
     // Clear FK references from items to this index.
     const removedItemIds = index.surveyItems.map(item => item.id);
     for (let id of removedItemIds) {
-      await this.surveyItemRepo.update(id, { surveyIndex: null });
+      await manager.update(SurveyItem, id, { surveyIndex: null });
     }
 
-    await this.surveyIndexRepo.remove(index);
+    await manager.remove(SurveyIndex, index);
 
     return {
       deletedIndexId: id,
       deletedItemIds: removedItemIds
     };
+  }
+
+  async deleteSurveyIndex(id: number) {
+    return this.entityManager.transaction(async manager =>
+      this._deleteSurveyIndex(manager, id)
+    );
+  }
+
+  async deleteSurveyDimension(
+    dimensionId: number
+  ): Promise<SurveyDimensionDeleteOutput> {
+    return this.entityManager.transaction(async manager => {
+      const surveyDimensionRepo = manager.getRepository(SurveyDimension);
+
+      const dimension = await surveyDimensionRepo.findOneOrFail(dimensionId, {
+        relations: ["surveyIndices"]
+      });
+
+      const dimensionDeleteOutput: SurveyDimensionDeleteOutput = {
+        deletedDimensionId: dimensionId,
+        deletedIndexIds: [],
+        deletedItemIds: []
+      };
+
+      for (const index of dimension.surveyIndices) {
+        const indexDeleteOutput = await this._deleteSurveyIndex(
+          manager,
+          index.id
+        );
+        dimensionDeleteOutput.deletedIndexIds.push(
+          indexDeleteOutput.deletedIndexId
+        );
+        dimensionDeleteOutput.deletedItemIds = dimensionDeleteOutput.deletedItemIds.concat(
+          indexDeleteOutput.deletedItemIds
+        );
+      }
+
+      await surveyDimensionRepo.remove(dimension);
+
+      return dimensionDeleteOutput;
+    });
   }
 
   private static dumpQualtricsQuestion(

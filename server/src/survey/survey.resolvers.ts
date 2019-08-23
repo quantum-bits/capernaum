@@ -59,27 +59,27 @@ export class SurveyResolver {
 
   @Query(returns => Survey)
   survey(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.readOneSurvey(id);
+    return this.surveyService.readOne(Survey, id);
   }
 
   @Query(returns => [Survey])
   surveys() {
-    return this.surveyService.readAllSurveys();
+    return this.surveyService.readAll(Survey);
   }
 
   @Query(returns => [SurveyDimension])
   surveyDimensions() {
-    return this.surveyService.readAllSurveyDimensions();
+    return this.surveyService.readAll(SurveyDimension);
   }
 
   @Query(returns => [SurveyIndex])
   surveyIndices() {
-    return this.surveyService.readAllSurveyIndices();
+    return this.surveyService.readAll(SurveyIndex);
   }
 
   @Query(returns => [SurveyItem], { description: "Retrieve all survey items" })
   surveyItems() {
-    return this.surveyService.readAllSurveyItems();
+    return this.surveyService.readAll(SurveyItem);
   }
 
   @Mutation(returns => Survey)
@@ -115,20 +115,18 @@ export class SurveyResolver {
     description:
       "Delete an index. Also removes associations with items; the items are not removed."
   })
-  deleteSurveyIndex(@Args("id") id: number) {
+  deleteSurveyIndex(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.deleteSurveyIndex(id);
   }
 
   @ResolveProperty("surveyItems", type => [SurveyItem])
   resolveSurveyItems(@Parent() survey: Survey) {
-    console.log(`** Resolve 'surveyItems' for survey ${survey.id}`);
-    return this.surveyService.findItemsForSurvey(survey);
+    return this.surveyService.find(SurveyItem, { survey });
   }
 
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])
   resolveSurveyDimensions(@Parent() survey: Survey) {
-    console.log(`** Resolve 'surveyDimensions' for survey ${survey.id}`);
-    return this.surveyService.findDimensionsForSurvey(survey);
+    return this.surveyService.find(SurveyDimension, { survey });
   }
 
   @Mutation(returns => Survey, {
@@ -157,18 +155,14 @@ export class SurveyDimensionResolver {
 
   @ResolveProperty(type => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
-    console.log(`** Resolve 'survey' for dimension ${surveyDimension.id}`);
-    return this.surveyService.readOneSurvey(surveyDimension.surveyId);
+    return this.surveyService.readOne(Survey, surveyDimension.surveyId);
   }
 
   @ResolveProperty(type => [SurveyIndex], {
     description: "List of survey index entries for this dimension."
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
-    console.log(
-      `** Resolve 'surveyIndices' for dimension ${surveyDimension.id}`
-    );
-    return this.surveyService.findIndicesForDimension(surveyDimension);
+    return this.surveyService.find(SurveyIndex, { surveyDimension });
   }
 }
 
@@ -180,12 +174,14 @@ export class SurveyIndexResolver {
     description: "List of survey items for this index"
   })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
-    console.log(`** Resolve 'surveyItems' for survey index ${surveyIndex.id}`);
-    return this.surveyService.findItemsForIndex(surveyIndex);
+    return this.surveyService.find(SurveyItem, { surveyIndex });
   }
 
   @ResolveProperty(type => SurveyDimension)
   surveyDimension(@Parent() surveyIndex: SurveyIndex) {
-    return this.surveyService.readOneDimension(surveyIndex.surveyDimensionId);
+    return this.surveyService.readOne(
+      SurveyDimension,
+      surveyIndex.surveyDimensionId
+    );
   }
 }

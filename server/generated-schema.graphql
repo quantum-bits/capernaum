@@ -3,6 +3,11 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type BaseEntity {
+  """Unique ID for this entity"""
+  id: Int!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -60,7 +65,7 @@ type Mutation {
   """
   Delete an index. Also removes associations with items; the items are not removed.
   """
-  deleteSurveyIndex(id: Float!): SurveyIndexDeleteOutput!
+  deleteSurveyIndex(id: Int!): SurveyIndexDeleteOutput!
 
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
@@ -149,6 +154,7 @@ input ScriptureEngagementPracticeUpdateInput {
 
 """All information about a survey imported from Qualtrics"""
 type Survey {
+  """Unique ID for this entity"""
   id: Int!
   surveyItems: [SurveyItem!]!
   surveyDimensions: [SurveyDimension!]!
@@ -176,6 +182,7 @@ input SurveyCreateInput {
 
 """Top-level grouping of questions in Capernaum; contains indices"""
 type SurveyDimension {
+  """Unique ID for this entity"""
   id: Int!
   survey: Survey!
   surveyIndices: [SurveyIndex!]!
@@ -215,6 +222,7 @@ input SurveyDimensionUpdateInput {
 
 """Collection of survey items, grouped for analysis"""
 type SurveyIndex {
+  """Unique ID for this entity"""
   id: Int!
   surveyDimension: SurveyDimension!
   surveyItems: [SurveyItem!]!
