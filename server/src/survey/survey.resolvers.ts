@@ -23,7 +23,21 @@ import {
 } from "./entities";
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
-import { Int } from "type-graphql";
+import { Int, registerEnumType } from "type-graphql";
+import { FindConditions, IsNull, Not } from "typeorm";
+
+// Used to filter which survey items are retrieved for a survey.
+enum WhichItems {
+  All,
+  WithIndex,
+  WithoutIndex
+}
+
+registerEnumType(WhichItems, {
+  name: "WhichItems",
+  description:
+    "Which items to retrieve: all, those with an index, those without an index"
+});
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -119,9 +133,36 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyIndex(id);
   }
 
-  @ResolveProperty("surveyItems", type => [SurveyItem])
-  resolveSurveyItems(@Parent() survey: Survey) {
-    return this.surveyService.find(SurveyItem, { survey });
+  @ResolveProperty("surveyItems", type => [SurveyItem], {
+    description:
+      "Retrieve survey items; pass `whichItems` to choose which to return (default `All`)"
+  })
+  resolveSurveyItems(
+    @Parent() survey: Survey,
+    @Args({
+      name: "whichItems",
+      type: () => WhichItems,
+      defaultValue: WhichItems.All
+    })
+    whichItems: WhichItems
+  ) {
+    const conditions = { survey };
+
+    switch (whichItems) {
+      case WhichItems.All:
+        /* NOP */
+        break;
+      case WhichItems.WithIndex:
+        conditions["surveyIndex"] = Not(IsNull());
+        break;
+      case WhichItems.WithoutIndex:
+        conditions["surveyIndex"] = IsNull();
+        break;
+    }
+
+    console.log("*** CONDITIONS", conditions);
+
+    return this.surveyService.find(SurveyItem, conditions);
   }
 
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])

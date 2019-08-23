@@ -158,7 +158,11 @@ input ScriptureEngagementPracticeUpdateInput {
 type Survey {
   """Unique ID for this entity"""
   id: Int!
-  surveyItems: [SurveyItem!]!
+
+  """
+  Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+  """
+  surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
   surveyDimensions: [SurveyDimension!]!
 
   """Title for this survey in Capernaum"""
@@ -293,4 +297,13 @@ input SurveyUpdateInput {
   qualtricsId: String
   qualtricsName: String
   qualtricsModDate: String
+}
+
+"""
+Which items to retrieve: all, those with an index, those without an index
+"""
+enum WhichItems {
+  All
+  WithIndex
+  WithoutIndex
 }
