@@ -271,6 +271,12 @@ export default Vue.extend({
   },
 
   methods: {
+    refetchSurveyData() {
+      this.$apollo.queries.surveyData.refetch()
+              .then(({data}) => {
+                console.log('survey data refetched! ', data);
+              });
+    },
     deleteIsConfirmed() {
       console.log("delete is confirmed!");
       if (this.deleteItemType === this.surveyDimensionEnum.SURVEY_DIMENSION) {
@@ -284,6 +290,7 @@ export default Vue.extend({
           })
           .then(({ data }) => {
             console.log("item(s) deleted!", data);
+            this.refetchSurveyData();
           })
           .catch(error => {
             console.log("there appears to have been an error: ", error);
@@ -299,6 +306,7 @@ export default Vue.extend({
           })
           .then(({ data }) => {
             console.log("item(s) deleted!", data);
+            this.refetchSurveyData();
           })
           .catch(error => {
             console.log("there appears to have been an error: ", error);
@@ -363,6 +371,7 @@ export default Vue.extend({
             .then(({ data }) => {
               console.log("done!", data);
               this.cancelDimensionDialog();
+              this.refetchSurveyData();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
@@ -386,6 +395,7 @@ export default Vue.extend({
             .then(({ data }) => {
               console.log("done!", data);
               this.cancelDimensionDialog();
+              this.refetchSurveyData();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
@@ -472,6 +482,7 @@ export default Vue.extend({
             .then(({ data }) => {
               console.log("done!", data);
               this.cancelIndexDialog();
+              this.refetchSurveyData();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
@@ -495,6 +506,7 @@ export default Vue.extend({
             .then(({ data }) => {
               console.log("done!", data);
               this.cancelIndexDialog();
+              this.refetchSurveyData();
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
