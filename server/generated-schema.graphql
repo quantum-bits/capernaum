@@ -68,6 +68,33 @@ type Mutation {
   importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
 }
 
+"""Scripture engagement predictions for one survey"""
+type PredictionTable {
+  id: Int!
+  entries: [PredictionTableEntry!]!
+  title: String!
+  description: String!
+}
+
+input PredictionTableCreateInput {
+  title: String!
+  description: String!
+}
+
+"""One entry in a prediction table"""
+type PredictionTableEntry {
+  table: [PredictionTableEntry!]!
+  surveyIndex: SurveyIndex!
+  practice: ScriptureEngagementPractice!
+  sequence: Int!
+}
+
+input PredictionTableUpdateInput {
+  id: Int!
+  title: String
+  description: String
+}
+
 input QualtricsImportInput {
   """Qualtrics unique identifier"""
   qualtricsId: String!
@@ -94,6 +121,27 @@ type Query {
   surveys: [Survey!]!
   surveyDimensions: [SurveyDimension!]!
   surveyIndices: [SurveyIndex!]!
+}
+
+"""Scripture engagement practice"""
+type ScriptureEngagementPractice {
+  id: Int!
+  title: String!
+  description: String!
+  sequence: Int!
+}
+
+input ScriptureEngagementPracticeCreateInput {
+  title: String!
+  description: String!
+  sequence: Int!
+}
+
+input ScriptureEngagementPracticeUpdateInput {
+  id: Int!
+  title: String
+  description: String
+  sequence: Int
 }
 
 """All information about a survey imported from Qualtrics"""
