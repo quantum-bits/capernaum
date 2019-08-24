@@ -50,6 +50,7 @@
                                 :item-text="'name'"
                                 :item-value="'id'"
                                 label="Choose Survey Items"
+                                return-object
                                 multiple
                                 chips
                               ></v-select>
@@ -224,6 +225,7 @@ import {
 } from "@/graphql/surveys.graphql";
 
 import {
+  WhichItems,
   Survey,
   SurveyDimensionEnum,
   SurveyDimensionView,
@@ -263,7 +265,7 @@ export default Vue.extend({
       surveyIndexDialogTitle: "",
       surveyIndexDialogHint: "",
       surveyIndexAbbrevHint: "",
-      surveyIndexId: -1, //id of the survey index currently being edited
+      surveyIndex: (null as any) as SurveyIndexView, //survey index currently being edited
       selectedSurveyItems: [] as SurveyItemView[],
       surveys: [] as Survey[],
       //title: this.initialTitle,
@@ -437,7 +439,8 @@ export default Vue.extend({
       // specify the type(!)
       console.log("edit index!", indexItem);
       this.surveyIndexEditOn = true;
-      this.surveyIndexId = indexItem.id;
+      this.surveyIndex = indexItem;
+      console.log('index being edited: ', this.surveyIndex);
       this.surveyDimensionId = indexItem.parentId;
       this.selectedSurveyItems = [];
       indexItem.children.forEach(surveyItem => {
@@ -453,6 +456,7 @@ export default Vue.extend({
         "Edit Survey Index for " + "'" + indexItem.parentName + "'";
       this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
       this.surveyIndexAbbrevHint = "e.g., 'FOO'";
+      console.log('selected survey items inside edit index: ', this.selectedSurveyItems);
     },
     deleteIndex(indexItem: any) {
       console.log("delete index!", indexItem);
@@ -470,7 +474,7 @@ export default Vue.extend({
       // FIXME: Replace the `as any` hack.
       (this.$refs.form as any).resetValidation();
       this.serverError = false;
-      this.surveyIndexEditOn = true;
+      this.surveyIndexEditOn = false;
     },
     submitSurveyIndex() {
       // FIXME: Replace the `as any` hack.
@@ -480,6 +484,7 @@ export default Vue.extend({
         if (!this.surveyIndexEditOn) {
           //adding a new index
           console.log("adding a new index");
+          console.log("selected survey items: ", this.selectedSurveyItems);
           this.$apollo
             .mutate({
               mutation: ADD_INDEX_MUTATION,
@@ -487,7 +492,7 @@ export default Vue.extend({
                 dimensionId: this.surveyDimensionId,
                 abbreviation: this.surveyIndexAbbrev,
                 title: this.surveyIndexText,
-                itemIds: this.selectedSurveyItems
+                itemIds: this.selectedSurveyItems.map( surveyItem => surveyItem.id)
               }
             })
             .then(({ data }) => {
@@ -504,14 +509,16 @@ export default Vue.extend({
         } else {
           //editing an existing dimension
           console.log("updating....");
+          console.log('index being edited: ', this.surveyIndex);
+          console.log("selected survey items: ", this.selectedSurveyItems);
           this.$apollo
             .mutate({
               mutation: UPDATE_INDEX_MUTATION,
               variables: {
-                id: this.surveyIndexId,
+                id: this.surveyIndex.id,
                 abbreviation: this.surveyIndexAbbrev,
                 title: this.surveyIndexText,
-                itemIds: this.selectedSurveyItems
+                itemIds: this.selectedSurveyItems.map( surveyItem => surveyItem.id)
               }
             })
             .then(({ data }) => {
@@ -553,7 +560,8 @@ export default Vue.extend({
           this.surveySelect.value
         );
         return {
-          surveyId: this.surveySelect.value
+          surveyId: this.surveySelect.value,
+          which: WhichItems.WITHOUT_INDEX
         };
       },
       update(data) {
@@ -597,10 +605,24 @@ export default Vue.extend({
     },
 
     surveyItems(): SurveyItemView[] {
-      return this.surveyData.surveyItems.map(item => ({
-        id: item.id,
-        name: item.qualtricsText
-      }));
+      console.log('survey index being edited: ', this.surveyIndex);
+      let returnArray: SurveyItemView[] = [];
+      if (this.surveyIndex) {
+        this.surveyIndex.children.forEach( item => {
+          returnArray.push({
+            id: item.id,
+            name: item.name
+          });
+        });
+      }
+      this.surveyData.surveyItems.forEach(item => {
+        returnArray.push({
+          id: item.id,
+          name: item.qualtricsText
+        });
+      });
+      console.log('return array: ', returnArray);
+      return returnArray;
     }
   },
 

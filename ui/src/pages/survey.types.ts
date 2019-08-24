@@ -6,6 +6,15 @@ export enum SurveyDimensionEnum {
   SURVEY_ITEM = "survey-item"
 }
 
+/**
+ * used when fetching survey items; this enum parallels one defined in the server-side code
+ */
+export enum WhichItems {
+  ALL = "All",
+  WITH_INDEX = "WithIndex",
+  WITHOUT_INDEX = "WithoutIndex"
+}
+
 // These interfaces capture the structure of GraphQL data.
 
 export interface QualtricsSurvey {

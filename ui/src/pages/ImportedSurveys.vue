@@ -42,8 +42,8 @@ import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 
 import {
   SurveyItem,
-  SurveySelection,
-  SurveyDimensionEnum
+  SurveySelection//,
+  //SurveyDimensionEnum
 } from "./survey.types";
 
 // WORKING HERE: fix...where are the qualtrics survey titles?!?

@@ -59,7 +59,7 @@ import {
 import {
   SurveyItem,
   SurveySelection,
-  SurveyDimensionEnum,
+  //SurveyDimensionEnum,
   QualtricsSurvey,
   QualtricsSurveySelection
 } from "./survey.types";

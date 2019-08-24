@@ -118,11 +118,11 @@ export const UPDATE_INDEX_MUTATION = gql`
 `;
 
 export const ONE_SURVEY_QUERY = gql`
-  query OneSurvey($surveyId: Int!) {
+  query OneSurvey($surveyId: Int!, $which: WhichItems = All) {
     survey(id: $surveyId) {
       id
       title
-      surveyItems {
+      surveyItems(whichItems: $which) {
         id
         sequence
         qualtricsId
