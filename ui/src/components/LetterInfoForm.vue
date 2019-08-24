@@ -48,7 +48,7 @@ import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
 import { BooleanAssociationBriefType } from "@/pages/association-table.types";
-import { SurveyItem, SurveySelection } from "@/pages/survey-dimension.types";
+import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";
 
@@ -75,7 +75,7 @@ export default class LetterInfoForm extends Vue {
   initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
 
-  surveys: SurveyItem[] = [];
+  surveys: Survey[] = [];
   booleanAssociations: BooleanAssociationType[] = [];
   name: string = this.initialTitle;
 
@@ -118,7 +118,7 @@ export default class LetterInfoForm extends Vue {
   // https://github.com/kaorun343/vue-property-decorator/issues/85
   get selections(): SurveySelection[] {
     return this.surveys.map(survey => ({
-      text: survey.name,
+      text: survey.title,
       value: survey.id
     }));
   }

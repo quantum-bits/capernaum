@@ -8,6 +8,15 @@ export enum SurveyDimensionEnum {
 
 // These interfaces capture the structure of GraphQL data.
 
+export interface QualtricsSurvey {
+  qualtricsId: string;
+  qualtricsOwnerId: string;
+  qualtricsName: string;
+  qualtricsModDate: string;
+  qualtricsIsActive: string;
+  qualtricsCreationDate: string;
+}
+
 export interface SurveyItem {
   id: number;
   sequence: number;
@@ -41,9 +50,14 @@ export interface Survey {
 
 // These interfaces represent _views_ of the data in the UI.
 
-export interface SelectedSurveyItem {
+export interface SurveySelection {
   text: string;
   value: number;
+}
+
+export interface QualtricsSurveySelection {
+  text: string;
+  value: string;
 }
 
 export interface SurveyItemView {

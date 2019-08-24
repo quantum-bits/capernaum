@@ -151,8 +151,8 @@
     <v-layout v-if="surveySelect" row wrap>
       <v-flex xs10 offset-xs1 class="text-right">
         <v-btn color="primary" @click="addSurveyDimension()"
-          >Add Survey Dimension</v-btn
-        >
+          >Add Survey Dimension
+        </v-btn>
       </v-flex>
       <v-flex v-if="surveyData" xs10 offset-xs1>
         <template>
@@ -162,13 +162,13 @@
             </template>
 
             <template v-slot:prepend="{ item, open }">
-              <v-icon v-if="item.type == SurveyDimensionEnum.SURVEY_ITEM">
+              <v-icon v-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
                 {{ "mdi-comment-outline" }}
               </v-icon>
             </template>
 
             <template v-slot:append="{ item, open }">
-              <span v-if="item.type == SurveyDimensionEnum.SURVEY_INDEX">
+              <span v-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
                 <a @click="editIndex(item)">
                   <v-icon>
                     {{ "mdi-pencil" }}
@@ -181,7 +181,7 @@
                 </a>
               </span>
               <span
-                v-else-if="item.type == SurveyDimensionEnum.SURVEY_DIMENSION"
+                v-else-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION"
               >
                 <a @click="addSurveyIndex(item)">
                   <v-icon>
@@ -208,32 +208,29 @@
 </template>
 
 <script lang="ts">
-import axios, { AxiosResponse } from "axios";
 import Vue from "vue";
 
 import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
 
 import {
-  ONE_SURVEY_QUERY,
   ADD_DIMENSION_MUTATION,
-  UPDATE_DIMENSION_MUTATION,
   ADD_INDEX_MUTATION,
-  UPDATE_INDEX_MUTATION,
   ALL_SURVEYS_QUERY,
   DELETE_DIMENSION,
-  DELETE_INDEX
+  DELETE_INDEX,
+  ONE_SURVEY_QUERY,
+  UPDATE_DIMENSION_MUTATION,
+  UPDATE_INDEX_MUTATION
 } from "@/graphql/surveys.graphql";
 
 import {
-  SurveyItem,
-  SelectedSurveyItem,
-  SurveyDimensionEnum,
   Survey,
-  SurveyDimension,
+  SurveyDimensionEnum,
   SurveyDimensionView,
+  SurveyIndexView,
   SurveyItemView,
-  SurveyIndexView
-} from "./survey-dimension.types";
+  SurveySelection
+} from "./survey.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
@@ -245,13 +242,14 @@ export default Vue.extend({
   },
   data() {
     return {
+      surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
       showConfirmDeleteDialog: false,
       deleteItemType: "", // will be set to the type of element that will be deleted (e.g., surveyDimensionEnum.SURVEY_INDEX)
       deleteItemId: -1, // id of the dimension or index to be deleted
       deleteItemDialogTitle: "", // custom title sent to the confirm delete dialog
       deleteItemDialogText: "", // custom text sent to the confirm delete dialog
-      serverError: false as boolean,
-      surveyData: {} as Survey,
+      serverError: false,
+      surveyData: (null as any) as Survey,
       surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
       surveyDimensionText: "",
@@ -271,7 +269,7 @@ export default Vue.extend({
       //title: this.initialTitle,
       valid: true,
       //FIXME: make surveySelect of the appropriate type
-      surveySelect: null as any,
+      surveySelect: (null as any) as SurveySelection,
       //select: null as any,
       //name: "",
       nameRules: [(v: any) => !!v || "Title is required"],
@@ -368,13 +366,13 @@ export default Vue.extend({
         if (!this.surveyDimensionEditOn) {
           //adding a new dimension
           console.log("adding a new dimension");
-          console.log("survey ID: ", parseInt(this.surveySelect.value, 10));
+          console.log("survey ID: ", this.surveySelect.value);
           console.log("title: ", this.surveyDimensionText);
           this.$apollo
             .mutate({
               mutation: ADD_DIMENSION_MUTATION,
               variables: {
-                surveyId: parseInt(this.surveySelect.value, 10),
+                surveyId: this.surveySelect.value,
                 title: this.surveyDimensionText,
                 // FIXME: sequence should not be hard-coded
                 sequence: 10
@@ -545,7 +543,7 @@ export default Vue.extend({
     surveys: {
       query: ALL_SURVEYS_QUERY
     },
-    // the following query runs automatically when this.surveySelect is updates (i.e., when something is chosen from the drop-down)
+    // the following query runs automatically when this.surveySelect updates (i.e., when something is chosen from the drop-down)
     surveyData: {
       query: ONE_SURVEY_QUERY,
       variables() {
@@ -569,12 +567,13 @@ export default Vue.extend({
   },
 
   computed: {
-    selections(): SelectedSurveyItem[] {
+    selections(): SurveySelection[] {
       return this.surveys.map(survey => ({
         text: survey.title,
         value: survey.id
       }));
     },
+
     surveyDimensions(): SurveyDimensionView[] {
       return this.surveyData.surveyDimensions.map(dimension => ({
         id: dimension.id,
@@ -596,6 +595,7 @@ export default Vue.extend({
         }))
       }));
     },
+
     surveyItems(): SurveyItemView[] {
       return this.surveyData.surveyItems.map(item => ({
         id: item.id,

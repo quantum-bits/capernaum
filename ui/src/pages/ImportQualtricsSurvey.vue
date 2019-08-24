@@ -59,8 +59,10 @@ import {
 import {
   SurveyItem,
   SurveySelection,
-  SurveyDimensionEnum
-} from "./survey-dimension.types";
+  SurveyDimensionEnum,
+  QualtricsSurvey,
+  QualtricsSurveySelection
+} from "./survey.types";
 
 export default Vue.extend({
   /** page to choose a Qualtrics survey so that it can be downloaded */
@@ -70,7 +72,7 @@ export default Vue.extend({
 
   data() {
     return {
-      qualtricsSurveys: [] as SurveyItem[],
+      qualtricsSurveys: [] as QualtricsSurvey[],
       title: "" as string,
       valid: true,
       serverError: false,
@@ -129,7 +131,7 @@ export default Vue.extend({
   },
 
   computed: {
-    selections(): SurveySelection[] {
+    selections(): QualtricsSurveySelection[] {
       return this.qualtricsSurveys.map(survey => ({
         text: survey.qualtricsName,
         value: survey.qualtricsId

@@ -59,11 +59,7 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table
-          :headers="headers"
-          :items="tableData"
-          class="elevation-1"
-        >
+        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -77,11 +73,10 @@
                 </span>
                 <span v-else>
                   <v-icon
-                    v-if="
-                      item.spiritualFocusOrientationIdDict[header.value]
-                    "
+                    v-if="item.spiritualFocusOrientationIdDict[header.value]"
                     color="success"
-                    >mdi-check-circle</v-icon>
+                    >mdi-check-circle</v-icon
+                  >
                 </span>
               </td>
             </tr>
@@ -100,11 +95,7 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table
-          :headers="headers"
-          :items="tableData"
-          class="elevation-1"
-        >
+        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -119,9 +110,7 @@
                 <span v-else>
                   <!-- note: deleted :input-value="myprops.item[header.value]", since it seemed superfluous with the addition of v-model -->
                   <v-checkbox
-                    v-model="
-                      item.spiritualFocusOrientationIdDict[header.value]
-                    "
+                    v-model="item.spiritualFocusOrientationIdDict[header.value]"
                     color="primary"
                     hide-details
                     @change="onCheckboxChange"
@@ -158,7 +147,6 @@ import {
   components: { AssociationTableInfoForm }
 })
 export default class AssociationTable extends Vue {
-
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];
   headers: AssociationTableHeader[] = [];

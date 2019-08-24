@@ -44,7 +44,7 @@ import {
   SurveyItem,
   SurveySelection,
   SurveyDimensionEnum
-} from "./survey-dimension.types";
+} from "./survey.types";
 
 // WORKING HERE: fix...where are the qualtrics survey titles?!?
 // Next: make the divs open-able, with the questions inside(?)
