@@ -18,6 +18,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
   EntityManager,
   FindConditions,
+  IsNull,
+  Not,
   ObjectType,
   Repository,
   Transaction
@@ -28,6 +30,7 @@ import {
 } from "../qualtrics/qualtrics.types";
 import { assign, pick, difference } from "lodash";
 import { BaseEntity } from "../shared/base-entity";
+import { WhichItems } from "./survey.types";
 
 @Injectable()
 export class SurveyService {
@@ -99,6 +102,29 @@ export class SurveyService {
     conditions: FindConditions<Entity>
   ) {
     return this.entityManager.find(entityClass, conditions);
+  }
+
+  findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
+    const where = { survey };
+
+    switch (whichItems) {
+      case WhichItems.All:
+        /* NOP */
+        break;
+      case WhichItems.WithIndex:
+        where["surveyIndexId"] = Not(IsNull());
+        break;
+      case WhichItems.WithoutIndex:
+        where["surveyIndexId"] = IsNull();
+        break;
+    }
+
+    console.log("WHERE", where);
+
+    return this.surveyItemRepo.find({
+      where,
+      order: { id: "ASC" }
+    });
   }
 
   async updateSurvey(updateInput: SurveyUpdateInput) {

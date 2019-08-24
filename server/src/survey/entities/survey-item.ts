@@ -19,6 +19,8 @@ export class SurveyItem {
   })
   @Field(type => SurveyIndex, { nullable: true })
   surveyIndex: SurveyIndex;
+  @Column("integer", { nullable: true })
+  surveyIndexId: number;
 
   @Column("integer", { default: -1 })
   @Field(type => Int, {

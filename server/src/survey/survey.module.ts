@@ -3,11 +3,14 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   SurveyDimensionResolver,
   SurveyResolver,
-  SurveyIndexResolver
+  SurveyIndexResolver,
+  SurveyItemResolver
 } from "./survey.resolvers";
 import { SurveyService } from "./survey.service";
 import { Survey, SurveyDimension, SurveyIndex, SurveyItem } from "./entities";
 import { QualtricsModule } from "../qualtrics/qualtrics.module";
+import { registerEnumType } from "type-graphql";
+import { WhichItems } from "./survey.types";
 
 @Module({
   imports: [
@@ -23,7 +26,16 @@ import { QualtricsModule } from "../qualtrics/qualtrics.module";
     SurveyService,
     SurveyResolver,
     SurveyDimensionResolver,
-    SurveyIndexResolver
+    SurveyIndexResolver,
+    SurveyItemResolver
   ]
 })
-export class SurveyModule {}
+export class SurveyModule {
+  constructor() {
+    registerEnumType(WhichItems, {
+      name: "WhichItems",
+      description:
+        "Which items to retrieve: all, those with an index, those without an index"
+    });
+  }
+}

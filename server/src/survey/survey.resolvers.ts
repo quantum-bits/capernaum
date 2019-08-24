@@ -23,21 +23,8 @@ import {
 } from "./entities";
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
-import { Int, registerEnumType } from "type-graphql";
-import { FindConditions, IsNull, Not } from "typeorm";
-
-// Used to filter which survey items are retrieved for a survey.
-enum WhichItems {
-  All,
-  WithIndex,
-  WithoutIndex
-}
-
-registerEnumType(WhichItems, {
-  name: "WhichItems",
-  description:
-    "Which items to retrieve: all, those with an index, those without an index"
-});
+import { Int } from "type-graphql";
+import { WhichItems } from "./survey.types";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -146,34 +133,7 @@ export class SurveyResolver {
     })
     whichItems: WhichItems
   ) {
-    /*
-    const conditions = {
-      where: {
-        survey: survey
-      },
-      order: {
-        surveyIndex: "ASC"
-      }
-    };
-*/
-
-    const conditions = { survey };
-
-    switch (whichItems) {
-      case WhichItems.All:
-        /* NOP */
-        break;
-      case WhichItems.WithIndex:
-        conditions["surveyIndex"] = Not(IsNull());
-        break;
-      case WhichItems.WithoutIndex:
-        conditions["surveyIndex"] = IsNull();
-        break;
-    }
-
-    console.log("*** CONDITIONS", conditions);
-
-    return this.surveyService.find(SurveyItem, conditions);
+    return this.surveyService.findItemsForSurvey(survey, whichItems);
   }
 
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])
@@ -235,5 +195,21 @@ export class SurveyIndexResolver {
       SurveyDimension,
       surveyIndex.surveyDimensionId
     );
+  }
+}
+
+@Resolver(of => SurveyItem)
+export class SurveyItemResolver {
+  constructor(private readonly surveyService: SurveyService) {}
+  @ResolveProperty(type => SurveyIndex, {
+    description: "Index associated with this item (if any)"
+  })
+  surveyIndex(@Parent() surveyItem: SurveyItem) {
+    console.log("SURVEY ITEM", surveyItem);
+    if (surveyItem && surveyItem.surveyIndexId) {
+      return this.surveyService.readOne(SurveyIndex, surveyItem.surveyIndexId);
+    } else {
+      return null;
+    }
   }
 }
