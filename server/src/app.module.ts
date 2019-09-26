@@ -5,6 +5,7 @@ import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { Letter, LetterElement, LetterElementType } from "./letter/entities";
 import { SurveyModule } from "./survey/survey.module";
+import typeORMConfig from "./typeorm-config";
 import {
   Survey,
   SurveyDimension,
@@ -20,23 +21,7 @@ import {
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: "postgres",
-      host: process.env.PG_HOST,
-      database: process.env.PG_DATABASE,
-      username: process.env.PG_USERNAME,
-      password: process.env.PG_PASSWORD,
-      entities: [
-        Letter,
-        LetterElement,
-        LetterElementType,
-        SurveyDimension,
-        Survey,
-        SurveyIndex,
-        SurveyItem,
-        ScriptureEngagementPractice,
-        PredictionTable,
-        PredictionTableEntry
-      ],
+      ... typeORMConfig,
       synchronize: true,
       logging: true
     }),

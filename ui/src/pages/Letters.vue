@@ -1,15 +1,17 @@
 <template>
   <v-container>
-    <v-layout wrap>
-      <v-flex xs9>
+    <v-row>
+      <v-col xs9>
         <h1 class="headline mb-5">Survey Follow-up Letters</h1>
-      </v-flex>
-      <v-flex xs3 class="text-xs-right">
+      </v-col>
+      <v-col xs3 class="text-xs-right">
         <v-btn color="primary" dark @click="newLetter">
           New Letter
         </v-btn>
-      </v-flex>
-      <v-flex xs12>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-data-table :headers="headers" :items="letters" class="elevation-1">
           <template v-slot:item="{ item }">
             <tr>
@@ -32,45 +34,51 @@
             </tr>
           </template>
         </v-data-table>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import Vue from "vue";
 import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
-@Component({
+export default Vue.extend({
+  name: "Letters",
+
   apollo: {
     letters: {
       query: ALL_LETTERS_QUERY
     }
-  }
-})
-export default class Letters extends Vue {
-  letters: any[] = [];
+  },
 
-  headers: any = [
-    {
-      text: "Letter",
-      align: "left",
-      sortable: false,
-      value: "title"
+  data() {
+    return {
+      letters: [],
+      headers: [
+        {
+          text: "Letter",
+          align: "left",
+          sortable: false,
+          value: "title"
+        },
+        { text: "Survey", value: "surveyTitle" },
+        { text: "Last Update", value: "lastUpdate" },
+        { text: "Frozen?", value: "isFrozen" },
+        { text: "Active?", value: "isActive" },
+        { text: "Action", sortable: false }
+      ]
+    };
+  },
+
+  methods: {
+    viewLetter(item: any) {
+      this.$router.push({ name: "compose", params: { id: item.id } });
     },
-    { text: "Survey", value: "surveyTitle" },
-    { text: "Last Update", value: "lastUpdate" },
-    { text: "Frozen?", value: "isFrozen" },
-    { text: "Active?", value: "isActive" },
-    { text: "Action", sortable: false }
-  ];
 
-  viewLetter(item: any) {
-    this.$router.push({ name: "compose", params: { id: item.id } });
+    newLetter() {
+      this.$router.push({ name: "compose" });
+    }
   }
-
-  newLetter() {
-    this.$router.push({ name: "compose" });
-  }
-}
+});
 </script>

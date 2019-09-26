@@ -1,0 +1,20 @@
+fixtures:
+  - table: letter
+    rows:
+      abide-letter:
+        name: Abide Bible Letter
+        created: 2018-12-10
+        updated: 2019-03-15
+  - table: letter_element
+    rows:
+      introduction:
+        sequence: 1
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.text
+        surveyDimension: ^survey_dimension.focal-dimension
+        content: Hello, reader.
+  - table: letter_element_type
+    rows:
+      text:
+        key: text
+        description: Free-form Text
