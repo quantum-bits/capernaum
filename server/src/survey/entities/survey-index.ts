@@ -1,18 +1,12 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
-import { BaseEntity } from "../../shared/base-entity";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
-export class SurveyIndex extends BaseEntity {
+export class SurveyIndex extends AbstractEntity {
   @ManyToOne(type => SurveyDimension, dimension => dimension.surveyIndices)
   @Field(type => SurveyDimension)
   surveyDimension: SurveyDimension;

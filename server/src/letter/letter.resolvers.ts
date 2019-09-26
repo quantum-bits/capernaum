@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
-import { LetterElementTypeService, LetterService } from "./letter.service";
+import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
 
@@ -13,15 +13,14 @@ export class LetterResolver {
     return await this.letterService.createLetter(name);
   }
 
-  @Query(returns => [Letter])
-  async letters() {
-    console.error(`LETTERS!`);
-    return await this.letterService.letters();
-  }
-
   @Query(returns => Letter)
   async letter(@Args({ name: "id", type: () => Int }) id: number) {
-    return await this.letterService.letter(id);
+    return await this.letterService.readOne(Letter, id);
+  }
+
+  @Query(returns => [Letter])
+  async letters() {
+    return await this.letterService.readAll(Letter);
   }
 
   @Mutation(returns => Letter)
@@ -31,19 +30,17 @@ export class LetterResolver {
 
   @Mutation(returns => Int)
   async deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
-    const result: DeleteResult = await this.letterService.deleteLetter(id);
+    const result: DeleteResult = await this.letterService.delete(Letter, id);
     return result.affected;
   }
 }
 
 @Resolver(of => LetterElementType)
 export class LetterElementTypeResolver {
-  constructor(
-    private readonly letterElementTypeService: LetterElementTypeService
-  ) {}
+  constructor(private readonly letterService: LetterService) {}
 
   @Query(returns => [LetterElementType])
-  async letterElementTypes() {
-    return await this.letterElementTypeService.letterElementTypes();
+  letterElementTypes() {
+    return this.letterService.readAll(LetterElementType);
   }
 }

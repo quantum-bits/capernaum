@@ -3,7 +3,7 @@ import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
-import { Letter, LetterElementType } from "./letter/entities";
+import { Letter, LetterElement, LetterElementType } from "./letter/entities";
 import { SurveyModule } from "./survey/survey.module";
 import {
   Survey,
@@ -27,6 +27,7 @@ import {
       password: process.env.PG_PASSWORD,
       entities: [
         Letter,
+        LetterElement,
         LetterElementType,
         SurveyDimension,
         Survey,

@@ -42,7 +42,7 @@ import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 
 import {
   SurveyItem,
-  SurveySelection//,
+  SurveySelection //,
   //SurveyDimensionEnum
 } from "./survey.types";
 

@@ -1,26 +1,24 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
-import { Repository } from "typeorm";
+import { EntityManager, Repository } from "typeorm";
+import { BaseService } from "../shared/base.service";
 
 @Injectable()
-export class LetterService {
+export class LetterService extends BaseService {
   constructor(
+    protected readonly entityManager: EntityManager,
     @InjectRepository(Letter)
-    private readonly letterRepository: Repository<Letter>
-  ) {}
+    private readonly letterRepository: Repository<Letter>,
+    @InjectRepository(LetterElementType)
+    private readonly letterElementTypeRepository: Repository<LetterElementType>
+  ) {
+    super(entityManager);
+  }
 
   createLetter(name: string) {
     const newLetter = this.letterRepository.create({ name });
     return this.letterRepository.save(newLetter);
-  }
-
-  letter(id: number) {
-    return this.letterRepository.findOne(id);
-  }
-
-  letters() {
-    return this.letterRepository.find();
   }
 
   async updateLetter(letterData: LetterUpdateInput) {
@@ -34,35 +32,11 @@ export class LetterService {
     return this.letterRepository.save(letter);
   }
 
-  deleteLetter(id: number) {
-    return this.letterRepository.delete(id);
-  }
-}
-
-@Injectable()
-export class LetterElementTypeService {
-  constructor(
-    @InjectRepository(LetterElementType)
-    private readonly letterElementTypeRepository: Repository<LetterElementType>
-  ) {}
-
   createLetterElementType(key: string, description: string) {
     const newLetterElementType = this.letterElementTypeRepository.create({
       key,
       description
     });
     return this.letterElementTypeRepository.save(newLetterElementType);
-  }
-
-  letterElementType(id: number) {
-    return this.letterElementTypeRepository.findOne(id);
-  }
-
-  letterElementTypes() {
-    return this.letterElementTypeRepository.find();
-  }
-
-  deleteLetterElementType(id: number) {
-    return this.letterElementTypeRepository.delete(id);
   }
 }

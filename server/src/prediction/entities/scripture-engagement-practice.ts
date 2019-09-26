@@ -1,10 +1,10 @@
 import { Column, Entity } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { BaseEntity } from "../../shared/base-entity";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType({ description: "Scripture engagement practice" })
-export class ScriptureEngagementPractice extends BaseEntity {
+export class ScriptureEngagementPractice extends AbstractEntity {
   @Column() @Field() title: string;
   @Column("text") @Field() description: string;
   @Column() @Field(type => Int) sequence: number;

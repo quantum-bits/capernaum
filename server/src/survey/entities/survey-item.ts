@@ -1,15 +1,12 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { SurveyIndex } from "./survey-index";
 import { Survey } from "./survey";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType({ description: "One item (question) from a survey" })
-export class SurveyItem {
-  @PrimaryGeneratedColumn()
-  @Field(type => Int)
-  id: number;
-
+export class SurveyItem extends AbstractEntity {
   @ManyToOne(type => Survey, survey => survey.surveyItems)
   @Field(type => Survey)
   survey: Survey;

@@ -3,17 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
+  OneToMany,
   UpdateDateColumn
 } from "typeorm";
+import { AbstractEntity } from "../../shared/abstract-entity";
+import { LetterElement } from "./letter-element";
 
 @Entity()
 @ObjectType()
-export class Letter {
-  @PrimaryGeneratedColumn()
-  @Field(type => Int)
-  id: number;
-
+export class Letter extends AbstractEntity {
   @Field()
   @Column()
   name: string;
@@ -29,6 +27,10 @@ export class Letter {
   @Field()
   @Column()
   isFrozen: boolean = false;
+
+  @OneToMany(type => LetterElement, letterElement => letterElement.letter)
+  @Field(type => [LetterElement])
+  elements: LetterElement[];
 }
 
 @InputType()

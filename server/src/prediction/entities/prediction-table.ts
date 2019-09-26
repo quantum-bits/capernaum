@@ -1,11 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "type-graphql";
 import { PredictionTableEntry } from "./prediction-table-entry";
-import { BaseEntity } from "../../shared/base-entity";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType({ description: "Scripture engagement predictions for one survey" })
-export class PredictionTable extends BaseEntity {
+export class PredictionTable extends AbstractEntity {
   @OneToMany(type => PredictionTableEntry, entry => entry.table)
   @Field(type => [PredictionTableEntry])
   entries: PredictionTableEntry[];

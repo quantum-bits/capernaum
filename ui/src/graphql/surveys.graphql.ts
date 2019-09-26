@@ -25,7 +25,7 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsName
       qualtricsModDate
     }
-  }  
+  }
 `;
 
 export const IMPORT_QUALTRICS_SURVEY = gql`
@@ -43,11 +43,7 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
 export const ADD_DIMENSION_MUTATION = gql`
   mutation AddDimension($surveyId: Int!, $title: String!, $sequence: Int!) {
     createSurveyDimension(
-      createInput: {
-        surveyId: $surveyId
-        title: $title
-        sequence: $sequence
-      }
+      createInput: { surveyId: $surveyId, title: $title, sequence: $sequence }
     ) {
       id
       title
@@ -81,12 +77,17 @@ export const UPDATE_DIMENSION_MUTATION = gql`
 `;
 
 export const ADD_INDEX_MUTATION = gql`
-  mutation AddIndex($dimensionId: Int!, $itemIds: [Int!]!, $title: String!, $abbreviation: String!) {
+  mutation AddIndex(
+    $dimensionId: Int!
+    $itemIds: [Int!]!
+    $title: String!
+    $abbreviation: String!
+  ) {
     createSurveyIndex(
       createInput: {
-        dimensionId: $dimensionId,
-        itemIds: $itemIds,
-        title: $title,
+        dimensionId: $dimensionId
+        itemIds: $itemIds
+        title: $title
         abbreviation: $abbreviation
       }
     ) {
@@ -101,9 +102,19 @@ export const ADD_INDEX_MUTATION = gql`
 `;
 
 export const UPDATE_INDEX_MUTATION = gql`
-  mutation UpdateIndex($id: Int!, $itemIds: [Int!]!, $title: String!, $abbreviation: String!) {
+  mutation UpdateIndex(
+    $id: Int!
+    $itemIds: [Int!]!
+    $title: String!
+    $abbreviation: String!
+  ) {
     updateSurveyIndex(
-      updateInput: { id: $id, title: $title, abbreviation: $abbreviation, itemIds: $itemIds }
+      updateInput: {
+        id: $id
+        title: $title
+        abbreviation: $abbreviation
+        itemIds: $itemIds
+      }
     ) {
       id
       title

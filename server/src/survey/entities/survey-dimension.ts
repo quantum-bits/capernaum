@@ -8,13 +8,13 @@ import {
 } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
-import { BaseEntity } from "../../shared/base-entity";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType({
   description: "Top-level grouping of questions in Capernaum; contains indices"
 })
-export class SurveyDimension extends BaseEntity {
+export class SurveyDimension extends AbstractEntity {
   @ManyToOne(type => Survey, survey => survey.surveyDimensions)
   @Field(type => Survey)
   survey: Survey;

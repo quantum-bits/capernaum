@@ -3,7 +3,7 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type BaseEntity {
+type AbstractEntity {
   """Unique ID for this entity"""
   id: Int!
 }
@@ -14,14 +14,27 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Letter {
+  """Unique ID for this entity"""
   id: Int!
   name: String!
   created: DateTime!
   updated: DateTime!
   isFrozen: Boolean!
+  elements: [LetterElement!]!
+}
+
+type LetterElement {
+  """Unique ID for this entity"""
+  id: Int!
+  sequence: Int!
+  content: String!
+  letter: Letter!
+  letterElementType: LetterElementType!
+  surveyDimension: SurveyDimension!
 }
 
 type LetterElementType {
+  """Unique ID for this entity"""
   id: Int!
   key: String!
   description: String!
@@ -119,8 +132,8 @@ type QualtricsSurveyListItem {
 }
 
 type Query {
-  letters: [Letter!]!
   letter(id: Int!): Letter!
+  letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   survey(id: Int!): Survey!
@@ -271,6 +284,7 @@ input SurveyIndexUpdateInput {
 
 """One item (question) from a survey"""
 type SurveyItem {
+  """Unique ID for this entity"""
   id: Int!
   survey: Survey!
   surveyIndex: SurveyIndex

@@ -15,27 +15,19 @@ import {
   SurveyUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import {
-  EntityManager,
-  FindConditions,
-  IsNull,
-  Not,
-  ObjectType,
-  Repository,
-  Transaction
-} from "typeorm";
+import { EntityManager, IsNull, Not, Repository } from "typeorm";
 import {
   QualtricsQuestion,
   QualtricsSurvey
 } from "../qualtrics/qualtrics.types";
-import { assign, pick, difference } from "lodash";
-import { BaseEntity } from "../shared/base-entity";
+import { assign, difference, pick } from "lodash";
 import { WhichItems } from "./survey.types";
+import { BaseService } from "../shared/base.service";
 
 @Injectable()
-export class SurveyService {
+export class SurveyService extends BaseService {
   constructor(
-    private readonly entityManager: EntityManager,
+    protected readonly entityManager: EntityManager,
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
@@ -44,7 +36,9 @@ export class SurveyService {
     private readonly surveyIndexRepo: Repository<SurveyIndex>,
     @InjectRepository(SurveyItem)
     private readonly surveyItemRepo: Repository<SurveyItem>
-  ) {}
+  ) {
+    super(entityManager);
+  }
 
   createSurvey(createInput: SurveyCreateInput) {
     return this.surveyRepo.save(this.surveyRepo.create(createInput));
@@ -87,21 +81,6 @@ export class SurveyService {
 
       return newIndex;
     });
-  }
-
-  readAll(entity: ObjectType<BaseEntity>) {
-    return this.entityManager.find(entity);
-  }
-
-  readOne(entity: ObjectType<BaseEntity>, id: number) {
-    return this.entityManager.findOne(entity, id);
-  }
-
-  find<Entity>(
-    entityClass: ObjectType<Entity>,
-    conditions: FindConditions<Entity>
-  ) {
-    return this.entityManager.find(entityClass, conditions);
   }
 
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
