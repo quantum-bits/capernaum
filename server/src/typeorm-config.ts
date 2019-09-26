@@ -1,7 +1,12 @@
 import { config } from "dotenv";
 
 import { ConnectionOptions } from "typeorm";
-import { Letter, LetterElement, LetterElementType } from "./letter/entities";
+import {
+  Letter,
+  LetterElement,
+  LetterElementType,
+  SurveyLetter
+} from "./letter/entities";
 import {
   Survey,
   SurveyDimension,
@@ -27,6 +32,7 @@ const options: ConnectionOptions = {
     LetterElement,
     LetterElementType,
     SurveyDimension,
+    SurveyLetter,
     Survey,
     SurveyIndex,
     SurveyItem,

@@ -12,12 +12,16 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="letters" class="elevation-1">
+        <v-data-table
+          :headers="headers"
+          :items="surveyLetters"
+          class="elevation-1"
+        >
           <template v-slot:item="{ item }">
             <tr>
-              <td>{{ item.name }}</td>
-              <td class="text-xs-right">[Survey Name Here]</td>
-              <td class="text-xs-right">{{ item.updated }}</td>
+              <td>{{ item.letter.name }}</td>
+              <td class="text-xs-right">{{ item.survey.qualtricsName }}</td>
+              <td class="text-xs-right">{{ item.letter.updated }}</td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
                   <v-icon color="success">mdi-check-circle</v-icon>
@@ -41,20 +45,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
+import { ALL_SURVEY_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
 export default Vue.extend({
   name: "Letters",
 
   apollo: {
-    letters: {
-      query: ALL_LETTERS_QUERY
+    surveyLetters: {
+      query: ALL_SURVEY_LETTERS_QUERY
     }
   },
 
   data() {
     return {
-      letters: [],
+      surveyLetters: [],
       headers: [
         {
           text: "Letter",

@@ -30,3 +30,20 @@ export const ADD_LETTER_MUTATION = gql`
     }
   }
 `;
+
+export const ALL_SURVEY_LETTERS_QUERY = gql`
+  query SurveyLetters {
+    surveyLetters {
+      id
+      survey {
+        qualtricsName
+      }
+      letter {
+        name
+        updated
+      }
+      isActive
+      isFrozen
+    }
+  }
+`;

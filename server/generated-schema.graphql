@@ -132,6 +132,7 @@ type QualtricsSurveyListItem {
 }
 
 type Query {
+  surveyLetters: [SurveyLetter!]!
   letter(id: Int!): Letter!
   letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
@@ -303,6 +304,16 @@ input SurveyItemCreateInput {
   sequence: Int = -1
   qualtricsId: String!
   qualtricsText: String!
+}
+
+type SurveyLetter {
+  """Unique ID for this entity"""
+  id: Int!
+  survey: Survey!
+  predictionTable: PredictionTable!
+  letter: Letter!
+  isActive: Boolean!
+  isFrozen: Boolean!
 }
 
 input SurveyUpdateInput {

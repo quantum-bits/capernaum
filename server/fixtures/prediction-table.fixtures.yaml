@@ -1,0 +1,6 @@
+fixtures:
+  - table: prediction_table
+    rows:
+      christian-life-survey:
+        title: CLS
+        description: Christian Life Survey

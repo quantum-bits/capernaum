@@ -18,3 +18,11 @@ fixtures:
       text:
         key: text
         description: Free-form Text
+  - table: survey_letter
+    rows:
+      cls-abide:
+        survey: ^survey.christian-life-survey
+        predictionTable: ^prediction_table.christian-life-survey
+        letter: ^letter.abide-letter
+        isActive: true
+        isFrozen: false

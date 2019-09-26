@@ -1,8 +1,50 @@
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver
+} from "@nestjs/graphql";
+import {
+  Letter,
+  LetterElementType,
+  LetterUpdateInput,
+  SurveyLetter
+} from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
+import { Survey } from "../survey/entities";
+import { PredictionTable } from "../prediction/entities";
+
+@Resolver(of => SurveyLetter)
+export class SurveyLetterResolver {
+  constructor(private readonly letterService: LetterService) {}
+
+  @Query(returns => [SurveyLetter])
+  surveyLetters() {
+    return this.letterService.readAll(SurveyLetter);
+  }
+
+  @ResolveProperty("letter", type => Letter)
+  resolveLetter(@Parent() surveyLetter: SurveyLetter) {
+    return this.letterService.findOneOrFail(Letter, surveyLetter.letterId);
+  }
+
+  @ResolveProperty("survey", type => Survey)
+  resolveSurvey(@Parent() surveyLetter: SurveyLetter) {
+    return this.letterService.findOneOrFail(Survey, surveyLetter.surveyId);
+  }
+
+  @ResolveProperty("predictionTable", type => PredictionTable)
+  resolvePredictionTable(@Parent() surveyLetter: SurveyLetter) {
+    return this.letterService.findOneOrFail(
+      PredictionTable,
+      surveyLetter.predictionTableId
+    );
+  }
+}
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -14,13 +56,13 @@ export class LetterResolver {
   }
 
   @Query(returns => Letter)
-  async letter(@Args({ name: "id", type: () => Int }) id: number) {
-    return await this.letterService.readOne(Letter, id);
+  letter(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.letterService.readOne(Letter, id);
   }
 
   @Query(returns => [Letter])
-  async letters() {
-    return await this.letterService.readAll(Letter);
+  letters() {
+    return this.letterService.readAll(Letter);
   }
 
   @Mutation(returns => Letter)
