@@ -18,8 +18,15 @@ export class BaseService {
     return this.entityManager.findOne(entityClass, id);
   }
 
-  readAll<Entity>(entityClass: ObjectType<Entity>) {
-    return this.entityManager.find(entityClass);
+  readAll<Entity>(entityClass: ObjectType<Entity>, order?: object) {
+    let args = {};
+    if (order) {
+      args = {
+        ...args,
+        order: { ...order }
+      };
+    }
+    return this.entityManager.find(entityClass, args);
   }
 
   findOneOrFail<Entity>(entityClass: ObjectType<Entity>, id: number) {

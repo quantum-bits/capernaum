@@ -27,7 +27,7 @@ type LetterElement {
   """Unique ID for this entity"""
   id: Int!
   sequence: Int!
-  content: String!
+  textDelta: String
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension!
@@ -132,6 +132,7 @@ type QualtricsSurveyListItem {
 }
 
 type Query {
+  surveyLetter(id: Int!): SurveyLetter!
   surveyLetters: [SurveyLetter!]!
   letter(id: Int!): Letter!
   letters: [Letter!]!

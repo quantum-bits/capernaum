@@ -9,7 +9,8 @@ import {
 import {
   LetterElementTypeResolver,
   LetterResolver,
-  SurveyLetterResolver
+  SurveyLetterResolver,
+  LetterElementResolver
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 
@@ -26,7 +27,8 @@ import { LetterService } from "./letter.service";
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    SurveyLetterResolver
+    SurveyLetterResolver,
+    LetterElementResolver
   ]
 })
 export class LetterModule {}

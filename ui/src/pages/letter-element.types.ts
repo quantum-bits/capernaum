@@ -1,13 +1,13 @@
 /** types of elements that can appear in a letter; these come back from the db
  */
-export interface LetterElementMenuItemType {
+export interface LetterElementType {
   key: string; // e.g., "boilerplate"
   description: string; // e.g., "Boilerplate Text"
 }
 
 /** letter elements (e.g., boilerplate, spiritual focus chart, etc.)
  */
-export interface LetterElementType {
+export interface LetterElement {
   id: number; // id in the database
   order: number; // order of this text item (paragraph) within the letter (0, 1,....)
   key: string; // e.g., "boilerplate", "spiritual-focus-chart", etc. (see LetterElement enum)

@@ -8,6 +8,7 @@ import {
 } from "@nestjs/graphql";
 import {
   Letter,
+  LetterElement,
   LetterElementType,
   LetterUpdateInput,
   SurveyLetter
@@ -21,6 +22,11 @@ import { PredictionTable } from "../prediction/entities";
 @Resolver(of => SurveyLetter)
 export class SurveyLetterResolver {
   constructor(private readonly letterService: LetterService) {}
+
+  @Query(returns => SurveyLetter)
+  surveyLetter(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.letterService.readOne(SurveyLetter, id);
+  }
 
   @Query(returns => [SurveyLetter])
   surveyLetters() {
@@ -42,6 +48,20 @@ export class SurveyLetterResolver {
     return this.letterService.findOneOrFail(
       PredictionTable,
       surveyLetter.predictionTableId
+    );
+  }
+}
+
+@Resolver(of => LetterElement)
+export class LetterElementResolver {
+  constructor(private readonly letterService: LetterService) {}
+
+  @ResolveProperty("letterElementType", type => LetterElementType)
+  resolveLetterElementType(@Parent() letterElement: LetterElement) {
+    console.log("LETTER ELEMENT", letterElement);
+    return this.letterService.findOneOrFail(
+      LetterElementType,
+      letterElement.letterElementTypeId
     );
   }
 }
@@ -75,6 +95,11 @@ export class LetterResolver {
     const result: DeleteResult = await this.letterService.delete(Letter, id);
     return result.affected;
   }
+
+  @ResolveProperty("elements", type => [LetterElement])
+  resolveElements(@Parent() letter: Letter) {
+    return this.letterService.find(LetterElement, { letter });
+  }
 }
 
 @Resolver(of => LetterElementType)
@@ -83,6 +108,8 @@ export class LetterElementTypeResolver {
 
   @Query(returns => [LetterElementType])
   letterElementTypes() {
-    return this.letterService.readAll(LetterElementType);
+    return this.letterService.readAll(LetterElementType, {
+      description: "ASC"
+    });
   }
 }

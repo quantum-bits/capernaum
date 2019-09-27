@@ -3,21 +3,62 @@ fixtures:
     rows:
       abide-letter:
         name: Abide Bible Letter
-        created: 2018-12-10
-        updated: 2019-03-15
+        created: 2018-01-10
+        updated: 2018-03-25
   - table: letter_element
     rows:
-      introduction:
+      boilerplate-1:
         sequence: 1
         letter: ^letter.abide-letter
-        letterElementType: ^letter_element_type.text
-        surveyDimension: ^survey_dimension.focal-dimension
-        content: Hello, reader.
+        letterElementType: ^letter_element_type.boilerplate
+        textDelta: Hello, reader.
+      boilerplate-2:
+        sequence: 2
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.boilerplate
+        textDelta: Hello, reader 2.
+      sf-chart:
+        sequence: 3
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.spiritual-focus-chart
+      so-chart:
+        sequence: 4
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.spiritual-orientations-chart
+      boilerplate-3:
+        sequence: 5
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.boilerplate
+        textDelta: People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing
+      bool-calc:
+        sequence: 6
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.boolean-calculation-results
+      boilerplate-4:
+        sequence: 7
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.boilerplate
+        textDelta: Closing remarks.
   - table: letter_element_type
     rows:
-      text:
-        key: text
-        description: Free-form Text
+      spiritual-focus-chart:
+        key: spiritual-focus-chart
+        description: Spiritual Focus Chart
+      spiritual-orientations-chart:
+        key: spiritual-orientations-chart
+        description: Spiritual Orientations Chart
+      boolean-calculation-results:
+        key: boolean-calculation-results
+        description: Boolean Calculation Results
+      header:
+        key: header
+        description: Header (Top of Letter)
+      footer:
+        key: footer
+        description: Footer (End of Letter)
+      boilerplate:
+        key: boilerplate
+        description: Boilerplate Text
   - table: survey_letter
     rows:
       cls-abide:

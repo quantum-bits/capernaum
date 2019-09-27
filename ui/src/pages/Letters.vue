@@ -21,7 +21,9 @@
             <tr>
               <td>{{ item.letter.name }}</td>
               <td class="text-xs-right">{{ item.survey.qualtricsName }}</td>
-              <td class="text-xs-right">{{ item.letter.updated }}</td>
+              <td class="text-xs-right">
+                {{ item.letter.updated | dateAndTime }}
+              </td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
                   <v-icon color="success">mdi-check-circle</v-icon>
@@ -46,6 +48,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_SURVEY_LETTERS_QUERY } from "@/graphql/letters.graphql";
+import { DateTime } from "luxon";
 
 export default Vue.extend({
   name: "Letters",
@@ -73,6 +76,13 @@ export default Vue.extend({
         { text: "Action", sortable: false }
       ]
     };
+  },
+
+  filters: {
+    dateAndTime(value: string) {
+      const dt = DateTime.fromISO(value);
+      return dt.toFormat("y-M-d tt");
+    }
   },
 
   methods: {

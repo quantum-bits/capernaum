@@ -45,7 +45,7 @@ import { AxiosResponse } from "axios";
 import Delta from "quill-delta";
 
 import {
-  LetterElementMenuItemType,
+  LetterElementType,
   LetterElementEnum
 } from "../pages/letter-element.types";
 
@@ -58,10 +58,10 @@ export default class StaticLetterElement extends Vue {
   @Prop() initialTextDelta!: Delta; // not actually used in this component, but need to mirror the props of  LetterTextArea.vue
   @Prop({ default: false }) initialEditModeOn!: boolean; // not actually used in this component
   @Prop() letterElementKey!: string;
+  @Prop() description!: string;
   @Prop() parentIsFrozen!: boolean;
 
-  letterElements: LetterElementMenuItemType[] = [];
-  description: string = "";
+  letterElements: LetterElementType[] = [];
 
   @Emit("move-up")
   moveUp() {}
@@ -92,18 +92,18 @@ export default class StaticLetterElement extends Vue {
     );
   }
 
-  mounted() {
-    axios
-      .get("http://localhost:4000/letter-elements/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.letterElements = response.data;
-        for (let letterElement of this.letterElements) {
-          if (letterElement.key === this.letterElementKey) {
-            this.description = letterElement.description;
-          }
-        }
-      });
-  }
+  // mounted() {
+  //   axios
+  //     .get("http://localhost:4000/letter-elements/")
+  //     .then((response: AxiosResponse) => {
+  //       console.log(response);
+  //       this.letterElements = response.data;
+  //       for (let letterElement of this.letterElements) {
+  //         if (letterElement.key === this.letterElementKey) {
+  //           this.description = letterElement.description;
+  //         }
+  //       }
+  //     });
+  // }
 }
 </script>

@@ -12,14 +12,15 @@ export class LetterElement extends AbstractEntity {
   @Column("int")
   sequence: number;
 
-  @Column("text")
-  @Field()
-  content: string;
+  @Column("text", { nullable: true })
+  @Field({ nullable: true })
+  textDelta?: string;
 
   @ManyToOne(type => Letter, letter => letter.elements)
   @Field(type => Letter)
   letter: Letter;
 
+  @Column("int") letterElementTypeId: number;
   @ManyToOne(type => LetterElementType)
   @Field(type => LetterElementType)
   letterElementType: LetterElementType;

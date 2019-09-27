@@ -13,11 +13,15 @@
           <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
-            <span class="font-weight-light">{{ letter.name }}</span>
+            <span class="font-weight-light">{{
+              surveyLetter.letter.name
+            }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
-            <span class="font-weight-light">{{ survey.title }}</span>
+            <span class="font-weight-light">{{
+              surveyLetter.survey.qualtricsName
+            }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Boolean Association Table:
@@ -30,7 +34,9 @@
           </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
-            <span class="font-weight-light">{{ lastUpdate }}</span>
+            <span class="font-weight-light">{{
+              surveyLetter.letter.updated
+            }}</span>
           </h2>
         </v-flex>
         <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
@@ -60,40 +66,29 @@
         <v-btn color="primary" dark @click="viewPDF">
           View PDF
         </v-btn>
-        <v-menu v-if="!isFrozen" offset-y>
-          <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark v-on="on">
-              Add Letter Element
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="item in letterElements"
-              :key="item.key"
-              @click="addElement(item.key)"
-              :disabled="itemDisabled(item.key)"
-            >
-              <v-list-item-title>{{ item.description }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <LetterElementMenu
+          v-if="!isFrozen"
+          offset-y
+          @click="addElement($event)"
+        />
       </v-flex>
 
       <v-flex xs10 offset-xs1>
         <!-- https://www.youtube.com/watch?v=Y3S7KShrRX0 -->
         <div
           class="form-group ma-4"
-          v-for="(element, index) in elements"
+          v-for="(element, index) in surveyLetter.letter.elements"
           :key="element.id"
         >
           <component
-            v-bind:is="letterElement(element.key)"
+            v-bind:is="letterElement(element.letterElementType.key)"
             :id="element.id"
-            :order="element.order"
+            :order="element.sequence"
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
-            :numItems="elements.length"
-            :letterElementKey="element.key"
+            :numItems="letterElements.length"
+            :letterElementKey="element.letterElementType.key"
+            :description="element.letterElementType.description"
             :parentIsFrozen="isFrozen"
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
@@ -101,64 +96,58 @@
           ></component>
         </div>
       </v-flex>
+
       <v-flex xs10 offset-xs1 class="text-xs-right">
-        <v-btn v-if="elements.length > 0" color="primary" dark @click="viewPDF">
+        <v-btn
+          v-if="letterElements.length > 0"
+          color="primary"
+          dark
+          @click="viewPDF"
+        >
           View PDF
         </v-btn>
-        <v-menu v-if="elements.length > 0 && !isFrozen" offset-y>
-          <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark v-on="on">
-              Add Letter Element
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="item in letterElements"
-              :key="item.key"
-              @click="addElement(item.key)"
-            >
-              <v-list-item-title>{{ item.description }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <LetterElementMenu
+          v-if="letterElements.length > 0 && !isFrozen"
+          @click="addElement($event)"
+          offset-y
+        />
       </v-flex>
     </v-layout>
     <!--
-            Next:
-                - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-                - might need to update the db every time a change is made (to the order, too)
-    
-                - ordering within categories for letters (order by survey, and then more ordering below this level)
-    
-    
-                - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-    
-                - if the letter contains the "SE strategies for user" element, and the boolean association
-                table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-                the user should get a warning message or something)
-    
-        -->
+                Next:
+                    - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+                    - might need to update the db every time a change is made (to the order, too)
+        
+                    - ordering within categories for letters (order by survey, and then more ordering below this level)
+        
+        
+                    - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+        
+                    - if the letter contains the "SE strategies for user" element, and the boolean association
+                    table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+                    the user should get a warning message or something)
+        
+            -->
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios, { AxiosResponse } from "axios";
-
-import _ from "lodash";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
+import orderBy from "lodash/orderBy";
 
 import {
   Letter,
+  LetterElement,
   LetterElementEnum,
-  LetterElementMenuItemType,
   LetterElementType
 } from "./letter-element.types";
 import { BooleanAssociationBriefType } from "./association-table.types";
-import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
+import { ONE_SURVEY_LETTER_QUERY } from "@/graphql/letters.graphql";
+import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
 // brief format, for data returned from the db
 interface SurveyTypeBrief {
@@ -167,35 +156,74 @@ interface SurveyTypeBrief {
 }
 
 @Component({
-  components: { LetterTextArea, StaticLetterElement, LetterInfoForm },
+  components: {
+    LetterTextArea,
+    StaticLetterElement,
+    LetterInfoForm,
+    LetterElementMenu
+  },
   apollo: {
-    letter: {
-      query: ONE_LETTER_QUERY,
+    surveyLetter: {
+      query: ONE_SURVEY_LETTER_QUERY,
       variables() {
-        // FIXME: this should eventually fetch not just the letter, but all of the related stuff (i.e., it should be a more complicated query)
-        if (this.$route.params.id !== undefined) {
-          return {
-            letterId: this.$route.params.id
-          };
-        }
+        return {
+          id: this.$route.params.id
+        };
       },
-      update(data) {
-        // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
-        // manipulation, can use a computed property instead
-        /**
-         * FIXME: eventually isFrozen will be on SurveyLetter instead of on Letter; if it is frozen, so will everything else be below it.
-         * That means that other pages will need to go up the chain to check if SurveyLetter is frozen or not.
-         * ...at this point, we are assuming that each combo of survey-tables-letter is standalone, so if SurveyLetter is frozen, they all are.
-         * ...in the future, we may want to allow for copying from these when making a new SurveyLetter, but that gets tricky, since the Qualtrics
-         * survey may have been edited in the meantime...!
-         */
-        console.log('data: ', data);
-        return data.letter;
+      update(data: any) {
+        console.log("DATA", data);
+        let localElements: LetterElement[] = [];
+        data.letter.elements.forEach((element: any) => {
+          localElements.push(element);
+        });
+        this.letterElements = orderBy(localElements, "order");
+
+        for (let box of this.letterElements) {
+          box.editModeOn = false;
+          box.isNew = false;
+        }
+        this.resetOrderProperty();
+        this.survey = {
+          id: data.survey.id,
+          title: data.survey.qualtricsName
+        };
+        this.lastUpdate = data.updated;
+        this.id = data.id;
+        this.isFrozen = data.isFrozen;
+        this.booleanAssociation = data.booleanAssociation;
+        return data;
       },
       skip() {
         return this.$route.params.id === undefined;
       }
     }
+    // letter: {
+    //   query: ONE_LETTER_QUERY,
+    //   variables() {
+    //     // FIXME: this should eventually fetch not just the letter, but all of the related stuff (i.e., it should be a more complicated query)
+    //     if (this.$route.params.id !== undefined) {
+    //       return {
+    //         letterId: this.$route.params.id
+    //       };
+    //     }
+    //   },
+    //   update(data) {
+    //     // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
+    //     // manipulation, can use a computed property instead
+    //     /**
+    //      * FIXME: eventually isFrozen will be on SurveyLetter instead of on Letter; if it is frozen, so will everything else be below it.
+    //      * That means that other pages will need to go up the chain to check if SurveyLetter is frozen or not.
+    //      * ...at this point, we are assuming that each combo of survey-tables-letter is standalone, so if SurveyLetter is frozen, they all are.
+    //      * ...in the future, we may want to allow for copying from these when making a new SurveyLetter, but that gets tricky, since the Qualtrics
+    //      * survey may have been edited in the meantime...!
+    //      */
+    //     console.log("data: ", data);
+    //     return data.letter;
+    //   },
+    //   skip() {
+    //     return this.$route.params.id === undefined;
+    //   }
+    // }
   }
 })
 export default class Compose extends Vue {
@@ -210,14 +238,14 @@ export default class Compose extends Vue {
 
   lastUpdate: string = "";
   id: number | null = null;
-  elements: LetterElementType[] = [];
-  letterElements: LetterElementMenuItemType[] = [];
+  letterElements: LetterElement[] = [];
+  letterElementTypes: LetterElementType[] = [];
   isFrozen: boolean = false;
   booleanAssociation: BooleanAssociationBriefType | null = null;
 
-  letterExistsAndIsFrozen(){
-    if (this.letter !== null) {
-      return this.letter.isFrozen;
+  letterExistsAndIsFrozen() {
+    if (this.surveyLetter !== null) {
+      return this.surveyLetter.isFrozen;
     } else {
       return false;
     }
@@ -243,50 +271,50 @@ export default class Compose extends Vue {
   moveUp(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
     console.log("move up!", index);
-    let element: LetterElementType = this.elements[index];
-    this.elements.splice(index, 1);
-    this.elements.splice(index - 1, 0, element);
+    let element: LetterElement = this.letterElements[index];
+    this.letterElements.splice(index, 1);
+    this.letterElements.splice(index - 1, 0, element);
     this.resetOrderProperty();
-    console.log(this.elements);
+    console.log(this.letterElements);
   }
 
   moveDown(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
     console.log("move down!", index);
-    let element: LetterElementType = this.elements[index + 1];
-    this.elements.splice(index + 1, 1);
-    this.elements.splice(index, 0, element);
+    let element: LetterElement = this.letterElements[index + 1];
+    this.letterElements.splice(index + 1, 1);
+    this.letterElements.splice(index, 0, element);
     this.resetOrderProperty();
-    console.log(this.elements);
+    console.log(this.letterElements);
   }
 
   deleteElement(index: number) {
     //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
     console.log("delete!", index);
-    this.elements.splice(index, 1);
+    this.letterElements.splice(index, 1);
     this.resetOrderProperty();
-    console.log(this.elements);
+    console.log(this.letterElements);
   }
 
   resetOrderProperty() {
     // cycles through the elements array and resets the 'order' property to reflect the current ordering of the text boxes
-    for (let i = 0; i < this.elements.length; i++) {
-      this.elements[i].order = i;
+    for (let i = 0; i < this.letterElements.length; i++) {
+      this.letterElements[i].order = i;
     }
   }
 
   addElement(key: string) {
     console.log("add: ", key);
-    let numElements: number = this.elements.length;
+    let numElements: number = this.letterElements.length;
     let maxId: number = 0;
     // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
-    for (let box of this.elements) {
+    for (let box of this.letterElements) {
       if (box.id > maxId) {
         maxId = box.id;
       }
     }
     maxId = maxId + 1;
-    this.elements.push({
+    this.letterElements.push({
       id: maxId, //will eventually get assigned a value by the server, but use this value as a key for now....
       order: numElements,
       textDelta: {
@@ -301,7 +329,7 @@ export default class Compose extends Vue {
       editModeOn: true
     });
     this.resetOrderProperty();
-    console.log(this.elements);
+    console.log(this.letterElements);
   }
 
   itemDisabled(key: string) {
@@ -335,44 +363,39 @@ export default class Compose extends Vue {
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
-    axios
-      .get("http://localhost:4000/letter-elements/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.letterElements = response.data;
-      });
     console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
       this.editModeOn = true;
       this.isNew = true;
-      console.log('new letter....');
-    } else {
-      axios
-        .get("http://localhost:4000/letter-data/" + this.$route.params.id)
-        .then((response: AxiosResponse) => {
-          console.log(response);
-          let localElements: LetterElementType[] = [];
-          response.data.elements.forEach((element: any) => {
-            localElements.push(element);
-          });
-          this.elements = _.orderBy(localElements, "order");
-          // add two convenience properties to the elements....
-          for (let box of this.elements) {
-            box.editModeOn = false;
-            box.isNew = false;
-          }
-          this.resetOrderProperty();
-          this.survey = {
-            id: response.data.survey.id,
-            title: response.data.survey.title
-          };
-          this.lastUpdate = response.data.lastUpdate;
-          this.id = response.data.id;
-          this.isFrozen = response.data.isFrozen;
-          this.booleanAssociation = response.data.booleanAssociation;
-        });
+      console.log("new letter....");
     }
+    // else {
+    //   axios
+    //     .get("http://localhost:4000/letter-data/" + this.$route.params.id)
+    //     .then((response: AxiosResponse) => {
+    //       console.log(response);
+    //       let localElements: LetterElement[] = [];
+    //       response.data.elements.forEach((element: any) => {
+    //         localElements.push(element);
+    //       });
+    //       this.letterElements = _.orderBy(localElements, "order");
+    //       // add two convenience properties to the elements....
+    //       for (let box of this.letterElements) {
+    //         box.editModeOn = false;
+    //         box.isNew = false;
+    //       }
+    //       this.resetOrderProperty();
+    //       this.survey = {
+    //         id: response.data.survey.id,
+    //         title: response.data.survey.title
+    //       };
+    //       this.lastUpdate = response.data.lastUpdate;
+    //       this.id = response.data.id;
+    //       this.isFrozen = response.data.isFrozen;
+    //       this.booleanAssociation = response.data.booleanAssociation;
+    //     });
+    // }
   }
 }
 </script>
