@@ -18,7 +18,7 @@
           class="elevation-1"
         >
           <template v-slot:item="{ item }">
-            <tr>
+            <tr @click="viewLetter(item)">
               <td>{{ item.letter.name }}</td>
               <td class="text-xs-right">{{ item.survey.qualtricsName }}</td>
               <td class="text-xs-right">
@@ -33,9 +33,6 @@
                 <span v-if="item.isActive">
                   <v-icon color="success">mdi-check-circle</v-icon>
                 </span>
-              </td>
-              <td class="text-xs-right">
-                <v-btn text v-on:click="viewLetter(item)">View</v-btn>
               </td>
             </tr>
           </template>
@@ -72,8 +69,7 @@ export default Vue.extend({
         { text: "Survey", value: "surveyTitle" },
         { text: "Last Update", value: "lastUpdate" },
         { text: "Frozen?", value: "isFrozen" },
-        { text: "Active?", value: "isActive" },
-        { text: "Action", sortable: false }
+        { text: "Active?", value: "isActive" }
       ]
     };
   },

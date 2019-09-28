@@ -4,7 +4,9 @@ import {
   SurveyDimensionResolver,
   SurveyIndexResolver,
   SurveyItemResolver,
-  SurveyResolver
+  SurveyItemResponseResolver,
+  SurveyResolver,
+  SurveyResponseResolver
 } from "./survey.resolvers";
 import { SurveyService } from "./survey.service";
 import {
@@ -35,6 +37,8 @@ import { WhichItems } from "./survey.types";
     SurveyService,
     SurveyResolver,
     SurveyDimensionResolver,
+    SurveyResponseResolver,
+    SurveyItemResponseResolver,
     SurveyIndexResolver,
     SurveyItemResolver
   ]

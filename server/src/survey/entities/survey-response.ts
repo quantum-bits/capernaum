@@ -7,6 +7,7 @@ import { SurveyItemResponse } from "./survey-item-response";
 @Entity()
 @ObjectType({ description: "One user's response to a survey" })
 export class SurveyResponse extends AbstractEntity {
+  @Column("int") surveyId;
   @ManyToOne(type => Survey, survey => survey.surveyItems)
   @Field(type => Survey)
   survey: Survey;

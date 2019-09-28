@@ -94,6 +94,11 @@ export default Vue.extend({
         ]
       },
       {
+        title: "Responses",
+        route: "responses",
+        icon: "mdi-message-outline"
+      },
+      {
         title: "Letters",
         route: "letters",
         icon: "mdi-email",

@@ -19,12 +19,16 @@ import {
   SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
+  SurveyItemResponse,
+  SurveyResponse,
   SurveyUpdateInput
 } from "./entities";
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { WhichItems } from "./survey.types";
+import { string } from "@oclif/command/lib/flags";
+import { QualtricsSurveyResponse } from "../qualtrics/qualtrics.types";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -161,6 +165,72 @@ export class SurveyResolver {
   }
 }
 
+@Resolver(of => SurveyItemResponse)
+export class SurveyItemResponseResolver {
+  constructor(private readonly surveyService: SurveyService) {}
+
+  @ResolveProperty("surveyItem", type => SurveyItem)
+  resolveSurveyItem(@Parent() surveyItemResponse: SurveyItemResponse) {
+    return this.surveyService.findOneOrFail(
+      SurveyItem,
+      surveyItemResponse.surveyItemId
+    );
+  }
+}
+
+@Resolver(of => SurveyResponse)
+export class SurveyResponseResolver {
+  constructor(
+    private readonly surveyService: SurveyService,
+    private readonly qualtricsService: QualtricsService
+  ) {}
+
+  @Query(returns => SurveyResponse)
+  surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyService.readOne(SurveyResponse, id);
+  }
+
+  @Query(returns => [SurveyResponse])
+  surveyResponses() {
+    return this.surveyService.readAll(SurveyResponse);
+  }
+
+  @ResolveProperty("survey", type => Survey)
+  resolveSurvey(@Parent() surveyResponse: SurveyResponse) {
+    return this.surveyService.findOneOrFail(Survey, surveyResponse.surveyId);
+  }
+
+  @Mutation(returns => [SurveyResponse], {
+    description: "Fetch responses to a survey"
+  })
+  async importQualtricsSurveyResponses(
+    @Args("qualtricsId") qualtricsId: string
+  ) {
+    const survey = await this.surveyService.find(Survey, { qualtricsId });
+
+    const zipFileEntries = await this.qualtricsService.getResponses(
+      qualtricsId
+    );
+    const allResponses = JSON.parse(zipFileEntries[0].content).responses;
+
+    const responses: SurveyResponse[] = [];
+    for (const oneResponse of allResponses) {
+      const response = await this.surveyService.importQualtricsSurveyResponse(
+        survey[0].id,
+        oneResponse
+      );
+      responses.push(response);
+    }
+
+    return responses;
+  }
+
+  @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
+  resolveSurveyItemResponses(@Parent() surveyResponse: SurveyResponse) {
+    return this.surveyService.find(SurveyItemResponse, { surveyResponse });
+  }
+}
+
 @Resolver(of => SurveyDimension)
 export class SurveyDimensionResolver {
   constructor(private readonly surveyService: SurveyService) {}
@@ -201,11 +271,11 @@ export class SurveyIndexResolver {
 @Resolver(of => SurveyItem)
 export class SurveyItemResolver {
   constructor(private readonly surveyService: SurveyService) {}
+
   @ResolveProperty(type => SurveyIndex, {
     description: "Index associated with this item (if any)"
   })
   surveyIndex(@Parent() surveyItem: SurveyItem) {
-    console.log("SURVEY ITEM", surveyItem);
     if (surveyItem && surveyItem.surveyIndexId) {
       return this.surveyService.readOne(SurveyIndex, surveyItem.surveyIndexId);
     } else {

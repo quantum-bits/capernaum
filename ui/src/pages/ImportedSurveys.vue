@@ -90,8 +90,6 @@ export default Vue.extend({
     }
   },
 
-  computed: {},
-
   mounted() {
     console.log("mounted....");
     this.surveys

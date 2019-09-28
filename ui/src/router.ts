@@ -62,6 +62,11 @@ export default new Router({
       path: "/about-even-more",
       name: "about-even-more",
       component: () => import("./pages/About.vue")
+    },
+    {
+      path: "/responses",
+      name: "responses",
+      component: () => import("./pages/Responses.vue")
     }
   ]
 });

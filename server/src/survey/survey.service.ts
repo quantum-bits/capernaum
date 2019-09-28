@@ -89,35 +89,6 @@ export class SurveyService extends BaseService {
     });
   }
 
-  async createSurveyResponse(
-    surveyId: number,
-    createInput: QualtricsSurveyResponse
-  ) {
-    return this.entityManager.transaction(async manager => {
-      const survey = manager.findOneOrFail(Survey, surveyId, {
-        relations: ["surveyItems"]
-      });
-
-      const newSurveyResponse = await this.surveyResponseRepo.save(
-        this.surveyResponseRepo.create({
-          email: createInput.values["QID2_TEXT"] || "??",
-          groupCode: createInput.values["QID3_TEXT"] || "??",
-          qualtricsResponseId: createInput.responseId || "??",
-          startDate: createInput.values["startDate"] || "??",
-          endDate: createInput.values["endDate"] || "??",
-          recordedDate: createInput.values["recordedDate"] || "??",
-          status: parseInt(createInput.values["status"]) || -1,
-          ipAddress: createInput.values["ipAddress"] || "??",
-          progress: parseInt(createInput.values["progress"]) || -1,
-          duration: parseInt(createInput.values["duration"]) || -1,
-          finished: parseInt(createInput.values["finished"]) || -1,
-          latitude: createInput.values["locationLatitude"] || "??",
-          longitude: createInput.values["locationLongitude"] || "??"
-        })
-      );
-    });
-  }
-
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
     const where = { survey };
 
@@ -296,5 +267,55 @@ export class SurveyService extends BaseService {
       surveyItems: newSurveyItems
     });
     return this.surveyRepo.save(newSurvey);
+  }
+
+  async importQualtricsSurveyResponse(
+    surveyId: number,
+    createInput: QualtricsSurveyResponse
+  ) {
+    return this.entityManager.transaction(async manager => {
+      const survey = await manager.findOneOrFail(Survey, surveyId, {
+        relations: ["surveyItems"]
+      });
+
+      const newSurveyResponse = await this.surveyResponseRepo.save(
+        this.surveyResponseRepo.create({
+          survey,
+          email: createInput.values["QID2_TEXT"] || "??",
+          groupCode: createInput.values["QID3_TEXT"] || "??",
+          qualtricsResponseId: createInput.responseId || "??",
+          startDate: createInput.values["startDate"] || "??",
+          endDate: createInput.values["endDate"] || "??",
+          recordedDate: createInput.values["recordedDate"] || "??",
+          status: parseInt(createInput.values["status"]) || -1,
+          ipAddress: createInput.values["ipAddress"] || "??",
+          progress: parseInt(createInput.values["progress"]) || -1,
+          duration: parseInt(createInput.values["duration"]) || -1,
+          finished: parseInt(createInput.values["finished"]) || -1,
+          latitude: createInput.values["locationLatitude"] || "??",
+          longitude: createInput.values["locationLongitude"] || "??"
+        })
+      );
+
+      const qualtricsIdToId = new Map<string, number>(
+        survey.surveyItems.map(item => [item.qualtricsId, item.id])
+      );
+
+      for (let [key, value] of Object.entries(createInput.values)) {
+        if (key.startsWith("QID") && qualtricsIdToId.has(key)) {
+          const label = createInput.labels[key];
+          await this.surveyItemResponseRepo.save(
+            this.surveyItemResponseRepo.create({
+              surveyResponse: newSurveyResponse,
+              surveyItemId: qualtricsIdToId.get(key),
+              label: label,
+              value: parseInt(value)
+            })
+          );
+        }
+      }
+
+      return newSurveyResponse;
+    });
   }
 }
