@@ -12,13 +12,16 @@ import {
   SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
+  SurveyItemResponse,
+  SurveyResponse,
   SurveyUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, IsNull, Not, Repository } from "typeorm";
 import {
   QualtricsQuestion,
-  QualtricsSurvey
+  QualtricsSurvey,
+  QualtricsSurveyResponse
 } from "../qualtrics/qualtrics.types";
 import { assign, difference, pick } from "lodash";
 import { WhichItems } from "./survey.types";
@@ -28,14 +31,17 @@ import { BaseService } from "../shared/base.service";
 export class SurveyService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
-    @InjectRepository(Survey)
-    private readonly surveyRepo: Repository<Survey>,
+    @InjectRepository(Survey) private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
     private readonly surveyDimensionRepo: Repository<SurveyDimension>,
     @InjectRepository(SurveyIndex)
     private readonly surveyIndexRepo: Repository<SurveyIndex>,
     @InjectRepository(SurveyItem)
-    private readonly surveyItemRepo: Repository<SurveyItem>
+    private readonly surveyItemRepo: Repository<SurveyItem>,
+    @InjectRepository(SurveyResponse)
+    private readonly surveyResponseRepo: Repository<SurveyResponse>,
+    @InjectRepository(SurveyItemResponse)
+    private readonly surveyItemResponseRepo: Repository<SurveyItemResponse>
   ) {
     super(entityManager);
   }
@@ -83,6 +89,35 @@ export class SurveyService extends BaseService {
     });
   }
 
+  async createSurveyResponse(
+    surveyId: number,
+    createInput: QualtricsSurveyResponse
+  ) {
+    return this.entityManager.transaction(async manager => {
+      const survey = manager.findOneOrFail(Survey, surveyId, {
+        relations: ["surveyItems"]
+      });
+
+      const newSurveyResponse = await this.surveyResponseRepo.save(
+        this.surveyResponseRepo.create({
+          email: createInput.values["QID2_TEXT"] || "??",
+          groupCode: createInput.values["QID3_TEXT"] || "??",
+          qualtricsResponseId: createInput.responseId || "??",
+          startDate: createInput.values["startDate"] || "??",
+          endDate: createInput.values["endDate"] || "??",
+          recordedDate: createInput.values["recordedDate"] || "??",
+          status: parseInt(createInput.values["status"]) || -1,
+          ipAddress: createInput.values["ipAddress"] || "??",
+          progress: parseInt(createInput.values["progress"]) || -1,
+          duration: parseInt(createInput.values["duration"]) || -1,
+          finished: parseInt(createInput.values["finished"]) || -1,
+          latitude: createInput.values["locationLatitude"] || "??",
+          longitude: createInput.values["locationLongitude"] || "??"
+        })
+      );
+    });
+  }
+
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
     const where = { survey };
 
@@ -97,8 +132,6 @@ export class SurveyService extends BaseService {
         where["surveyIndexId"] = IsNull();
         break;
     }
-
-    console.log("WHERE", where);
 
     return this.surveyItemRepo.find({
       where,

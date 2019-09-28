@@ -1,7 +1,6 @@
 import { Args, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
 import { QualtricsSurveyListItem } from "./qualtrics.entities";
-import { Field } from "type-graphql";
 
 @Resolver()
 export class QualtricsResolver {

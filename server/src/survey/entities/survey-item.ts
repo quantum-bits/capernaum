@@ -1,8 +1,9 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { SurveyIndex } from "./survey-index";
 import { Survey } from "./survey";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { SurveyItemResponse } from "./survey-item-response";
 
 @Entity()
 @ObjectType({ description: "One item (question) from a survey" })
@@ -18,6 +19,13 @@ export class SurveyItem extends AbstractEntity {
   surveyIndex: SurveyIndex;
   @Column("integer", { nullable: true })
   surveyIndexId: number;
+
+  @OneToMany(
+    type => SurveyItemResponse,
+    surveyItemResponse => surveyItemResponse.surveyItem
+  )
+  @Field(type => [SurveyItemResponse])
+  surveyItemResponses: SurveyItemResponse[];
 
   @Column("integer", { default: -1 })
   @Field(type => Int, {

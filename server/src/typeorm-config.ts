@@ -11,7 +11,9 @@ import {
   Survey,
   SurveyDimension,
   SurveyIndex,
-  SurveyItem
+  SurveyItem,
+  SurveyItemResponse,
+  SurveyResponse
 } from "./survey/entities";
 import {
   PredictionTable,
@@ -33,6 +35,8 @@ const options: ConnectionOptions = {
     LetterElementType,
     SurveyDimension,
     SurveyLetter,
+    SurveyResponse,
+    SurveyItemResponse,
     Survey,
     SurveyIndex,
     SurveyItem,

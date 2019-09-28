@@ -290,6 +290,7 @@ type SurveyItem {
   id: Int!
   survey: Survey!
   surveyIndex: SurveyIndex
+  surveyItemResponses: [SurveyItemResponse!]!
 
   """Sequence number; items will be displayed in this order"""
   sequence: Int!
@@ -307,6 +308,16 @@ input SurveyItemCreateInput {
   qualtricsText: String!
 }
 
+"""One user's response to a single survey question"""
+type SurveyItemResponse {
+  """Unique ID for this entity"""
+  id: Int!
+  surveyResponse: SurveyResponse!
+  surveyItem: SurveyItem!
+  label: String!
+  value: Int!
+}
+
 type SurveyLetter {
   """Unique ID for this entity"""
   id: Int!
@@ -315,6 +326,27 @@ type SurveyLetter {
   letter: Letter!
   isActive: Boolean!
   isFrozen: Boolean!
+}
+
+"""One user's response to a survey"""
+type SurveyResponse {
+  """Unique ID for this entity"""
+  id: Int!
+  survey: Survey!
+  surveyItemResponses: [SurveyItemResponse!]!
+  email: String!
+  groupCode: String!
+  qualtricsResponseId: String!
+  startDate: String!
+  endDate: String!
+  recordedDate: String!
+  status: Int!
+  progress: Int!
+  duration: Int!
+  finished: Int!
+  ipAddress: String!
+  latitude: String!
+  longitude: String!
 }
 
 input SurveyUpdateInput {

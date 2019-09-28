@@ -88,9 +88,14 @@ export default class ResponseCommand extends Command {
         break;
 
       case SubCommand.Complete:
+        // Get responses in the date range.
+        // Encoded as a ZipFileEntry[]
+        // Grab the first (should be only?) ZipFileEntry (response[0])
         api
           .getResponses(args.surveyId, flags.startDate, flags.endDate)
-          .then(entries => console.log("ENTRIES", entries))
+          .then(response => response[0].content)
+          .then(zipFileEntry => JSON.parse(zipFileEntry))
+          .then(jsonData => console.log(JSON.stringify(jsonData, null, 2)))
           .catch(err => this.error(err));
         break;
     }

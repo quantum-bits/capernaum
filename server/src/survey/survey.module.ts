@@ -2,12 +2,19 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   SurveyDimensionResolver,
-  SurveyResolver,
   SurveyIndexResolver,
-  SurveyItemResolver
+  SurveyItemResolver,
+  SurveyResolver
 } from "./survey.resolvers";
 import { SurveyService } from "./survey.service";
-import { Survey, SurveyDimension, SurveyIndex, SurveyItem } from "./entities";
+import {
+  Survey,
+  SurveyDimension,
+  SurveyIndex,
+  SurveyItem,
+  SurveyResponse,
+  SurveyItemResponse
+} from "./entities";
 import { QualtricsModule } from "../qualtrics/qualtrics.module";
 import { registerEnumType } from "type-graphql";
 import { WhichItems } from "./survey.types";
@@ -18,6 +25,8 @@ import { WhichItems } from "./survey.types";
       Survey,
       SurveyIndex,
       SurveyDimension,
+      SurveyResponse,
+      SurveyItemResponse,
       SurveyItem
     ]),
     QualtricsModule
