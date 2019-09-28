@@ -44,10 +44,7 @@ import axios from "axios";
 import { AxiosResponse } from "axios";
 import Delta from "quill-delta";
 
-import {
-  LetterElementType,
-  LetterElementEnum
-} from "../pages/letter-element.types";
+import { LetterElementType, LetterElementEnum } from "../types/letter.types";
 
 @Component({})
 export default class StaticLetterElement extends Vue {

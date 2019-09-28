@@ -1,21 +1,19 @@
 <template>
   <v-container>
-    <v-layout v-if="letterExistsAndIsFrozen()" class="mb-3">
+    <v-layout v-if="letterExistsAndIsFrozen" class="mb-3">
       <v-flex xs10 offset-xs1>
         <v-alert :value="true" type="info">
           Note that this letter has been frozen -- it is no longer editable.
         </v-alert>
       </v-flex>
     </v-layout>
-    <div v-if="letterExistsAndEditModeOff()">
+    <div v-if="letterExistsAndEditModeOff">
       <v-layout row wrap>
         <v-flex xs7 offset-xs1>
           <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
-            <span class="font-weight-light">{{
-              surveyLetter.letter.name
-            }}</span>
+            <span class="font-weight-light">{{ letter.name }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
@@ -34,19 +32,17 @@
           </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
-            <span class="font-weight-light">{{
-              surveyLetter.letter.updated
-            }}</span>
+            <span class="font-weight-light">{{ letter.updated }}</span>
           </h2>
         </v-flex>
-        <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
+        <v-flex v-if="!surveyLetterIsFrozen" xs3 class="text-xs-right">
           <v-btn color="primary" dark @click="toggleEditMode">
             Edit
           </v-btn>
         </v-flex>
       </v-layout>
     </div>
-    <div v-if="letterExistsAndEditModeOn()">
+    <div v-if="letterExistsAndEditModeOn">
       <LetterInfoForm
         :id="id"
         :initialTitle="letter.name"
@@ -67,9 +63,9 @@
           View PDF
         </v-btn>
         <LetterElementMenu
-          v-if="!isFrozen"
-          offset-y
+          v-if="!surveyLetterIsFrozen"
           @click="addElement($event)"
+          offset-y
         />
       </v-flex>
 
@@ -77,7 +73,7 @@
         <!-- https://www.youtube.com/watch?v=Y3S7KShrRX0 -->
         <div
           class="form-group ma-4"
-          v-for="(element, index) in surveyLetter.letter.elements"
+          v-for="(element, index) in surveyLetterElements"
           :key="element.id"
         >
           <component
@@ -86,10 +82,10 @@
             :order="element.sequence"
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
-            :numItems="letterElements.length"
+            :numItems="surveyLetterElements.length"
             :letterElementKey="element.letterElementType.key"
             :description="element.letterElementType.description"
-            :parentIsFrozen="isFrozen"
+            :parentIsFrozen="surveyLetterIsFrozen"
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
             v-on:delete-element="deleteElement(index)"
@@ -99,7 +95,7 @@
 
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <v-btn
-          v-if="letterElements.length > 0"
+          v-if="surveyLetterElements.length > 0"
           color="primary"
           dark
           @click="viewPDF"
@@ -107,27 +103,27 @@
           View PDF
         </v-btn>
         <LetterElementMenu
-          v-if="letterElements.length > 0 && !isFrozen"
+          v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
           @click="addElement($event)"
           offset-y
         />
       </v-flex>
     </v-layout>
     <!--
-                Next:
-                    - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-                    - might need to update the db every time a change is made (to the order, too)
-        
-                    - ordering within categories for letters (order by survey, and then more ordering below this level)
-        
-        
-                    - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-        
-                    - if the letter contains the "SE strategies for user" element, and the boolean association
-                    table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-                    the user should get a warning message or something)
-        
-            -->
+                    Next:
+                        - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+                        - might need to update the db every time a change is made (to the order, too)
+            
+                        - ordering within categories for letters (order by survey, and then more ordering below this level)
+            
+            
+                        - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+            
+                        - if the letter contains the "SE strategies for user" element, and the boolean association
+                        table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+                        the user should get a warning message or something)
+            
+                -->
   </v-container>
 </template>
 
@@ -137,23 +133,15 @@ import { Component, Vue } from "vue-property-decorator";
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
-import orderBy from "lodash/orderBy";
 
 import {
-  Letter,
   LetterElement,
   LetterElementEnum,
-  LetterElementType
-} from "./letter-element.types";
-import { BooleanAssociationBriefType } from "./association-table.types";
+  SurveyLetter
+} from "../types/letter.types";
+import { BooleanAssociationBriefType } from "../types/association-table.types";
 import { ONE_SURVEY_LETTER_QUERY } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
-
-// brief format, for data returned from the db
-interface SurveyTypeBrief {
-  id: number | null;
-  title: string;
-}
 
 @Component({
   components: {
@@ -167,31 +155,15 @@ interface SurveyTypeBrief {
       query: ONE_SURVEY_LETTER_QUERY,
       variables() {
         return {
-          id: this.$route.params.id
+          id: parseInt(this.$route.params.id)
         };
       },
       update(data: any) {
-        console.log("DATA", data);
-        let localElements: LetterElement[] = [];
-        data.letter.elements.forEach((element: any) => {
-          localElements.push(element);
-        });
-        this.letterElements = orderBy(localElements, "order");
-
-        for (let box of this.letterElements) {
+        for (let box of data.surveyLetter.letter.elements) {
           box.editModeOn = false;
           box.isNew = false;
         }
-        this.resetOrderProperty();
-        this.survey = {
-          id: data.survey.id,
-          title: data.survey.qualtricsName
-        };
-        this.lastUpdate = data.updated;
-        this.id = data.id;
-        this.isFrozen = data.isFrozen;
-        this.booleanAssociation = data.booleanAssociation;
-        return data;
+        return data.surveyLetter;
       },
       skip() {
         return this.$route.params.id === undefined;
@@ -229,21 +201,31 @@ interface SurveyTypeBrief {
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
-  survey: SurveyTypeBrief = {
-    id: null,
-    title: ""
-  };
 
-  letter: Letter | null = null;
-
-  lastUpdate: string = "";
-  id: number | null = null;
-  letterElements: LetterElement[] = [];
-  letterElementTypes: LetterElementType[] = [];
-  isFrozen: boolean = false;
+  surveyLetter: SurveyLetter | null = null;
   booleanAssociation: BooleanAssociationBriefType | null = null;
 
-  letterExistsAndIsFrozen() {
+  get letter() {
+    if (this.surveyLetter) {
+      return this.surveyLetter.letter;
+    } else {
+      throw Error("Survey letter not yet defined.");
+    }
+  }
+
+  get surveyLetterElements() {
+    if (this.surveyLetter) {
+      return this.surveyLetter.letter.elements;
+    } else {
+      return [];
+    }
+  }
+
+  get surveyLetterIsFrozen() {
+    return this.surveyLetter && this.surveyLetter.isFrozen;
+  }
+
+  get letterExistsAndIsFrozen() {
     if (this.surveyLetter !== null) {
       return this.surveyLetter.isFrozen;
     } else {
@@ -252,71 +234,70 @@ export default class Compose extends Vue {
     // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
   }
 
-  letterExistsAndEditModeOff() {
-    if (this.letter !== null) {
+  get letterExistsAndEditModeOff() {
+    if (this.surveyLetter !== null) {
       return !this.editModeOn;
     } else {
       return false;
     }
   }
 
-  letterExistsAndEditModeOn() {
-    if (this.letter !== null) {
+  get letterExistsAndEditModeOn() {
+    if (this.surveyLetter !== null) {
       return this.editModeOn;
     } else {
       return false;
     }
   }
 
+  // Move code from
+  //   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
+
   moveUp(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log("move up!", index);
-    let element: LetterElement = this.letterElements[index];
-    this.letterElements.splice(index, 1);
-    this.letterElements.splice(index - 1, 0, element);
-    this.resetOrderProperty();
-    console.log(this.letterElements);
+    const letterElements = this.surveyLetterElements;
+    let element: LetterElement = letterElements[index];
+    letterElements.splice(index, 1);
+    letterElements.splice(index - 1, 0, element);
+    this.resetSequenceProperty();
+    console.log(letterElements);
   }
 
   moveDown(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log("move down!", index);
-    let element: LetterElement = this.letterElements[index + 1];
-    this.letterElements.splice(index + 1, 1);
-    this.letterElements.splice(index, 0, element);
-    this.resetOrderProperty();
-    console.log(this.letterElements);
+    const letterElements = this.surveyLetterElements;
+    let element: LetterElement = letterElements[index + 1];
+    letterElements.splice(index + 1, 1);
+    letterElements.splice(index, 0, element);
+    this.resetSequenceProperty();
+    console.log(letterElements);
   }
 
   deleteElement(index: number) {
-    //https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-    console.log("delete!", index);
-    this.letterElements.splice(index, 1);
-    this.resetOrderProperty();
-    console.log(this.letterElements);
+    const letterElements = this.surveyLetterElements;
+    letterElements.splice(index, 1);
+    this.resetSequenceProperty();
+    console.log(letterElements);
   }
 
-  resetOrderProperty() {
-    // cycles through the elements array and resets the 'order' property to reflect the current ordering of the text boxes
-    for (let i = 0; i < this.letterElements.length; i++) {
-      this.letterElements[i].order = i;
-    }
+  resetSequenceProperty() {
+    // cycles through the elements array and resets the 'order' property to reflect
+    // the current ordering of the text boxes
+    this.surveyLetterElements.forEach((elt, idx) => (elt.sequence = idx));
   }
 
   addElement(key: string) {
-    console.log("add: ", key);
-    let numElements: number = this.letterElements.length;
+    const letterElements = this.surveyLetterElements;
+    let numElements: number = letterElements.length;
     let maxId: number = 0;
     // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
-    for (let box of this.letterElements) {
+    for (let box of letterElements) {
       if (box.id > maxId) {
         maxId = box.id;
       }
     }
     maxId = maxId + 1;
-    this.letterElements.push({
+    letterElements.push({
       id: maxId, //will eventually get assigned a value by the server, but use this value as a key for now....
-      order: numElements,
+      sequence: numElements,
       textDelta: {
         ops: [
           {
@@ -328,8 +309,8 @@ export default class Compose extends Vue {
       isNew: true,
       editModeOn: true
     });
-    this.resetOrderProperty();
-    console.log(this.letterElements);
+    this.resetSequenceProperty();
+    console.log(letterElements);
   }
 
   itemDisabled(key: string) {
@@ -363,7 +344,6 @@ export default class Compose extends Vue {
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
-    console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
       this.editModeOn = true;
@@ -385,7 +365,7 @@ export default class Compose extends Vue {
     //         box.editModeOn = false;
     //         box.isNew = false;
     //       }
-    //       this.resetOrderProperty();
+    //       this.resetSequenceProperty();
     //       this.survey = {
     //         id: response.data.survey.id,
     //         title: response.data.survey.title

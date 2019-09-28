@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Letter, LetterElementType, LetterUpdateInput } from "./entities";
+import {
+  Letter,
+  LetterElement,
+  LetterElementType,
+  LetterUpdateInput
+} from "./entities";
 import { EntityManager, Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 
@@ -9,34 +14,51 @@ export class LetterService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
     @InjectRepository(Letter)
-    private readonly letterRepository: Repository<Letter>,
+    private readonly letterRepo: Repository<Letter>,
+    @InjectRepository(LetterElement)
+    private readonly letterElementRepo: Repository<LetterElement>,
     @InjectRepository(LetterElementType)
-    private readonly letterElementTypeRepository: Repository<LetterElementType>
+    private readonly letterElementTypeRepo: Repository<LetterElementType>
   ) {
     super(entityManager);
   }
 
   createLetter(name: string) {
-    const newLetter = this.letterRepository.create({ name });
-    return this.letterRepository.save(newLetter);
+    const newLetter = this.letterRepo.create({ name });
+    return this.letterRepo.save(newLetter);
+  }
+
+  letterElementTypes() {
+    return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
+  }
+
+  /**
+   * Return elements of letter in sequence order.
+   * @param letter
+   */
+  letterElements(letter: Letter) {
+    return this.letterElementRepo.find({
+      where: { letter },
+      order: { sequence: "ASC" }
+    });
   }
 
   async updateLetter(letterData: LetterUpdateInput) {
-    const letter = await this.letterRepository.findOne(letterData.id);
+    const letter = await this.letterRepo.findOne(letterData.id);
     if (letterData.isFrozen !== undefined) {
       letter.isFrozen = letterData.isFrozen;
     }
     if (letterData.name !== undefined) {
       letter.name = letterData.name;
     }
-    return this.letterRepository.save(letter);
+    return this.letterRepo.save(letter);
   }
 
   createLetterElementType(key: string, description: string) {
-    const newLetterElementType = this.letterElementTypeRepository.create({
+    const newLetterElementType = this.letterElementTypeRepo.create({
       key,
       description
     });
-    return this.letterElementTypeRepository.save(newLetterElementType);
+    return this.letterElementTypeRepo.save(newLetterElementType);
   }
 }

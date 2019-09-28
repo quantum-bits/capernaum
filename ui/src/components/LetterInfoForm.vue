@@ -47,7 +47,7 @@ import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
-import { BooleanAssociationBriefType } from "@/pages/association-table.types";
+import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";

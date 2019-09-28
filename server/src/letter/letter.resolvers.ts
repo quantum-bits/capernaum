@@ -58,7 +58,6 @@ export class LetterElementResolver {
 
   @ResolveProperty("letterElementType", type => LetterElementType)
   resolveLetterElementType(@Parent() letterElement: LetterElement) {
-    console.log("LETTER ELEMENT", letterElement);
     return this.letterService.findOneOrFail(
       LetterElementType,
       letterElement.letterElementTypeId
@@ -98,7 +97,7 @@ export class LetterResolver {
 
   @ResolveProperty("elements", type => [LetterElement])
   resolveElements(@Parent() letter: Letter) {
-    return this.letterService.find(LetterElement, { letter });
+    return this.letterService.letterElements(letter);
   }
 }
 
@@ -108,8 +107,6 @@ export class LetterElementTypeResolver {
 
   @Query(returns => [LetterElementType])
   letterElementTypes() {
-    return this.letterService.readAll(LetterElementType, {
-      description: "ASC"
-    });
+    return this.letterService.letterElementTypes();
   }
 }

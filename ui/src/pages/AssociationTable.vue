@@ -141,7 +141,7 @@ import {
   TableData,
   SpiritualFocusOrientation,
   AssociationTableHeader
-} from "./association-table.types";
+} from "../types/association-table.types";
 
 @Component({
   components: { AssociationTableInfoForm }

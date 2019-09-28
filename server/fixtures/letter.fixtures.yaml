@@ -65,5 +65,5 @@ fixtures:
         survey: ^survey.christian-life-survey
         predictionTable: ^prediction_table.christian-life-survey
         letter: ^letter.abide-letter
-        isActive: true
+        isActive: false
         isFrozen: false

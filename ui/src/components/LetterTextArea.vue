@@ -51,7 +51,7 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import axios, { AxiosResponse } from "axios";
 
-import { LetterElementType } from "@/pages/letter-element.types";
+import { LetterElementType } from "@/types/letter.types";
 import Delta from "quill-delta/dist/Delta";
 import Quill from "quill";
 
