@@ -161,44 +161,79 @@
             <template v-slot:label="{ item }">
               <div v-html="item.name"></div>
             </template>
-
             <template v-slot:prepend="{ item, open }">
               <v-icon v-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
                 {{ "mdi-comment-outline" }}
               </v-icon>
             </template>
-
             <template v-slot:append="{ item, open }">
               <span v-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
-                <a @click="editIndex(item)">
-                  <v-icon>
-                    {{ "mdi-pencil" }}
-                  </v-icon>
-                </a>
-                <a @click="deleteIndex(item)">
-                  <v-icon>
-                    {{ "mdi-close-circle" }}
-                  </v-icon>
-                </a>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="editIndex(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-pencil" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >Edit this survey index and/or update the associations to
+                    survey items.</span
+                  >
+                </v-tooltip>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="deleteIndex(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-close-circle" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >Delete this survey index and the associations to survey
+                    items.</span
+                  >
+                </v-tooltip>
               </span>
               <span
                 v-else-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION"
               >
-                <a @click="addSurveyIndex(item)">
-                  <v-icon>
-                    {{ "mdi-plus-circle" }}
-                  </v-icon>
-                </a>
-                <a @click="editSurveyDimension(item)">
-                  <v-icon>
-                    {{ "mdi-pencil" }}
-                  </v-icon>
-                </a>
-                <a @click="deleteDimension(item)">
-                  <v-icon>
-                    {{ "mdi-close-circle" }}
-                  </v-icon>
-                </a>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="addSurveyIndex(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-plus-circle" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >Add a new survey index for this survey dimension.</span
+                  >
+                </v-tooltip>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="editSurveyDimension(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-pencil" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >Edit this survey dimension.</span
+                  >
+                </v-tooltip>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="deleteDimension(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-close-circle" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >Delete this survey dimension and all associated survey indexes.</span
+                  >
+                </v-tooltip>
               </span>
             </template>
           </v-treeview>
