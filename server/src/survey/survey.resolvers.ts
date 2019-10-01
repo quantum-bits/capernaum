@@ -207,6 +207,7 @@ export class SurveyResponseResolver {
     @Args("qualtricsId") qualtricsId: string
   ) {
     const survey = await this.surveyService.find(Survey, { qualtricsId });
+    console.log("SURVEY", survey);
 
     const zipFileEntries = await this.qualtricsService.getResponses(
       qualtricsId

@@ -31,3 +31,15 @@ export const ONE_RESPONSE_DETAIL_QUERY = gql`
     }
   }
 `;
+
+export const RESPONSES_TO_ONE_SURVEY_MUTATION = gql`
+  mutation ImportSurveyResponses($qId: String!) {
+    importQualtricsSurveyResponses(qualtricsId: $qId) {
+      duration
+      email
+      qualtricsResponseId
+      startDate
+      endDate
+    }
+  }
+`;

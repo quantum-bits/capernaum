@@ -9,16 +9,7 @@
       </v-flex>
       <v-flex xs7 offset-xs1>
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-select
-            v-model="surveySelect"
-            :items="selections"
-            :rules="[v => !!v || 'A survey must be selected']"
-            label="Qualtrics Survey"
-            required
-            persistent-hint
-            return-object
-            single-line
-          />
+          <QualtricsSurveyMenu v-model="selectedSurvey" />
 
           <v-text-field
             v-model="title"
@@ -51,35 +42,24 @@
 <script lang="ts">
 import Vue from "vue";
 
-import {
-  IMPORT_QUALTRICS_SURVEY,
-  ALL_QUALTRICS_SURVEYS_QUERY
-} from "@/graphql/surveys.graphql";
+import { IMPORT_QUALTRICS_SURVEY } from "@/graphql/surveys.graphql";
 
-import {
-  SurveyItem,
-  SurveySelection,
-  //SurveyDimensionEnum,
-  QualtricsSurvey,
-  QualtricsSurveySelection
-} from "./survey.types";
+import { QualtricsSurvey, QualtricsSurveySelection } from "./survey.types";
+import QualtricsSurveyMenu from "@/components/QualtricsSurveyMenu.vue";
 
 export default Vue.extend({
   /** page to choose a Qualtrics survey so that it can be downloaded */
   name: "ImportQualtricsSurvey",
 
-  props: {},
+  components: { QualtricsSurveyMenu },
 
   data() {
     return {
       qualtricsSurveys: [] as QualtricsSurvey[],
+      selectedSurvey: {} as QualtricsSurveySelection,
       title: "" as string,
       valid: true,
       serverError: false,
-      //FIXME: make surveySelect of the appropriate type
-      surveySelect: null as any,
-      //select: null as any,
-      //name: "",
       titleRules: [
         (v: any) => !!v || "Title is required",
         (v: any) =>
@@ -97,14 +77,13 @@ export default Vue.extend({
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("title is: ", this.title);
-        console.log("selected survey: ", this.surveySelect); //this.surveySelect.value
 
         this.$apollo
           .mutate({
             mutation: IMPORT_QUALTRICS_SURVEY,
             variables: {
               qualtricsImportInput: {
-                qualtricsId: this.surveySelect.value,
+                qualtricsId: this.selectedSurvey.value,
                 title: this.title
               }
             }
@@ -122,25 +101,6 @@ export default Vue.extend({
           });
       }
     }
-  },
-
-  apollo: {
-    qualtricsSurveys: {
-      query: ALL_QUALTRICS_SURVEYS_QUERY
-    }
-  },
-
-  computed: {
-    selections(): QualtricsSurveySelection[] {
-      return this.qualtricsSurveys.map(survey => ({
-        text: survey.qualtricsName,
-        value: survey.qualtricsId
-      }));
-    }
-  },
-
-  mounted() {
-    console.log("mounted....");
   }
 });
 </script>
