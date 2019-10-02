@@ -15,19 +15,25 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_QUALTRICS_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { QualtricsSurveySelection } from "@/pages/survey.types";
-
-export interface QualtricsSurveyListItem {
-  qualtricsId: string;
-  qualtricsName: string;
-}
+import {
+  QualtricsSurvey,
+  QualtricsSurveySelection
+} from "@/pages/survey.types";
 
 export default Vue.extend({
+  /**
+   * Present a select list containing active Qualtrics surveys.
+   * Emits an object containing the
+   * - Qualtrics name (`text` property)
+   * - Qualtrics ID (`value` property)
+   * of the selected survey.
+   */
   name: "QualtricsSurveyMenu",
 
   apollo: {
-    qualtricsSurveys: {
-      query: ALL_QUALTRICS_SURVEYS_QUERY
+    availableQualtricsSurveys: {
+      query: ALL_QUALTRICS_SURVEYS_QUERY,
+      update: data => data.qualtricsSurveys
     }
   },
 
@@ -40,13 +46,13 @@ export default Vue.extend({
 
   data() {
     return {
-      qualtricsSurveys: [] as Array<QualtricsSurveyListItem>
+      availableQualtricsSurveys: [] as Array<QualtricsSurvey>
     };
   },
 
   computed: {
     selections(): QualtricsSurveySelection[] {
-      return this.qualtricsSurveys.map(survey => ({
+      return this.availableQualtricsSurveys.map(survey => ({
         text: survey.qualtricsName,
         value: survey.qualtricsId
       }));

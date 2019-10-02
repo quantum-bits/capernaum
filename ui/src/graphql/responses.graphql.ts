@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export const RESPONSES_SUMMARY_QUERY = gql`
+export const RESPONSE_SUMMARY_QUERY = gql`
   query ResponseSummary {
     surveyResponses {
       id
@@ -32,7 +32,7 @@ export const ONE_RESPONSE_DETAIL_QUERY = gql`
   }
 `;
 
-export const RESPONSES_TO_ONE_SURVEY_MUTATION = gql`
+export const IMPORT_SURVEY_RESPONSES = gql`
   mutation ImportSurveyResponses($qId: String!) {
     importQualtricsSurveyResponses(qualtricsId: $qId) {
       duration

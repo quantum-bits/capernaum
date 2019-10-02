@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const ONE_LETTER_QUERY = gql`
-  query oneLetter($letterId: Int!) {
+  query OneLetter($letterId: Int!) {
     letter(id: $letterId) {
       id
       name
@@ -11,7 +11,7 @@ export const ONE_LETTER_QUERY = gql`
 `;
 
 export const ALL_LETTERS_QUERY = gql`
-  query allLetters {
+  query AllLetters {
     letters {
       id
       name
@@ -23,7 +23,7 @@ export const ALL_LETTERS_QUERY = gql`
 `;
 
 export const ADD_LETTER_MUTATION = gql`
-  mutation addLetter($name: String!) {
+  mutation AddLetter($name: String!) {
     createLetter(name: $name) {
       id
       name
