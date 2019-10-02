@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row class="align-baseline">
       <v-col>Fetch Responses from Qualtrics</v-col>
       <v-col>
         <v-select
-          v-model="selectedSurvey"
-          :items="surveySelections"
+          v-model="selectedQualtricsId"
+          :items="availableSurveys"
           label="Choose imported survey"
         />
       </v-col>
@@ -19,7 +19,7 @@
         <h4>All Responses</h4>
         <v-data-table
           :headers="masterHeaders"
-          :items="responseSummaries"
+          :items="responseSummary.surveyResponses"
           class="elevation-1"
           @click:row="showDetails"
         />
@@ -49,15 +49,18 @@
 import Vue from "vue";
 import {
   ONE_RESPONSE_DETAIL_QUERY,
-  RESPONSES_SUMMARY_QUERY,
-  RESPONSES_TO_ONE_SURVEY_MUTATION
+  RESPONSE_SUMMARY_QUERY,
+  IMPORT_SURVEY_RESPONSES
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ResponseSummary } from "@/types/ResponseSummary";
 
 interface ImportedSurvey {
   id: number;
+  title: string;
   qualtricsId: string;
   qualtricsName: string;
+  qualtricsModDate: string;
 }
 
 export default Vue.extend({
@@ -68,9 +71,9 @@ export default Vue.extend({
       query: ALL_SURVEYS_QUERY
     },
 
-    responseSummaries: {
-      query: RESPONSES_SUMMARY_QUERY,
-      update: data => data.surveyResponses
+    responseSummary: {
+      query: RESPONSE_SUMMARY_QUERY,
+      update: data => data
     },
 
     responseDetails: {
@@ -90,9 +93,9 @@ export default Vue.extend({
   data() {
     return {
       surveys: [] as ImportedSurvey[],
-      selectedSurvey: {} as ImportedSurvey,
+      selectedQualtricsId: "",
 
-      responseSummaries: [],
+      responseSummary: {} as ResponseSummary,
       masterHeaders: [
         { text: "Survey", value: "survey.qualtricsName" },
         { text: "Response ID", value: "qualtricsResponseId" },
@@ -115,7 +118,7 @@ export default Vue.extend({
   },
 
   computed: {
-    surveySelections(): object {
+    availableSurveys(): object {
       return this.surveys.map(survey => ({
         text: survey.qualtricsName,
         value: survey.qualtricsId
@@ -128,21 +131,29 @@ export default Vue.extend({
       this.selectedResponse = item.id;
     },
 
-    fetchFromQualtrics() {
-      console.log("FETCH FROM QUALTRICS", this.selectedSurvey);
-      this.$apollo
-        .mutate({
-          mutation: RESPONSES_TO_ONE_SURVEY_MUTATION,
+    async fetchFromQualtrics() {
+      try {
+        console.log("IMPORT RESPONSES", this.selectedQualtricsId);
+        // Import all responses for one survey from the Qualtrics API.
+        await this.$apollo.mutate({
+          mutation: IMPORT_SURVEY_RESPONSES,
           variables: {
-            qId: this.selectedSurvey.value
-          }
-        })
-        .then(data => {
-          console.log("DATA", data);
-        })
-        .catch(err => {
-          throw err;
+            qId: this.selectedQualtricsId
+          },
+          refetchQueries: ["ResponseSummary"]
         });
+
+        // Read them in to refresh the table.
+        const queryResult = await this.$apollo.query<ResponseSummary>({
+          query: RESPONSE_SUMMARY_QUERY
+        });
+        console.log("QR", queryResult);
+        const responseSummary = queryResult.data;
+        console.log("responseSummary", responseSummary);
+        this.responseSummary = responseSummary;
+      } catch (err) {
+        throw err;
+      }
     }
   }
 });
