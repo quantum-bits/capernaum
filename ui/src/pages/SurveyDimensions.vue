@@ -206,9 +206,7 @@
                       </v-icon>
                     </a>
                   </template>
-                  <span
-                    >Add a new survey index for this survey dimension.</span
-                  >
+                  <span>Add a new survey index for this survey dimension.</span>
                 </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -218,9 +216,7 @@
                       </v-icon>
                     </a>
                   </template>
-                  <span
-                    >Edit this survey dimension.</span
-                  >
+                  <span>Edit this survey dimension.</span>
                 </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -231,7 +227,8 @@
                     </a>
                   </template>
                   <span
-                    >Delete this survey dimension and all associated survey indexes.</span
+                    >Delete this survey dimension and all associated survey
+                    indexes.</span
                   >
                 </v-tooltip>
               </span>

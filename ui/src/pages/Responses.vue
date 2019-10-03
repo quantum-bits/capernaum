@@ -53,7 +53,7 @@ import {
   IMPORT_SURVEY_RESPONSES
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { ResponseSummary } from "@/types/ResponseSummary";
+import { ResponseSummary } from "@/graphql/types/ResponseSummary";
 
 interface ImportedSurvey {
   id: number;
