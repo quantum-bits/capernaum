@@ -14,8 +14,8 @@
           <template v-slot:item="{ item }">
             <tr>
               <td>{{ item.title }}</td>
-              <td class="text-xs-right">{{ item.surveyTitle }}</td>
-              <td class="text-xs-right">{{ item.lastUpdate }}</td>
+              <td class="text-xs-right">{{ item.qualtricsName }}</td>
+              <td class="text-xs-right">{{ item.qualtricsModDate }}</td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
                   <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
@@ -40,13 +40,16 @@ import Vue from "vue";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 
-import {
-  SurveyItem,
-  SurveySelection //,
-  //SurveyDimensionEnum
-} from "./survey.types";
+//import {
+//  SurveyItem,
+//  SurveySelection //,
+//  //SurveyDimensionEnum
+//} from "./survey.types";
 
-// WORKING HERE: fix...where are the qualtrics survey titles?!?
+import {
+  Surveys
+} from "@/graphql/types/Surveys";
+
 // Next: make the divs open-able, with the questions inside(?)
 
 export default Vue.extend({
@@ -57,7 +60,7 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as SurveyItem[],
+      surveys: [] as Surveys,
       headers: [
         {
           text: "Survey Title (Local)",

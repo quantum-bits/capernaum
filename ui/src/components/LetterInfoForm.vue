@@ -68,9 +68,9 @@ interface BooleanAssociationType {
 })
 export default class LetterInfoForm extends Vue {
   /** Form to create/update Letter Info (e.g., title, etc.) */
-  @Prop() id!: number;
-  @Prop() initialTitle!: string;
-  @Prop() initialSurveyId!: number;
+  @Prop({default: null}) id!: number;
+  @Prop({default: null}) initialTitle!: string;
+  @Prop({default: null}) initialSurveyId!: number;
   @Prop({ default: null })
   initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
@@ -87,7 +87,7 @@ export default class LetterInfoForm extends Vue {
       (v && v.length <= 80) || "Title of letter must be less than 80 characters"
   ];
 
-  surveySelect: any = null;
+  surveySelect: number = this.initialSurveyId;//any = null;
   booleanAssociationSelect: any = null;
 
   submit() {

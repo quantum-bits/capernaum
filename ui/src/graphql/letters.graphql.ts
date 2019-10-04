@@ -57,6 +57,7 @@ export const ONE_SURVEY_LETTER_QUERY = gql`
         qualtricsName
       }
       letter {
+        id
         name
         updated
         elements {

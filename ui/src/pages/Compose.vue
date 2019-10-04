@@ -44,10 +44,17 @@
     </div>
     <div v-if="letterExistsAndEditModeOn">
       <LetterInfoForm
-        :id="id"
+        :id="letter.id"
         :initialTitle="letter.name"
         :initialSurveyId="survey.id"
         :initialBooleanAssociation="booleanAssociation"
+        :isNew="isNew"
+        v-on:save-info="saveInfo"
+      >
+      </LetterInfoForm>
+    </div>
+    <div v-if="letterIsNewAndEditModeOn">
+      <LetterInfoForm
         :isNew="isNew"
         v-on:save-info="saveInfo"
       >
@@ -136,9 +143,13 @@ import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import {
   LetterElement,
-  LetterElementEnum,
-  SurveyLetter
+  LetterElementEnum//,
+  //SurveyLetter
 } from "../types/letter.types";
+import {
+  SurveyLetter
+} from "@/graphql/types/SurveyLetter";
+
 import { BooleanAssociationBriefType } from "../types/association-table.types";
 import { ONE_SURVEY_LETTER_QUERY } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
@@ -221,6 +232,15 @@ export default class Compose extends Vue {
     }
   }
 
+
+  get survey() {
+    if (this.surveyLetter) {
+      return this.surveyLetter.survey;
+    } else {
+      throw Error("Survey letter not yet defined.");
+    }
+  }
+
   get surveyLetterIsFrozen() {
     return this.surveyLetter && this.surveyLetter.isFrozen;
   }
@@ -248,6 +268,10 @@ export default class Compose extends Vue {
     } else {
       return false;
     }
+  }
+
+  get letterIsNewAndEditModeOn() {
+    return this.isNew && this.editModeOn;
   }
 
   // Move code from

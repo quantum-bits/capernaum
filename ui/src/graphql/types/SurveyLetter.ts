@@ -37,6 +37,10 @@ export interface SurveyLetter_surveyLetter_letter_elements {
 
 export interface SurveyLetter_surveyLetter_letter {
   __typename: "Letter";
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   name: string;
   updated: any;
   elements: SurveyLetter_surveyLetter_letter_elements[];
