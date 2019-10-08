@@ -156,7 +156,9 @@ type Query {
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses: [SurveyResponse!]!
+  predictionTable(id: Int!): PredictionTable!
   predictionTables: [PredictionTable!]!
+  scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 

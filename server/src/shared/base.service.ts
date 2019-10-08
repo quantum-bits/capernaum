@@ -1,9 +1,20 @@
 import { EntityManager, FindConditions, ObjectType, Repository } from "typeorm";
 import { AbstractEntity } from "./abstract-entity";
 import { validate } from "class-validator";
+import { SurveyUpdateInput } from "../survey/entities";
 
 export class BaseService {
   constructor(protected readonly entityManager: EntityManager) {}
+
+  create<Entity, CreateInput>(
+    entityClass: ObjectType<Entity>,
+    createInput: CreateInput
+  ) {
+    return this.entityManager.save(
+      entityClass,
+      this.entityManager.create(entityClass, createInput)
+    );
+  }
 
   async validateAndSave(entity: AbstractEntity) {
     const errors = await validate(entity);
@@ -33,8 +44,12 @@ export class BaseService {
     return this.entityManager.find(entityClass, conditions);
   }
 
-  update<Entity>(entity: Entity) {
-    return this.entityManager.save(entity);
+  async update<Entity, UpdateInput>(
+    entityClass: ObjectType<Entity>,
+    updateInput: UpdateInput
+  ) {
+    const preload = await this.entityManager.preload(entityClass, updateInput);
+    return this.entityManager.save(entityClass, preload);
   }
 
   delete<Entity>(entityClass: ObjectType<Entity>, id: number) {
