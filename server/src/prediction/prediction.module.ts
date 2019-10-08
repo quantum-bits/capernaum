@@ -5,6 +5,11 @@ import {
   PredictionTableEntry,
   ScriptureEngagementPractice
 } from "./entities";
+import {
+  PredictionTableEntryResolver,
+  PredictionTableResolver
+} from "./prediction.resolvers";
+import { PredictionService } from "./prediction.service";
 
 @Module({
   imports: [
@@ -14,6 +19,10 @@ import {
       ScriptureEngagementPractice
     ])
   ],
-  providers: []
+  providers: [
+    PredictionService,
+    PredictionTableResolver,
+    PredictionTableEntryResolver
+  ]
 })
 export class PredictionModule {}

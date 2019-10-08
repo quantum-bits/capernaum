@@ -87,6 +87,12 @@ type Mutation {
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
+
+  """Create a prediction table"""
+  createPredictionTable(createInput: PredictionTableCreateInput!): PredictionTable!
+
+  """Create a scripture engagement practice"""
+  createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
 }
 
 """Scripture engagement predictions for one survey"""
@@ -150,6 +156,8 @@ type Query {
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses: [SurveyResponse!]!
+  predictionTables: [PredictionTable!]!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 type QuillDelta {

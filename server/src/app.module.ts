@@ -5,6 +5,7 @@ import { LetterModule } from "./letter/letter.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { SurveyModule } from "./survey/survey.module";
 import typeORMConfig from "./typeorm-config";
+import { PredictionModule } from "./prediction/prediction.module";
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import typeORMConfig from "./typeorm-config";
     }),
     LetterModule,
     QualtricsModule,
-    SurveyModule
+    SurveyModule,
+    PredictionModule
   ]
 })
 export class AppModule {}

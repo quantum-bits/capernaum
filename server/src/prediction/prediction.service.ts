@@ -8,18 +8,22 @@ import {
   ScriptureEngagementPracticeUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { EntityManager, Repository } from "typeorm";
+import { BaseService } from "../shared/base.service";
 
 @Injectable()
-export class PredictionService {
+export class PredictionService extends BaseService {
   constructor(
+    protected readonly entityManager: EntityManager,
     @InjectRepository(PredictionTable)
     private readonly predictionTableRepo: Repository<PredictionTable>,
     @InjectRepository(ScriptureEngagementPractice)
     private readonly scriptureEngagementRepo: Repository<
       ScriptureEngagementPractice
     >
-  ) {}
+  ) {
+    super(entityManager);
+  }
 
   createPredictionTable(createInput: PredictionTableCreateInput) {
     return this.predictionTableRepo.save(
