@@ -27,7 +27,7 @@ fixtures:
       pte-1:
         table: ^prediction_table.christian-life-survey
         surveyIndex: ^survey_index.focus-on-god
-        practice: ^scripture_engagement_practice.journalling-scripture
+        practice: ^scripture_engagement_practice.journaling-scripture
         sequence: 1
       pte-2:
         table: ^prediction_table.christian-life-survey
