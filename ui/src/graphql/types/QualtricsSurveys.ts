@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface QualtricsSurveys_qualtricsSurveys {
-  __typename: "QualtricsSurveyListItem";
   qualtricsId: string;
   qualtricsOwnerId: string;
   qualtricsName: string;

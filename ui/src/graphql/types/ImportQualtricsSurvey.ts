@@ -9,7 +9,6 @@ import { QualtricsImportInput } from "./globalTypes";
 // ====================================================
 
 export interface ImportQualtricsSurvey_importQualtricsSurvey_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Text of this question from Qualtrics
    */
@@ -17,7 +16,6 @@ export interface ImportQualtricsSurvey_importQualtricsSurvey_surveyItems {
 }
 
 export interface ImportQualtricsSurvey_importQualtricsSurvey {
-  __typename: "Survey";
   /**
    * Unique ID for this entity
    */

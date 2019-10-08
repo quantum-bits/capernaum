@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface AddDimension_createSurveyDimension_surveyIndices_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Qualtrics identifier for this question
    */
@@ -19,7 +18,6 @@ export interface AddDimension_createSurveyDimension_surveyIndices_surveyItems {
 }
 
 export interface AddDimension_createSurveyDimension_surveyIndices {
-  __typename: "SurveyIndex";
   /**
    * Title of this index
    */
@@ -32,7 +30,6 @@ export interface AddDimension_createSurveyDimension_surveyIndices {
 }
 
 export interface AddDimension_createSurveyDimension {
-  __typename: "SurveyDimension";
   /**
    * Unique ID for this entity
    */

@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface LetterElementTypes_letterElementTypes {
-  __typename: "LetterElementType";
   key: string;
   description: string;
 }

@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface AddLetter_createLetter {
-  __typename: "Letter";
   /**
    * Unique ID for this entity
    */

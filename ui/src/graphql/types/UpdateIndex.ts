@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface UpdateIndex_updateSurveyIndex_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Unique ID for this entity
    */
@@ -23,7 +22,6 @@ export interface UpdateIndex_updateSurveyIndex_surveyItems {
 }
 
 export interface UpdateIndex_updateSurveyIndex {
-  __typename: "SurveyIndex";
   /**
    * Unique ID for this entity
    */

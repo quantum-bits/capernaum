@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface ChangeDimension_updateSurveyDimension_surveyIndices_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Text of this question from Qualtrics
    */
@@ -15,7 +14,6 @@ export interface ChangeDimension_updateSurveyDimension_surveyIndices_surveyItems
 }
 
 export interface ChangeDimension_updateSurveyDimension_surveyIndices {
-  __typename: "SurveyIndex";
   /**
    * Title of this index
    */
@@ -24,7 +22,6 @@ export interface ChangeDimension_updateSurveyDimension_surveyIndices {
 }
 
 export interface ChangeDimension_updateSurveyDimension {
-  __typename: "SurveyDimension";
   /**
    * Title of this dimension (e.g., 'Focus on Prayer')
    */

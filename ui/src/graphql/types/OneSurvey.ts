@@ -9,7 +9,6 @@ import { WhichItems } from "./globalTypes";
 // ====================================================
 
 export interface OneSurvey_survey_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Unique ID for this entity
    */
@@ -29,7 +28,6 @@ export interface OneSurvey_survey_surveyItems {
 }
 
 export interface OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Unique ID for this entity
    */
@@ -45,7 +43,6 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems {
 }
 
 export interface OneSurvey_survey_surveyDimensions_surveyIndices {
-  __typename: "SurveyIndex";
   /**
    * Unique ID for this entity
    */
@@ -62,7 +59,6 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices {
 }
 
 export interface OneSurvey_survey_surveyDimensions {
-  __typename: "SurveyDimension";
   /**
    * Unique ID for this entity
    */
@@ -79,7 +75,6 @@ export interface OneSurvey_survey_surveyDimensions {
 }
 
 export interface OneSurvey_survey {
-  __typename: "Survey";
   /**
    * Unique ID for this entity
    */

@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface ResponseDetails_surveyResponse_surveyItemResponses_surveyItem {
-  __typename: "SurveyItem";
   /**
    * Qualtrics identifier for this question
    */
@@ -19,14 +18,12 @@ export interface ResponseDetails_surveyResponse_surveyItemResponses_surveyItem {
 }
 
 export interface ResponseDetails_surveyResponse_surveyItemResponses {
-  __typename: "SurveyItemResponse";
   surveyItem: ResponseDetails_surveyResponse_surveyItemResponses_surveyItem;
   label: string;
   value: number;
 }
 
 export interface ResponseDetails_surveyResponse {
-  __typename: "SurveyResponse";
   surveyItemResponses: ResponseDetails_surveyResponse_surveyItemResponses[];
 }
 

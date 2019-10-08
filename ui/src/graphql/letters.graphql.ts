@@ -49,7 +49,7 @@ export const ALL_SURVEY_LETTERS_QUERY = gql`
 `;
 
 export const ONE_SURVEY_LETTER_QUERY = gql`
-  query SurveyLetter($id: Int!) {
+  query OneSurveyLetter($id: Int!) {
     surveyLetter(id: $id) {
       id
       survey {
@@ -67,7 +67,11 @@ export const ONE_SURVEY_LETTER_QUERY = gql`
             key
             description
           }
-          textDelta
+          textDelta {
+            ops {
+              insert
+            }
+          }
         }
       }
       isActive

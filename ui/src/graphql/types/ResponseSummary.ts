@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface ResponseSummary_surveyResponses_survey {
-  __typename: "Survey";
   /**
    * Name of this survey on Qualtrics
    */
@@ -15,7 +14,6 @@ export interface ResponseSummary_surveyResponses_survey {
 }
 
 export interface ResponseSummary_surveyResponses {
-  __typename: "SurveyResponse";
   /**
    * Unique ID for this entity
    */

@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface SurveyLetters_surveyLetters_survey {
-  __typename: "Survey";
   /**
    * Name of this survey on Qualtrics
    */
@@ -15,13 +14,11 @@ export interface SurveyLetters_surveyLetters_survey {
 }
 
 export interface SurveyLetters_surveyLetters_letter {
-  __typename: "Letter";
   name: string;
   updated: any;
 }
 
 export interface SurveyLetters_surveyLetters {
-  __typename: "SurveyLetter";
   /**
    * Unique ID for this entity
    */

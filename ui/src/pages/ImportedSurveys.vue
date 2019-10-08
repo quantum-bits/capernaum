@@ -46,9 +46,7 @@ import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 //  //SurveyDimensionEnum
 //} from "./survey.types";
 
-import {
-  Surveys
-} from "@/graphql/types/Surveys";
+import { Surveys } from "@/graphql/types/Surveys";
 
 // Next: make the divs open-able, with the questions inside(?)
 
@@ -60,7 +58,7 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as Surveys,
+      surveys: {} as Surveys,
       headers: [
         {
           text: "Survey Title (Local)",

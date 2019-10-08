@@ -27,7 +27,7 @@ type LetterElement {
   """Unique ID for this entity"""
   id: Int!
   sequence: Int!
-  textDelta: String
+  textDelta: QuillDelta
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension!
@@ -150,6 +150,16 @@ type Query {
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses: [SurveyResponse!]!
+}
+
+type QuillDelta {
+  ops: [QuillDeltaOp!]
+}
+
+type QuillDeltaOp {
+  insert: String
+  delete: Float
+  retain: Float
 }
 
 """Scripture engagement practice"""

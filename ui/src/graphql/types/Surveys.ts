@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface Surveys_surveys {
-  __typename: "Survey";
   /**
    * Unique ID for this entity
    */

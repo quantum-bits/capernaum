@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface ImportSurveyResponses_importQualtricsSurveyResponses {
-  __typename: "SurveyResponse";
   duration: number;
   email: string;
   qualtricsResponseId: string;

@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface TossSurveyDimension_deleteSurveyDimension {
-  __typename: "SurveyDimensionDeleteOutput";
   /**
    * ID of deleted dimension
    */

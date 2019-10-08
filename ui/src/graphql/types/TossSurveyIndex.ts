@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface TossSurveyIndex_deleteSurveyIndex {
-  __typename: "SurveyIndexDeleteOutput";
   /**
    * ID of deleted index
    */

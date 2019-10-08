@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface AllLetters_letters {
-  __typename: "Letter";
   /**
    * Unique ID for this entity
    */

@@ -54,10 +54,7 @@
       </LetterInfoForm>
     </div>
     <div v-if="letterIsNewAndEditModeOn">
-      <LetterInfoForm
-        :isNew="isNew"
-        v-on:save-info="saveInfo"
-      >
+      <LetterInfoForm :isNew="isNew" v-on:save-info="saveInfo">
       </LetterInfoForm>
     </div>
 
@@ -117,20 +114,20 @@
       </v-flex>
     </v-layout>
     <!--
-                    Next:
-                        - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-                        - might need to update the db every time a change is made (to the order, too)
-            
-                        - ordering within categories for letters (order by survey, and then more ordering below this level)
-            
-            
-                        - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-            
-                        - if the letter contains the "SE strategies for user" element, and the boolean association
-                        table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-                        the user should get a warning message or something)
-            
-                -->
+                            Next:
+                                - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+                                - might need to update the db every time a change is made (to the order, too)
+                    
+                                - ordering within categories for letters (order by survey, and then more ordering below this level)
+                    
+                    
+                                - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+                    
+                                - if the letter contains the "SE strategies for user" element, and the boolean association
+                                table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+                                the user should get a warning message or something)
+                    
+                        -->
   </v-container>
 </template>
 
@@ -141,18 +138,23 @@ import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
-import {
-  LetterElement,
-  LetterElementEnum//,
-  //SurveyLetter
-} from "../types/letter.types";
-import {
-  SurveyLetter
-} from "@/graphql/types/SurveyLetter";
+import { LetterElementEnum } from "../types/letter.types";
 
 import { BooleanAssociationBriefType } from "../types/association-table.types";
 import { ONE_SURVEY_LETTER_QUERY } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
+
+import {
+  OneSurveyLetter,
+  OneSurveyLetter_surveyLetter,
+  OneSurveyLetter_surveyLetter_letter_elements
+} from "@/graphql/types/OneSurveyLetter";
+
+interface LetterElement extends OneSurveyLetter_surveyLetter_letter_elements {
+  editModeOn: boolean;
+  isNew: boolean;
+  key: string;
+}
 
 @Component({
   components: {
@@ -169,12 +171,14 @@ import LetterElementMenu from "@/components/LetterElementMenu.vue";
           id: parseInt(this.$route.params.id)
         };
       },
-      update(data: any) {
-        for (let box of data.surveyLetter.letter.elements) {
+      update(oneSurvey: OneSurveyLetter) {
+        const elements = oneSurvey.surveyLetter.letter
+          .elements as LetterElement[];
+        for (let box of elements) {
           box.editModeOn = false;
           box.isNew = false;
         }
-        return data.surveyLetter;
+        return oneSurvey.surveyLetter;
       },
       skip() {
         return this.$route.params.id === undefined;
@@ -213,7 +217,7 @@ export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
 
-  surveyLetter: SurveyLetter | null = null;
+  surveyLetter: OneSurveyLetter_surveyLetter | null = null;
   booleanAssociation: BooleanAssociationBriefType | null = null;
 
   get letter() {
@@ -224,14 +228,13 @@ export default class Compose extends Vue {
     }
   }
 
-  get surveyLetterElements() {
+  get surveyLetterElements(): LetterElement[] {
     if (this.surveyLetter) {
-      return this.surveyLetter.letter.elements;
+      return this.surveyLetter.letter.elements as LetterElement[];
     } else {
       return [];
     }
   }
-
 
   get survey() {
     if (this.surveyLetter) {
@@ -323,16 +326,12 @@ export default class Compose extends Vue {
       id: maxId, //will eventually get assigned a value by the server, but use this value as a key for now....
       sequence: numElements,
       textDelta: {
-        ops: [
-          {
-            insert: ""
-          }
-        ]
+        ops: [{ insert: "" }]
       },
       key: key,
       isNew: true,
       editModeOn: true
-    });
+    } as LetterElement);
     this.resetSequenceProperty();
     console.log(letterElements);
   }

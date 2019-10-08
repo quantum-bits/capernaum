@@ -7,7 +7,6 @@
 // ====================================================
 
 export interface AddIndex_createSurveyIndex_surveyItems {
-  __typename: "SurveyItem";
   /**
    * Text of this question from Qualtrics
    */
@@ -15,7 +14,6 @@ export interface AddIndex_createSurveyIndex_surveyItems {
 }
 
 export interface AddIndex_createSurveyIndex {
-  __typename: "SurveyIndex";
   /**
    * Unique ID for this entity
    */
