@@ -15,6 +15,7 @@ import {
   ScriptureEngagementPracticeCreateInput
 } from "./entities";
 import { PredictionService } from "./prediction.service";
+import { Int } from "type-graphql";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
 
@@ -29,6 +30,11 @@ export class PredictionTableResolver {
     @Args("createInput") createInput: PredictionTableCreateInput
   ) {
     return this.predictionService.create(PredictionTable, createInput);
+  }
+
+  @Query(returns => PredictionTable)
+  predictionTable(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.predictionService.readOne(PredictionTable, id);
   }
 
   @Query(returns => PredictionTable)
