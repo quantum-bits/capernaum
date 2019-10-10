@@ -1,0 +1,49 @@
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver
+} from "@nestjs/graphql";
+
+@Resolver(of => {{ pascalCase entityBaseName }} )
+export class {{ pascalCase entityBaseName }}Resolver {
+  constructor(private readonly {{ camelCase entityBaseName }}Service: {{ pascalCase entityBaseName }}Service) {}
+
+  // Create
+  @Mutation(returns => {{ pascalCase entityBaseName }})
+  create{{ pascalCase entityBaseName }}(
+    @Args("createInput") createInput: {{ pascalCase entityBaseName }}CreateInput)
+  {
+    return this.{{ camelCase entityBaseName }}Service.create{{ pascalCase entityBaseName }}(createInput);
+  }
+
+  // Read one
+  @Query(returns => {{ pascalCase entityBaseName }})
+  {{ camelCase entityBaseName }}(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.{{ camelCase entityBaseName }}Service.readOne({{ pascalCase entityBaseName }}, id);
+  }
+
+  // Read many
+  @Query(returns => [{{ pascalCase entityBaseName }}])
+  {{ camelCase entityBaseName }}s() {
+    return this.{{ camelCase entityBaseName }}Service.readAll({{ pascalCase entityBaseName }});
+  }
+
+  // Update
+  @Mutation(returns => {{ pascalCase entityBaseName }})
+  update{{ pascalCase entityBaseName }}(
+    @Args("updateInput") updateInput: {{ pascalCase entityBaseName }}UpdateInput)
+  {
+    return this.{{ camelCase entityBaseName }}Service.update({{ pascalCase entityBaseName }}, updateInput);
+  }
+
+  // Delete
+  @Mutation(returns => Int)
+  delete{{ pascalCase entityBaseName }}(id: number) {
+    return this.{{ camelCase entityBaseName }}Service.delete({{ pascalCase entityBaseName }}, id);
+  }
+
+  // Property resolvers
+}

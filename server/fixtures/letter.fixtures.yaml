@@ -1,4 +1,12 @@
 fixtures:
+  - table: survey_letter
+    rows:
+      survey-letter-1:
+        survey: ^survey.christian-life-survey
+        predictionTable: ^prediction_table.christian-life-survey
+        letter: ^letter.abide-letter
+        isActive: true
+        isFrozen: false
   - table: letter
     rows:
       abide-letter:

@@ -11,7 +11,8 @@ import {
   LetterElement,
   LetterElementType,
   LetterUpdateInput,
-  SurveyLetter
+  SurveyLetter,
+  SurveyLetterCreateInput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
@@ -22,6 +23,13 @@ import { PredictionTable } from "../prediction/entities";
 @Resolver(of => SurveyLetter)
 export class SurveyLetterResolver {
   constructor(private readonly letterService: LetterService) {}
+
+  @Mutation(returns => SurveyLetter)
+  createSurveyLetter(
+    @Args("createInput") createInput: SurveyLetterCreateInput
+  ) {
+    return this.letterService.createSurveyLetter(createInput);
+  }
 
   @Query(returns => SurveyLetter)
   surveyLetter(@Args({ name: "id", type: () => Int }) id: number) {

@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import {
   PredictionTable,
   PredictionTableCreateInput,
+  PredictionTableEntry,
+  PredictionTableEntryCreateInput,
   PredictionTableUpdateInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
@@ -17,18 +19,14 @@ export class PredictionService extends BaseService {
     protected readonly entityManager: EntityManager,
     @InjectRepository(PredictionTable)
     private readonly predictionTableRepo: Repository<PredictionTable>,
+    @InjectRepository(PredictionTableEntry)
+    private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,
     @InjectRepository(ScriptureEngagementPractice)
     private readonly scriptureEngagementRepo: Repository<
       ScriptureEngagementPractice
     >
   ) {
     super(entityManager);
-  }
-
-  createPredictionTable(createInput: PredictionTableCreateInput) {
-    return this.predictionTableRepo.save(
-      this.predictionTableRepo.create(createInput)
-    );
   }
 
   createScriptureEngagementPractice(

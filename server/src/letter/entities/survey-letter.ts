@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Survey } from "../../survey/entities";
@@ -30,4 +30,23 @@ export class SurveyLetter extends AbstractEntity {
   @Column()
   @Field()
   isFrozen: boolean;
+}
+
+@InputType()
+export class SurveyLetterCreateInput {
+  @Field() surveyId: number;
+  @Field() predictionTableId: number;
+  @Field() letterId: number;
+  @Field({ defaultValue: false }) isActive: boolean;
+  @Field({ defaultValue: false }) isFrozen: boolean;
+}
+
+@InputType()
+export class SurveyLetterUpdateInput {
+  @Field(type => Int) id: number;
+  @Field({ nullable: true }) surveyId?: number;
+  @Field({ nullable: true }) predictionTableId?: number;
+  @Field({ nullable: true }) letterId?: number;
+  @Field({ nullable: true }) isActive?: boolean;
+  @Field({ nullable: true }) isFrozen?: boolean;
 }
