@@ -58,7 +58,7 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: {} as Surveys,
+      surveys: [] as Surveys,
       headers: [
         {
           text: "Survey Title (Local)",

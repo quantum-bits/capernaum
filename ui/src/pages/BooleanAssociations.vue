@@ -12,6 +12,38 @@
       <v-flex xs12>
         <v-data-table
           :headers="headers"
+          :items="predictionTables"
+          class="elevation-1"
+        >
+          <template v-slot:item="{ item }">
+            <tr>
+              <td>{{ item.title }}</td>
+              <td class="text-xs-right">{{ item.description }}</td>
+              <td class="text-xs-right">-- survey title --</td>
+              <td class="text-xs-right">{{ item.lastUpdate }}</td>
+              <td class="text-xs-center">
+                <span v-if="item.isFrozen">
+                  <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-center">
+                <span v-if="item.isActive">
+                  <v-icon color="success">mdi-check-circle</v-icon>
+                </span>
+              </td>
+              <td class="text-xs-right">
+                <v-btn text v-on:click="viewAssociationTable(item)">
+                  View
+                </v-btn>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-flex>
+      <v-flex xs12>
+        <v-data-table
+          :headers="oldHeaders"
           :items="booleanAssociationSummary"
           class="elevation-1"
         >
@@ -49,9 +81,23 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
 
-@Component
+import { ALL_PREDICTION_TABLES_QUERY } from "@/graphql/prediction-tables.graphql";
+
+import { PredictionTableSummary } from "@/graphql/types/PredictionTableSummary";
+
+@Component({
+  apollo: {
+    predictionTables: {
+      query: ALL_PREDICTION_TABLES_QUERY,
+      update(data) {
+        console.log("inside update; prediction table data: ", data);
+        return data.predictionTables;
+      }
+    }
+  }
+})
 export default class BooleanAssociations extends Vue {
-  headers: any = [
+  oldHeaders: any = [
     {
       text: "Association Table",
       align: "left",
@@ -64,7 +110,22 @@ export default class BooleanAssociations extends Vue {
     { text: "Active?", value: "isActive" },
     { text: "Action", sortable: false }
   ];
+  headers: any = [
+    {
+      text: "Association Table",
+      align: "left",
+      sortable: false,
+      value: "title"
+    },
+    { text: "Description", value: "description" },
+    { text: "Survey", value: "surveyTitle" },
+    { text: "Last Update", value: "lastUpdate" },
+    { text: "Frozen?", value: "isFrozen" },
+    { text: "Active?", value: "isActive" },
+    { text: "Action", sortable: false }
+  ];
 
+  predictionTables: PredictionTableSummary | [] = [];
   booleanAssociationSummary: any = [];
 
   viewAssociationTable(item: any) {

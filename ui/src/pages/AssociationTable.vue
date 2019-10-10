@@ -143,10 +143,41 @@ import {
   AssociationTableHeader
 } from "../types/association-table.types";
 
+import { ONE_PREDICTION_TABLE_QUERY } from "@/graphql/prediction-tables.graphql";
+
+import {
+  OneTable
+} from "@/graphql/types/OneTable";
+
 @Component({
-  components: { AssociationTableInfoForm }
+  components: { AssociationTableInfoForm },
+  apollo: {
+    predictionTable: {
+      query: ONE_PREDICTION_TABLE_QUERY,
+      variables() {
+        return {
+          predictionTableId: parseInt(this.$route.params.id)
+        };
+      },
+      update(oneTable: OneTable) {
+        // const elements = oneSurvey.surveyLetter.letter
+        //   .elements as LetterElement[];
+        // for (let box of elements) {
+        //   box.editModeOn = false;
+        //   box.isNew = false;
+        // }
+        console.log('data: ', oneTable);
+        return oneTable.predictionTable;
+      },
+      skip() {
+        console.log('skipping....');
+        return this.$route.params.id === undefined;
+      }
+    }
+  }
 })
 export default class AssociationTable extends Vue {
+  predictionTable: OneTable | null = null;
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];
   headers: AssociationTableHeader[] = [];
