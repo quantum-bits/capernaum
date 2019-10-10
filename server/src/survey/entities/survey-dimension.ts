@@ -29,6 +29,12 @@ export class SurveyDimension extends AbstractEntity {
   @Field({ description: "Title of this dimension (e.g., 'Focus on Prayer')" })
   title: string;
 
+  @Column({ default: true })
+  @Field({
+    description: "Use this dimension in prediction tables?"
+  })
+  useForPredictions: boolean;
+
   @Column("int")
   @Field(type => Int, {
     description: "Sequence number; dimension are displayed in this order."
@@ -43,6 +49,7 @@ export class SurveyDimension extends AbstractEntity {
 export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
   @Field(type => Int) surveyId: number;
   @Field() title: string;
+  @Field() useForPredictions: boolean;
   @Field(type => Int) sequence: number;
 }
 
@@ -50,6 +57,7 @@ export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
 export class SurveyDimensionUpdateInput implements Partial<SurveyDimension> {
   @Field(type => Int) id: number;
   @Field({ nullable: true }) title?: string;
+  @Field({ nullable: true }) useForPredictions?: boolean;
   @Field(type => Int, { nullable: true }) sequence?: number;
 }
 

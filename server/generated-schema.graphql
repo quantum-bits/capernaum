@@ -254,6 +254,9 @@ type SurveyDimension {
   """Title of this dimension (e.g., 'Focus on Prayer')"""
   title: String!
 
+  """Use this dimension in prediction tables?"""
+  useForPredictions: Boolean!
+
   """Sequence number; dimension are displayed in this order."""
   sequence: Int!
 }
@@ -264,6 +267,7 @@ Data to create a new dimension. Does not embed indices. Add them with createSurv
 input SurveyDimensionCreateInput {
   surveyId: Int!
   title: String!
+  useForPredictions: Boolean!
   sequence: Int!
 }
 
@@ -281,6 +285,7 @@ type SurveyDimensionDeleteOutput {
 input SurveyDimensionUpdateInput {
   id: Int!
   title: String
+  useForPredictions: Boolean
   sequence: Int
 }
 
