@@ -1,0 +1,4 @@
+@ResolveProperty("survey", type => {{ }})
+resolveSurvey(@Parent() surveyLetter: SurveyLetter) {
+  return this.letterService.findOneOrFail(Survey, surveyLetter.surveyId);
+}

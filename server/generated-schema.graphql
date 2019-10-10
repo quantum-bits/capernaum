@@ -47,6 +47,7 @@ input LetterUpdateInput {
 }
 
 type Mutation {
+  createSurveyLetter(createInput: SurveyLetterCreateInput!): SurveyLetter!
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
@@ -90,6 +91,7 @@ type Mutation {
 
   """Create a prediction table"""
   createPredictionTable(createInput: PredictionTableCreateInput!): PredictionTable!
+  createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
@@ -102,6 +104,7 @@ type PredictionTable {
   entries: [PredictionTableEntry!]!
   title: String!
   description: String!
+  surveyLetter: SurveyLetter!
 }
 
 input PredictionTableCreateInput {
@@ -115,6 +118,21 @@ type PredictionTableEntry {
   surveyIndex: SurveyIndex!
   practice: ScriptureEngagementPractice!
   sequence: Int!
+}
+
+input PredictionTableEntryCreateInput {
+  tableId: Int!
+  surveyIndexId: Int!
+  practiceId: Int!
+  sequence: Int!
+}
+
+input PredictionTableEntryUpdateInput {
+  id: Int!
+  tableId: Int
+  surveyIndexId: Int
+  practiceId: Int
+  sequence: Int
 }
 
 input PredictionTableUpdateInput {
@@ -351,6 +369,23 @@ type SurveyLetter {
   letter: Letter!
   isActive: Boolean!
   isFrozen: Boolean!
+}
+
+input SurveyLetterCreateInput {
+  surveyId: Float!
+  predictionTableId: Float!
+  letterId: Float!
+  isActive: Boolean = false
+  isFrozen: Boolean = false
+}
+
+input SurveyLetterUpdateInput {
+  id: Int!
+  surveyId: Float
+  predictionTableId: Float
+  letterId: Float
+  isActive: Boolean
+  isFrozen: Boolean
 }
 
 """One user's response to a survey"""

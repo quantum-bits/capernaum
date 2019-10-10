@@ -15,9 +15,9 @@ import {
   ScriptureEngagementPracticeCreateInput
 } from "./entities";
 import { PredictionService } from "./prediction.service";
-import { Int } from "type-graphql";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
+import { SurveyLetter } from "../letter/entities";
 
 @Resolver(of => PredictionTable)
 export class PredictionTableResolver {
@@ -37,11 +37,6 @@ export class PredictionTableResolver {
     return this.predictionService.readOne(PredictionTable, id);
   }
 
-  @Query(returns => PredictionTable)
-  predictionTable(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.predictionService.readOne(PredictionTable, id);
-  }
-
   @Query(returns => [PredictionTable])
   predictionTables() {
     return this.predictionService.readAllPredictionTables();
@@ -52,6 +47,14 @@ export class PredictionTableResolver {
     return this.predictionService.find(PredictionTableEntry, {
       table
     });
+  }
+
+  @ResolveProperty("surveyLetter", type => SurveyLetter)
+  resolveSurveyLetter(@Parent() predictionTable: PredictionTable) {
+    return this.predictionService.findOneOrFail(
+      SurveyLetter,
+      predictionTable.id
+    );
   }
 }
 

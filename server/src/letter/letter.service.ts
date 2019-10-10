@@ -4,7 +4,9 @@ import {
   Letter,
   LetterElement,
   LetterElementType,
-  LetterUpdateInput
+  LetterUpdateInput,
+  SurveyLetter,
+  SurveyLetterCreateInput
 } from "./entities";
 import { EntityManager, Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
@@ -13,6 +15,8 @@ import { BaseService } from "../shared/base.service";
 export class LetterService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
+    @InjectRepository(SurveyLetter)
+    private readonly surveyLetterRepo: Repository<SurveyLetter>,
     @InjectRepository(Letter)
     private readonly letterRepo: Repository<Letter>,
     @InjectRepository(LetterElement)
@@ -21,6 +25,12 @@ export class LetterService extends BaseService {
     private readonly letterElementTypeRepo: Repository<LetterElementType>
   ) {
     super(entityManager);
+  }
+
+  createSurveyLetter(createInput: SurveyLetterCreateInput) {
+    return this.surveyLetterRepo.save(
+      this.surveyLetterRepo.create(createInput)
+    );
   }
 
   createLetter(name: string) {

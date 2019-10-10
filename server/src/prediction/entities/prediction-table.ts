@@ -1,7 +1,8 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "type-graphql";
 import { PredictionTableEntry } from "./prediction-table-entry";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { SurveyLetter } from "../../letter/entities";
 
 @Entity()
 @ObjectType({ description: "Scripture engagement predictions for one survey" })
