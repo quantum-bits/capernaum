@@ -30,6 +30,10 @@ export interface ChangeDimension_updateSurveyDimension {
    * Sequence number; dimension are displayed in this order.
    */
   sequence: number;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyIndices: ChangeDimension_updateSurveyDimension_surveyIndices[];
 }
 
@@ -41,4 +45,5 @@ export interface ChangeDimensionVariables {
   id: number;
   title: string;
   sequence: number;
+  useForPredictions: boolean;
 }

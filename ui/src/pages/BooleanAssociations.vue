@@ -19,47 +19,16 @@
             <tr>
               <td>{{ item.title }}</td>
               <td class="text-xs-right">{{ item.description }}</td>
-              <td class="text-xs-right">-- survey title --</td>
+              <td class="text-xs-right">{{ item.surveyLetter.survey.title }}</td>
               <td class="text-xs-right">{{ item.lastUpdate }}</td>
               <td class="text-xs-center">
-                <span v-if="item.isFrozen">
+                <span v-if="item.surveyLetter.isFrozen">
                   <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
                   <v-icon color="success">mdi-check-circle</v-icon>
                 </span>
               </td>
               <td class="text-xs-center">
-                <span v-if="item.isActive">
-                  <v-icon color="success">mdi-check-circle</v-icon>
-                </span>
-              </td>
-              <td class="text-xs-right">
-                <v-btn text v-on:click="viewAssociationTable(item)">
-                  View
-                </v-btn>
-              </td>
-            </tr>
-          </template>
-        </v-data-table>
-      </v-flex>
-      <v-flex xs12>
-        <v-data-table
-          :headers="oldHeaders"
-          :items="booleanAssociationSummary"
-          class="elevation-1"
-        >
-          <template v-slot:item="{ item }">
-            <tr>
-              <td>{{ item.title }}</td>
-              <td class="text-xs-right">{{ item.surveyTitle }}</td>
-              <td class="text-xs-right">{{ item.lastUpdate }}</td>
-              <td class="text-xs-center">
-                <span v-if="item.isFrozen">
-                  <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
-                  <v-icon color="success">mdi-check-circle</v-icon>
-                </span>
-              </td>
-              <td class="text-xs-center">
-                <span v-if="item.isActive">
+                <span v-if="item.surveyLetter.isActive">
                   <v-icon color="success">mdi-check-circle</v-icon>
                 </span>
               </td>
@@ -97,19 +66,6 @@ import { PredictionTableSummary } from "@/graphql/types/PredictionTableSummary";
   }
 })
 export default class BooleanAssociations extends Vue {
-  oldHeaders: any = [
-    {
-      text: "Association Table",
-      align: "left",
-      sortable: false,
-      value: "title"
-    },
-    { text: "Survey", value: "surveyTitle" },
-    { text: "Last Update", value: "lastUpdate" },
-    { text: "Frozen?", value: "isFrozen" },
-    { text: "Active?", value: "isActive" },
-    { text: "Action", sortable: false }
-  ];
   headers: any = [
     {
       text: "Association Table",
@@ -126,8 +82,7 @@ export default class BooleanAssociations extends Vue {
   ];
 
   predictionTables: PredictionTableSummary | [] = [];
-  booleanAssociationSummary: any = [];
-
+  
   viewAssociationTable(item: any) {
     this.$router.push({ name: "association-table", params: { id: item.id } });
   }
@@ -137,22 +92,6 @@ export default class BooleanAssociations extends Vue {
   }
 
   mounted() {
-    axios
-      .get("http://localhost:4000/boolean-associations")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        response.data.map((val: any) => {
-          console.log(val.title);
-          this.booleanAssociationSummary.push({
-            title: val.title,
-            surveyTitle: val.surveyTitle,
-            lastUpdate: val.lastUpdate,
-            id: val.id,
-            isFrozen: val.isFrozen,
-            isActive: val.isActive
-          });
-        });
-      });
   }
 }
 </script>

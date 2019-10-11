@@ -71,6 +71,10 @@ export interface OneSurvey_survey_surveyDimensions {
    * Sequence number; dimension are displayed in this order.
    */
   sequence: number;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyIndices: OneSurvey_survey_surveyDimensions_surveyIndices[];
 }
 

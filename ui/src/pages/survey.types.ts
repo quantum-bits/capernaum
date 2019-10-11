@@ -44,6 +44,7 @@ export interface SurveyDimension {
   id: number;
   title: string;
   sequence: number;
+  useForPredictions: boolean;
   surveyIndices: SurveyIndex[];
 }
 

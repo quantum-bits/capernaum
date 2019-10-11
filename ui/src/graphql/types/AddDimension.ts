@@ -38,6 +38,14 @@ export interface AddDimension_createSurveyDimension {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
+  /**
+   * Sequence number; dimension are displayed in this order.
+   */
+  sequence: number;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyIndices: AddDimension_createSurveyDimension_surveyIndices[];
 }
 
@@ -52,4 +60,5 @@ export interface AddDimensionVariables {
   surveyId: number;
   title: string;
   sequence: number;
+  useForPredictions: boolean;
 }

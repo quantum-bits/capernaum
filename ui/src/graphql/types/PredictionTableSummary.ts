@@ -6,47 +6,17 @@
 // GraphQL query operation: PredictionTableSummary
 // ====================================================
 
-export interface PredictionTableSummary_predictionTables_entries_practice {
+export interface PredictionTableSummary_predictionTables_surveyLetter_survey {
   /**
-   * Unique ID for this entity
-   */
-  id: number;
-  title: string;
-  description: string;
-  sequence: number;
-}
-
-export interface PredictionTableSummary_predictionTables_entries_surveyIndex_surveyItems {
-  /**
-   * Qualtrics identifier for this question
-   */
-  qualtricsId: string;
-  /**
-   * Text of this question from Qualtrics
-   */
-  qualtricsText: string;
-}
-
-export interface PredictionTableSummary_predictionTables_entries_surveyIndex {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Abbreviation for this index (e.g., 'FOG')
-   */
-  abbreviation: string;
-  /**
-   * Title of this index
+   * Title for this survey in Capernaum
    */
   title: string;
-  surveyItems: PredictionTableSummary_predictionTables_entries_surveyIndex_surveyItems[];
 }
 
-export interface PredictionTableSummary_predictionTables_entries {
-  sequence: number;
-  practice: PredictionTableSummary_predictionTables_entries_practice;
-  surveyIndex: PredictionTableSummary_predictionTables_entries_surveyIndex;
+export interface PredictionTableSummary_predictionTables_surveyLetter {
+  isActive: boolean;
+  isFrozen: boolean;
+  survey: PredictionTableSummary_predictionTables_surveyLetter_survey;
 }
 
 export interface PredictionTableSummary_predictionTables {
@@ -56,7 +26,7 @@ export interface PredictionTableSummary_predictionTables {
   id: number;
   title: string;
   description: string;
-  entries: PredictionTableSummary_predictionTables_entries[];
+  surveyLetter: PredictionTableSummary_predictionTables_surveyLetter;
 }
 
 export interface PredictionTableSummary {

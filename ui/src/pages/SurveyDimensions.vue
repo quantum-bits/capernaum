@@ -97,6 +97,10 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
+                      <v-switch
+                        v-model="surveyDimensionUseForPredictions"
+                        :label="`Use For Predictions in Boolean Association Table`"
+                      ></v-switch>
                       <div v-if="serverError" class="red--text text-center">
                         Sorry, there appears to have been an error. Please try
                         again later.
@@ -198,6 +202,14 @@
               <span
                 v-else-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION"
               >
+                <v-tooltip v-if="item.useForPredictions" top>
+                  <template v-slot:activator="{ on }">
+                      <v-icon v-on="on">
+                        {{ "mdi-table" }}
+                      </v-icon>
+                  </template>
+                  <span>Items for this index used in Boolean Association Table.</span>
+                </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
                     <a @click="addSurveyIndex(item)" v-on="on">
@@ -287,6 +299,7 @@ export default Vue.extend({
       surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
       surveyDimensionText: "",
+      surveyDimensionUseForPredictions: true, // editable in the form
       surveyDimensionDialogTitle: "",
       surveyDimensionDialogHint: "",
       surveyDimensionId: -1, //id of the survey dimension currently being edited
@@ -359,6 +372,7 @@ export default Vue.extend({
     addSurveyDimension() {
       this.surveyDimensionDialog = true;
       this.surveyDimensionText = "";
+      this.surveyDimensionUseForPredictions = true;
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
       console.log("valid? ", this.valid);
@@ -368,10 +382,12 @@ export default Vue.extend({
       }
     },
     editSurveyDimension(dimension: any) {
+      console.log('dimension: ', dimension);
       this.surveyDimensionDialog = true;
       this.surveyDimensionEditOn = true;
       this.surveyDimensionId = dimension.id;
       this.surveyDimensionText = dimension.name;
+      this.surveyDimensionUseForPredictions = dimension.useForPredictions;
       this.surveyDimensionDialogTitle = "Edit Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
     },
@@ -402,12 +418,14 @@ export default Vue.extend({
           console.log("adding a new dimension");
           console.log("survey ID: ", this.surveySelect.value);
           console.log("title: ", this.surveyDimensionText);
+          console.log("use for predictions:", this.surveyDimensionUseForPredictions);
           this.$apollo
             .mutate({
               mutation: ADD_DIMENSION_MUTATION,
               variables: {
                 surveyId: this.surveySelect.value,
                 title: this.surveyDimensionText,
+                useForPredictions: this.surveyDimensionUseForPredictions,
                 // FIXME: sequence should not be hard-coded
                 sequence: 10
               }
@@ -432,6 +450,7 @@ export default Vue.extend({
               variables: {
                 id: this.surveyDimensionId,
                 title: this.surveyDimensionText,
+                useForPredictions: this.surveyDimensionUseForPredictions,
                 // FIXME: sequence should not be hard-coded
                 sequence: 10
               }
@@ -625,6 +644,7 @@ export default Vue.extend({
       return this.surveyData.surveyDimensions.map(dimension => ({
         id: dimension.id,
         name: dimension.title,
+        useForPredictions: dimension.useForPredictions,
         //abbrev: dimension.abbreviation,
         type: "survey-dimension",
         children: dimension.surveyIndices.map(index => ({

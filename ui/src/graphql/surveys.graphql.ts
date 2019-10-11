@@ -41,12 +41,14 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
 `;
 
 export const ADD_DIMENSION_MUTATION = gql`
-  mutation AddDimension($surveyId: Int!, $title: String!, $sequence: Int!) {
+  mutation AddDimension($surveyId: Int!, $title: String!, $sequence: Int!, $useForPredictions: Boolean!) {
     createSurveyDimension(
-      createInput: { surveyId: $surveyId, title: $title, sequence: $sequence }
+      createInput: { surveyId: $surveyId, title: $title, sequence: $sequence, useForPredictions: $useForPredictions }
     ) {
       id
       title
+      sequence
+      useForPredictions
       surveyIndices {
         title
         abbreviation
@@ -60,12 +62,13 @@ export const ADD_DIMENSION_MUTATION = gql`
 `;
 
 export const UPDATE_DIMENSION_MUTATION = gql`
-  mutation ChangeDimension($id: Int!, $title: String!, $sequence: Int!) {
+  mutation ChangeDimension($id: Int!, $title: String!, $sequence: Int!, $useForPredictions: Boolean!) {
     updateSurveyDimension(
-      updateInput: { id: $id, title: $title, sequence: $sequence }
+      updateInput: { id: $id, title: $title, sequence: $sequence, useForPredictions: $useForPredictions }
     ) {
       title
       sequence
+      useForPredictions
       surveyIndices {
         title
         surveyItems {
@@ -143,6 +146,7 @@ export const ONE_SURVEY_QUERY = gql`
         id
         title
         sequence
+        useForPredictions
         surveyIndices {
           id
           title

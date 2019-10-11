@@ -6,22 +6,11 @@ export const ALL_PREDICTION_TABLES_QUERY = gql`
       id
       title
       description
-      entries {
-        sequence
-        practice {
-          id
+      surveyLetter {
+        isActive
+        isFrozen
+        survey {
           title
-          description
-          sequence
-        }
-        surveyIndex {
-          id
-          abbreviation
-          title
-          surveyItems {
-            qualtricsId
-            qualtricsText
-          }
         }
       }
     }
