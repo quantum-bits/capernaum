@@ -24,6 +24,7 @@ type Letter {
   survey: Survey!
   letterElements: [LetterElement!]!
   tableEntries: [PredictionTableEntry!]!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 type LetterElement {
@@ -50,10 +51,15 @@ input LetterUpdateInput {
   isFrozen: Boolean
 }
 
+input LetterWriterInput {
+  letterId: Int!
+}
+
 type Mutation {
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
+  writeLetter(letterWriterInput: LetterWriterInput!): String!
 
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
@@ -209,6 +215,8 @@ type Survey {
 
   """Date and time at which this survey was modified on Qualtrics"""
   qualtricsModDate: String!
+
+  """Convenience property to retrieve SE practices"""
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 

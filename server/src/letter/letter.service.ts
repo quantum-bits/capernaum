@@ -65,10 +65,11 @@ export class LetterService extends BaseService {
   }
 
   createLetterElementType(key: string, description: string) {
-    const newLetterElementType = this.letterElementTypeRepo.create({
-      key,
-      description
-    });
-    return this.letterElementTypeRepo.save(newLetterElementType);
+    return this.letterElementTypeRepo.save(
+      this.letterElementTypeRepo.create({
+        key,
+        description
+      })
+    );
   }
 }
