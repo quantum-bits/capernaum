@@ -27,7 +27,6 @@ import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { WhichItems } from "./survey.types";
-import { ScriptureEngagementPractice } from "../prediction/entities";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -142,13 +141,6 @@ export class SurveyResolver {
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])
   resolveSurveyDimensions(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyDimension, { survey });
-  }
-
-  @ResolveProperty("scriptureEngagementPractices", type => [
-    ScriptureEngagementPractice
-  ])
-  resolveScriptureEngagementPractices(@Parent() survey: Survey) {
-    return this.surveyService.find(ScriptureEngagementPractice);
   }
 
   @Mutation(returns => Survey, {
