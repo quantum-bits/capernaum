@@ -55,9 +55,10 @@ export class LetterResolver {
 
   @Mutation(returns => String)
   writeLetter(@Args("letterWriterInput") letterWriterInput: LetterWriterInput) {
-    const writer = new LaTeXWriter();
+    const writer = new LaTeXWriter(this.letterService);
     const letter = writer.render(letterWriterInput);
     console.log("LETTER", letter);
+    return letter;
   }
 
   @ResolveProperty("scriptureEngagementPractices", type => [
