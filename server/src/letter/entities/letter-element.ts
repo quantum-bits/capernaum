@@ -28,7 +28,7 @@ export class LetterElement extends AbstractEntity {
   @Field({ nullable: true })
   textDelta?: QuillDelta;
 
-  @ManyToOne(type => Letter, letter => letter.elements)
+  @ManyToOne(type => Letter, letter => letter.letterElements)
   @Field(type => Letter)
   letter: Letter;
 

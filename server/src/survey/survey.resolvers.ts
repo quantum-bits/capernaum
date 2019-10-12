@@ -27,8 +27,7 @@ import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { WhichItems } from "./survey.types";
-import { string } from "@oclif/command/lib/flags";
-import { QualtricsSurveyResponse } from "../qualtrics/qualtrics.types";
+import { ScriptureEngagementPractice } from "../prediction/entities";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -64,27 +63,27 @@ export class SurveyResolver {
 
   @Query(returns => Survey)
   survey(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.readOne(Survey, id);
+    return this.surveyService.findOne(Survey, id);
   }
 
   @Query(returns => [Survey])
   surveys() {
-    return this.surveyService.readAll(Survey);
+    return this.surveyService.find(Survey);
   }
 
   @Query(returns => [SurveyDimension])
   surveyDimensions() {
-    return this.surveyService.readAll(SurveyDimension);
+    return this.surveyService.find(SurveyDimension);
   }
 
   @Query(returns => [SurveyIndex])
   surveyIndices() {
-    return this.surveyService.readAll(SurveyIndex);
+    return this.surveyService.find(SurveyIndex);
   }
 
   @Query(returns => [SurveyItem], { description: "Retrieve all survey items" })
   surveyItems() {
-    return this.surveyService.readAll(SurveyItem);
+    return this.surveyService.find(SurveyItem);
   }
 
   @Mutation(returns => Survey)
@@ -145,6 +144,13 @@ export class SurveyResolver {
     return this.surveyService.find(SurveyDimension, { survey });
   }
 
+  @ResolveProperty("scriptureEngagementPractices", type => [
+    ScriptureEngagementPractice
+  ])
+  resolveScriptureEngagementPractices(@Parent() survey: Survey) {
+    return this.surveyService.find(ScriptureEngagementPractice);
+  }
+
   @Mutation(returns => Survey, {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
@@ -187,12 +193,12 @@ export class SurveyResponseResolver {
 
   @Query(returns => SurveyResponse)
   surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.readOne(SurveyResponse, id);
+    return this.surveyService.findOne(SurveyResponse, id);
   }
 
   @Query(returns => [SurveyResponse])
   surveyResponses() {
-    return this.surveyService.readAll(SurveyResponse);
+    return this.surveyService.find(SurveyResponse);
   }
 
   @ResolveProperty("survey", type => Survey)
@@ -237,7 +243,7 @@ export class SurveyDimensionResolver {
 
   @ResolveProperty(type => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
-    return this.surveyService.readOne(Survey, surveyDimension.surveyId);
+    return this.surveyService.findOne(Survey, surveyDimension.surveyId);
   }
 
   @ResolveProperty(type => [SurveyIndex], {
@@ -261,7 +267,7 @@ export class SurveyIndexResolver {
 
   @ResolveProperty(type => SurveyDimension)
   surveyDimension(@Parent() surveyIndex: SurveyIndex) {
-    return this.surveyService.readOne(
+    return this.surveyService.findOne(
       SurveyDimension,
       surveyIndex.surveyDimensionId
     );
@@ -277,7 +283,7 @@ export class SurveyItemResolver {
   })
   surveyIndex(@Parent() surveyItem: SurveyItem) {
     if (surveyItem && surveyItem.surveyIndexId) {
-      return this.surveyService.readOne(SurveyIndex, surveyItem.surveyIndexId);
+      return this.surveyService.findOne(SurveyIndex, surveyItem.surveyIndexId);
     } else {
       return null;
     }

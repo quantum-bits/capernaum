@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { ScriptureEngagementPractice } from "../../prediction/entities";
 
 @Entity()
 @ObjectType({
@@ -40,6 +41,11 @@ export class Survey extends AbstractEntity {
     description: "Date and time at which this survey was modified on Qualtrics"
   })
   qualtricsModDate: string;
+
+  @Field(type => [ScriptureEngagementPractice], {
+    description: "Convenience property to retrieve SE practices"
+  })
+  scriptureEngagementPractices: ScriptureEngagementPractice[];
 }
 
 @InputType()

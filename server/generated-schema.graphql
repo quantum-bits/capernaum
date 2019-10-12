@@ -16,11 +16,14 @@ scalar DateTime
 type Letter {
   """Unique ID for this entity"""
   id: Int!
-  name: String!
+  title: String!
+  description: String!
   created: DateTime!
   updated: DateTime!
   isFrozen: Boolean!
-  elements: [LetterElement!]!
+  survey: Survey!
+  letterElements: [LetterElement!]!
+  tableEntries: [PredictionTableEntry!]!
 }
 
 type LetterElement {
@@ -42,12 +45,12 @@ type LetterElementType {
 
 input LetterUpdateInput {
   id: Int!
-  name: String
+  title: String
+  description: String
   isFrozen: Boolean
 }
 
 type Mutation {
-  createSurveyLetter(createInput: SurveyLetterCreateInput!): SurveyLetter!
   createLetter(name: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
@@ -88,40 +91,22 @@ type Mutation {
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
-
-  """Create a prediction table"""
-  createPredictionTable(createInput: PredictionTableCreateInput!): PredictionTable!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
 }
 
-"""Scripture engagement predictions for one survey"""
-type PredictionTable {
-  """Unique ID for this entity"""
-  id: Int!
-  entries: [PredictionTableEntry!]!
-  title: String!
-  description: String!
-  surveyLetter: SurveyLetter!
-}
-
-input PredictionTableCreateInput {
-  title: String!
-  description: String!
-}
-
 """One entry in a prediction table"""
 type PredictionTableEntry {
-  table: [PredictionTableEntry!]!
+  letter: [PredictionTableEntry!]!
   surveyIndex: SurveyIndex!
   practice: ScriptureEngagementPractice!
   sequence: Int!
 }
 
 input PredictionTableEntryCreateInput {
-  tableId: Int!
+  letterId: Int!
   surveyIndexId: Int!
   practiceId: Int!
   sequence: Int!
@@ -129,16 +114,10 @@ input PredictionTableEntryCreateInput {
 
 input PredictionTableEntryUpdateInput {
   id: Int!
-  tableId: Int
+  letterId: Int
   surveyIndexId: Int
   practiceId: Int
   sequence: Int
-}
-
-input PredictionTableUpdateInput {
-  id: Int!
-  title: String
-  description: String
 }
 
 input QualtricsImportInput {
@@ -159,8 +138,6 @@ type QualtricsSurveyListItem {
 }
 
 type Query {
-  surveyLetter(id: Int!): SurveyLetter!
-  surveyLetters: [SurveyLetter!]!
   letter(id: Int!): Letter!
   letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
@@ -174,8 +151,6 @@ type Query {
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses: [SurveyResponse!]!
-  predictionTable(id: Int!): PredictionTable!
-  predictionTables: [PredictionTable!]!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
@@ -234,6 +209,7 @@ type Survey {
 
   """Date and time at which this survey was modified on Qualtrics"""
   qualtricsModDate: String!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 input SurveyCreateInput {
@@ -364,33 +340,6 @@ type SurveyItemResponse {
   surveyItem: SurveyItem!
   label: String!
   value: Int!
-}
-
-type SurveyLetter {
-  """Unique ID for this entity"""
-  id: Int!
-  survey: Survey!
-  predictionTable: PredictionTable!
-  letter: Letter!
-  isActive: Boolean!
-  isFrozen: Boolean!
-}
-
-input SurveyLetterCreateInput {
-  surveyId: Float!
-  predictionTableId: Float!
-  letterId: Float!
-  isActive: Boolean = false
-  isFrozen: Boolean = false
-}
-
-input SurveyLetterUpdateInput {
-  id: Int!
-  surveyId: Float
-  predictionTableId: Float
-  letterId: Float
-  isActive: Boolean
-  isFrozen: Boolean
 }
 
 """One user's response to a survey"""

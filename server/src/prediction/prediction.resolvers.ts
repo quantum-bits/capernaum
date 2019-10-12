@@ -7,8 +7,6 @@ import {
   Resolver
 } from "@nestjs/graphql";
 import {
-  PredictionTable,
-  PredictionTableCreateInput,
   PredictionTableEntry,
   PredictionTableEntryCreateInput,
   ScriptureEngagementPractice,
@@ -17,46 +15,6 @@ import {
 import { PredictionService } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
-import { SurveyLetter } from "../letter/entities";
-
-@Resolver(of => PredictionTable)
-export class PredictionTableResolver {
-  constructor(private readonly predictionService: PredictionService) {}
-
-  @Mutation(returns => PredictionTable, {
-    description: "Create a prediction table"
-  })
-  createPredictionTable(
-    @Args("createInput") createInput: PredictionTableCreateInput
-  ) {
-    return this.predictionService.create(PredictionTable, createInput);
-  }
-
-  @Query(returns => PredictionTable)
-  predictionTable(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.predictionService.readOne(PredictionTable, id);
-  }
-
-  @Query(returns => [PredictionTable])
-  predictionTables() {
-    return this.predictionService.readAllPredictionTables();
-  }
-
-  @ResolveProperty("entries", type => [PredictionTableEntry])
-  resolveEntries(@Parent() table: PredictionTable) {
-    return this.predictionService.find(PredictionTableEntry, {
-      table
-    });
-  }
-
-  @ResolveProperty("surveyLetter", type => SurveyLetter)
-  resolveSurveyLetter(@Parent() predictionTable: PredictionTable) {
-    return this.predictionService.findOneOrFail(
-      SurveyLetter,
-      predictionTable.id
-    );
-  }
-}
 
 @Resolver(of => PredictionTableEntry)
 export class PredictionTableEntryResolver {
@@ -107,11 +65,11 @@ export class ScriptureEngagementPracticeResolver {
   scriptureEngagementPractice(
     @Args({ name: "id", type: () => Int }) id: number
   ) {
-    return this.predictionService.readOne(ScriptureEngagementPractice, id);
+    return this.predictionService.findOne(ScriptureEngagementPractice, id);
   }
 
   @Query(returns => [ScriptureEngagementPractice])
   scriptureEngagementPractices() {
-    return this.predictionService.readAllScriptureEngagementPractices();
+    return this.predictionService.find(ScriptureEngagementPractice);
   }
 }

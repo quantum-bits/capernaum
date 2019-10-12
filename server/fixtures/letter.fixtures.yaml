@@ -1,16 +1,10 @@
 fixtures:
-  - table: survey_letter
-    rows:
-      survey-letter-1:
-        survey: ^survey.christian-life-survey
-        predictionTable: ^prediction_table.christian-life-survey
-        letter: ^letter.abide-letter
-        isActive: true
-        isFrozen: false
   - table: letter
     rows:
       abide-letter:
-        name: Abide Bible Letter
+        title: Abide Bible Letter
+        description: Letter to send out to Abide Bible readers
+        survey: ^survey.christian-life-survey
         created: 2018-01-10
         updated: 2018-03-25
   - table: letter_element
@@ -67,11 +61,3 @@ fixtures:
       boilerplate:
         key: boilerplate
         description: Boilerplate Text
-  - table: survey_letter
-    rows:
-      cls-abide:
-        survey: ^survey.christian-life-survey
-        predictionTable: ^prediction_table.christian-life-survey
-        letter: ^letter.abide-letter
-        isActive: false
-        isFrozen: false
