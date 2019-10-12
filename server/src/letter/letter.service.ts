@@ -31,6 +31,12 @@ export class LetterService extends BaseService {
     return this.letterRepo.save(newLetter);
   }
 
+  letter(id: number) {
+    return this.letterRepo.findOneOrFail(id, {
+      relations: ["letterElements", "letterElements.letterElementType"]
+    });
+  }
+
   letterElementTypes() {
     return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
   }

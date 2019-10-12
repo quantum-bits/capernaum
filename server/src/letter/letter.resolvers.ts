@@ -54,11 +54,13 @@ export class LetterResolver {
   }
 
   @Mutation(returns => String)
-  writeLetter(@Args("letterWriterInput") letterWriterInput: LetterWriterInput) {
+  async writeLetter(
+    @Args("letterWriterInput") letterWriterInput: LetterWriterInput
+  ) {
+    const letter = await this.letterService.letter(letterWriterInput.letterId);
     const writer = new LaTeXWriter(this.letterService);
-    const letter = writer.render(letterWriterInput);
-    console.log("LETTER", letter);
-    return letter;
+    const result = await writer.render(letter);
+    return result;
   }
 
   @ResolveProperty("scriptureEngagementPractices", type => [
