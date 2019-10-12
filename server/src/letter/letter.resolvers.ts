@@ -10,7 +10,8 @@ import {
   Letter,
   LetterElement,
   LetterElementType,
-  LetterUpdateInput
+  LetterUpdateInput,
+  LetterWriterInput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
@@ -53,9 +54,9 @@ export class LetterResolver {
   }
 
   @Mutation(returns => String)
-  writeLetter() {
+  writeLetter(@Args("letterWriterInput") letterWriterInput: LetterWriterInput) {
     const writer = new LaTeXWriter();
-    const letter = writer.render();
+    const letter = writer.render(letterWriterInput);
     console.log("LETTER", letter);
   }
 
