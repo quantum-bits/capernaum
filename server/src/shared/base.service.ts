@@ -25,23 +25,23 @@ export class BaseService {
     }
   }
 
-  readOne<Entity>(entityClass: ObjectType<Entity>, id: number) {
-    return this.entityManager.findOne(entityClass, id);
+  find<Entity>(
+    entityClass: ObjectType<Entity>,
+    conditions?: FindConditions<Entity>
+  ) {
+    return this.entityManager.find(entityClass, conditions);
   }
 
-  readAll<Entity>(entityClass: ObjectType<Entity>) {
-    return this.entityManager.find(entityClass);
+  findOne<Entity>(entityClass: ObjectType<Entity>, id: number) {
+    return this.entityManager.findOne(entityClass, id);
   }
 
   findOneOrFail<Entity>(entityClass: ObjectType<Entity>, id: number) {
     return this.entityManager.findOneOrFail(entityClass, id);
   }
 
-  find<Entity>(
-    entityClass: ObjectType<Entity>,
-    conditions: FindConditions<Entity>
-  ) {
-    return this.entityManager.find(entityClass, conditions);
+  findAll<Entity>(entityClass: ObjectType<Entity>) {
+    return this.entityManager.find(entityClass);
   }
 
   async update<Entity, UpdateInput>(

@@ -33,12 +33,12 @@ export class SurveyLetterResolver {
 
   @Query(returns => SurveyLetter)
   surveyLetter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.readOne(SurveyLetter, id);
+    return this.letterService.findOne(SurveyLetter, id);
   }
 
   @Query(returns => [SurveyLetter])
   surveyLetters() {
-    return this.letterService.readAll(SurveyLetter);
+    return this.letterService.find(SurveyLetter);
   }
 
   @ResolveProperty("letter", type => Letter)
@@ -84,12 +84,12 @@ export class LetterResolver {
 
   @Query(returns => Letter)
   letter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.readOne(Letter, id);
+    return this.letterService.findOne(Letter, id);
   }
 
   @Query(returns => [Letter])
   letters() {
-    return this.letterService.readAll(Letter);
+    return this.letterService.find(Letter);
   }
 
   @Mutation(returns => Letter)

@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import {
   PredictionTable,
-  PredictionTableCreateInput,
   PredictionTableEntry,
-  PredictionTableEntryCreateInput,
   PredictionTableUpdateInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
@@ -39,10 +37,6 @@ export class PredictionService extends BaseService {
 
   readAllPredictionTables() {
     return this.predictionTableRepo.find();
-  }
-
-  readAllScriptureEngagementPractices() {
-    return this.scriptureEngagementRepo.find();
   }
 
   async updatePredictionTable(updateInput: PredictionTableUpdateInput) {

@@ -7,7 +7,8 @@ import {
 } from "./entities";
 import {
   PredictionTableEntryResolver,
-  PredictionTableResolver
+  PredictionTableResolver,
+  ScriptureEngagementPracticeResolver
 } from "./prediction.resolvers";
 import { PredictionService } from "./prediction.service";
 
@@ -22,7 +23,8 @@ import { PredictionService } from "./prediction.service";
   providers: [
     PredictionService,
     PredictionTableResolver,
-    PredictionTableEntryResolver
+    PredictionTableEntryResolver,
+    ScriptureEngagementPracticeResolver
   ]
 })
 export class PredictionModule {}

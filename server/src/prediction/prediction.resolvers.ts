@@ -34,7 +34,7 @@ export class PredictionTableResolver {
 
   @Query(returns => PredictionTable)
   predictionTable(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.predictionService.readOne(PredictionTable, id);
+    return this.predictionService.findOne(PredictionTable, id);
   }
 
   @Query(returns => [PredictionTable])
@@ -107,11 +107,11 @@ export class ScriptureEngagementPracticeResolver {
   scriptureEngagementPractice(
     @Args({ name: "id", type: () => Int }) id: number
   ) {
-    return this.predictionService.readOne(ScriptureEngagementPractice, id);
+    return this.predictionService.findOne(ScriptureEngagementPractice, id);
   }
 
   @Query(returns => [ScriptureEngagementPractice])
   scriptureEngagementPractices() {
-    return this.predictionService.readAllScriptureEngagementPractices();
+    return this.predictionService.find(ScriptureEngagementPractice);
   }
 }

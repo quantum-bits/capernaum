@@ -234,6 +234,7 @@ type Survey {
 
   """Date and time at which this survey was modified on Qualtrics"""
   qualtricsModDate: String!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 input SurveyCreateInput {
