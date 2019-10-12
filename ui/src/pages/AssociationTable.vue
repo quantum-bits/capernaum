@@ -59,7 +59,11 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
+        <v-data-table
+          :headers="oldHeaders"
+          :items="tableData"
+          class="elevation-1"
+        >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -95,7 +99,11 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
+        <v-data-table
+          :headers="oldHeaders"
+          :items="tableData"
+          class="elevation-1"
+        >
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -144,10 +152,14 @@ import {
 } from "../types/association-table.types";
 
 import { ONE_PREDICTION_TABLE_QUERY } from "@/graphql/prediction-tables.graphql";
+import { ONE_SURVEY_QUERY } from "@/graphql/surveys.graphql";
+import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY } from "@/graphql/scripture-engagement-practices.graphql";
 
-import {
-  OneTable
-} from "@/graphql/types/OneTable";
+import { OneTable } from "@/graphql/types/OneTable";
+
+import { OneSurvey } from "@/graphql/types/OneSurvey";
+
+import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
 
 @Component({
   components: { AssociationTableInfoForm },
@@ -166,21 +178,84 @@ import {
         //   box.editModeOn = false;
         //   box.isNew = false;
         // }
-        console.log('data: ', oneTable);
+        console.log("table data: ", oneTable);
         return oneTable.predictionTable;
       },
       skip() {
-        console.log('skipping....');
+        console.log("skipping fetch of table....");
         return this.$route.params.id === undefined;
+      }
+    },
+    survey: {
+      query: ONE_SURVEY_QUERY,
+      variables() {
+        return {
+          surveyId: parseInt(this.$route.params.surveyId)
+        };
+      },
+      update(oneSurvey: OneTable) {
+        // const elements = oneSurvey.surveyLetter.letter
+        //   .elements as LetterElement[];
+        // for (let box of elements) {
+        //   box.editModeOn = false;
+        //   box.isNew = false;
+        // }
+        this.headers.push({
+          text: "SE Practice",
+          align: "left",
+          sortable: true,
+          value: "practice"
+        });
+        let surveyDimensions = _.orderBy(
+          oneSurvey.survey.surveyDimensions,
+          "sequence"
+        );
+        surveyDimensions.forEach(surveyDimension => {
+          if (surveyDimension.useForPredictions) {
+            surveyDimension.surveyIndices.forEach(surveyIndex => {
+              this.headers.push({
+                text: surveyIndex.abbreviation,
+                align: "left",
+                sortable: true,
+                value: "columnId-sDim-" + surveyDimension.id + "-sInd-" + surveyIndex.id//unique id for the column
+              });
+            });
+          }
+        });
+
+        console.log("inside of update; completed headers: ", this.headers);
+        console.log("survey data: ", oneSurvey);
+        return oneSurvey.survey;
+      },
+      skip() {
+        console.log("skipping fetch of survey....");
+        return this.$route.params.surveyId === undefined;
+      }
+    },
+    scriptureEngagementPractices: {
+      query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
+      update(scriptureEngagementPractices: ScriptureEngagementPractices) {
+        // const elements = oneSurvey.surveyLetter.letter
+        //   .elements as LetterElement[];
+        // for (let box of elements) {
+        //   box.editModeOn = false;
+        //   box.isNew = false;
+        // }
+        console.log("SE data: ", scriptureEngagementPractices);
+        return scriptureEngagementPractices.scriptureEngagementPractices;
       }
     }
   }
 })
 export default class AssociationTable extends Vue {
   predictionTable: OneTable | null = null;
+  survey: OneSurvey | null = null;
+  scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
+
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];
   headers: AssociationTableHeader[] = [];
+  oldHeaders: AssociationTableHeader[] = [];
 
   tableEditModeOn: boolean = false;
 
@@ -252,14 +327,14 @@ export default class AssociationTable extends Vue {
       .then((response: AxiosResponse) => {
         this.tableColumns = _.orderBy(response.data, "order");
         // construct headers for data table
-        this.headers.push({
+        this.oldHeaders.push({
           text: "SE Practice",
           align: "left",
           sortable: true,
           value: "practice"
         });
         for (let col of this.tableColumns) {
-          this.headers.push({
+          this.oldHeaders.push({
             text: col.abbr,
             align: "left",
             sortable: true,
@@ -285,7 +360,7 @@ export default class AssociationTable extends Vue {
           this.tableData.push(newDataRowObject);
         }
         console.log("table: ", this.tableData);
-        console.log("headers: ", this.headers);
+        console.log("old headers: ", this.oldHeaders);
       });
   }
 

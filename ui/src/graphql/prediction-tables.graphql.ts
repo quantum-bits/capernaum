@@ -11,6 +11,7 @@ export const ALL_PREDICTION_TABLES_QUERY = gql`
         isFrozen
         survey {
           title
+          id
         }
       }
     }

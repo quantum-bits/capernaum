@@ -84,7 +84,8 @@ export default class BooleanAssociations extends Vue {
   predictionTables: PredictionTableSummary | [] = [];
   
   viewAssociationTable(item: any) {
-    this.$router.push({ name: "association-table", params: { id: item.id } });
+    console.log('item: ', item);
+    this.$router.push({ name: "association-table", params: { id: item.id, surveyId: item.surveyLetter.survey.id } });
   }
 
   newAssociationTable() {
