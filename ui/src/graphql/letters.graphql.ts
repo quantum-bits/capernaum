@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export const ONE_LETTER_QUERY = gql`
+/*export const ONE_LETTER_QUERY = gql`
   query OneLetter($letterId: Int!) {
     letter(id: $letterId) {
       id
@@ -8,9 +8,9 @@ export const ONE_LETTER_QUERY = gql`
       isFrozen
     }
   }
-`;
+`;*/
 
-export const ALL_LETTERS_QUERY = gql`
+/* export const ALL_LETTERS_QUERY = gql`
   query AllLetters {
     letters {
       id
@@ -20,7 +20,7 @@ export const ALL_LETTERS_QUERY = gql`
       isFrozen
     }
   }
-`;
+`; */
 
 export const ADD_LETTER_MUTATION = gql`
   mutation AddLetter($name: String!) {
@@ -31,7 +31,8 @@ export const ADD_LETTER_MUTATION = gql`
   }
 `;
 
-export const ALL_SURVEY_LETTERS_QUERY = gql`
+
+/*export const ALL_SURVEY_LETTERS_QUERY = gql`
   query SurveyLetters {
     surveyLetters {
       id
@@ -46,7 +47,104 @@ export const ALL_SURVEY_LETTERS_QUERY = gql`
       isFrozen
     }
   }
+`;*/
+
+export const ONE_LETTER_QUERY = gql`
+  query OneLetter($letterId: Int!) {
+    letter(id: $letterId) {
+      id
+      description
+      tableEntries {
+        surveyIndex {
+          abbreviation
+          title
+          surveyItems {
+            qualtricsId
+            qualtricsText
+          }
+        }
+      }
+      letterElements {
+        letterElementType {
+          key
+          description
+        }
+        sequence
+      }
+      survey {
+        qualtricsId
+        qualtricsName
+        surveyDimensions {
+          survey {
+            qualtricsName
+          }
+          sequence
+          title
+          useForPredictions
+          surveyIndices {
+            abbreviation
+            title
+            surveyItems {
+              id
+              qualtricsId
+              qualtricsText
+            }
+          }
+        }
+      }
+    }
+  }
 `;
+
+export const ALL_LETTERS_QUERY = gql`
+  query AllLetters {
+    letters {
+      id
+      description
+      tableEntries {
+        surveyIndex {
+          abbreviation
+          title
+          surveyItems {
+            qualtricsId
+            qualtricsText
+          }
+        }
+      }
+      letterElements {
+        letterElementType {
+          key
+          description
+        }
+        sequence
+      }
+      survey {
+        qualtricsId
+        qualtricsName
+        surveyDimensions {
+          survey {
+            qualtricsName
+          }
+          sequence
+          title
+          useForPredictions
+          surveyIndices {
+            abbreviation
+            title
+            surveyItems {
+              id
+              qualtricsId
+              qualtricsText
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+
 
 export const ONE_SURVEY_LETTER_QUERY = gql`
   query OneSurveyLetter($id: Int!) {
