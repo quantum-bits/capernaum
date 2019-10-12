@@ -17,20 +17,15 @@ fixtures:
         title: Singing Scripture
         description: Sing to the Lord a new song!
         sequence: 4
-  - table: prediction_table
-    rows:
-      christian-life-survey:
-        title: CLS
-        description: Christian Life Survey
   - table: prediction_table_entry
     rows:
       pte-1:
-        table: ^prediction_table.christian-life-survey
+        letter: ^letter.abide-letter
         surveyIndex: ^survey_index.focus-on-god
         practice: ^scripture_engagement_practice.journaling-scripture
         sequence: 1
       pte-2:
-        table: ^prediction_table.christian-life-survey
+        letter: ^letter.abide-letter
         surveyIndex: ^survey_index.focus-on-prayer
         practice: ^scripture_engagement_practice.copying-scripture
         sequence: 2

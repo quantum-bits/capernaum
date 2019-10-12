@@ -4,37 +4,30 @@ import {
   Letter,
   LetterElement,
   LetterElementType,
-  LetterUpdateInput,
-  SurveyLetter,
-  SurveyLetterCreateInput
+  LetterUpdateInput
 } from "./entities";
 import { EntityManager, Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
+import { PredictionTableEntry } from "../prediction/entities";
 
 @Injectable()
 export class LetterService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
-    @InjectRepository(SurveyLetter)
-    private readonly surveyLetterRepo: Repository<SurveyLetter>,
     @InjectRepository(Letter)
     private readonly letterRepo: Repository<Letter>,
     @InjectRepository(LetterElement)
     private readonly letterElementRepo: Repository<LetterElement>,
     @InjectRepository(LetterElementType)
-    private readonly letterElementTypeRepo: Repository<LetterElementType>
+    private readonly letterElementTypeRepo: Repository<LetterElementType>,
+    @InjectRepository(PredictionTableEntry)
+    private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>
   ) {
     super(entityManager);
   }
 
-  createSurveyLetter(createInput: SurveyLetterCreateInput) {
-    return this.surveyLetterRepo.save(
-      this.surveyLetterRepo.create(createInput)
-    );
-  }
-
-  createLetter(name: string) {
-    const newLetter = this.letterRepo.create({ name });
+  createLetter(title: string) {
+    const newLetter = this.letterRepo.create({ title });
     return this.letterRepo.save(newLetter);
   }
 
@@ -53,13 +46,20 @@ export class LetterService extends BaseService {
     });
   }
 
+  tableEntries(letter: Letter) {
+    return this.predictionTableEntryRepo.find({
+      where: { letter },
+      order: { sequence: "ASC" }
+    });
+  }
+
   async updateLetter(letterData: LetterUpdateInput) {
     const letter = await this.letterRepo.findOne(letterData.id);
     if (letterData.isFrozen !== undefined) {
       letter.isFrozen = letterData.isFrozen;
     }
-    if (letterData.name !== undefined) {
-      letter.name = letterData.name;
+    if (letterData.title !== undefined) {
+      letter.title = letterData.title;
     }
     return this.letterRepo.save(letter);
   }

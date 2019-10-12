@@ -1,18 +1,13 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import {
-  Letter,
-  LetterElement,
-  LetterElementType,
-  SurveyLetter
-} from "./entities";
+import { Letter, LetterElement, LetterElementType } from "./entities";
 import {
   LetterElementTypeResolver,
   LetterResolver,
-  SurveyLetterResolver,
   LetterElementResolver
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
+import { PredictionTableEntry } from "../prediction/entities";
 
 @Module({
   imports: [
@@ -20,14 +15,13 @@ import { LetterService } from "./letter.service";
       Letter,
       LetterElement,
       LetterElementType,
-      SurveyLetter
+      PredictionTableEntry
     ])
   ],
   providers: [
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    SurveyLetterResolver,
     LetterElementResolver
   ]
 })

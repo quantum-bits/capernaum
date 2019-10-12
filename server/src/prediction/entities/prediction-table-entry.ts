@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { PredictionTable } from "./prediction-table";
-import { SurveyIndex, SurveyItemCreateInput } from "../../survey/entities";
+import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
+import { Letter } from "../../letter/entities";
 
 /**
  * This entity is a ternary association table.
@@ -10,10 +10,10 @@ import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
 @Entity()
 @ObjectType({ description: "One entry in a prediction table" })
 export class PredictionTableEntry {
-  @PrimaryColumn("int") tableId: number;
-  @ManyToOne(type => PredictionTable, { primary: true })
+  @PrimaryColumn("int") letterId: number;
+  @ManyToOne(type => Letter, { primary: true })
   @Field(type => [PredictionTableEntry])
-  table: PredictionTable;
+  letter: Letter;
 
   @PrimaryColumn("int") surveyIndexId: number;
   @ManyToOne(type => SurveyIndex, { primary: true })
@@ -30,7 +30,7 @@ export class PredictionTableEntry {
 
 @InputType()
 export class PredictionTableEntryCreateInput {
-  @Field(type => Int) tableId: number;
+  @Field(type => Int) letterId: number;
   @Field(type => Int) surveyIndexId: number;
   @Field(type => Int) practiceId: number;
   @Field(type => Int) sequence: number;
@@ -39,7 +39,7 @@ export class PredictionTableEntryCreateInput {
 @InputType()
 export class PredictionTableEntryUpdateInput {
   @Field(type => Int) id: number;
-  @Field(type => Int, { nullable: true }) tableId?: number;
+  @Field(type => Int, { nullable: true }) letterId?: number;
   @Field(type => Int, { nullable: true }) surveyIndexId?: number;
   @Field(type => Int, { nullable: true }) practiceId?: number;
   @Field(type => Int, { nullable: true }) sequence: number;

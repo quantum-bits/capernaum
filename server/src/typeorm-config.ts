@@ -1,12 +1,7 @@
 import { config } from "dotenv";
 
 import { ConnectionOptions } from "typeorm";
-import {
-  Letter,
-  LetterElement,
-  LetterElementType,
-  SurveyLetter
-} from "./letter/entities";
+import { Letter, LetterElement, LetterElementType } from "./letter/entities";
 import {
   Survey,
   SurveyDimension,
@@ -16,7 +11,6 @@ import {
   SurveyResponse
 } from "./survey/entities";
 import {
-  PredictionTable,
   PredictionTableEntry,
   ScriptureEngagementPractice
 } from "./prediction/entities";
@@ -34,14 +28,12 @@ const options: ConnectionOptions = {
     LetterElement,
     LetterElementType,
     SurveyDimension,
-    SurveyLetter,
     SurveyResponse,
     SurveyItemResponse,
     Survey,
     SurveyIndex,
     SurveyItem,
     ScriptureEngagementPractice,
-    PredictionTable,
     PredictionTableEntry
   ]
 };

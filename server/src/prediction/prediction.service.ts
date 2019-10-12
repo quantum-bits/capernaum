@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import {
-  PredictionTable,
   PredictionTableEntry,
-  PredictionTableUpdateInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
   ScriptureEngagementPracticeUpdateInput
@@ -15,8 +13,6 @@ import { BaseService } from "../shared/base.service";
 export class PredictionService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
-    @InjectRepository(PredictionTable)
-    private readonly predictionTableRepo: Repository<PredictionTable>,
     @InjectRepository(PredictionTableEntry)
     private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,
     @InjectRepository(ScriptureEngagementPractice)
@@ -33,15 +29,6 @@ export class PredictionService extends BaseService {
     return this.scriptureEngagementRepo.save(
       this.scriptureEngagementRepo.create(createInput)
     );
-  }
-
-  readAllPredictionTables() {
-    return this.predictionTableRepo.find();
-  }
-
-  async updatePredictionTable(updateInput: PredictionTableUpdateInput) {
-    const table = await this.predictionTableRepo.preload(updateInput);
-    return this.predictionTableRepo.save(table);
   }
 
   async updateScriptureEngagementPractice(

@@ -10,68 +10,13 @@ import {
   Letter,
   LetterElement,
   LetterElementType,
-  LetterUpdateInput,
-  SurveyLetter,
-  SurveyLetterCreateInput
+  LetterUpdateInput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
 import { Survey } from "../survey/entities";
-import { PredictionTable } from "../prediction/entities";
-
-@Resolver(of => SurveyLetter)
-export class SurveyLetterResolver {
-  constructor(private readonly letterService: LetterService) {}
-
-  @Mutation(returns => SurveyLetter)
-  createSurveyLetter(
-    @Args("createInput") createInput: SurveyLetterCreateInput
-  ) {
-    return this.letterService.createSurveyLetter(createInput);
-  }
-
-  @Query(returns => SurveyLetter)
-  surveyLetter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.findOne(SurveyLetter, id);
-  }
-
-  @Query(returns => [SurveyLetter])
-  surveyLetters() {
-    return this.letterService.find(SurveyLetter);
-  }
-
-  @ResolveProperty("letter", type => Letter)
-  resolveLetter(@Parent() surveyLetter: SurveyLetter) {
-    return this.letterService.findOneOrFail(Letter, surveyLetter.letterId);
-  }
-
-  @ResolveProperty("survey", type => Survey)
-  resolveSurvey(@Parent() surveyLetter: SurveyLetter) {
-    return this.letterService.findOneOrFail(Survey, surveyLetter.surveyId);
-  }
-
-  @ResolveProperty("predictionTable", type => PredictionTable)
-  resolvePredictionTable(@Parent() surveyLetter: SurveyLetter) {
-    return this.letterService.findOneOrFail(
-      PredictionTable,
-      surveyLetter.predictionTableId
-    );
-  }
-}
-
-@Resolver(of => LetterElement)
-export class LetterElementResolver {
-  constructor(private readonly letterService: LetterService) {}
-
-  @ResolveProperty("letterElementType", type => LetterElementType)
-  resolveLetterElementType(@Parent() letterElement: LetterElement) {
-    return this.letterService.findOneOrFail(
-      LetterElementType,
-      letterElement.letterElementTypeId
-    );
-  }
-}
+import { PredictionTableEntry } from "../prediction/entities";
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -103,9 +48,32 @@ export class LetterResolver {
     return result.affected;
   }
 
-  @ResolveProperty("elements", type => [LetterElement])
+  @ResolveProperty("survey", type => Survey)
+  resolveSurvey(@Parent() letter: Letter) {
+    return this.letterService.findOneOrFail(Survey, letter.surveyId);
+  }
+
+  @ResolveProperty("letterElements", type => [LetterElement])
   resolveElements(@Parent() letter: Letter) {
     return this.letterService.letterElements(letter);
+  }
+
+  @ResolveProperty("tableEntries", type => [PredictionTableEntry])
+  resolveEntries(@Parent() letter: Letter) {
+    return this.letterService.tableEntries(letter);
+  }
+}
+
+@Resolver(of => LetterElement)
+export class LetterElementResolver {
+  constructor(private readonly letterService: LetterService) {}
+
+  @ResolveProperty("letterElementType", type => LetterElementType)
+  resolveLetterElementType(@Parent() letterElement: LetterElement) {
+    return this.letterService.findOneOrFail(
+      LetterElementType,
+      letterElement.letterElementTypeId
+    );
   }
 }
 
