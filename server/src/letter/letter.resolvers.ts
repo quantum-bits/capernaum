@@ -16,7 +16,11 @@ import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
 import { DeleteResult } from "typeorm";
 import { Survey } from "../survey/entities";
-import { PredictionTableEntry } from "../prediction/entities";
+import {
+  PredictionTableEntry,
+  ScriptureEngagementPractice
+} from "../prediction/entities";
+import LaTeXWriter from "./letter.writer";
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -46,6 +50,20 @@ export class LetterResolver {
   async deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
     const result: DeleteResult = await this.letterService.delete(Letter, id);
     return result.affected;
+  }
+
+  @Mutation(returns => String)
+  writeLetter() {
+    const writer = new LaTeXWriter();
+    const letter = writer.render();
+    console.log("LETTER", letter);
+  }
+
+  @ResolveProperty("scriptureEngagementPractices", type => [
+    ScriptureEngagementPractice
+  ])
+  resolveScriptureEngagementPractices(@Parent() survey: Survey) {
+    return this.letterService.find(ScriptureEngagementPractice);
   }
 
   @ResolveProperty("survey", type => Survey)
