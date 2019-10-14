@@ -24,11 +24,6 @@ export default new Router({
       component: () => import("./pages/Letters.vue")
     },
     {
-      path: "/boolean-associations",
-      name: "boolean-associations",
-      component: () => import("./pages/BooleanAssociations.vue")
-    },
-    {
       path: "/survey-dimensions",
       name: "survey-dimensions",
       component: () => import("./pages/SurveyDimensions.vue")
@@ -49,7 +44,7 @@ export default new Router({
       component: () => import("./pages/Compose.vue")
     },
     {
-      path: "/association-table/:id?",
+      path: "/association-table/:letterId?",
       name: "association-table",
       component: () => import("./pages/AssociationTable.vue")
     },
