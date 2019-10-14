@@ -159,7 +159,7 @@ import {
         //   box.editModeOn = false;
         //   box.isNew = false;
         // }
-        console.log("letter data: ", oneLetter);
+        console.log("inside update; letter data: ", oneLetter);
         this.letterId = oneLetter.letter.id;
         this.isFrozen = oneLetter.letter.isFrozen;
         this.surveyTitle = oneLetter.letter.survey.title;
@@ -330,10 +330,17 @@ export default class AssociationTable extends Vue {
       })
       .then(({ data }) => {
         console.log("done!", data);
+        this.refetchLetterData();
       })
       .catch(error => {
         console.log("there appears to have been an error: ", error);
       });
+  }
+
+  refetchLetterData() {
+    this.$apollo.queries.predictionTable.refetch().then(({ data }) => {
+      console.log("survey data refetched! ", data);
+    });
   }
 
   onCheckboxChange() {
