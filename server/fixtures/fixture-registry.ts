@@ -115,7 +115,6 @@ export default class FixtureRegistry {
       .filter(name => name.endsWith(".fixtures.yaml"));
 
     yamlFileNames.forEach(yamlFileName => {
-      console.log(`Reading '${yamlFileName}'`);
       const doc = safeLoad(
         fs.readFileSync(path.join(baseDir, yamlFileName), "utf8")
       );

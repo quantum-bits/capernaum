@@ -4,6 +4,7 @@ import { createConnection, getManager, getRepository } from "typeorm";
 
 import FixtureRegistry from "./fixture-registry";
 import EntityMetadataRegistry from "./entity-metadata";
+import makeFakeSurvey from "./fake-survey";
 
 import Debug from "debug";
 import { AbstractEntity } from "../src/shared/abstract-entity";
@@ -53,6 +54,7 @@ async function main(argv) {
       "-n, --nuclear",
       "nuke and reload everything (same as '--all-fixtures --truncate')"
     )
+    .option("--fake-survey", "make a fake survey and exit")
     .option("-d, --dump-metadata", "dump all metadata and exit")
     .option("-v, --verbose", "output lots of details", false)
     .parse(argv);
@@ -114,6 +116,10 @@ async function main(argv) {
       console.log(`Truncate table '${tableName}'`);
       await truncateTable(tableName);
     }
+  }
+
+  if (program.fakeSurvey) {
+    await makeFakeSurvey();
   }
 
   // Load the fixtures requested.
