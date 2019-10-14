@@ -4,8 +4,14 @@ import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 import apolloProvider from "./plugins/apollo";
+import { DateTime } from "luxon";
 
 Vue.config.productionTip = false;
+
+Vue.filter('dateAndTime', function (value: string) {
+  const dt = DateTime.fromISO(value);
+  return dt.toFormat("y-M-d tt");
+});
 
 new Vue({
   router,

@@ -14,6 +14,7 @@ export const ONE_LETTER_QUERY = gql`
     letter(id: $letterId) {
       id
       title
+      updated
       description
       scriptureEngagementPractices {
         id
@@ -43,6 +44,7 @@ export const ONE_LETTER_QUERY = gql`
         sequence
       }
       survey {
+        title
         qualtricsId
         qualtricsName
         surveyDimensions {

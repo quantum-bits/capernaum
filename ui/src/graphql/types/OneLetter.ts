@@ -126,6 +126,10 @@ export interface OneLetter_letter_survey_surveyDimensions {
 
 export interface OneLetter_letter_survey {
   /**
+   * Title for this survey in Capernaum
+   */
+  title: string;
+  /**
    * Unique identifier for this survey on Qualtrics
    */
   qualtricsId: string;
@@ -142,6 +146,7 @@ export interface OneLetter_letter {
    */
   id: number;
   title: string;
+  updated: any;
   description: string;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
   tableEntries: OneLetter_letter_tableEntries[];

@@ -9,42 +9,24 @@
       </v-flex>
     </v-layout>
     
-      <v-layout row wrap>
-        <v-flex xs8>
-          <h1 class="headline mb-3">{{ title }}</h1>
-          <h2 class="title font-weight-regular mb-1">
-            Survey:
-            <span class="font-weight-light">{{ surveyTitle }}</span>
-          </h2>
-          <h2 class="title font-weight-regular mb-5">
-            Last Update:
-            <span class="font-weight-light">{{ lastUpdate }}</span>
-          </h2>
-        </v-flex>
-        <v-flex v-if="!isFrozen" xs4 class="text-xs-right">
-          <v-btn
-            color="primary"
-            :disabled="tableEditModeOn"
-            :dark="!tableEditModeOn"
-            @click="toggleEditMode"
-          >
-            Edit
-          </v-btn>
-        </v-flex>
-      </v-layout>
+    <v-layout row wrap>
+      <v-flex xs8>
+        <h1 class="headline mb-3">{{ title }}</h1>
+        <h2 class="title font-weight-regular mb-1">
+          Survey:
+          <span class="font-weight-light">{{ surveyTitle }}</span>
+        </h2>
+        <h2 class="title font-weight-regular mb-1">
+          Letter:
+          <span class="font-weight-light">{{ letterTitle }}</span>
+        </h2>
+        <h2 class="title font-weight-regular mb-5">
+          Last Update:
+          <span class="font-weight-light">{{ lastUpdate | dateAndTime }}</span>
+        </h2>
+      </v-flex>
+    </v-layout>
 
-<!--
-    <div v-else>
-      <AssociationTableInfoForm
-        :id="id"
-        :initialTitle="title"
-        :initialSurveyId="surveyId"
-        :isNew="isNew"
-        v-on:save-info="saveInfo"
-      >
-      </AssociationTableInfoForm>
-    </div>
-    -->
 
     <v-layout v-if="!tableEditModeOn" row wrap>
       <v-flex xs9>
@@ -53,8 +35,7 @@
       <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
         <v-btn
           color="primary"
-          :disabled="editModeOn"
-          :dark="!editModeOn"
+          dark
           @click="editTable"
         >
           Edit Table
@@ -192,6 +173,9 @@ import {
         // }
         console.log("letter data: ", oneLetter);
         this.isFrozen = oneLetter.letter.isFrozen;
+        this.surveyTitle = oneLetter.letter.survey.title;
+        this.lastUpdate = oneLetter.letter.updated;
+        this.letterTitle = oneLetter.letter.title;
         // construct headers
         this.tableColumns = [];
         this.headers = [];
@@ -262,8 +246,8 @@ import {
 })
 export default class AssociationTable extends Vue {
   tableEntries: OneLetter_letter_tableEntries | null = null;
-  survey: OneSurvey | null = null;
-  scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
+  //survey: OneSurvey | null = null;
+  //scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
 
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];
@@ -272,24 +256,25 @@ export default class AssociationTable extends Vue {
 
   tableEditModeOn: boolean = false;
 
-  isNew: boolean = false; // true if this is a new table association
-  editModeOn: boolean = false;
+  //isNew: boolean = false; // true if this is a new table association
+  //editModeOn: boolean = false;
   title: string = "";
   surveyTitle: string = "";
+  letterTitle: string = "";
   surveyId: number = -1;
   lastUpdate: string = "";
   id: number = -1;
 
   isFrozen: boolean = false;
 
-  toggleEditMode() {
+  /* toggleEditMode() {
     this.editModeOn = true;
-  }
+  } */
 
-  saveInfo() {
+  /* saveInfo() {
     // save the letter info (title, etc....maybe do this in the child component and reload the page?)
     this.editModeOn = false;
-  }
+  } */
 
   editTable() {
     this.tableEditModeOn = true;
@@ -330,63 +315,65 @@ export default class AssociationTable extends Vue {
     //console.log(this.tableData);
     //could use this to save data every time a change is made....
   }
-  constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
-    // the data come in from the db in ScriptureEngagementPractice[] format, but we need to create a new
-    // data type (TableData) in order to display the data conveniently in a table; when we go to save the data, we
-    // revert back to the ScriptureEngagementPractice[] data type; the source for truth (up to this point)
-    // in the page is this.tableData, which is of the TableData type
-    axios
-      .get("http://localhost:4000/spiritual-foci-orientations/")
-      .then((response: AxiosResponse) => {
-        this.tableColumns = _.orderBy(response.data, "order");
-        // construct headers for data table
-        this.oldHeaders.push({
-          text: "SE Practice",
-          align: "left",
-          sortable: true,
-          value: "practice"
-        });
-        for (let col of this.tableColumns) {
-          this.oldHeaders.push({
-            text: col.abbr,
-            align: "left",
-            sortable: true,
-            value: "columnId-" + col.id
-          });
-        }
+  
+  // constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
+  //   // the data come in from the db in ScriptureEngagementPractice[] format, but we need to create a new
+  //   // data type (TableData) in order to display the data conveniently in a table; when we go to save the data, we
+  //   // revert back to the ScriptureEngagementPractice[] data type; the source for truth (up to this point)
+  //   // in the page is this.tableData, which is of the TableData type
+  //   axios
+  //     .get("http://localhost:4000/spiritual-foci-orientations/")
+  //     .then((response: AxiosResponse) => {
+  //       this.tableColumns = _.orderBy(response.data, "order");
+  //       // construct headers for data table
+  //       this.oldHeaders.push({
+  //         text: "SE Practice",
+  //         align: "left",
+  //         sortable: true,
+  //         value: "practice"
+  //       });
+  //       for (let col of this.tableColumns) {
+  //         this.oldHeaders.push({
+  //           text: col.abbr,
+  //           align: "left",
+  //           sortable: true,
+  //           value: "columnId-" + col.id
+  //         });
+  //       }
 
 
-        /* let newDataRowObject: any = {};
-        let colKey: string = "";
-        let idDict: any = {};
-        for (let row of scriptureEngagementPractices) {
-          newDataRowObject = {};
-          newDataRowObject.practice = row.title;
-          newDataRowObject.practiceId = row.id; // added so that we can figure out which practice this is when we go to save the data
-          newDataRowObject.practiceOrder = row.order; // added so we know the original ordering...not sure if we will allow this to change
-          idDict = {};
-          for (let column of this.tableColumns) {
-            idDict[
-              "columnId-" + column.id
-            ] = row.spiritualFocusOrientationIds.includes(column.id);
-          }
-          newDataRowObject.spiritualFocusOrientationIdDict = idDict;
-          this.tableData.push(newDataRowObject);
-        }
-        console.log("table: ", this.tableData);
-        console.log("old headers: ", this.oldHeaders); */
+  //       /* let newDataRowObject: any = {};
+  //       let colKey: string = "";
+  //       let idDict: any = {};
+  //       for (let row of scriptureEngagementPractices) {
+  //         newDataRowObject = {};
+  //         newDataRowObject.practice = row.title;
+  //         newDataRowObject.practiceId = row.id; // added so that we can figure out which practice this is when we go to save the data
+  //         newDataRowObject.practiceOrder = row.order; // added so we know the original ordering...not sure if we will allow this to change
+  //         idDict = {};
+  //         for (let column of this.tableColumns) {
+  //           idDict[
+  //             "columnId-" + column.id
+  //           ] = row.spiritualFocusOrientationIds.includes(column.id);
+  //         }
+  //         newDataRowObject.spiritualFocusOrientationIdDict = idDict;
+  //         this.tableData.push(newDataRowObject);
+  //       }
+  //       console.log("table: ", this.tableData);
+  //       console.log("old headers: ", this.oldHeaders); */
 
-      });
-  }
+  //     });
+  // }
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
-    console.log("route param: ", this.$route.params.id);
+
+    /* console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
-      this.editModeOn = true;
+      //this.editModeOn = true;
       this.tableEditModeOn = false;
-      this.isNew = true;
+      //this.isNew = true;
       axios
         .get("http://localhost:4000/scripture-engagement-practices/")
         .then((response: AxiosResponse) => {
@@ -424,14 +411,14 @@ export default class AssociationTable extends Vue {
             "order"
           );
           this.title = response.data.title;
-          this.surveyTitle = response.data.surveyTitle;
-          this.lastUpdate = response.data.lastUpdate;
+          //this.surveyTitle = response.data.surveyTitle;
+          //this.lastUpdate = response.data.lastUpdate;
           this.id = response.data.id;
           this.surveyId = response.data.surveyId;
           this.isFrozen = response.data.isFrozen;
           this.constructTable(scriptureEngagementPractices);
         });
-    }
+    } */
   }
 }
 </script>
