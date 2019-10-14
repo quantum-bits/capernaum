@@ -73,7 +73,7 @@ input LetterWriterInput {
 }
 
 type Mutation {
-  createLetter(name: String!): Letter!
+  createLetter(title: String!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!

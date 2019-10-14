@@ -29,8 +29,8 @@ export class LetterResolver {
   constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
-  createLetter(@Args("name") name: string) {
-    return this.letterService.createLetter(name);
+  createLetter(@Args("title") title: string) {
+    return this.letterService.createLetter(title);
   }
 
   @Mutation(returns => LetterElement)

@@ -105,12 +105,6 @@ export default Vue.extend({
         divider: true
       },
       {
-        title: "Boolean Association Tables",
-        route: "boolean-associations",
-        icon: "mdi-book",
-        divider: true
-      },
-      {
         title: "Survey Dimensions",
         route: "survey-dimensions",
         icon: "mdi-file-tree",

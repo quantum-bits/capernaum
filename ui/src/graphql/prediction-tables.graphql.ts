@@ -1,22 +1,26 @@
 import gql from "graphql-tag";
 
-/* export const REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION = gql`
-  mutation ReplacePredictionTableEntries($replaceInput: replaceInput) {
+export const REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION = gql`
+  mutation ReplacePredictionTableEntries($replaceInput: PredictionTableEntryReplaceInput!) {
     replacePredictionTableEntries(
-      replaceInput: { surveyId: $surveyId, title: $title, sequence: $sequence, useForPredictions: $useForPredictions }
+      replaceInput: $replaceInput
     ) {
       id
-      title
-      sequence
-      useForPredictions
-      surveyIndices {
-        title
-        abbreviation
-        surveyItems {
-          qualtricsId
-          qualtricsText
-        }
+      letter {
+        id
       }
+      surveyIndex {
+        id
+        abbreviation
+        title
+      }
+      practice {
+        id
+        title
+        sequence
+        description
+      }
+      sequence
     }
   }
-`; */
+`;
