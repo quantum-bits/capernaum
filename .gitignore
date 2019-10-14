@@ -5,3 +5,5 @@ private/
 /dist
 /lib
 server/dist
+auto/
+foo.*

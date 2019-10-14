@@ -9,6 +9,10 @@ fixtures:
         updated: 2018-03-25
   - table: letter_element
     rows:
+      header:
+        sequence: 0
+        letter: ^letter.abide-letter
+        letterElementType: ^letter_element_type.header
       boilerplate-1:
         sequence: 1
         letter: ^letter.abide-letter

@@ -1,7 +1,15 @@
-\documentclass{letter}
+\documentclass{article}
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage[colorlinks]{hyperref}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
 
 \begin{document}
-{{ letter.title }}
+{% include "header.tex" %}
 
 {% for elt in letter.letterElements %}
   {% if elt.letterElementType.key == "boilerplate" %}
@@ -11,7 +19,7 @@
   {% elif elt.letterElementType.key == "footer" %}
     footer
   {% elif elt.letterElementType.key == "header" %}
-    header
+    {% include "header.tex" %}
   {% elif elt.letterElementType.key == "spiritual-focus-chart" %}
     spiritual-focus-chart
   {% elif elt.letterElementType.key == "spiritual-orientations-chart" %}
