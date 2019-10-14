@@ -19,7 +19,9 @@
             <tr>
               <td>{{ item.title }}</td>
               <td class="text-xs-right">{{ item.description }}</td>
-              <td class="text-xs-right">{{ item.surveyLetter.survey.title }}</td>
+              <td class="text-xs-right">
+                {{ item.surveyLetter.survey.title }}
+              </td>
               <td class="text-xs-right">{{ item.lastUpdate }}</td>
               <td class="text-xs-center">
                 <span v-if="item.surveyLetter.isFrozen">
@@ -50,16 +52,17 @@ import { Component, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { AxiosResponse } from "axios";
 
-import { ALL_PREDICTION_TABLES_QUERY } from "@/graphql/prediction-tables.graphql";
+import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
-import { PredictionTableSummary } from "@/graphql/types/PredictionTableSummary";
+import { Letters, Letters_letters } from "@/graphql/types/Letters";
 
 @Component({
   apollo: {
     predictionTables: {
-      query: ALL_PREDICTION_TABLES_QUERY,
-      update(data) {
-        console.log("inside update; prediction table data: ", data);
+      query: ALL_LETTERS_QUERY,
+      update(letters: Letters) {
+        console.log("inside update; prediction table data: ", letters);
+
         return data.predictionTables;
       }
     }
@@ -82,17 +85,19 @@ export default class BooleanAssociations extends Vue {
   ];
 
   predictionTables: PredictionTableSummary | [] = [];
-  
+
   viewAssociationTable(item: any) {
-    console.log('item: ', item);
-    this.$router.push({ name: "association-table", params: { id: item.id, surveyId: item.surveyLetter.survey.id } });
+    console.log("item: ", item);
+    this.$router.push({
+      name: "association-table",
+      params: { id: item.id, surveyId: item.surveyLetter.survey.id }
+    });
   }
 
   newAssociationTable() {
     this.$router.push({ name: "association-table" });
   }
 
-  mounted() {
-  }
+  mounted() {}
 }
 </script>

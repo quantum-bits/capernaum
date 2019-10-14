@@ -8,7 +8,7 @@
         </v-alert>
       </v-flex>
     </v-layout>
-    <div v-if="!editModeOn">
+    
       <v-layout row wrap>
         <v-flex xs8>
           <h1 class="headline mb-3">{{ title }}</h1>
@@ -32,7 +32,8 @@
           </v-btn>
         </v-flex>
       </v-layout>
-    </div>
+
+<!--
     <div v-else>
       <AssociationTableInfoForm
         :id="id"
@@ -43,6 +44,7 @@
       >
       </AssociationTableInfoForm>
     </div>
+    -->
 
     <v-layout v-if="!tableEditModeOn" row wrap>
       <v-flex xs9>
@@ -60,7 +62,7 @@
       </v-flex>
       <v-flex xs12>
         <v-data-table
-          :headers="oldHeaders"
+          :headers="headers"
           :items="tableData"
           class="elevation-1"
         >
@@ -100,7 +102,7 @@
       </v-flex>
       <v-flex xs12>
         <v-data-table
-          :headers="oldHeaders"
+          :headers="headers"
           :items="tableData"
           class="elevation-1"
         >
@@ -144,111 +146,122 @@ import _ from "lodash";
 import AssociationTableInfoForm from "../components/AssociationTableInfoForm.vue";
 
 //import { LetterElementMenuItemType, LetterElementType, LetterElementEnum } from "./letter-element.types";
+
 import {
-  ScriptureEngagementPractice,
+  //ScriptureEngagementPractice,
   TableData,
   SpiritualFocusOrientation,
   AssociationTableHeader
 } from "../types/association-table.types";
 
-import { ONE_PREDICTION_TABLE_QUERY } from "@/graphql/prediction-tables.graphql";
-import { ONE_SURVEY_QUERY } from "@/graphql/surveys.graphql";
-import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY } from "@/graphql/scripture-engagement-practices.graphql";
+//import { ONE_PREDICTION_TABLE_QUERY } from "@/graphql/prediction-tables.graphql";
+//import { ONE_SURVEY_QUERY } from "@/graphql/surveys.graphql";
+//import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY } from "@/graphql/scripture-engagement-practices.graphql";
 
-import { OneTable } from "@/graphql/types/OneTable";
+//import { OneTable } from "@/graphql/types/OneTable";
 
-import { OneSurvey } from "@/graphql/types/OneSurvey";
+//import { OneSurvey } from "@/graphql/types/OneSurvey";
 
-import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
+//import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
+
+import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
+
+import {
+  OneLetter,
+  OneLetter_letter_tableEntries,
+  OneLetter_letter_scriptureEngagementPractices,
+  OneLetter_letter_survey_surveyDimensions
+} from "@/graphql/types/OneLetter";
 
 @Component({
   components: { AssociationTableInfoForm },
   apollo: {
     predictionTable: {
-      query: ONE_PREDICTION_TABLE_QUERY,
+      query: ONE_LETTER_QUERY,
       variables() {
         return {
-          predictionTableId: parseInt(this.$route.params.id)
+          letterId: parseInt(this.$route.params.letterId)
         };
       },
-      update(oneTable: OneTable) {
+      update(oneLetter: OneLetter) {
         // const elements = oneSurvey.surveyLetter.letter
         //   .elements as LetterElement[];
         // for (let box of elements) {
         //   box.editModeOn = false;
         //   box.isNew = false;
         // }
-        console.log("table data: ", oneTable);
-        return oneTable.predictionTable;
-      },
-      skip() {
-        console.log("skipping fetch of table....");
-        return this.$route.params.id === undefined;
-      }
-    },
-    survey: {
-      query: ONE_SURVEY_QUERY,
-      variables() {
-        return {
-          surveyId: parseInt(this.$route.params.surveyId)
-        };
-      },
-      update(oneSurvey: OneTable) {
-        // const elements = oneSurvey.surveyLetter.letter
-        //   .elements as LetterElement[];
-        // for (let box of elements) {
-        //   box.editModeOn = false;
-        //   box.isNew = false;
-        // }
+        console.log("letter data: ", oneLetter);
+        this.isFrozen = oneLetter.letter.isFrozen;
+        // construct headers
+        this.tableColumns = [];
+        this.headers = [];
         this.headers.push({
           text: "SE Practice",
           align: "left",
           sortable: true,
           value: "practice"
         });
-        let surveyDimensions = _.orderBy(
-          oneSurvey.survey.surveyDimensions,
+        let surveyDimensions: OneLetter_letter_survey_surveyDimensions = _.orderBy(
+          oneLetter.letter.survey.surveyDimensions,
           "sequence"
         );
-        surveyDimensions.forEach(surveyDimension => {
-          if (surveyDimension.useForPredictions) {
-            surveyDimension.surveyIndices.forEach(surveyIndex => {
+        surveyDimensions.forEach(dimension => {
+          if (dimension.useForPredictions) {
+            dimension.surveyIndices.forEach(index => {
+              //this.tableColumns.push(index);
               this.headers.push({
-                text: surveyIndex.abbreviation,
+                text: index.abbreviation,
                 align: "left",
                 sortable: true,
-                value: "columnId-sDim-" + surveyDimension.id + "-sInd-" + surveyIndex.id//unique id for the column
+                value: "columnId-" + index.id // unique id for this index
               });
             });
           }
         });
+        console.log("headers: ", this.headers);
 
-        console.log("inside of update; completed headers: ", this.headers);
-        console.log("survey data: ", oneSurvey);
-        return oneSurvey.survey;
+        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices = _.orderBy(
+          oneLetter.letter.scriptureEngagementPractices,
+          "sequence"
+        );
+      
+        let tableEntriesDict = {};
+        scriptureEngagementPractices.forEach( practice => {
+          tableEntriesDict[practice.id] = [];
+        });
+        oneLetter.letter.tableEntries.forEach( entry => {
+          tableEntriesDict[entry.practice.id].push('columnId-'+entry.surveyIndex.id);
+        });
+        console.log('table entries dict: ', tableEntriesDict);
+
+        this.tableData = [];
+        scriptureEngagementPractices.forEach( practice => {
+          let idDict: any = {};
+          this.headers.forEach( header => {
+            if (header.value !== 'practice') {
+              idDict[header.value] = tableEntriesDict[practice.id].includes(header.value);
+            }
+          });
+          this.tableData.push({
+            practice: practice.title,
+            practiceId: practice.id, // added so that we can figure out which practice this is when we go to save the data
+            practiceOrder: practice.sequence, // added so we know the original ordering...not sure if we will allow this to change
+            spiritualFocusOrientationIdDict: idDict
+          });
+        });
+        console.log('table data: ',this.tableData);
+
+        return oneLetter.letter.tableEntries;
       },
       skip() {
-        console.log("skipping fetch of survey....");
-        return this.$route.params.surveyId === undefined;
-      }
-    },
-    scriptureEngagementPractices: {
-      query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
-      update(scriptureEngagementPractices: ScriptureEngagementPractices) {
-        // const elements = oneSurvey.surveyLetter.letter
-        //   .elements as LetterElement[];
-        // for (let box of elements) {
-        //   box.editModeOn = false;
-        //   box.isNew = false;
-        // }
-        console.log("SE data: ", scriptureEngagementPractices);
-        return scriptureEngagementPractices.scriptureEngagementPractices;
+        console.log("skipping fetch of letter data....");
+        return this.$route.params.letterId === undefined;
       }
     }
   }
 })
 export default class AssociationTable extends Vue {
-  predictionTable: OneTable | null = null;
+  tableEntries: OneLetter_letter_tableEntries | null = null;
   survey: OneSurvey | null = null;
   scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
 
@@ -342,7 +355,8 @@ export default class AssociationTable extends Vue {
           });
         }
 
-        let newDataRowObject: any = {};
+
+        /* let newDataRowObject: any = {};
         let colKey: string = "";
         let idDict: any = {};
         for (let row of scriptureEngagementPractices) {
@@ -360,7 +374,8 @@ export default class AssociationTable extends Vue {
           this.tableData.push(newDataRowObject);
         }
         console.log("table: ", this.tableData);
-        console.log("old headers: ", this.oldHeaders);
+        console.log("old headers: ", this.oldHeaders); */
+
       });
   }
 

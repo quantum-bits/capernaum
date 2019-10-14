@@ -1,94 +1,111 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col xs9>
-        <h1 class="headline mb-5">Survey Follow-up Letters</h1>
-      </v-col>
-      <v-col xs3 class="text-xs-right">
+    <v-layout row wrap>
+      <v-flex xs9>
+        <h1 class="headline mb-5">Letters</h1>
+      </v-flex>
+      <v-flex xs3 class="text-xs-right">
         <v-btn color="primary" dark @click="newLetter">
           New Letter
         </v-btn>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
+      </v-flex>
+      <v-flex xs12>
         <v-data-table
           :headers="headers"
-          :items="surveyLetters"
+          :items="letters"
           class="elevation-1"
         >
           <template v-slot:item="{ item }">
-            <tr @click="viewLetter(item)">
-              <td>{{ item.letter.name }}</td>
-              <td class="text-xs-right">{{ item.survey.qualtricsName }}</td>
-              <td class="text-xs-right">
-                {{ item.letter.updated | dateAndTime }}
-              </td>
+            <tr>
+              <td>{{ item.title }}</td>
+              <!--<td class="text-xs-right">{{ item.description }}</td>-->
+              <td class="text-xs-right">{{ item.survey.title }}</td>
+              <td class="text-xs-right">{{ item.lastUpdate }}</td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
+                  <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
                   <v-icon color="success">mdi-check-circle</v-icon>
                 </span>
               </td>
               <td class="text-xs-center">
-                <span v-if="item.isActive">
-                  <v-icon color="success">mdi-check-circle</v-icon>
-                </span>
+                -- is active ? --
+              </td>
+              <td class="text-xs-center">
+                <v-btn text v-on:click="viewAssociationTable(item)">
+                  Update Entries
+                </v-btn>
+              </td>
+              <td class="text-xs-right">
+                <v-btn text v-on:click="viewLetter(item)">
+                  View Letter
+                </v-btn>
               </td>
             </tr>
           </template>
         </v-data-table>
-      </v-col>
-    </v-row>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { ALL_SURVEY_LETTERS_QUERY } from "@/graphql/letters.graphql";
-import { DateTime } from "luxon";
+import { Component, Vue } from "vue-property-decorator";
+import axios from "axios";
+import { AxiosResponse } from "axios";
 
-export default Vue.extend({
-  name: "Letters",
+import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
+import { Letters, Letters_letters } from "@/graphql/types/Letters";
+
+@Component({
   apollo: {
-    surveyLetters: {
-      query: ALL_SURVEY_LETTERS_QUERY
-    }
-  },
-
-  data() {
-    return {
-      surveyLetters: [],
-      headers: [
-        {
-          text: "Letter",
-          align: "left",
-          sortable: false,
-          value: "title"
-        },
-        { text: "Survey", value: "surveyTitle" },
-        { text: "Last Update", value: "lastUpdate" },
-        { text: "Frozen?", value: "isFrozen" },
-        { text: "Active?", value: "isActive" }
-      ]
-    };
-  },
-
-  filters: {
-    dateAndTime(value: string) {
-      const dt = DateTime.fromISO(value);
-      return dt.toFormat("y-M-d tt");
-    }
-  },
-
-  methods: {
-    viewLetter(item: any) {
-      this.$router.push({ name: "compose", params: { id: item.id } });
-    },
-
-    newLetter() {
-      this.$router.push({ name: "compose" });
+    letters: {
+      query: ALL_LETTERS_QUERY,
+      update(letters: Letters) {
+        console.log("letter data: ", letters.letters);
+        
+        return letters.letters;
+      }
     }
   }
-});
+})
+export default class Letters extends Vue {
+  headers: any = [
+    {
+      text: "Letter",
+      align: "left",
+      sortable: false,
+      value: "title"
+    },
+    //{ text: "Description", value: "description" },
+    { text: "Survey", value: "surveyTitle" },
+    { text: "Last Update", value: "lastUpdate" },
+    { text: "Frozen?", value: "isFrozen" },
+    { text: "Active?", value: "isActive" },
+    { text: "Boolean Association Table", value: "booleanAssociationTable" },
+    { text: "Action", sortable: false }
+  ];
+
+  letters: Letters_letters | [] = [];
+  
+  newLetter() {
+    console.log('create new letter');
+  }
+
+  viewAssociationTable(item: any) {
+    console.log('item: ', item);
+    this.$router.push({ name: "association-table", params: { letterId: item.id } });
+  }
+
+  viewLetter(item: any) {
+    console.log('item: ', item);
+    console.log('view letter!');
+    //this.$router.push({ name: "association-table", params: { id: item.id, surveyId: item.surveyLetter.survey.id } });
+  }
+  
+
+  mounted() {
+  }
+}
 </script>
+

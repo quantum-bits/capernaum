@@ -1,67 +1,38 @@
 import gql from "graphql-tag";
 
-/*export const ONE_LETTER_QUERY = gql`
-  query OneLetter($letterId: Int!) {
-    letter(id: $letterId) {
-      id
-      name
-      isFrozen
-    }
-  }
-`;*/
-
-/* export const ALL_LETTERS_QUERY = gql`
-  query AllLetters {
-    letters {
-      id
-      name
-      created
-      updated
-      isFrozen
-    }
-  }
-`; */
-
 export const ADD_LETTER_MUTATION = gql`
-  mutation AddLetter($name: String!) {
-    createLetter(name: $name) {
+  mutation AddLetter($title: String!) {
+    createLetter(title: $title) {
       id
-      name
+      title
     }
   }
 `;
-
-
-/*export const ALL_SURVEY_LETTERS_QUERY = gql`
-  query SurveyLetters {
-    surveyLetters {
-      id
-      survey {
-        qualtricsName
-      }
-      letter {
-        name
-        updated
-      }
-      isActive
-      isFrozen
-    }
-  }
-`;*/
 
 export const ONE_LETTER_QUERY = gql`
   query OneLetter($letterId: Int!) {
     letter(id: $letterId) {
       id
+      title
       description
+      scriptureEngagementPractices {
+        id
+        title
+        description
+        sequence
+      }
       tableEntries {
         surveyIndex {
+          id
           abbreviation
           title
           surveyItems {
             qualtricsId
             qualtricsText
           }
+        }
+        practice {
+          id
         }
       }
       letterElements {
@@ -78,10 +49,12 @@ export const ONE_LETTER_QUERY = gql`
           survey {
             qualtricsName
           }
+          id
           sequence
           title
           useForPredictions
           surveyIndices {
+            id
             abbreviation
             title
             surveyItems {
@@ -97,10 +70,17 @@ export const ONE_LETTER_QUERY = gql`
 `;
 
 export const ALL_LETTERS_QUERY = gql`
-  query AllLetters {
+  query Letters {
     letters {
       id
+      title
       description
+      scriptureEngagementPractices {
+        id
+        title
+        description
+        sequence
+      }
       tableEntries {
         surveyIndex {
           abbreviation
@@ -119,6 +99,7 @@ export const ALL_LETTERS_QUERY = gql`
         sequence
       }
       survey {
+        title
         qualtricsId
         qualtricsName
         surveyDimensions {
@@ -143,40 +124,6 @@ export const ALL_LETTERS_QUERY = gql`
   }
 `;
 
-
-
-
-export const ONE_SURVEY_LETTER_QUERY = gql`
-  query OneSurveyLetter($id: Int!) {
-    surveyLetter(id: $id) {
-      id
-      survey {
-        id
-        qualtricsName
-      }
-      letter {
-        id
-        name
-        updated
-        elements {
-          id
-          sequence
-          letterElementType {
-            key
-            description
-          }
-          textDelta {
-            ops {
-              insert
-            }
-          }
-        }
-      }
-      isActive
-      isFrozen
-    }
-  }
-`;
 
 export const ALL_LETTER_ELEMENT_TYPES_QUERY = gql`
   query LetterElementTypes {

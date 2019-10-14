@@ -6,13 +6,147 @@
 // GraphQL query operation: OneLetter
 // ====================================================
 
+export interface OneLetter_letter_scriptureEngagementPractices {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  title: string;
+  description: string;
+  sequence: number;
+}
+
+export interface OneLetter_letter_tableEntries_surveyIndex_surveyItems {
+  /**
+   * Qualtrics identifier for this question
+   */
+  qualtricsId: string;
+  /**
+   * Text of this question from Qualtrics
+   */
+  qualtricsText: string;
+}
+
+export interface OneLetter_letter_tableEntries_surveyIndex {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Abbreviation for this index (e.g., 'FOG')
+   */
+  abbreviation: string;
+  /**
+   * Title of this index
+   */
+  title: string;
+  surveyItems: OneLetter_letter_tableEntries_surveyIndex_surveyItems[];
+}
+
+export interface OneLetter_letter_tableEntries_practice {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
+export interface OneLetter_letter_tableEntries {
+  surveyIndex: OneLetter_letter_tableEntries_surveyIndex;
+  practice: OneLetter_letter_tableEntries_practice;
+}
+
+export interface OneLetter_letter_letterElements_letterElementType {
+  key: string;
+  description: string;
+}
+
+export interface OneLetter_letter_letterElements {
+  letterElementType: OneLetter_letter_letterElements_letterElementType;
+  sequence: number;
+}
+
+export interface OneLetter_letter_survey_surveyDimensions_survey {
+  /**
+   * Name of this survey on Qualtrics
+   */
+  qualtricsName: string;
+}
+
+export interface OneLetter_letter_survey_surveyDimensions_surveyIndices_surveyItems {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Qualtrics identifier for this question
+   */
+  qualtricsId: string;
+  /**
+   * Text of this question from Qualtrics
+   */
+  qualtricsText: string;
+}
+
+export interface OneLetter_letter_survey_surveyDimensions_surveyIndices {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Abbreviation for this index (e.g., 'FOG')
+   */
+  abbreviation: string;
+  /**
+   * Title of this index
+   */
+  title: string;
+  surveyItems: OneLetter_letter_survey_surveyDimensions_surveyIndices_surveyItems[];
+}
+
+export interface OneLetter_letter_survey_surveyDimensions {
+  survey: OneLetter_letter_survey_surveyDimensions_survey;
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Sequence number; dimension are displayed in this order.
+   */
+  sequence: number;
+  /**
+   * Title of this dimension (e.g., 'Focus on Prayer')
+   */
+  title: string;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
+  surveyIndices: OneLetter_letter_survey_surveyDimensions_surveyIndices[];
+}
+
+export interface OneLetter_letter_survey {
+  /**
+   * Unique identifier for this survey on Qualtrics
+   */
+  qualtricsId: string;
+  /**
+   * Name of this survey on Qualtrics
+   */
+  qualtricsName: string;
+  surveyDimensions: OneLetter_letter_survey_surveyDimensions[];
+}
+
 export interface OneLetter_letter {
   /**
    * Unique ID for this entity
    */
   id: number;
-  name: string;
-  isFrozen: boolean;
+  title: string;
+  description: string;
+  scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
+  tableEntries: OneLetter_letter_tableEntries[];
+  letterElements: OneLetter_letter_letterElements[];
+  survey: OneLetter_letter_survey;
 }
 
 export interface OneLetter {

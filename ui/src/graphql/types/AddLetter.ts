@@ -11,7 +11,7 @@ export interface AddLetter_createLetter {
    * Unique ID for this entity
    */
   id: number;
-  name: string;
+  title: string;
 }
 
 export interface AddLetter {
@@ -19,5 +19,5 @@ export interface AddLetter {
 }
 
 export interface AddLetterVariables {
-  name: string;
+  title: string;
 }

@@ -28,8 +28,8 @@ export class LetterResolver {
   constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
-  async createLetter(@Args("name") name: string) {
-    return await this.letterService.createLetter(name);
+  async createLetter(@Args("title") title: string) {
+    return await this.letterService.createLetter(title);
   }
 
   @Query(returns => Letter)

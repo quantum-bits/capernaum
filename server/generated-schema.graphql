@@ -56,7 +56,7 @@ input LetterWriterInput {
 }
 
 type Mutation {
-  createLetter(name: String!): Letter!
+  createLetter(title: String!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   deleteLetter(id: Int!): Int!
   writeLetter(letterWriterInput: LetterWriterInput!): String!
