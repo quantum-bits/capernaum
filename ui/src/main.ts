@@ -8,7 +8,7 @@ import { DateTime } from "luxon";
 
 Vue.config.productionTip = false;
 
-Vue.filter('dateAndTime', function (value: string) {
+Vue.filter("dateAndTime", function(value: string) {
   const dt = DateTime.fromISO(value);
   return dt.toFormat("y-M-d tt");
 });
