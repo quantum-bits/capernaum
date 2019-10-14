@@ -77,7 +77,7 @@ export class LetterResolver {
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
     const letter = await this.letterService.letter(letterWriterInput.letterId);
-    const writer = new LaTeXWriter(this.letterService);
+    const writer = new LaTeXWriter();
     const result = await writer.render(letter);
     return result;
   }

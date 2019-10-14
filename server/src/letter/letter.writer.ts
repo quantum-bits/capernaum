@@ -16,7 +16,7 @@ const VALID_ELEMENT_TYPES = [
 export default class LaTeXWriter {
   private environment: Environment;
 
-  constructor(protected readonly letterService: LetterService) {
+  constructor() {
     const loader = new FileSystemLoader("./src/letter/templates");
     const configuration: ConfigureOptions = {
       autoescape: true

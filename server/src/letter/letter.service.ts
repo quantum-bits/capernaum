@@ -33,7 +33,7 @@ export class LetterService extends BaseService {
 
   letter(id: number) {
     return this.letterRepo.findOneOrFail(id, {
-      relations: ["letterElements", "letterElements.letterElementType"]
+      relations: ["letterElements", "letterElements.letterElementType"],
     });
   }
 
