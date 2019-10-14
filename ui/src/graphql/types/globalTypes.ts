@@ -15,6 +15,17 @@ export enum WhichItems {
   WithoutIndex = "WithoutIndex",
 }
 
+export interface PartialPredictionTableEntry {
+  surveyIndexId: number;
+  practiceId: number;
+  sequence: number;
+}
+
+export interface PredictionTableEntryReplaceInput {
+  letterId: number;
+  entries: PartialPredictionTableEntry[];
+}
+
 export interface QualtricsImportInput {
   qualtricsId: string;
   title: string;

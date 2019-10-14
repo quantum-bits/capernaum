@@ -8,7 +8,7 @@
         </v-alert>
       </v-flex>
     </v-layout>
-    
+
     <v-layout row wrap>
       <v-flex xs8>
         <h1 class="headline mb-3">{{ title }}</h1>
@@ -27,26 +27,17 @@
       </v-flex>
     </v-layout>
 
-
     <v-layout v-if="!tableEditModeOn" row wrap>
       <v-flex xs9>
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
       </v-flex>
       <v-flex v-if="!isFrozen" xs3 class="text-xs-right">
-        <v-btn
-          color="primary"
-          dark
-          @click="editTable"
-        >
+        <v-btn color="primary" dark @click="editTable">
           Edit Table
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table
-          :headers="headers"
-          :items="tableData"
-          class="elevation-1"
-        >
+        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -82,11 +73,7 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table
-          :headers="headers"
-          :items="tableData"
-          class="elevation-1"
-        >
+        <v-data-table :headers="headers" :items="tableData" class="elevation-1">
           <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
@@ -146,6 +133,7 @@ import {
 //import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
 
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
+import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
 
 import {
   OneLetter,
@@ -172,6 +160,7 @@ import {
         //   box.isNew = false;
         // }
         console.log("letter data: ", oneLetter);
+        this.letterId = oneLetter.letter.id;
         this.isFrozen = oneLetter.letter.isFrozen;
         this.surveyTitle = oneLetter.letter.survey.title;
         this.lastUpdate = oneLetter.letter.updated;
@@ -208,22 +197,26 @@ import {
           oneLetter.letter.scriptureEngagementPractices,
           "sequence"
         );
-      
+
         let tableEntriesDict = {};
-        scriptureEngagementPractices.forEach( practice => {
+        scriptureEngagementPractices.forEach(practice => {
           tableEntriesDict[practice.id] = [];
         });
-        oneLetter.letter.tableEntries.forEach( entry => {
-          tableEntriesDict[entry.practice.id].push('columnId-'+entry.surveyIndex.id);
+        oneLetter.letter.tableEntries.forEach(entry => {
+          tableEntriesDict[entry.practice.id].push(
+            "columnId-" + entry.surveyIndex.id
+          );
         });
-        console.log('table entries dict: ', tableEntriesDict);
+        console.log("table entries dict: ", tableEntriesDict);
 
         this.tableData = [];
-        scriptureEngagementPractices.forEach( practice => {
+        scriptureEngagementPractices.forEach(practice => {
           let idDict: any = {};
-          this.headers.forEach( header => {
-            if (header.value !== 'practice') {
-              idDict[header.value] = tableEntriesDict[practice.id].includes(header.value);
+          this.headers.forEach(header => {
+            if (header.value !== "practice") {
+              idDict[header.value] = tableEntriesDict[practice.id].includes(
+                header.value
+              );
             }
           });
           this.tableData.push({
@@ -233,7 +226,7 @@ import {
             spiritualFocusOrientationIdDict: idDict
           });
         });
-        console.log('table data: ',this.tableData);
+        console.log("table data: ", this.tableData);
 
         return oneLetter.letter.tableEntries;
       },
@@ -261,9 +254,10 @@ export default class AssociationTable extends Vue {
   title: string = "";
   surveyTitle: string = "";
   letterTitle: string = "";
-  surveyId: number = -1;
+  letterId: number | null = null;
+  //surveyId: number = -1;
   lastUpdate: string = "";
-  id: number = -1;
+  //id: number = -1;
 
   isFrozen: boolean = false;
 
@@ -284,10 +278,11 @@ export default class AssociationTable extends Vue {
     // save edits to db....
     this.tableEditModeOn = false;
     //console.log(this.tableData);
-    let scriptureEngagementPracticeData: ScriptureEngagementPractice[] = [];
-    let spiritualFocusOrientationIds: number[] = [];
+    //let scriptureEngagementPracticeData: ScriptureEngagementPractice[] = [];
+    //let spiritualFocusOrientationIds: number[] = [];
+    let partialPredictionTableEntries = [];
     for (let tableRow of this.tableData) {
-      spiritualFocusOrientationIds = [];
+      //spiritualFocusOrientationIds = [];
       //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
       Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
         ([key, value]) => {
@@ -297,25 +292,55 @@ export default class AssociationTable extends Vue {
             // (e.g., "columnId-2" means the focus/orientation id is 2);
             // if the value is true, the id is harvested from the key and saved to an array
             let id: number = +key.split("columnId-")[1];
-            spiritualFocusOrientationIds.push(id);
+            //spiritualFocusOrientationIds.push(id);
+            partialPredictionTableEntries.push({
+              surveyIndexId: id,
+              practiceId: tableRow.practiceId,
+              // hard-coding the sequence for now....
+              sequence: 10
+            });
           }
         }
       );
-      scriptureEngagementPracticeData.push({
-        id: tableRow.practiceId,
-        order: tableRow.practiceOrder,
-        title: tableRow.practice,
-        spiritualFocusOrientationIds: spiritualFocusOrientationIds
-      });
+      // scriptureEngagementPracticeData.push({
+      //   id: tableRow.practiceId,
+      //   order: tableRow.practiceOrder,
+      //   title: tableRow.practice,
+      //   spiritualFocusOrientationIds: spiritualFocusOrientationIds
+      // });
     }
-    console.log("data ready to be saved: ", scriptureEngagementPracticeData);
+    //console.log("data ready to be saved: ", scriptureEngagementPracticeData);
+    console.log("partialPredictionTableEntries", partialPredictionTableEntries);
+
+    /*
+    let replaceInput = {
+      letterId: this.letterId,
+
+    }
+    */
+    this.$apollo
+      .mutate({
+        mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
+        variables: {
+          replaceInput: {
+            letterId: this.letterId,
+            entries: partialPredictionTableEntries
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+      });
   }
 
   onCheckboxChange() {
     //console.log(this.tableData);
     //could use this to save data every time a change is made....
   }
-  
+
   // constructTable(scriptureEngagementPractices: ScriptureEngagementPractice[]) {
   //   // the data come in from the db in ScriptureEngagementPractice[] format, but we need to create a new
   //   // data type (TableData) in order to display the data conveniently in a table; when we go to save the data, we
@@ -340,7 +365,6 @@ export default class AssociationTable extends Vue {
   //           value: "columnId-" + col.id
   //         });
   //       }
-
 
   //       /* let newDataRowObject: any = {};
   //       let colKey: string = "";
@@ -367,7 +391,6 @@ export default class AssociationTable extends Vue {
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
-
     /* console.log("route param: ", this.$route.params.id);
     if (this.$route.params.id === undefined) {
       // launch form for creating a new letter
