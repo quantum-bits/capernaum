@@ -73,7 +73,8 @@ export class ScriptureEngagementPracticeResolver {
   createScriptureEngagementPractice(
     @Args("createInput") createInput: ScriptureEngagementPracticeCreateInput
   ) {
-    return this.predictionService.createScriptureEngagementPractice(
+    return this.predictionService.create(
+      ScriptureEngagementPractice,
       createInput
     );
   }

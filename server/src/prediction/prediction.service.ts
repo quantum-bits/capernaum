@@ -25,14 +25,6 @@ export class PredictionService extends BaseService {
     super(entityManager);
   }
 
-  createScriptureEngagementPractice(
-    createInput: ScriptureEngagementPracticeCreateInput
-  ) {
-    return this.scriptureEngagementRepo.save(
-      this.scriptureEngagementRepo.create(createInput)
-    );
-  }
-
   replacePredictionTableEntries(
     replaceInput: PredictionTableEntryReplaceInput
   ) {

@@ -34,7 +34,7 @@ type LetterElement {
   textDelta: QuillDelta
   letter: Letter!
   letterElementType: LetterElementType!
-  surveyDimension: SurveyDimension!
+  surveyDimension: SurveyDimension
 }
 
 input LetterElementCreateInput {
@@ -42,7 +42,7 @@ input LetterElementCreateInput {
   textDelta: QuillDeltaInput
   letterId: Int!
   letterElementTypeId: Int!
-  surveyDimensionId: Int!
+  surveyDimensionId: Int
 }
 
 type LetterElementType {

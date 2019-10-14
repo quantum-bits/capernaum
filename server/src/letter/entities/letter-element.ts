@@ -44,10 +44,10 @@ export class LetterElement extends AbstractEntity {
   @Field(type => LetterElementType)
   letterElementType: LetterElementType;
 
-  @Column("integer") surveyDimensionId: number;
+  @Column("integer", { nullable: true }) surveyDimensionId: number;
   @ManyToOne(type => SurveyDimension)
-  @Field(type => SurveyDimension)
-  surveyDimension: SurveyDimension;
+  @Field(type => SurveyDimension, { nullable: true })
+  surveyDimension?: SurveyDimension;
 }
 
 // It's stinky that we appear to have to duplicate these declarations as GraphQL `input`.
@@ -69,7 +69,7 @@ export class LetterElementCreateInput {
   @Field(type => QuillDeltaInput, { nullable: true }) textDelta?: QuillDelta;
   @Field(type => Int) letterId: number;
   @Field(type => Int) letterElementTypeId: number;
-  @Field(type => Int) surveyDimensionId: number;
+  @Field(type => Int, { nullable: true }) surveyDimensionId: number;
 }
 
 @InputType()
