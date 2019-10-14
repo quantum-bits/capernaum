@@ -59,17 +59,6 @@ export class LetterService extends BaseService {
     });
   }
 
-  async updateLetter(letterData: LetterUpdateInput) {
-    const letter = await this.letterRepo.findOne(letterData.id);
-    if (letterData.isFrozen !== undefined) {
-      letter.isFrozen = letterData.isFrozen;
-    }
-    if (letterData.title !== undefined) {
-      letter.title = letterData.title;
-    }
-    return this.letterRepo.save(letter);
-  }
-
   createLetterElementType(key: string, description: string) {
     return this.letterElementTypeRepo.save(
       this.letterElementTypeRepo.create({

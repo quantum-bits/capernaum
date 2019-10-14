@@ -10,11 +10,13 @@ import {
   PredictionTableEntry,
   PredictionTableEntryCreateInput,
   ScriptureEngagementPractice,
-  ScriptureEngagementPracticeCreateInput
+  ScriptureEngagementPracticeCreateInput,
+  PredictionTableEntryReplaceInput
 } from "./entities";
 import { PredictionService } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
+import { Letter } from "../letter/entities";
 
 @Resolver(of => PredictionTableEntry)
 export class PredictionTableEntryResolver {
@@ -25,6 +27,13 @@ export class PredictionTableEntryResolver {
     @Args("createInput") createInput: PredictionTableEntryCreateInput
   ) {
     return this.predictionService.create(PredictionTableEntry, createInput);
+  }
+
+  @Mutation(returns => [PredictionTableEntry])
+  replacePredictionTableEntries(
+    @Args("replaceInput") replaceInput: PredictionTableEntryReplaceInput
+  ) {
+    return this.predictionService.replacePredictionTableEntries(replaceInput);
   }
 
   @ResolveProperty("surveyIndex", type => SurveyIndex)
@@ -42,6 +51,14 @@ export class PredictionTableEntryResolver {
     return this.predictionService.findOneOrFail(
       ScriptureEngagementPractice,
       predictionTableEntry.practiceId
+    );
+  }
+
+  @ResolveProperty("letter", type => Letter)
+  resolveLetter(@Parent() predictionTableEntry: PredictionTableEntry) {
+    return this.predictionService.findOneOrFail(
+      Letter,
+      predictionTableEntry.letterId
     );
   }
 }

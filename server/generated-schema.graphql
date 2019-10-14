@@ -37,11 +37,28 @@ type LetterElement {
   surveyDimension: SurveyDimension!
 }
 
+input LetterElementCreateInput {
+  sequence: Int!
+  textDelta: QuillDeltaInput
+  letterId: Int!
+  letterElementTypeId: Int!
+  surveyDimensionId: Int!
+}
+
 type LetterElementType {
   """Unique ID for this entity"""
   id: Int!
   key: String!
   description: String!
+}
+
+input LetterElementUpdateInput {
+  id: Int!
+  sequence: Int
+  textDelta: QuillDeltaInput
+  letterId: Int
+  letterElementTypeId: Int
+  surveyDimensionId: Int
 }
 
 input LetterUpdateInput {
@@ -57,8 +74,11 @@ input LetterWriterInput {
 
 type Mutation {
   createLetter(name: String!): Letter!
+  createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
+  updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
   deleteLetter(id: Int!): Int!
+  deleteLetterElement(id: Int!): Int!
   writeLetter(letterWriterInput: LetterWriterInput!): String!
 
   """Create a new survey."""
@@ -98,24 +118,38 @@ type Mutation {
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
+  replacePredictionTableEntries(replaceInput: PredictionTableEntryReplaceInput!): [PredictionTableEntry!]!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
 }
 
+input PartialPredictionTableEntry {
+  surveyIndexId: Int!
+  practiceId: Int!
+  sequence: Int!
+}
+
 """One entry in a prediction table"""
 type PredictionTableEntry {
-  letter: [PredictionTableEntry!]!
+  """Unique ID for this entity"""
+  id: Int!
+  letter: Letter!
   surveyIndex: SurveyIndex!
   practice: ScriptureEngagementPractice!
   sequence: Int!
 }
 
 input PredictionTableEntryCreateInput {
-  letterId: Int!
   surveyIndexId: Int!
   practiceId: Int!
   sequence: Int!
+  letterId: Int!
+}
+
+input PredictionTableEntryReplaceInput {
+  letterId: Int!
+  entries: [PartialPredictionTableEntry!]!
 }
 
 input PredictionTableEntryUpdateInput {
@@ -157,6 +191,7 @@ type Query {
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses: [SurveyResponse!]!
+  updateSurveyDimension: SurveyDimension!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
@@ -165,7 +200,17 @@ type QuillDelta {
   ops: [QuillDeltaOp!]
 }
 
+input QuillDeltaInput {
+  ops: [QuillDeltaOpInput!]
+}
+
 type QuillDeltaOp {
+  insert: String
+  delete: Float
+  retain: Float
+}
+
+input QuillDeltaOpInput {
   insert: String
   delete: Float
   retain: Float

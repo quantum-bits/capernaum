@@ -87,14 +87,14 @@ export class SurveyResolver {
 
   @Mutation(returns => Survey)
   updateSurvey(@Args("updateInput") updateInput: SurveyUpdateInput) {
-    return this.surveyService.updateSurvey(updateInput);
+    return this.surveyService.update(Survey, updateInput);
   }
 
   @Mutation(returns => SurveyDimension)
   updateSurveyDimension(
     @Args("updateInput") updateInput: SurveyDimensionUpdateInput
   ) {
-    return this.surveyService.updateSurveyDimension(updateInput);
+    return this.surveyService.update(SurveyDimension, updateInput);
   }
 
   @Mutation(returns => SurveyIndex, {
@@ -163,19 +163,6 @@ export class SurveyResolver {
   }
 }
 
-@Resolver(of => SurveyItemResponse)
-export class SurveyItemResponseResolver {
-  constructor(private readonly surveyService: SurveyService) {}
-
-  @ResolveProperty("surveyItem", type => SurveyItem)
-  resolveSurveyItem(@Parent() surveyItemResponse: SurveyItemResponse) {
-    return this.surveyService.findOneOrFail(
-      SurveyItem,
-      surveyItemResponse.surveyItemId
-    );
-  }
-}
-
 @Resolver(of => SurveyResponse)
 export class SurveyResponseResolver {
   constructor(
@@ -229,9 +216,32 @@ export class SurveyResponseResolver {
   }
 }
 
+@Resolver(of => SurveyItemResponse)
+export class SurveyItemResponseResolver {
+  constructor(private readonly surveyService: SurveyService) {}
+
+  @ResolveProperty("surveyItem", type => SurveyItem)
+  resolveSurveyItem(@Parent() surveyItemResponse: SurveyItemResponse) {
+    return this.surveyService.findOneOrFail(
+      SurveyItem,
+      surveyItemResponse.surveyItemId
+    );
+  }
+}
+
 @Resolver(of => SurveyDimension)
 export class SurveyDimensionResolver {
   constructor(private readonly surveyService: SurveyService) {}
+
+  @Query(returns => [SurveyDimension])
+  surveyDimensions() {
+    return this.surveyService.find(SurveyDimension);
+  }
+
+  @Query(returns => SurveyDimension)
+  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
+    return this.surveyService.update(SurveyDimension, updateInput);
+  }
 
   @ResolveProperty(type => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
