@@ -10,11 +10,7 @@
         </v-btn>
       </v-flex>
       <v-flex xs12>
-        <v-data-table
-          :headers="headers"
-          :items="letters"
-          class="elevation-1"
-        >
+        <v-data-table :headers="headers" :items="letters" class="elevation-1">
           <template v-slot:item="{ item }">
             <tr>
               <td>{{ item.title }}</td>
@@ -50,8 +46,6 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
-import { AxiosResponse } from "axios";
 
 import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
 
@@ -63,13 +57,13 @@ import { Letters, Letters_letters } from "@/graphql/types/Letters";
       query: ALL_LETTERS_QUERY,
       update(letters: Letters) {
         console.log("letter data: ", letters.letters);
-        
+
         return letters.letters;
       }
     }
   }
 })
-export default class Letters extends Vue {
+export default class LettersPage extends Vue {
   headers: any = [
     {
       text: "Letter",
@@ -87,25 +81,25 @@ export default class Letters extends Vue {
   ];
 
   letters: Letters_letters | [] = [];
-  
+
   newLetter() {
-    console.log('create new letter');
+    console.log("create new letter");
   }
 
   viewAssociationTable(item: any) {
-    console.log('item: ', item);
-    this.$router.push({ name: "association-table", params: { letterId: item.id } });
+    console.log("item: ", item);
+    this.$router.push({
+      name: "association-table",
+      params: { letterId: item.id }
+    });
   }
 
   viewLetter(item: any) {
-    console.log('item: ', item);
-    console.log('view letter!');
+    console.log("item: ", item);
+    console.log("view letter!");
     //this.$router.push({ name: "association-table", params: { id: item.id, surveyId: item.surveyLetter.survey.id } });
   }
-  
 
-  mounted() {
-  }
+  mounted() {}
 }
 </script>
-

@@ -39,14 +39,7 @@
 import Vue from "vue";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-
-//import {
-//  SurveyItem,
-//  SurveySelection //,
-//  //SurveyDimensionEnum
-//} from "./survey.types";
-
-import { Surveys } from "@/graphql/types/Surveys";
+import { AllSurveys, AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 
 // Next: make the divs open-able, with the questions inside(?)
 
@@ -58,7 +51,7 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as Surveys,
+      surveys: [] as AllSurveys_surveys[],
       headers: [
         {
           text: "Survey Title (Local)",

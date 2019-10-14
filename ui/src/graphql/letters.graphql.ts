@@ -16,6 +16,7 @@ export const ONE_LETTER_QUERY = gql`
       title
       updated
       description
+      isFrozen
       scriptureEngagementPractices {
         id
         title
@@ -37,6 +38,7 @@ export const ONE_LETTER_QUERY = gql`
         }
       }
       letterElements {
+        id
         letterElementType {
           key
           description
@@ -125,7 +127,6 @@ export const ALL_LETTERS_QUERY = gql`
     }
   }
 `;
-
 
 export const ALL_LETTER_ELEMENT_TYPES_QUERY = gql`
   query LetterElementTypes {

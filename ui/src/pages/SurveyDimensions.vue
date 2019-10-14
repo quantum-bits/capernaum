@@ -99,7 +99,9 @@
                       ></v-text-field>
                       <v-switch
                         v-model="surveyDimensionUseForPredictions"
-                        :label="`Use For Predictions in Boolean Association Table`"
+                        :label="
+                          `Use For Predictions in Boolean Association Table`
+                        "
                       ></v-switch>
                       <div v-if="serverError" class="red--text text-center">
                         Sorry, there appears to have been an error. Please try
@@ -204,11 +206,14 @@
               >
                 <v-tooltip v-if="item.useForPredictions" top>
                   <template v-slot:activator="{ on }">
-                      <v-icon v-on="on">
-                        {{ "mdi-table" }}
-                      </v-icon>
+                    <v-icon v-on="on">
+                      {{ "mdi-table" }}
+                    </v-icon>
                   </template>
-                  <span>Items for this index used in Boolean Association Table.</span>
+                  <span
+                    >Items for this index used in Boolean Association
+                    Table.</span
+                  >
                 </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -382,7 +387,7 @@ export default Vue.extend({
       }
     },
     editSurveyDimension(dimension: any) {
-      console.log('dimension: ', dimension);
+      console.log("dimension: ", dimension);
       this.surveyDimensionDialog = true;
       this.surveyDimensionEditOn = true;
       this.surveyDimensionId = dimension.id;
@@ -418,7 +423,10 @@ export default Vue.extend({
           console.log("adding a new dimension");
           console.log("survey ID: ", this.surveySelect.value);
           console.log("title: ", this.surveyDimensionText);
-          console.log("use for predictions:", this.surveyDimensionUseForPredictions);
+          console.log(
+            "use for predictions:",
+            this.surveyDimensionUseForPredictions
+          );
           this.$apollo
             .mutate({
               mutation: ADD_DIMENSION_MUTATION,

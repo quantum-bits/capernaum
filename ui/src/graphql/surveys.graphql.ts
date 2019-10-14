@@ -17,7 +17,7 @@ export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
  * this query is for getting all of the surveys that are saved in the local database (as opposed to the ones coming from Qualtrics itself)
  */
 export const ALL_SURVEYS_QUERY = gql`
-  query Surveys {
+  query AllSurveys {
     surveys {
       id
       title
@@ -41,9 +41,19 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
 `;
 
 export const ADD_DIMENSION_MUTATION = gql`
-  mutation AddDimension($surveyId: Int!, $title: String!, $sequence: Int!, $useForPredictions: Boolean!) {
+  mutation AddDimension(
+    $surveyId: Int!
+    $title: String!
+    $sequence: Int!
+    $useForPredictions: Boolean!
+  ) {
     createSurveyDimension(
-      createInput: { surveyId: $surveyId, title: $title, sequence: $sequence, useForPredictions: $useForPredictions }
+      createInput: {
+        surveyId: $surveyId
+        title: $title
+        sequence: $sequence
+        useForPredictions: $useForPredictions
+      }
     ) {
       id
       title
@@ -62,9 +72,19 @@ export const ADD_DIMENSION_MUTATION = gql`
 `;
 
 export const UPDATE_DIMENSION_MUTATION = gql`
-  mutation ChangeDimension($id: Int!, $title: String!, $sequence: Int!, $useForPredictions: Boolean!) {
+  mutation ChangeDimension(
+    $id: Int!
+    $title: String!
+    $sequence: Int!
+    $useForPredictions: Boolean!
+  ) {
     updateSurveyDimension(
-      updateInput: { id: $id, title: $title, sequence: $sequence, useForPredictions: $useForPredictions }
+      updateInput: {
+        id: $id
+        title: $title
+        sequence: $sequence
+        useForPredictions: $useForPredictions
+      }
     ) {
       title
       sequence

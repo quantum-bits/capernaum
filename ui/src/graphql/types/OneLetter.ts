@@ -61,6 +61,10 @@ export interface OneLetter_letter_letterElements_letterElementType {
 }
 
 export interface OneLetter_letter_letterElements {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   letterElementType: OneLetter_letter_letterElements_letterElementType;
   sequence: number;
 }
@@ -148,6 +152,7 @@ export interface OneLetter_letter {
   title: string;
   updated: any;
   description: string;
+  isFrozen: boolean;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
   tableEntries: OneLetter_letter_tableEntries[];
   letterElements: OneLetter_letter_letterElements[];

@@ -22,7 +22,9 @@
         </h2>
         <h2 class="title font-weight-regular mb-5">
           Last Update:
-          <span class="font-weight-light">{{ oneLetter.updated | dateAndTime }}</span>
+          <span class="font-weight-light">{{
+            oneLetter.updated | dateAndTime
+          }}</span>
         </h2>
       </v-flex>
     </v-layout>
@@ -104,14 +106,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import axios from "axios";
-import { AxiosResponse } from "axios";
-import _ from "lodash";
+import { orderBy } from "lodash";
 
 import {
-  TableData,
+  AssociationTableHeader,
   SpiritualFocusOrientation,
-  AssociationTableHeader
+  TableData
 } from "../types/association-table.types";
 
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
@@ -120,10 +120,10 @@ import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-
 import {
   OneLetter,
   OneLetter_letter,
-  OneLetter_letter_tableEntries,
   OneLetter_letter_scriptureEngagementPractices,
   OneLetter_letter_survey_surveyDimensions
 } from "@/graphql/types/OneLetter";
+import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 
 @Component({
   //components: { AssociationTableInfoForm },
@@ -146,7 +146,7 @@ import {
           sortable: true,
           value: "practice"
         });
-        let surveyDimensions: OneLetter_letter_survey_surveyDimensions = _.orderBy(
+        let surveyDimensions: OneLetter_letter_survey_surveyDimensions[] = orderBy(
           oneLetter.letter.survey.surveyDimensions,
           "sequence"
         );
@@ -164,12 +164,12 @@ import {
           }
         });
 
-        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices = _.orderBy(
+        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[] = orderBy(
           oneLetter.letter.scriptureEngagementPractices,
           "sequence"
         );
 
-        let tableEntriesDict = {};
+        let tableEntriesDict: { [key: number]: string[] } = {};
         scriptureEngagementPractices.forEach(practice => {
           tableEntriesDict[practice.id] = [];
         });
@@ -178,11 +178,11 @@ import {
             "columnId-" + entry.surveyIndex.id
           );
         });
-      
+
         this.tableData = [];
         scriptureEngagementPractices.forEach(practice => {
           let idDict: any = {};
-          this.headers.forEach(header => {
+          this.headers.forEach((header: AssociationTableHeader) => {
             if (header.value !== "practice") {
               idDict[header.value] = tableEntriesDict[practice.id].includes(
                 header.value
@@ -198,7 +198,7 @@ import {
         });
         console.log("table data: ", this.tableData);
 
-        return oneLetter.letter;// return oneLetter, but in the end we are not actually using it anywhere....
+        return oneLetter.letter; // return oneLetter, but in the end we are not actually using it anywhere....
       },
       skip() {
         console.log("skipping fetch of letter data....");
@@ -225,7 +225,7 @@ export default class AssociationTable extends Vue {
   saveTableEdits() {
     // save edits to db....
     this.tableEditModeOn = false;
-    let partialPredictionTableEntries = [];
+    let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
     for (let tableRow of this.tableData) {
       //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
       Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
@@ -253,7 +253,7 @@ export default class AssociationTable extends Vue {
         mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
         variables: {
           replaceInput: {
-            letterId: this.oneLetter.id,
+            letterId: this.oneLetter!.id,
             entries: partialPredictionTableEntries
           }
         }
@@ -273,7 +273,6 @@ export default class AssociationTable extends Vue {
     });
   }
 
-  mounted() {
-  }
+  mounted() {}
 }
 </script>

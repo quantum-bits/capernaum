@@ -13,7 +13,7 @@
     "start:prod": "node dist/main.js",
     "lint": "echo NOT USING tslint -p tsconfig.json -c tslint.json",
     "load-fixtures": "ts-node fixtures/fixture-loader.ts --nuclear",
-    "load-fake-survey": "ts-node fixtures/fixture-loader.ts --fake-survey",
+    "load-fake-survey": "ts-node fixtures/fixture-loader.ts --nuclear --fake-survey",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
