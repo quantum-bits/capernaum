@@ -1,4 +1,10 @@
-import { EntityManager, FindConditions, ObjectType, Repository } from "typeorm";
+import {
+  DeleteResult,
+  EntityManager,
+  FindConditions,
+  ObjectType,
+  Repository
+} from "typeorm";
 import { AbstractEntity } from "./abstract-entity";
 import { validate } from "class-validator";
 import { SurveyUpdateInput } from "../survey/entities";
@@ -40,10 +46,6 @@ export class BaseService {
     return this.entityManager.findOneOrFail(entityClass, id);
   }
 
-  findAll<Entity>(entityClass: ObjectType<Entity>) {
-    return this.entityManager.find(entityClass);
-  }
-
   async update<Entity, UpdateInput>(
     entityClass: ObjectType<Entity>,
     updateInput: UpdateInput
@@ -52,7 +54,11 @@ export class BaseService {
     return this.entityManager.save(entityClass, preload);
   }
 
-  delete<Entity>(entityClass: ObjectType<Entity>, id: number) {
-    return this.entityManager.delete(entityClass, id);
+  async delete<Entity>(entityClass: ObjectType<Entity>, id: number) {
+    const result: DeleteResult = await this.entityManager.delete(
+      entityClass,
+      id
+    );
+    return result.affected;
   }
 }

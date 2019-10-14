@@ -1,5 +1,23 @@
-\document{letter}
+\documentclass{letter}
 
 \begin{document}
-Hello, Capernaum
+{{ letter.title }}
+
+{% for elt in letter.letterElements %}
+  {% if elt.letterElementType.key == "boilerplate" %}
+    {{ elt.textDelta }}
+  {% elif elt.letterElementType.key == "boolean-calculation-results" %}
+    boolean calculation results
+  {% elif elt.letterElementType.key == "footer" %}
+    footer
+  {% elif elt.letterElementType.key == "header" %}
+    header
+  {% elif elt.letterElementType.key == "spiritual-focus-chart" %}
+    spiritual-focus-chart
+  {% elif elt.letterElementType.key == "spiritual-orientations-chart" %}
+    spiritual-orientations-chart
+  {% else %}
+    {{ elt }}
+  {% endif %}
+{% endfor %}
 \end{document}

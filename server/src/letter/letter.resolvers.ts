@@ -9,13 +9,14 @@ import {
 import {
   Letter,
   LetterElement,
+  LetterElementCreateInput,
   LetterElementType,
+  LetterElementUpdateInput,
   LetterUpdateInput,
   LetterWriterInput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
-import { DeleteResult } from "typeorm";
 import { Survey } from "../survey/entities";
 import {
   PredictionTableEntry,
@@ -28,13 +29,20 @@ export class LetterResolver {
   constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
-  async createLetter(@Args("title") title: string) {
-    return await this.letterService.createLetter(title);
+  createLetter(@Args("name") name: string) {
+    return this.letterService.createLetter(name);
+  }
+
+  @Mutation(returns => LetterElement)
+  createLetterElement(
+    @Args("createInput") createInput: LetterElementCreateInput
+  ) {
+    return this.letterService.create(LetterElement, createInput);
   }
 
   @Query(returns => Letter)
   letter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.findOne(Letter, id);
+    return this.letterService.letter(id);
   }
 
   @Query(returns => [Letter])
@@ -43,22 +51,35 @@ export class LetterResolver {
   }
 
   @Mutation(returns => Letter)
-  async updateLetter(@Args("letterData") letterData: LetterUpdateInput) {
-    return await this.letterService.updateLetter(letterData);
+  updateLetter(@Args("letterData") letterData: LetterUpdateInput) {
+    return this.letterService.update(Letter, letterData);
+  }
+
+  @Mutation(returns => LetterElement)
+  updateLetterElement(
+    @Args("updateInput") updateInput: LetterElementUpdateInput
+  ) {
+    return this.letterService.update(LetterElement, updateInput);
   }
 
   @Mutation(returns => Int)
-  async deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
-    const result: DeleteResult = await this.letterService.delete(Letter, id);
-    return result.affected;
+  deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.letterService.delete(Letter, id);
+  }
+
+  @Mutation(returns => Int)
+  deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.letterService.delete(LetterElement, id);
   }
 
   @Mutation(returns => String)
-  writeLetter(@Args("letterWriterInput") letterWriterInput: LetterWriterInput) {
+  async writeLetter(
+    @Args("letterWriterInput") letterWriterInput: LetterWriterInput
+  ) {
+    const letter = await this.letterService.letter(letterWriterInput.letterId);
     const writer = new LaTeXWriter(this.letterService);
-    const letter = writer.render(letterWriterInput);
-    console.log("LETTER", letter);
-    return letter;
+    const result = await writer.render(letter);
+    return result;
   }
 
   @ResolveProperty("scriptureEngagementPractices", type => [

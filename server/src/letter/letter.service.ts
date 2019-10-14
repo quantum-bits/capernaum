@@ -31,6 +31,12 @@ export class LetterService extends BaseService {
     return this.letterRepo.save(newLetter);
   }
 
+  letter(id: number) {
+    return this.letterRepo.findOneOrFail(id, {
+      relations: ["letterElements", "letterElements.letterElementType"]
+    });
+  }
+
   letterElementTypes() {
     return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
   }
@@ -51,17 +57,6 @@ export class LetterService extends BaseService {
       where: { letter },
       order: { sequence: "ASC" }
     });
-  }
-
-  async updateLetter(letterData: LetterUpdateInput) {
-    const letter = await this.letterRepo.findOne(letterData.id);
-    if (letterData.isFrozen !== undefined) {
-      letter.isFrozen = letterData.isFrozen;
-    }
-    if (letterData.title !== undefined) {
-      letter.title = letterData.title;
-    }
-    return this.letterRepo.save(letter);
   }
 
   createLetterElementType(key: string, description: string) {

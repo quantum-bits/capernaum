@@ -1,5 +1,5 @@
-import { Field, Int, ObjectType } from "type-graphql";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Field, ObjectType } from "type-graphql";
+import { Column, Entity } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()

@@ -111,16 +111,6 @@ export class SurveyService extends BaseService {
     });
   }
 
-  async updateSurvey(updateInput: SurveyUpdateInput) {
-    const preload = await this.surveyRepo.preload(updateInput);
-    return this.surveyRepo.save(preload);
-  }
-
-  async updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
-    const preload = await this.surveyDimensionRepo.preload(updateInput);
-    return this.surveyDimensionRepo.save(preload);
-  }
-
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
     return this.entityManager.transaction(async manager => {
       // N.B., can also use the manager directly.
