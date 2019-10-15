@@ -26,14 +26,9 @@ export class LetterService extends BaseService {
     super(entityManager);
   }
 
-  createLetter(title: string) {
-    const newLetter = this.letterRepo.create({ title });
-    return this.letterRepo.save(newLetter);
-  }
-
   letter(id: number) {
     return this.letterRepo.findOneOrFail(id, {
-      relations: ["letterElements", "letterElements.letterElementType"],
+      relations: ["letterElements", "letterElements.letterElementType"]
     });
   }
 

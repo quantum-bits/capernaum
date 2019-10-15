@@ -8,6 +8,7 @@ import {
 } from "@nestjs/graphql";
 import {
   Letter,
+  LetterCreateInput,
   LetterElement,
   LetterElementCreateInput,
   LetterElementType,
@@ -29,8 +30,8 @@ export class LetterResolver {
   constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
-  createLetter(@Args("title") title: string) {
-    return this.letterService.createLetter(title);
+  createLetter(@Args("createInput") createInput: LetterCreateInput) {
+    return this.letterService.create(Letter, createInput);
   }
 
   @Mutation(returns => LetterElement)
