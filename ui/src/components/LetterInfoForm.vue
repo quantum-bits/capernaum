@@ -6,29 +6,18 @@
     <v-flex xs12 sm6 offset-sm2>
       <v-form ref="form" v-model="valid" lazy-validation>
         <v-text-field
-          v-model="name"
+          v-model="title"
           :counter="80"
-          :rules="nameRules"
+          :rules="titleRules"
           label="Title of Letter"
           required
         ></v-text-field>
-        <v-select
+        <v-select v-if="isNew"
           v-model="surveySelect"
           :items="selections"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
           required
-          persistent-hint
-          return-object
-          single-line
-        />
-        <v-select
-          v-model="booleanAssociationSelect"
-          :items="booleanAssociations"
-          item-text="title"
-          item-value="id"
-          label="Boolean Association Table"
-          clearable
           persistent-hint
           return-object
           single-line
@@ -47,17 +36,17 @@ import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
-import { BooleanAssociationBriefType } from "@/types/association-table.types";
+//import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";
 
 // used for data returned from the db (for the list used in the drop-down)
-interface BooleanAssociationType {
-  id: number; // id of the association table in our db
-  title: string; // e.g., "General (<2019)"
-  [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
-}
+// interface BooleanAssociationType {
+//   id: number; // id of the association table in our db
+//   title: string; // e.g., "General (<2019)"
+//   [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
+// }
 
 @Component({
   apollo: {
@@ -71,33 +60,36 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
   @Prop({ default: null }) initialSurveyId!: number;
-  @Prop({ default: null })
-  initialBooleanAssociation!: BooleanAssociationBriefType | null;
+  //@Prop({ default: null })
+  //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
 
   surveys: Survey[] = [];
-  booleanAssociations: BooleanAssociationType[] = [];
-  name: string = this.initialTitle;
+  //booleanAssociations: BooleanAssociationType[] = [];
+  title: string = this.initialTitle;
 
   valid: boolean = true;
   //name: string = "";
-  nameRules: any = [
+  titleRules: any = [
     (v: any) => !!v || "Title is required",
     (v: any) =>
       (v && v.length <= 80) || "Title of letter must be less than 80 characters"
   ];
 
   surveySelect: number = this.initialSurveyId; //any = null;
-  booleanAssociationSelect: any = null;
+  //booleanAssociationSelect: any = null;
 
   submit() {
+    // TODO: 
+    // - add description
+    // - add surveyId
     // FIXME: Replace the `as any` hack.
     if ((this.$refs.form as any).validate()) {
-      console.log("name is: ", this.name);
+      console.log("title is: ", this.title);
       this.$apollo.mutate({
         mutation: ADD_LETTER_MUTATION,
         variables: {
-          name: this.name
+          title: this.title
         }
       });
       /*
@@ -124,9 +116,9 @@ export default class LetterInfoForm extends Vue {
   }
 
   mounted() {
-    console.log("name: ", this.name);
-    console.log(typeof this.name);
-    console.log("boolean association: ", this.initialBooleanAssociation);
+    console.log("title: ", this.title);
+    console.log(typeof this.title);
+    //console.log("boolean association: ", this.initialBooleanAssociation);
     //axios
     //  .get("http://localhost:4000/survey-data/")
     //  .then((response: AxiosResponse) => {
@@ -141,19 +133,19 @@ export default class LetterInfoForm extends Vue {
     //    }
     //  });
     // json-server -p 4000 --watch db.json
-    axios
-      .get("http://localhost:4000/boolean-associations/")
-      .then((response: AxiosResponse) => {
-        console.log(response);
-        this.booleanAssociations = response.data;
-        if (!this.isNew && this.initialBooleanAssociation !== null) {
-          for (let booleanAssociation of this.booleanAssociations) {
-            if (booleanAssociation.id === this.initialBooleanAssociation.id) {
-              this.booleanAssociationSelect = booleanAssociation;
-            }
-          }
-        }
-      });
+  //   axios
+  //     .get("http://localhost:4000/boolean-associations/")
+  //     .then((response: AxiosResponse) => {
+  //       console.log(response);
+  //       this.booleanAssociations = response.data;
+  //       if (!this.isNew && this.initialBooleanAssociation !== null) {
+  //         for (let booleanAssociation of this.booleanAssociations) {
+  //           if (booleanAssociation.id === this.initialBooleanAssociation.id) {
+  //             this.booleanAssociationSelect = booleanAssociation;
+  //           }
+  //         }
+  //       }
+  //     });
   }
 }
 </script>

@@ -35,13 +35,14 @@ export interface AssociationTableHeader {
   align: string; // e.g., "left"
   sortable: boolean; // whether or not the column is sortable
   text: string; // text for the column
-  value: string; // "practice" for the first column; "columnID-id" for the rest, where id is the id of the spiritual focus/orientation in the db
+  value: string; // "practice" for the first column; "columnId-id" for the rest, where id is the id of the spiritual focus/orientation in the db
 }
 
 /**
  * abbreviated type used in json data
+ * deprecated....
  */
-export interface BooleanAssociationBriefType {
-  id: number;
-  title: string;
-}
+//export interface BooleanAssociationBriefType {
+//  id: number;
+//  title: string;
+//}

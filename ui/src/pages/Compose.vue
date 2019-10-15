@@ -13,7 +13,7 @@
           <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
-            <span class="font-weight-light">{{ letter.name }}</span>
+            <span class="font-weight-light">{{ letter.title }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
@@ -24,15 +24,15 @@
           <h2 class="title font-weight-regular mb-1">
             Boolean Association Table:
             <span
-              v-if="booleanAssociation !== null"
+              v-if="predictionTableEntriesExist"
               class="font-weight-light"
-              >{{ booleanAssociation.title }}</span
+              >{{ theLetter.tableEntries.length }} entries</span
             >
             <span v-else class="font-weight-light"> None </span>
           </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
-            <span class="font-weight-light">{{ letter.updated }}</span>
+            <span class="font-weight-light">{{ letter.updated | dateAndTime}}</span>
           </h2>
         </v-flex>
         <v-flex v-if="!surveyLetterIsFrozen" xs3 class="text-xs-right">
@@ -45,9 +45,8 @@
     <div v-if="letterExistsAndEditModeOn">
       <LetterInfoForm
         :id="letter.id"
-        :initialTitle="letter.name"
+        :initialTitle="letter.title"
         :initialSurveyId="survey.id"
-        :initialBooleanAssociation="booleanAssociation"
         :isNew="isNew"
         v-on:save-info="saveInfo"
       >
@@ -139,7 +138,7 @@ import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementEnum } from "../types/letter.types";
 
-import { BooleanAssociationBriefType } from "../types/association-table.types";
+//import { BooleanAssociationBriefType } from "../types/association-table.types";
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
@@ -166,8 +165,9 @@ interface LetterElement extends OneLetter_letter_letterElements {
     theLetter: {
       query: ONE_LETTER_QUERY,
       variables() {
+        console.log("route params: ", parseInt(this.$route.params.letterId));
         return {
-          id: parseInt(this.$route.params.id)
+          letterId: parseInt(this.$route.params.letterId)
         };
       },
       update(data: OneLetter) {
@@ -176,10 +176,12 @@ interface LetterElement extends OneLetter_letter_letterElements {
           box.editModeOn = false;
           box.isNew = false;
         }
+        console.log("letter: ", data.letter);
         return data.letter;
       },
       skip() {
-        return this.$route.params.id === undefined;
+        return this.$route.params.letterId === undefined;
+        console.log("skipping fetch for now....");
       }
     }
     // letter: {
@@ -216,7 +218,15 @@ export default class Compose extends Vue {
   editModeOn: boolean = false;
 
   theLetter: OneLetter_letter | null = null;
-  booleanAssociation: BooleanAssociationBriefType | null = null;
+  //booleanAssociation: BooleanAssociationBriefType | null = null;
+
+  get predictionTableEntriesExist() {
+    if (this.theLetter) {
+      return this.theLetter.tableEntries.length > 0;
+    } else {
+      return false;
+    }
+  }
 
   get letter() {
     if (this.theLetter) {
@@ -335,13 +345,13 @@ export default class Compose extends Vue {
     console.log(letterElements);
   }
 
-  itemDisabled(key: string) {
+  /* itemDisabled(key: string) {
     console.log("key: ", key);
     return (
       key === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS &&
       this.booleanAssociation === null
     );
-  }
+  } */
 
   letterElement(key: string) {
     if (key === LetterElementEnum.BOILERPLATE) {
@@ -366,7 +376,7 @@ export default class Compose extends Vue {
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
-    if (this.$route.params.id === undefined) {
+    if (this.$route.params.letterId === undefined) {
       // launch form for creating a new letter
       this.editModeOn = true;
       this.isNew = true;

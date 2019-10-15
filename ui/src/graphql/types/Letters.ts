@@ -44,13 +44,52 @@ export interface Letters_letters_tableEntries {
 }
 
 export interface Letters_letters_letterElements_letterElementType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   key: string;
   description: string;
 }
 
+export interface Letters_letters_letterElements_textDelta_ops {
+  insert: string | null;
+  delete: number | null;
+  retain: number | null;
+}
+
+export interface Letters_letters_letterElements_textDelta {
+  ops: Letters_letters_letterElements_textDelta_ops[] | null;
+}
+
+export interface Letters_letters_letterElements_surveyDimension {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Title of this dimension (e.g., 'Focus on Prayer')
+   */
+  title: string;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
+  /**
+   * Sequence number; dimension are displayed in this order.
+   */
+  sequence: number;
+}
+
 export interface Letters_letters_letterElements {
   letterElementType: Letters_letters_letterElements_letterElementType;
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   sequence: number;
+  textDelta: Letters_letters_letterElements_textDelta | null;
+  surveyDimension: Letters_letters_letterElements_surveyDimension | null;
 }
 
 export interface Letters_letters_survey_surveyDimensions_survey {
@@ -127,6 +166,8 @@ export interface Letters_letters {
   id: number;
   title: string;
   description: string;
+  updated: any;
+  isFrozen: boolean;
   scriptureEngagementPractices: Letters_letters_scriptureEngagementPractices[];
   tableEntries: Letters_letters_tableEntries[];
   letterElements: Letters_letters_letterElements[];

@@ -130,7 +130,10 @@ export default class LetterTextArea extends Vue {
                             });
                             */
   }
-
+  mounted() {
+    console.log("description", this.description);
+    console.log("initial text delta: ", this.textDelta);
+  }
   // mounted() {
   //   axios
   //     .get("http://localhost:4000/letter-elements/")

@@ -56,17 +56,52 @@ export interface OneLetter_letter_tableEntries {
 }
 
 export interface OneLetter_letter_letterElements_letterElementType {
-  key: string;
-  description: string;
-}
-
-export interface OneLetter_letter_letterElements {
   /**
    * Unique ID for this entity
    */
   id: number;
-  letterElementType: OneLetter_letter_letterElements_letterElementType;
+  key: string;
+  description: string;
+}
+
+export interface OneLetter_letter_letterElements_textDelta_ops {
+  insert: string | null;
+  delete: number | null;
+  retain: number | null;
+}
+
+export interface OneLetter_letter_letterElements_textDelta {
+  ops: OneLetter_letter_letterElements_textDelta_ops[] | null;
+}
+
+export interface OneLetter_letter_letterElements_surveyDimension {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Title of this dimension (e.g., 'Focus on Prayer')
+   */
+  title: string;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
+  /**
+   * Sequence number; dimension are displayed in this order.
+   */
   sequence: number;
+}
+
+export interface OneLetter_letter_letterElements {
+  letterElementType: OneLetter_letter_letterElements_letterElementType;
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  sequence: number;
+  textDelta: OneLetter_letter_letterElements_textDelta | null;
+  surveyDimension: OneLetter_letter_letterElements_surveyDimension | null;
 }
 
 export interface OneLetter_letter_survey_surveyDimensions_survey {

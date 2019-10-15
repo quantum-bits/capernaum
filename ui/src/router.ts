@@ -39,12 +39,12 @@ export default new Router({
       component: () => import("./pages/ImportedSurveys.vue")
     },
     {
-      path: "/compose/:id?",
+      path: "/compose/:letterId?",
       name: "compose",
       component: () => import("./pages/Compose.vue")
     },
     {
-      path: "/association-table/:letterId?",
+      path: "/association-table/:letterId",
       name: "association-table",
       component: () => import("./pages/AssociationTable.vue")
     },

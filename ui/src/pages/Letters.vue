@@ -16,7 +16,7 @@
               <td>{{ item.title }}</td>
               <!--<td class="text-xs-right">{{ item.description }}</td>-->
               <td class="text-xs-right">{{ item.survey.title }}</td>
-              <td class="text-xs-right">{{ item.lastUpdate }}</td>
+              <td class="text-xs-right">{{ item.updated | dateAndTime }}</td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
                   <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
@@ -84,6 +84,7 @@ export default class LettersPage extends Vue {
 
   newLetter() {
     console.log("create new letter");
+    this.$router.push({ name: "compose" });
   }
 
   viewAssociationTable(item: any) {
@@ -97,7 +98,7 @@ export default class LettersPage extends Vue {
   viewLetter(item: any) {
     console.log("item: ", item);
     console.log("view letter!");
-    //this.$router.push({ name: "association-table", params: { id: item.id, surveyId: item.surveyLetter.survey.id } });
+    this.$router.push({ name: "compose", params: { letterId: item.id } });
   }
 
   mounted() {}

@@ -38,12 +38,26 @@ export const ONE_LETTER_QUERY = gql`
         }
       }
       letterElements {
-        id
         letterElementType {
+          id
           key
           description
         }
+        id
         sequence
+        textDelta {
+          ops {
+            insert
+            delete
+            retain
+          }
+        }
+        surveyDimension {
+          id
+          title
+          useForPredictions
+          sequence
+        }
       }
       survey {
         title
@@ -79,6 +93,8 @@ export const ALL_LETTERS_QUERY = gql`
       id
       title
       description
+      updated
+      isFrozen
       scriptureEngagementPractices {
         id
         title
@@ -97,10 +113,25 @@ export const ALL_LETTERS_QUERY = gql`
       }
       letterElements {
         letterElementType {
+          id
           key
           description
         }
+        id
         sequence
+        textDelta {
+          ops {
+            insert
+            delete
+            retain
+          }
+        }
+        surveyDimension {
+          id
+          title
+          useForPredictions
+          sequence
+        }
       }
       survey {
         title
