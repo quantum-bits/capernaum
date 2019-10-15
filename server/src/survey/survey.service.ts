@@ -31,7 +31,8 @@ import { BaseService } from "../shared/base.service";
 export class SurveyService extends BaseService {
   constructor(
     protected readonly entityManager: EntityManager,
-    @InjectRepository(Survey) private readonly surveyRepo: Repository<Survey>,
+    @InjectRepository(Survey)
+    private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
     private readonly surveyDimensionRepo: Repository<SurveyDimension>,
     @InjectRepository(SurveyIndex)
