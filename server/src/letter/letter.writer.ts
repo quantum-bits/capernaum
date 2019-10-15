@@ -1,6 +1,5 @@
 import { ConfigureOptions, Environment, FileSystemLoader } from "nunjucks";
 import { Letter } from "./entities";
-import { LetterService } from "./letter.service";
 import { exec } from "child_process";
 import { writeFile } from "fs";
 

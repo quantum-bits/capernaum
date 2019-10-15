@@ -8,6 +8,8 @@ import {
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
+import SurveyAnalyst from "../survey/survey.analyst";
+import { SurveyService } from "../survey/survey.service";
 
 @Module({
   imports: [
@@ -22,7 +24,9 @@ import { PredictionTableEntry } from "../prediction/entities";
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    LetterElementResolver
+    LetterElementResolver,
+    SurveyAnalyst,
+    SurveyService
   ]
 })
 export class LetterModule {}

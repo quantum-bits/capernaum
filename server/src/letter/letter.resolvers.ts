@@ -23,10 +23,14 @@ import {
   ScriptureEngagementPractice
 } from "../prediction/entities";
 import LaTeXWriter from "./letter.writer";
+import SurveyAnalyst from "../survey/survey.analyst";
 
 @Resolver(of => Letter)
 export class LetterResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    private readonly letterService: LetterService,
+    private readonly surveyAnalyst: SurveyAnalyst
+  ) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("title") title: string) {
@@ -76,6 +80,7 @@ export class LetterResolver {
   async writeLetter(
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
+    await this.surveyAnalyst.scoreSurveyDimension(56, 1);
     const letter = await this.letterService.letter(letterWriterInput.letterId);
     const writer = new LaTeXWriter();
     const result = await writer.render(letter);
