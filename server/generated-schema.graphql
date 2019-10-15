@@ -20,11 +20,18 @@ type Letter {
   description: String!
   created: DateTime!
   updated: DateTime!
-  isFrozen: Boolean!
+  isFrozen: Boolean
   survey: Survey!
   letterElements: [LetterElement!]!
   tableEntries: [PredictionTableEntry!]!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+}
+
+input LetterCreateInput {
+  title: String!
+  description: String!
+  isFrozen: Boolean = false
+  surveyId: Int!
 }
 
 type LetterElement {
@@ -66,6 +73,7 @@ input LetterUpdateInput {
   title: String
   description: String
   isFrozen: Boolean
+  surveyId: Int!
 }
 
 input LetterWriterInput {
@@ -73,7 +81,7 @@ input LetterWriterInput {
 }
 
 type Mutation {
-  createLetter(title: String!): Letter!
+  createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!

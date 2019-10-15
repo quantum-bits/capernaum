@@ -31,7 +31,7 @@ export class Letter extends AbstractEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @Field()
+  @Field({ defaultValue: false })
   @Column()
   isFrozen: boolean = false;
 
@@ -50,9 +50,18 @@ export class Letter extends AbstractEntity {
 }
 
 @InputType()
+export class LetterCreateInput {
+  @Field() title: string;
+  @Field() description: string;
+  @Field({ nullable: true, defaultValue: false }) isFrozen?: boolean;
+  @Field(type => Int) surveyId: number;
+}
+
+@InputType()
 export class LetterUpdateInput {
   @Field(type => Int) id: number;
   @Field({ nullable: true }) title: string;
   @Field({ nullable: true }) description: string;
   @Field({ nullable: true }) isFrozen: boolean;
+  @Field(type => Int) surveyId: number;
 }

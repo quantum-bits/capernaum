@@ -26,12 +26,12 @@ fixtures:
       sf-chart:
         sequence: 3
         letter: ^letter.abide-letter
-        letterElementType: ^letter_element_type.spiritual-focus-chart
+        letterElementType: ^letter_element_type.chart
         surveyDimension: ^survey_dimension.focal-dimension
       so-chart:
         sequence: 4
         letter: ^letter.abide-letter
-        letterElementType: ^letter_element_type.spiritual-orientations-chart
+        letterElementType: ^letter_element_type.chart
         surveyDimension: ^survey_dimension.focal-dimension
       boilerplate-3:
         sequence: 5
@@ -49,12 +49,9 @@ fixtures:
         textDelta: Closing remarks.
   - table: letter_element_type
     rows:
-      spiritual-focus-chart:
-        key: spiritual-focus-chart
-        description: Spiritual Focus Chart
-      spiritual-orientations-chart:
-        key: spiritual-orientations-chart
-        description: Spiritual Orientations Chart
+      chart:
+        key: chart
+        description: Bar Chart
       boolean-calculation-results:
         key: boolean-calculation-results
         description: Boolean Calculation Results
