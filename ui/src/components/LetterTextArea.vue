@@ -11,7 +11,7 @@
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="save">Save</v-btn>
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+          <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
             <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
           <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
@@ -31,7 +31,7 @@
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="openEditor">Edit</v-btn>
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+          <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
             <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
           <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
@@ -64,7 +64,8 @@ export default class LetterTextArea extends Vue {
   /** Item to display */
   @Prop() id!: number;
   @Prop() order!: number;
-  @Prop() numItems!: number;
+  @Prop() largestSequenceNumber!: number;
+  @Prop() smallestSequenceNumber!: number;
   @Prop() initialTextDelta!: Delta;
   @Prop({ default: false }) initialEditModeOn!: boolean;
   @Prop() letterElementKey!: string;
@@ -102,7 +103,11 @@ export default class LetterTextArea extends Vue {
                     */
 
   get showMoveDown() {
-    return this.order < this.numItems - 1;
+    return this.order < this.largestSequenceNumber;
+  }
+
+  get showMoveUp() {
+    return this.order > this.smallestSequenceNumber;
   }
 
   // Fetch a properly typed Quill.

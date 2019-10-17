@@ -45,7 +45,8 @@ export default class StaticLetterElement extends Vue {
   /** Non-boilerplate letter element */
   @Prop() id!: number;
   @Prop() order!: number;
-  @Prop() numItems!: number;
+  @Prop() largestSequenceNumber!: number;
+  @Prop() smallestSequenceNumber!: number;
   @Prop() initialTextDelta!: Delta; // not actually used in this component, but need to mirror the props of  LetterTextArea.vue
   @Prop({ default: false }) initialEditModeOn!: boolean; // not actually used in this component
   @Prop() letterElementKey!: string;
@@ -64,7 +65,11 @@ export default class StaticLetterElement extends Vue {
   deleteElement() {}
 
   get showMoveDown() {
-    return this.order < this.numItems - 1;
+    return this.order < this.largestSequenceNumber;
+  }
+
+  get showMoveUp() {
+    return this.order > this.smallestSequenceNumber;
   }
 
   get displayChart() {

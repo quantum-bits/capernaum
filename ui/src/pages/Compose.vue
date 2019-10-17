@@ -94,12 +94,14 @@
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
             :numItems="surveyLetterElements.length"
+            :largestSequenceNumber="largestSequenceNumber"
+            :smallestSequenceNumber="smallestSequenceNumber"
             :letterElementKey="element.letterElementType.key"
             :description="element.letterElementType.description"
             :parentIsFrozen="surveyLetterIsFrozen"
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
-            v-on:delete-element="deleteElement(index)"
+            v-on:delete-element="deleteElement(element.id)"
           ></component>
         </div>
       </v-flex>
@@ -147,7 +149,12 @@ import LetterInfoForm from "../components/LetterInfoForm.vue";
 import { LetterElementEnum } from "../types/letter.types";
 
 //import { BooleanAssociationBriefType } from "../types/association-table.types";
-import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
+import {
+  ONE_LETTER_QUERY,
+  CREATE_LETTER_ELEMENT_MUTATION,
+  UPDATE_LETTER_ELEMENT_MUTATION,
+  DELETE_LETTER_ELEMENT_MUTATION
+} from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
 import {
@@ -195,40 +202,29 @@ interface LetterElement extends OneLetter_letter_letterElements {
         return this.$route.params.letterId === undefined;
       }
     }
-    // letter: {
-    //   query: ONE_LETTER_QUERY,
-    //   variables() {
-    //     // FIXME: this should eventually fetch not just the letter, but all of the related stuff (i.e., it should be a more complicated query)
-    //     if (this.$route.params.id !== undefined) {
-    //       return {
-    //         letterId: this.$route.params.id
-    //       };
-    //     }
-    //   },
-    //   update(data) {
-    //     // FIXME: we may not need to use update() here.  Can delete this method, and then the result will simply go to "letter"; if need to do some
-    //     // manipulation, can use a computed property instead
-    //     /**
-    //      * FIXME: eventually isFrozen will be on SurveyLetter instead of on Letter; if it is frozen, so will everything else be below it.
-    //      * That means that other pages will need to go up the chain to check if SurveyLetter is frozen or not.
-    //      * ...at this point, we are assuming that each combo of survey-tables-letter is standalone, so if SurveyLetter is frozen, they all are.
-    //      * ...in the future, we may want to allow for copying from these when making a new SurveyLetter, but that gets tricky, since the Qualtrics
-    //      * survey may have been edited in the meantime...!
-    //      */
-    //     console.log("data: ", data);
-    //     return data.letter;
-    //   },
-    //   skip() {
-    //     return this.$route.params.id === undefined;
-    //   }
-    // }
   }
 })
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
 
-  theLetter: OneLetter_letter | null = null;
+  theLetter: OneLetter_letter = {
+    id: -1,
+    title: "",
+    description: "",
+    scriptureEngagementPractices: [],
+    updated: "",
+    isFrozen: false,
+    tableEntries: [],
+    letterElements: [],
+    survey: {
+      id: -1,
+      title: "",
+      qualtricsId: "",
+      qualtricsName: "",
+      surveyDimensions: []
+    }
+  };
   //booleanAssociation: BooleanAssociationBriefType | null = null;
 
   get predictionTableEntriesExist() {
@@ -296,32 +292,116 @@ export default class Compose extends Vue {
     return this.isNew && this.editModeOn;
   }
 
+  get largestSequenceNumber() {
+    let largestSN: number = -1;
+    this.surveyLetterElements.forEach(surveyLetterElement => {
+      if (largestSN < surveyLetterElement.sequence) {
+        largestSN = surveyLetterElement.sequence;
+      }
+    });
+    return largestSN;
+  }
+
+  get smallestSequenceNumber() {
+    let smallestSN: number = this.largestSequenceNumber;
+    this.surveyLetterElements.forEach(surveyLetterElement => {
+      if (smallestSN > surveyLetterElement.sequence) {
+        smallestSN = surveyLetterElement.sequence;
+      }
+    });
+    return smallestSN;
+  }
+
   // Move code from
   //   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
 
   moveUp(index: number) {
     const letterElements = this.surveyLetterElements;
     let element: LetterElement = letterElements[index];
-    letterElements.splice(index, 1);
-    letterElements.splice(index - 1, 0, element);
-    this.resetSequenceProperty();
-    console.log(letterElements);
+    let previousElement: LetterElement = letterElements[index - 1];
+    this.exchangeElements(element, previousElement);
   }
 
   moveDown(index: number) {
     const letterElements = this.surveyLetterElements;
-    let element: LetterElement = letterElements[index + 1];
-    letterElements.splice(index + 1, 1);
-    letterElements.splice(index, 0, element);
-    this.resetSequenceProperty();
-    console.log(letterElements);
+    let element: LetterElement = letterElements[index];
+    let nextElement: LetterElement = letterElements[index + 1];
+    this.exchangeElements(element, nextElement);
   }
 
-  deleteElement(index: number) {
-    const letterElements = this.surveyLetterElements;
-    letterElements.splice(index, 1);
-    this.resetSequenceProperty();
-    console.log(letterElements);
+  exchangeElements(
+    letterElement1: LetterElement,
+    letterElement2: LetterElement
+  ) {
+    let newSequence1: number = letterElement2.sequence;
+    let newSequence2: number = letterElement1.sequence;
+    this.$apollo
+      .mutate({
+        mutation: UPDATE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          updateInput: {
+            id: letterElement1.id,
+            sequence: newSequence1
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done first element!", data);
+        // now update second element....
+        this.$apollo
+          .mutate({
+            mutation: UPDATE_LETTER_ELEMENT_MUTATION,
+            variables: {
+              updateInput: {
+                id: letterElement2.id,
+                sequence: newSequence2
+              }
+            }
+          })
+          .then(({ data }) => {
+            console.log("done second element!", data);
+            this.refreshPage();
+            //this.$emit("letter-created", data.createLetter.id);
+          })
+          .catch(error => {
+            console.log(
+              "there appears to have been an error updating the 2nd element: ",
+              error
+            );
+            //this.errorMessage =
+            //  "Sorry, there appears to have been an error.  Please tray again later.";
+          });
+        //this.$emit("letter-created", data.createLetter.id);
+      })
+      .catch(error => {
+        console.log(
+          "there appears to have been an error updating the 1st element: ",
+          error
+        );
+        //this.errorMessage =
+        //  "Sorry, there appears to have been an error.  Please tray again later.";
+      });
+  }
+
+  deleteElement(letterElementId: number) {
+    console.log(letterElementId);
+    this.$apollo
+      .mutate({
+        mutation: DELETE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          id: letterElementId
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+        this.refreshPage();
+        //this.$emit("letter-created", data.createLetter.id);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+        //this.errorMessage =
+        //  "Sorry, there appears to have been an error.  Please tray again later.";
+      });
   }
 
   resetSequenceProperty() {
@@ -334,29 +414,41 @@ export default class Compose extends Vue {
     letterElementType: OneLetter_letter_letterElements_letterElementType
   ) {
     const letterElements = this.surveyLetterElements;
-    let numElements: number = letterElements.length;
-    let maxId: number = 0;
-
-    // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
-    for (let box of letterElements) {
-      if (box.id > maxId) {
-        maxId = box.id;
+    //let numElements: number = letterElements.length;
+    //let maxId: number = 0;
+    let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
+    letterElements.forEach(letterElement => {
+      if (maxSequence < letterElement.sequence) {
+        maxSequence = letterElement.sequence;
       }
-    }
-    maxId = maxId + 1;
-    letterElements.push({
-      id: maxId, //will eventually get assigned a value by the server, but use this value as a key for now....
-      sequence: numElements,
-      textDelta: {
-        ops: [{ insert: "" }]
-      },
-      key: letterElementType.key,
-      isNew: true,
-      editModeOn: true,
-      letterElementType: letterElementType
-    } as LetterElement);
-    this.resetSequenceProperty();
-    console.log(letterElements);
+    });
+    let newSequence: number = maxSequence + 1;
+    console.log("letter element type: ", letterElementType);
+    this.$apollo
+      .mutate({
+        mutation: CREATE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          createInput: {
+            sequence: newSequence,
+            letterId: this.theLetter.id,
+            letterElementTypeId: letterElementType.id //,
+            //title: this.title,
+            //description: this.description,
+            //isFrozen: false,
+            //surveyId: this.surveySelect.value
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+        this.refreshPage();
+        //this.$emit("letter-created", data.createLetter.id);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+        //this.errorMessage =
+        //  "Sorry, there appears to have been an error.  Please tray again later.";
+      });
   }
 
   /* itemDisabled(key: string) {
@@ -366,6 +458,12 @@ export default class Compose extends Vue {
       this.booleanAssociation === null
     );
   } */
+
+  refreshPage() {
+    this.$apollo.queries.theLetter.refetch().then(({ data }) => {
+      console.log("letter data refetched! ", data);
+    });
+  }
 
   letterElement(key: string) {
     if (key === LetterElementEnum.BOILERPLATE) {
@@ -393,7 +491,7 @@ export default class Compose extends Vue {
     console.log("new letter created!");
     console.log("id: ", id);
     //https://www.w3schools.com/jsref/jsref_tostring_number.asp
-    let idString = id.toString();
+    let idString: string = id.toString();
     this.$router.push({ name: "compose", params: { letterId: idString } });
     // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
     // https://router.vuejs.org/guide/essentials/navigation.html

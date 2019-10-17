@@ -7,6 +7,10 @@
 // ====================================================
 
 export interface LetterElementTypes_letterElementTypes {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   key: string;
   description: string;
 }

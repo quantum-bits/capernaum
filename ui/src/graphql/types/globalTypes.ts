@@ -22,6 +22,23 @@ export interface LetterCreateInput {
   surveyId: number;
 }
 
+export interface LetterElementCreateInput {
+  sequence: number;
+  textDelta?: QuillDeltaInput | null;
+  letterId: number;
+  letterElementTypeId: number;
+  surveyDimensionId?: number | null;
+}
+
+export interface LetterElementUpdateInput {
+  id: number;
+  sequence?: number | null;
+  textDelta?: QuillDeltaInput | null;
+  letterId?: number | null;
+  letterElementTypeId?: number | null;
+  surveyDimensionId?: number | null;
+}
+
 export interface LetterUpdateInput {
   id: number;
   title?: string | null;
@@ -44,6 +61,16 @@ export interface PredictionTableEntryReplaceInput {
 export interface QualtricsImportInput {
   qualtricsId: string;
   title: string;
+}
+
+export interface QuillDeltaInput {
+  ops?: QuillDeltaOpInput[] | null;
+}
+
+export interface QuillDeltaOpInput {
+  insert?: string | null;
+  delete?: number | null;
+  retain?: number | null;
 }
 
 //==============================================================

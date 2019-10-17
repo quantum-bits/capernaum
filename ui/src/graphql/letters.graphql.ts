@@ -178,8 +178,33 @@ export const ALL_LETTERS_QUERY = gql`
 export const ALL_LETTER_ELEMENT_TYPES_QUERY = gql`
   query LetterElementTypes {
     letterElementTypes {
+      id
       key
       description
     }
+  }
+`;
+
+export const CREATE_LETTER_ELEMENT_MUTATION = gql`
+  mutation CreateLetterElement($createInput: LetterElementCreateInput!) {
+    createLetterElement(createInput: $createInput) {
+      id
+      sequence
+    }
+  }
+`;
+
+export const UPDATE_LETTER_ELEMENT_MUTATION = gql`
+  mutation UpdateLetterElement($updateInput: LetterElementUpdateInput!) {
+    updateLetterElement(updateInput: $updateInput) {
+      id
+      sequence
+    }
+  }
+`;
+
+export const DELETE_LETTER_ELEMENT_MUTATION = gql`
+  mutation DeleteLetterElement($id: Int!) {
+    deleteLetterElement(id: $id)
   }
 `;
