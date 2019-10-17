@@ -165,6 +165,10 @@ export interface OneLetter_letter_survey_surveyDimensions {
 
 export interface OneLetter_letter_survey {
   /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
    * Title for this survey in Capernaum
    */
   title: string;
@@ -187,7 +191,7 @@ export interface OneLetter_letter {
   title: string;
   updated: any;
   description: string;
-  isFrozen: boolean;
+  isFrozen: boolean | null;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
   tableEntries: OneLetter_letter_tableEntries[];
   letterElements: OneLetter_letter_letterElements[];

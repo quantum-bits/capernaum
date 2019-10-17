@@ -7,14 +7,8 @@
             <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
             <!-- https://github.com/vuetifyjs/vuetify-loader/issues/12 -->
             <v-img
-              v-if="displaySpiritualFoci"
+              v-if="displayChart"
               :src="require('@/images/spiritual-foci.png')"
-              :width="400"
-            ></v-img>
-
-            <v-img
-              v-if="displaySpiritualOrientations"
-              :src="require('@/images/spiritual-orientations.png')"
               :width="400"
             ></v-img>
             <span v-if="displaySEStrategies">
@@ -73,14 +67,8 @@ export default class StaticLetterElement extends Vue {
     return this.order < this.numItems - 1;
   }
 
-  get displaySpiritualFoci() {
-    return this.letterElementKey === LetterElementEnum.SPIRITUAL_FOCUS_CHART;
-  }
-
-  get displaySpiritualOrientations() {
-    return (
-      this.letterElementKey === LetterElementEnum.SPIRITUAL_ORIENTATIONS_CHART
-    );
+  get displayChart() {
+    return this.letterElementKey === LetterElementEnum.CHART;
   }
 
   get displaySEStrategies() {

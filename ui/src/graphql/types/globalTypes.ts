@@ -15,6 +15,21 @@ export enum WhichItems {
   WithoutIndex = "WithoutIndex",
 }
 
+export interface LetterCreateInput {
+  title: string;
+  description: string;
+  isFrozen?: boolean | null;
+  surveyId: number;
+}
+
+export interface LetterUpdateInput {
+  id: number;
+  title?: string | null;
+  description?: string | null;
+  isFrozen?: boolean | null;
+  surveyId: number;
+}
+
 export interface PartialPredictionTableEntry {
   surveyIndexId: number;
   practiceId: number;

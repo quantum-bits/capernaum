@@ -16,6 +16,10 @@
             <span class="font-weight-light">{{ letter.title }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
+            Description:
+            <span class="font-weight-light">{{ letter.description }}</span>
+          </h2>
+          <h2 class="title font-weight-regular mb-1">
             Survey:
             <span class="font-weight-light">{{
               theLetter.survey.qualtricsName
@@ -23,16 +27,16 @@
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Boolean Association Table:
-            <span
-              v-if="predictionTableEntriesExist"
-              class="font-weight-light"
+            <span v-if="predictionTableEntriesExist" class="font-weight-light"
               >{{ theLetter.tableEntries.length }} entries</span
             >
             <span v-else class="font-weight-light"> None </span>
           </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
-            <span class="font-weight-light">{{ letter.updated | dateAndTime}}</span>
+            <span class="font-weight-light">{{
+              letter.updated | dateAndTime
+            }}</span>
           </h2>
         </v-flex>
         <v-flex v-if="!surveyLetterIsFrozen" xs3 class="text-xs-right">
@@ -46,14 +50,18 @@
       <LetterInfoForm
         :id="letter.id"
         :initialTitle="letter.title"
-        :initialSurveyId="survey.id"
+        :initialDescription="letter.description"
+        :initialSurveyId="letter.survey.id"
         :isNew="isNew"
-        v-on:save-info="saveInfo"
+        v-on:letter-info-updated="letterInfoUpdated"
       >
       </LetterInfoForm>
     </div>
     <div v-if="letterIsNewAndEditModeOn">
-      <LetterInfoForm :isNew="isNew" v-on:save-info="saveInfo">
+      <LetterInfoForm
+        :isNew="isNew"
+        v-on:letter-created="newLetterCreated($event)"
+      >
       </LetterInfoForm>
     </div>
 
@@ -145,7 +153,8 @@ import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import {
   OneLetter,
   OneLetter_letter,
-  OneLetter_letter_letterElements
+  OneLetter_letter_letterElements,
+  OneLetter_letter_letterElements_letterElementType
 } from "@/graphql/types/OneLetter";
 
 interface LetterElement extends OneLetter_letter_letterElements {
@@ -180,8 +189,10 @@ interface LetterElement extends OneLetter_letter_letterElements {
         return data.letter;
       },
       skip() {
+        if (this.$route.params.letterId === undefined) {
+          console.log("skipping fetch for now....");
+        }
         return this.$route.params.letterId === undefined;
-        console.log("skipping fetch for now....");
       }
     }
     // letter: {
@@ -319,10 +330,13 @@ export default class Compose extends Vue {
     this.surveyLetterElements.forEach((elt, idx) => (elt.sequence = idx));
   }
 
-  addElement(key: string) {
+  addElement(
+    letterElementType: OneLetter_letter_letterElements_letterElementType
+  ) {
     const letterElements = this.surveyLetterElements;
     let numElements: number = letterElements.length;
     let maxId: number = 0;
+
     // set the (temporary) id of the new element to be greater than the id's of all the other ones; it is used as a key, so it needs to be unique
     for (let box of letterElements) {
       if (box.id > maxId) {
@@ -336,10 +350,10 @@ export default class Compose extends Vue {
       textDelta: {
         ops: [{ insert: "" }]
       },
-      key: key,
+      key: letterElementType.key,
       isNew: true,
       editModeOn: true,
-      letterElementType: { key: key, description: key }
+      letterElementType: letterElementType
     } as LetterElement);
     this.resetSequenceProperty();
     console.log(letterElements);
@@ -365,9 +379,25 @@ export default class Compose extends Vue {
     this.editModeOn = true;
   }
 
-  saveInfo() {
-    // save the letter info (title, etc....maybe do this in the child component and reload the page?)
+  letterInfoUpdated() {
+    // letter information has been successfully updated....
+    console.log("letter info updated!");
+    this.$apollo.queries.theLetter.refetch().then(({ data }) => {
+      console.log("survey data refetched! ", data);
+    });
     this.editModeOn = false;
+  }
+
+  newLetterCreated(id: number) {
+    // letter information has been successfully created or updated....reload the page, but now with the appropriate letterId
+    console.log("new letter created!");
+    console.log("id: ", id);
+    //https://www.w3schools.com/jsref/jsref_tostring_number.asp
+    let idString = id.toString();
+    this.$router.push({ name: "compose", params: { letterId: idString } });
+    // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
+    // https://router.vuejs.org/guide/essentials/navigation.html
+    this.$router.go(0);
   }
 
   viewPDF() {

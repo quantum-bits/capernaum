@@ -2,13 +2,13 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { LetterCreateInput } from "./globalTypes";
+import { LetterUpdateInput } from "./globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: AddLetter
+// GraphQL mutation operation: UpdateLetter
 // ====================================================
 
-export interface AddLetter_createLetter {
+export interface UpdateLetter_updateLetter {
   /**
    * Unique ID for this entity
    */
@@ -19,10 +19,10 @@ export interface AddLetter_createLetter {
   isFrozen: boolean | null;
 }
 
-export interface AddLetter {
-  createLetter: AddLetter_createLetter;
+export interface UpdateLetter {
+  updateLetter: UpdateLetter_updateLetter;
 }
 
-export interface AddLetterVariables {
-  createInput: LetterCreateInput;
+export interface UpdateLetterVariables {
+  letterData: LetterUpdateInput;
 }

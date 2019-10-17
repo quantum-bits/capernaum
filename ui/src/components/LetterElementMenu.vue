@@ -9,7 +9,7 @@
       <v-list-item
         v-for="item in letterElementTypes"
         :key="item.key"
-        @click="emitKey(item.key)"
+        @click="emitLetterElementType(item)"
       >
         <v-list-item-title>{{ item.description }}</v-list-item-title>
       </v-list-item>
@@ -20,6 +20,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_LETTER_ELEMENT_TYPES_QUERY } from "@/graphql/letters.graphql";
+import {
+  OneLetter_letter_letterElements_letterElementType
+} from "@/graphql/types/OneLetter";
 
 export default Vue.extend({
   name: "ComposeMenu",
@@ -37,8 +40,8 @@ export default Vue.extend({
   },
 
   methods: {
-    emitKey(key: string) {
-      this.$emit("click", key);
+    emitLetterElementType(letterElementType: OneLetter_letter_letterElements_letterElementType) {
+      this.$emit("click", letterElementType);
     }
   }
 });

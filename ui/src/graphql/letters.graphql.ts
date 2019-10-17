@@ -1,10 +1,25 @@
 import gql from "graphql-tag";
 
 export const ADD_LETTER_MUTATION = gql`
-  mutation AddLetter($title: String!) {
-    createLetter(title: $title) {
+  mutation AddLetter($createInput: LetterCreateInput!) {
+    createLetter(createInput: $createInput) {
       id
       title
+      description
+      updated
+      isFrozen
+    }
+  }
+`;
+
+export const UPDATE_LETTER_MUTATION = gql`
+  mutation UpdateLetter($letterData: LetterUpdateInput!) {
+    updateLetter(letterData: $letterData) {
+      id
+      title
+      description
+      updated
+      isFrozen
     }
   }
 `;
@@ -60,6 +75,7 @@ export const ONE_LETTER_QUERY = gql`
         }
       }
       survey {
+        id
         title
         qualtricsId
         qualtricsName

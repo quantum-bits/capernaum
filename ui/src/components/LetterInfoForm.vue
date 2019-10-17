@@ -12,7 +12,15 @@
           label="Title of Letter"
           required
         ></v-text-field>
-        <v-select v-if="isNew"
+        <v-text-field
+          v-model="description"
+          :counter="120"
+          :rules="descriptionRules"
+          label="Description"
+          required
+        ></v-text-field>
+        <v-select
+          v-if="isNew"
           v-model="surveySelect"
           :items="selections"
           :rules="[v => !!v || 'Survey is required']"
@@ -22,6 +30,7 @@
           return-object
           single-line
         />
+        <div v-if="errorMessage" class="red--text mb-4">{{ errorMessage }}</div>
         <v-btn :disabled="!valid" color="success" @click="submit">
           Submit
         </v-btn>
@@ -39,7 +48,14 @@ import gql from "graphql-tag";
 //import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { ADD_LETTER_MUTATION } from "@/graphql/letters.graphql";
+import {
+  ADD_LETTER_MUTATION,
+  UPDATE_LETTER_MUTATION
+} from "@/graphql/letters.graphql";
+import {
+  LetterCreateInput,
+  LetterUpdateInput
+} from "@/graphql/types/globalTypes";
 
 // used for data returned from the db (for the list used in the drop-down)
 // interface BooleanAssociationType {
@@ -59,7 +75,8 @@ export default class LetterInfoForm extends Vue {
   /** Form to create/update Letter Info (e.g., title, etc.) */
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
-  @Prop({ default: null }) initialSurveyId!: number;
+  @Prop({ default: null }) initialDescription!: string;
+  @Prop({ default: -1 }) initialSurveyId!: number; // no id will be -1, so this is presumably safe
   //@Prop({ default: null })
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
@@ -67,43 +84,96 @@ export default class LetterInfoForm extends Vue {
   surveys: Survey[] = [];
   //booleanAssociations: BooleanAssociationType[] = [];
   title: string = this.initialTitle;
+  description: string = this.initialDescription;
+  errorMessage: string = "";
+  surveySelect: { text: string; value: number } = {
+    text: "",
+    value: this.initialSurveyId
+  };
 
   valid: boolean = true;
   //name: string = "";
   titleRules: any = [
     (v: any) => !!v || "Title is required",
     (v: any) =>
-      (v && v.length <= 80) || "Title of letter must be less than 80 characters"
+      (v && v.length <= 80) ||
+      "Title of letter must be fewer than 80 characters"
+  ];
+  descriptionRules: any = [
+    (v: any) =>
+      (v && v.length <= 120) || "Description must be fewer than 120 characters"
   ];
 
-  surveySelect: number = this.initialSurveyId; //any = null;
-  //booleanAssociationSelect: any = null;
-
   submit() {
-    // TODO: 
+    // TODO:
     // - add description
     // - add surveyId
     // FIXME: Replace the `as any` hack.
-    if ((this.$refs.form as any).validate()) {
-      console.log("title is: ", this.title);
-      this.$apollo.mutate({
-        mutation: ADD_LETTER_MUTATION,
-        variables: {
-          title: this.title
-        }
-      });
-      /*
+    console.log("survey selected: ", this.surveySelect);
+    //console.log(typeof this.surveySelect.value);
+    if (this.isNew) {
+      if ((this.$refs.form as any).validate()) {
+        console.log("title is: ", this.title);
+        this.$apollo
+          .mutate({
+            mutation: ADD_LETTER_MUTATION,
+            variables: {
+              createInput: {
+                title: this.title,
+                description: this.description,
+                isFrozen: false,
+                surveyId: this.surveySelect.value
+              }
+            }
+          })
+          .then(({ data }) => {
+            console.log("done!", data);
+            this.$emit("letter-created", data.createLetter.id);
+          })
+          .catch(error => {
+            console.log("there appears to have been an error: ", error);
+            this.errorMessage =
+              "Sorry, there appears to have been an error.  Please tray again later.";
+          });
+      }
+    } else {
+      if ((this.$refs.form as any).validate()) {
+        console.log("title is: ", this.title);
+        this.$apollo
+          .mutate({
+            mutation: UPDATE_LETTER_MUTATION,
+            variables: {
+              letterData: {
+                id: this.id,
+                title: this.title,
+                description: this.description,
+                surveyId: this.initialSurveyId
+              }
+            }
+          })
+          .then(({ data }) => {
+            console.log("done!", data);
+            this.$emit("letter-info-updated");
+          })
+          .catch(error => {
+            console.log("there appears to have been an error: ", error);
+            this.errorMessage =
+              "Sorry, there appears to have been an error.  Please tray again later.";
+          });
+      }
+    }
+
+    /*
                 console.log("save info");
                 console.log("survey: ", this.surveySelect);
                 console.log("boolean association table: ", this.booleanAssociationSelect);
                 this.saveInfo();
                 */
-    }
   }
 
-  @Emit("save-info")
-  saveInfo() {
-    // need to redirect or something, depending on if this is a new letter....
+  @Emit("letter-info-updated")
+  letterInfoUpdated() {
+    // nothing to send back
   }
 
   // using a getter, which is apparently the way to do a computed property when using vue property decorators:
@@ -133,19 +203,19 @@ export default class LetterInfoForm extends Vue {
     //    }
     //  });
     // json-server -p 4000 --watch db.json
-  //   axios
-  //     .get("http://localhost:4000/boolean-associations/")
-  //     .then((response: AxiosResponse) => {
-  //       console.log(response);
-  //       this.booleanAssociations = response.data;
-  //       if (!this.isNew && this.initialBooleanAssociation !== null) {
-  //         for (let booleanAssociation of this.booleanAssociations) {
-  //           if (booleanAssociation.id === this.initialBooleanAssociation.id) {
-  //             this.booleanAssociationSelect = booleanAssociation;
-  //           }
-  //         }
-  //       }
-  //     });
+    //   axios
+    //     .get("http://localhost:4000/boolean-associations/")
+    //     .then((response: AxiosResponse) => {
+    //       console.log(response);
+    //       this.booleanAssociations = response.data;
+    //       if (!this.isNew && this.initialBooleanAssociation !== null) {
+    //         for (let booleanAssociation of this.booleanAssociations) {
+    //           if (booleanAssociation.id === this.initialBooleanAssociation.id) {
+    //             this.booleanAssociationSelect = booleanAssociation;
+    //           }
+    //         }
+    //       }
+    //     });
   }
 }
 </script>
