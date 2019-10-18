@@ -52,6 +52,10 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import axios, { AxiosResponse } from "axios";
 
 import { LetterElementType } from "@/types/letter.types";
+import { UPDATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
+
+import LetterElementMenu from "@/components/LetterElementMenu.vue";
+
 import Delta from "quill-delta/dist/Delta";
 import Quill from "quill";
 
@@ -121,6 +125,51 @@ export default class LetterTextArea extends Vue {
     this.editModeOn = false;
     let delta: Delta = this.quillEditor.getContents();
     console.log("delta object to save: ", delta);
+
+    /*
+    if (letterElementType.key === LetterElementEnum.BOILERPLATE) {
+      createInput = {
+        sequence: newSequence,
+        letterId: this.theLetter.id,
+        letterElementTypeId: letterElementType.id,
+        textDelta: {
+          ops: []
+        }
+      };
+    } else {
+      createInput = {
+        sequence: newSequence,
+        letterId: this.theLetter.id,
+        letterElementTypeId: letterElementType.id
+      };
+    }
+    */
+    //,
+    //title: this.title,
+    //description: this.description,
+    //isFrozen: false,
+    //surveyId: this.surveySelect.value
+
+    this.$apollo
+      .mutate({
+        mutation: UPDATE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          updateInput: {
+            id: this.id,
+            textDelta: delta
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+        //this.refreshPage();
+        //this.$emit("letter-created", data.createLetter.id);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+        //this.errorMessage =
+        //  "Sorry, there appears to have been an error.  Please tray again later.";
+      });
   }
 
   openEditor() {

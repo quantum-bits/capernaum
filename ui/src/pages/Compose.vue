@@ -189,6 +189,8 @@ import LetterInfoForm from "../components/LetterInfoForm.vue";
 import { LetterElementEnum } from "../types/letter.types";
 
 //import { BooleanAssociationBriefType } from "../types/association-table.types";
+import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
+
 import {
   ONE_LETTER_QUERY,
   CREATE_LETTER_ELEMENT_MUTATION,
@@ -252,7 +254,7 @@ export default class Compose extends Vue {
   selectedChartTypeId: number | null = null;
   chartSelectionValid: boolean = false;
   selectedSurveyDimension: any = {};
-  chartTypeElementId: number = -1;//used when creating a chart type of letter element
+  chartTypeElementId: number = -1; //used when creating a chart type of letter element
 
   theLetter: OneLetter_letter = {
     id: -1,
@@ -557,19 +559,34 @@ export default class Compose extends Vue {
     });
     let newSequence: number = maxSequence + 1;
     console.log("letter element type: ", letterElementType);
+    let createInput: LetterElementCreateInput;
+    if (letterElementType.key === LetterElementEnum.BOILERPLATE) {
+      createInput = {
+        sequence: newSequence,
+        letterId: this.theLetter.id,
+        letterElementTypeId: letterElementType.id,
+        textDelta: {
+          ops: []
+        }
+      };
+    } else {
+      createInput = {
+        sequence: newSequence,
+        letterId: this.theLetter.id,
+        letterElementTypeId: letterElementType.id
+      };
+    }
+    //,
+    //title: this.title,
+    //description: this.description,
+    //isFrozen: false,
+    //surveyId: this.surveySelect.value
+
     this.$apollo
       .mutate({
         mutation: CREATE_LETTER_ELEMENT_MUTATION,
         variables: {
-          createInput: {
-            sequence: newSequence,
-            letterId: this.theLetter.id,
-            letterElementTypeId: letterElementType.id //,
-            //title: this.title,
-            //description: this.description,
-            //isFrozen: false,
-            //surveyId: this.surveySelect.value
-          }
+          createInput: createInput
         }
       })
       .then(({ data }) => {
