@@ -1,5 +1,45 @@
 <template>
   <v-container>
+    <template>
+      <v-row justify="center">
+        <v-dialog v-model="chooseChartTypeDialog" persistent max-width="600">
+          <v-form ref="form" v-model="chartSelectionValid" lazy-validation>
+            <v-card>
+              <v-card-title class="headline">Chart Letter Element</v-card-title>
+              <v-card-text>
+                Choose a custom type of chart from the list
+                <v-select
+                  v-model="selectedSurveyDimension"
+                  :items="chartElements"
+                  :rules="[v => !!v || 'Chart type is required']"
+                  label="Type of Chart"
+                  return-object
+                  required
+                  persistent-hint
+                  single-line
+                />
+              </v-card-text>
+              <v-card-actions>
+                <div class="flex-grow-1"></div>
+                <v-btn
+                  color="green darken-1"
+                  text
+                  @click="cancelChartSelection()"
+                  >Cancel</v-btn
+                >
+                <v-btn
+                  color="green darken-1"
+                  :disabled="!chartSelectionValid"
+                  text
+                  @click="submitChartSelection()"
+                  >Submit</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-form>
+        </v-dialog>
+      </v-row>
+    </template>
     <v-layout v-if="letterExistsAndIsFrozen" class="mb-3">
       <v-flex xs10 offset-xs1>
         <v-alert :value="true" type="info">
@@ -161,7 +201,8 @@ import {
   OneLetter,
   OneLetter_letter,
   OneLetter_letter_letterElements,
-  OneLetter_letter_letterElements_letterElementType
+  OneLetter_letter_letterElements_letterElementType,
+  OneLetter_letter_survey_surveyDimensions
 } from "@/graphql/types/OneLetter";
 
 interface LetterElement extends OneLetter_letter_letterElements {
@@ -207,6 +248,11 @@ interface LetterElement extends OneLetter_letter_letterElements {
 export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
+  chooseChartTypeDialog: boolean = false;
+  selectedChartTypeId: number | null = null;
+  chartSelectionValid: boolean = false;
+  selectedSurveyDimension: any = {};
+  chartTypeElementId: number = -1;//used when creating a chart type of letter element
 
   theLetter: OneLetter_letter = {
     id: -1,
@@ -249,6 +295,13 @@ export default class Compose extends Vue {
     } else {
       return [];
     }
+  }
+
+  get chartElements() {
+    return this.theLetter.survey.surveyDimensions.map(surveyDimension => ({
+      text: surveyDimension.title,
+      value: surveyDimension.id
+    }));
   }
 
   get survey() {
@@ -312,9 +365,29 @@ export default class Compose extends Vue {
     return smallestSN;
   }
 
+  cancelChartSelection() {
+    this.selectedChartTypeId = null;
+    this.chartSelectionValid = false;
+    this.chooseChartTypeDialog = false;
+    this.chartTypeElementId = -1;
+  }
+
+  submitChartSelection() {
+    console.log("chart selection: ", this.selectedChartTypeId);
+
+    if ((this.$refs.form as any).validate()) {
+      console.log("form is valid!");
+      this.chartSelectionValid = false;
+      this.selectedChartTypeId = null;
+      this.chooseChartTypeDialog = false;
+      this.addChartElement();
+    } else {
+      console.log("form is not valid!");
+    }
+  }
+
   // Move code from
   //   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-
   moveUp(index: number) {
     const letterElements = this.surveyLetterElements;
     let element: LetterElement = letterElements[index];
@@ -411,6 +484,66 @@ export default class Compose extends Vue {
   }
 
   addElement(
+    letterElementType: OneLetter_letter_letterElements_letterElementType
+  ) {
+    if (letterElementType.key === LetterElementEnum.CHART) {
+      console.log("we have a chart!");
+      this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
+      this.chooseChartTypeDialog = true;
+    } else {
+      console.log("we do not have a chart!");
+      this.addNonChartElement(letterElementType);
+    }
+  }
+
+  // WORKING HERE:
+  // ...code is sort of working, but it's a bit buggy:
+  // - editModeOn/Off not really working for letter elements
+  // - for some reason can't yet create a letter element that connects to a survey dimension
+  // - the validation on the dialog submit seems messed up
+
+  addChartElement() {
+    //this.selectedChartTypeId;
+    console.log("survey dimension id: ", this.selectedSurveyDimension.value);
+    const letterElements = this.surveyLetterElements;
+    //let numElements: number = letterElements.length;
+    //let maxId: number = 0;
+    let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
+    letterElements.forEach(letterElement => {
+      if (maxSequence < letterElement.sequence) {
+        maxSequence = letterElement.sequence;
+      }
+    });
+    let newSequence: number = maxSequence + 1;
+    this.$apollo
+      .mutate({
+        mutation: CREATE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          createInput: {
+            sequence: newSequence,
+            letterId: this.theLetter.id,
+            letterElementTypeId: this.chartTypeElementId,
+            surveyDimensionId: this.selectedSurveyDimension.value
+            //title: this.title,
+            //description: this.description,
+            //isFrozen: false,
+            //surveyId: this.surveySelect.value
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+        this.refreshPage();
+        //this.$emit("letter-created", data.createLetter.id);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+        //this.errorMessage =
+        //  "Sorry, there appears to have been an error.  Please tray again later.";
+      });
+  }
+
+  addNonChartElement(
     letterElementType: OneLetter_letter_letterElements_letterElementType
   ) {
     const letterElements = this.surveyLetterElements;
