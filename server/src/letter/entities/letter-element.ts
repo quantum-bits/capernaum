@@ -4,7 +4,7 @@ import { AbstractEntity } from "../../shared/abstract-entity";
 import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
-import Delta = require("quill-delta/dist/Delta");
+import QuillDelta from "./quill-delta";
 
 @Entity()
 @ObjectType()
@@ -14,8 +14,8 @@ export class LetterElement extends AbstractEntity {
   sequence: number;
 
   @Column("text", { nullable: true })
-  @Field(type => String, { nullable: true })
-  textDelta?: Delta;
+  @Field(type => QuillDelta, { nullable: true })
+  textDelta?: any;
 
   @Column("integer") letterId: number;
   @ManyToOne(type => Letter, letter => letter.letterElements)
@@ -38,7 +38,7 @@ export class LetterElementCreateInput {
   @Field(type => Int) letterId: number;
   @Field(type => Int) sequence: number;
   @Field(type => Int) letterElementTypeId: number;
-  @Field(type => String, { nullable: true }) textDelta?: Delta;
+  @Field(type => QuillDelta, { nullable: true }) textDelta?: any;
   @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }
 
@@ -47,6 +47,6 @@ export class LetterElementUpdateInput {
   @Field(type => Int) id: number;
   @Field(type => Int, { nullable: true }) sequence?: number;
   @Field(type => Int, { nullable: true }) letterElementTypeId?: number;
-  @Field(type => String, { nullable: true }) textDelta?: Delta;
+  @Field(type => QuillDelta, { nullable: true }) textDelta?: any;
   @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }
