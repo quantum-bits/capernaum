@@ -8,11 +8,10 @@ const VALID_ELEMENT_TYPES = [
   "boolean-calculation-results",
   "footer",
   "header",
-  "spiritual-focus-chart",
-  "spiritual-orientations-chart"
+  "chart"
 ];
 
-export default class LaTeXWriter {
+export default class LetterWriter {
   private environment: Environment;
 
   constructor() {

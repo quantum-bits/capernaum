@@ -20,6 +20,7 @@ import {
 import { QualtricsModule } from "../qualtrics/qualtrics.module";
 import { registerEnumType } from "type-graphql";
 import { WhichItems } from "./survey.types";
+import SurveyAnalyst from "./survey.analyst";
 
 @Module({
   imports: [
@@ -40,8 +41,10 @@ import { WhichItems } from "./survey.types";
     SurveyResponseResolver,
     SurveyItemResponseResolver,
     SurveyIndexResolver,
-    SurveyItemResolver
-  ]
+    SurveyItemResolver,
+    SurveyAnalyst
+  ],
+  exports: [SurveyAnalyst]
 })
 export class SurveyModule {
   constructor() {
