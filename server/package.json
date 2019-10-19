@@ -40,6 +40,7 @@
     "nunjucks": "^3.2.0",
     "pg": "^7.12.1",
     "pluralize": "^8.0.0",
+    "quill-delta": "^4.2.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",

@@ -1,27 +1,10 @@
-import {
-  createUnionType,
-  Field,
-  InputType,
-  Int,
-  ObjectType
-} from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
-
-@ObjectType()
-class QuillDeltaOp {
-  @Field({ nullable: true }) insert?: string;
-  @Field({ nullable: true }) delete?: number;
-  @Field({ nullable: true }) retain?: number;
-}
-
-@ObjectType()
-class QuillDelta {
-  @Field(type => [QuillDeltaOp], { nullable: true }) ops?: QuillDeltaOp[];
-}
+import Delta = require("quill-delta/dist/Delta");
 
 @Entity()
 @ObjectType()
@@ -31,8 +14,8 @@ export class LetterElement extends AbstractEntity {
   sequence: number;
 
   @Column("text", { nullable: true })
-  @Field({ nullable: true })
-  textDelta?: QuillDelta;
+  @Field(type => String, { nullable: true })
+  textDelta?: Delta;
 
   @Column("integer") letterId: number;
   @ManyToOne(type => Letter, letter => letter.letterElements)
@@ -50,34 +33,20 @@ export class LetterElement extends AbstractEntity {
   surveyDimension?: SurveyDimension;
 }
 
-// It's stinky that we appear to have to duplicate these declarations as GraphQL `input`.
-@InputType()
-class QuillDeltaOpInput {
-  @Field({ nullable: true }) insert?: string;
-  @Field({ nullable: true }) delete?: number;
-  @Field({ nullable: true }) retain?: number;
-}
-
-@InputType()
-class QuillDeltaInput {
-  @Field(type => [QuillDeltaOpInput], { nullable: true }) ops?: QuillDeltaOp[];
-}
-
 @InputType()
 export class LetterElementCreateInput {
-  @Field(type => Int) sequence: number;
-  @Field(type => QuillDeltaInput, { nullable: true }) textDelta?: QuillDelta;
   @Field(type => Int) letterId: number;
+  @Field(type => Int) sequence: number;
   @Field(type => Int) letterElementTypeId: number;
-  @Field(type => Int, { nullable: true }) surveyDimensionId: number;
+  @Field(type => String, { nullable: true }) textDelta?: Delta;
+  @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }
 
 @InputType()
 export class LetterElementUpdateInput {
   @Field(type => Int) id: number;
   @Field(type => Int, { nullable: true }) sequence?: number;
-  @Field(type => QuillDeltaInput, { nullable: true }) textDelta?: QuillDelta;
-  @Field(type => Int, { nullable: true }) letterId?: number;
   @Field(type => Int, { nullable: true }) letterElementTypeId?: number;
+  @Field(type => String, { nullable: true }) textDelta?: Delta;
   @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }

@@ -13,7 +13,7 @@ export interface LetterElement {
   id: number; // id in the database
   sequence: number; // order of this text item (paragraph) within the letter (0, 1,....)
   key: string; // e.g., "boilerplate", "spiritual-focus-chart", etc. (see LetterElement enum)
-  textDelta: any; // Quill Delta object containing the text
+  textDelta: string; // Quill Delta object containing the text
   isNew?: boolean; // is not yet in the db (useful information for the form)
   editModeOn?: boolean; // are we editing this item at the moment? useful in the form
 }
@@ -55,6 +55,5 @@ export interface SurveyLetter {
 export enum LetterElementEnum {
   BOILERPLATE = "boilerplate",
   CHART = "chart",
-  BOOLEAN_CALCULATION_RESULTS = "boolean-calculation-results",
-
+  BOOLEAN_CALCULATION_RESULTS = "boolean-calculation-results"
 }

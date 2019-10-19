@@ -38,17 +38,17 @@ type LetterElement {
   """Unique ID for this entity"""
   id: Int!
   sequence: Int!
-  textDelta: QuillDelta
+  textDelta: String
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension
 }
 
 input LetterElementCreateInput {
-  sequence: Int!
-  textDelta: QuillDeltaInput
   letterId: Int!
+  sequence: Int!
   letterElementTypeId: Int!
+  textDelta: String
   surveyDimensionId: Int
 }
 
@@ -62,9 +62,8 @@ type LetterElementType {
 input LetterElementUpdateInput {
   id: Int!
   sequence: Int
-  textDelta: QuillDeltaInput
-  letterId: Int
   letterElementTypeId: Int
+  textDelta: String
   surveyDimensionId: Int
 }
 
@@ -202,26 +201,6 @@ type Query {
   updateSurveyDimension: SurveyDimension!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
-}
-
-type QuillDelta {
-  ops: [QuillDeltaOp!]
-}
-
-input QuillDeltaInput {
-  ops: [QuillDeltaOpInput!]
-}
-
-type QuillDeltaOp {
-  insert: String
-  delete: Float
-  retain: Float
-}
-
-input QuillDeltaOpInput {
-  insert: String
-  delete: Float
-  retain: Float
 }
 
 """Scripture engagement practice"""

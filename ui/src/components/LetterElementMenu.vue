@@ -20,9 +20,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_LETTER_ELEMENT_TYPES_QUERY } from "@/graphql/letters.graphql";
-import {
-  OneLetter_letter_letterElements_letterElementType
-} from "@/graphql/types/OneLetter";
+import { OneLetter_letter_letterElements_letterElementType } from "@/graphql/types/OneLetter";
 
 export default Vue.extend({
   name: "ComposeMenu",
@@ -40,7 +38,9 @@ export default Vue.extend({
   },
 
   methods: {
-    emitLetterElementType(letterElementType: OneLetter_letter_letterElements_letterElementType) {
+    emitLetterElementType(
+      letterElementType: OneLetter_letter_letterElements_letterElementType
+    ) {
       this.$emit("click", letterElementType);
     }
   }

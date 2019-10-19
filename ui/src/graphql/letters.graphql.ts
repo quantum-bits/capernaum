@@ -60,13 +60,7 @@ export const ONE_LETTER_QUERY = gql`
         }
         id
         sequence
-        textDelta {
-          ops {
-            insert
-            delete
-            retain
-          }
-        }
+        textDelta
         surveyDimension {
           id
           title
@@ -135,13 +129,7 @@ export const ALL_LETTERS_QUERY = gql`
         }
         id
         sequence
-        textDelta {
-          ops {
-            insert
-            delete
-            retain
-          }
-        }
+        textDelta
         surveyDimension {
           id
           title

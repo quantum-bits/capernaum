@@ -565,9 +565,7 @@ export default class Compose extends Vue {
         sequence: newSequence,
         letterId: this.theLetter.id,
         letterElementTypeId: letterElementType.id,
-        textDelta: {
-          ops: []
-        }
+        textDelta: ""
       };
     } else {
       createInput = {
