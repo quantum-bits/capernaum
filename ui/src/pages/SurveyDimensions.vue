@@ -370,9 +370,6 @@ export default Vue.extend({
             console.log("there appears to have been an error: ", error);
           });
       }
-      console.log(
-        "There appears to be a problem -- it is not clear which type of item to delete...."
-      );
     },
     addSurveyDimension() {
       this.surveyDimensionDialog = true;
