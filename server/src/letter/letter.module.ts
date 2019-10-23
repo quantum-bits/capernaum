@@ -2,9 +2,9 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Letter, LetterElement, LetterElementType } from "./entities";
 import {
+  LetterElementResolver,
   LetterElementTypeResolver,
-  LetterResolver,
-  LetterElementResolver
+  LetterResolver
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";

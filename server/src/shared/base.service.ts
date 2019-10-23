@@ -2,6 +2,7 @@ import {
   DeleteResult,
   EntityManager,
   FindConditions,
+  FindManyOptions,
   ObjectType,
   Repository
 } from "typeorm";
@@ -33,7 +34,7 @@ export class BaseService {
 
   find<Entity>(
     entityClass: ObjectType<Entity>,
-    conditions?: FindConditions<Entity>
+    conditions?: FindConditions<Entity> | FindManyOptions<Entity>
   ) {
     return this.entityManager.find(entityClass, conditions);
   }

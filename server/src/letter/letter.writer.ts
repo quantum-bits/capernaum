@@ -1,6 +1,5 @@
 import { ConfigureOptions, Environment, FileSystemLoader } from "nunjucks";
 import { Letter } from "./entities";
-import { LetterService } from "./letter.service";
 import { exec } from "child_process";
 import { writeFile } from "fs";
 
@@ -9,11 +8,10 @@ const VALID_ELEMENT_TYPES = [
   "boolean-calculation-results",
   "footer",
   "header",
-  "spiritual-focus-chart",
-  "spiritual-orientations-chart"
+  "chart"
 ];
 
-export default class LaTeXWriter {
+export default class LetterWriter {
   private environment: Environment;
 
   constructor() {

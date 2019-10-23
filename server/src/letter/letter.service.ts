@@ -1,11 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import {
-  Letter,
-  LetterElement,
-  LetterElementType,
-  LetterUpdateInput
-} from "./entities";
+import { Letter, LetterElement, LetterElementType } from "./entities";
 import { EntityManager, Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
