@@ -181,6 +181,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { Route } from "vue-router";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
@@ -236,6 +237,7 @@ interface LetterElement extends OneLetter_letter_letterElements {
           box.isNew = false;
         }
         console.log("letter: ", data.letter);
+        this.letterExists = true;
         return data.letter;
       },
       skip() {
@@ -255,6 +257,9 @@ export default class Compose extends Vue {
   chartSelectionValid: boolean = false;
   selectedSurveyDimension: any = {};
   chartTypeElementId: number = -1; //used when creating a chart type of letter element
+
+  name: string = "";
+  letterExists: boolean = false;
 
   theLetter: OneLetter_letter = {
     id: -1,
@@ -319,7 +324,7 @@ export default class Compose extends Vue {
   }
 
   get letterExistsAndIsFrozen() {
-    if (this.theLetter !== null) {
+    if (this.letterExists) {
       return this.theLetter.isFrozen;
     } else {
       return false;
@@ -328,7 +333,7 @@ export default class Compose extends Vue {
   }
 
   get letterExistsAndEditModeOff() {
-    if (this.theLetter !== null) {
+    if (this.letterExists) {
       return !this.editModeOn;
     } else {
       return false;
@@ -336,7 +341,7 @@ export default class Compose extends Vue {
   }
 
   get letterExistsAndEditModeOn() {
-    if (this.theLetter !== null) {
+    if (this.letterExists) {
       return this.editModeOn;
     } else {
       return false;
@@ -640,18 +645,26 @@ export default class Compose extends Vue {
     console.log("id: ", id);
     //https://www.w3schools.com/jsref/jsref_tostring_number.asp
     let idString: string = id.toString();
+    this.editModeOn = false;
     this.$router.push({ name: "compose", params: { letterId: idString } });
     // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
     // https://router.vuejs.org/guide/essentials/navigation.html
-    this.$router.go(0);
+    //this.$router.go(0);
   }
 
   viewPDF() {
     console.log("view sample pdf....");
   }
 
+  // https://github.com/vuejs/vue-class-component/issues/270
+  beforeRouteUpdate(to: Route, from: Route, next: Function) {
+    this.name = to.params.name;
+    next();
+  }
+
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
   mounted() {
+    this.name = this.$route.params.name;
     if (this.$route.params.letterId === undefined) {
       // launch form for creating a new letter
       this.editModeOn = true;

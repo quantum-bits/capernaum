@@ -101,6 +101,11 @@ export default class LettersPage extends Vue {
     this.$router.push({ name: "compose", params: { letterId: item.id } });
   }
 
-  mounted() {}
+  mounted() {
+    console.log('inside mounted!');
+    this.$apollo.queries.letters.refetch().then(({ data }) => {
+      console.log("item(s) refetched!", data);
+    });
+  }
 }
 </script>
