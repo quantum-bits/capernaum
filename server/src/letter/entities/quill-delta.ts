@@ -5,14 +5,17 @@ const QuillDelta = new GraphQLScalarType({
   name: "QuillDelta",
   description: "Quill Delta",
   parseValue(value: string) {
+    console.log("VALUE", value);
     return JSON.parse(value);
   },
   serialize(value: Delta) {
+    console.log("SERIALIZE", value);
     return JSON.stringify(value);
   },
   parseLiteral(ast) {
     if (ast.kind == Kind.STRING) {
-      return 1;
+      console.log("LITERAL", ast);
+      return JSON.parse(ast.value);
     }
     return null;
   }
