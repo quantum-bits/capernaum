@@ -102,7 +102,7 @@ export default class LettersPage extends Vue {
   }
 
   mounted() {
-    console.log('inside mounted!');
+    console.log("inside mounted!");
     this.$apollo.queries.letters.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });

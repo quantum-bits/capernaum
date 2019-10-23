@@ -27,10 +27,7 @@ import LetterWriter from "./letter.writer";
 
 @Resolver(of => Letter)
 export class LetterResolver {
-  constructor(
-    private readonly letterService: LetterService,
-    private readonly latexWriter: LetterWriter
-  ) {}
+  constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
