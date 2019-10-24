@@ -18,6 +18,10 @@ export interface Letters_letters_scriptureEngagementPractices {
 
 export interface Letters_letters_tableEntries_surveyIndex_surveyItems {
   /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
    * Qualtrics identifier for this question
    */
   qualtricsId: string;
@@ -28,6 +32,10 @@ export interface Letters_letters_tableEntries_surveyIndex_surveyItems {
 }
 
 export interface Letters_letters_tableEntries_surveyIndex {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   /**
    * Abbreviation for this index (e.g., 'FOG')
    */
@@ -40,6 +48,10 @@ export interface Letters_letters_tableEntries_surveyIndex {
 }
 
 export interface Letters_letters_tableEntries {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   surveyIndex: Letters_letters_tableEntries_surveyIndex;
 }
 
@@ -117,6 +129,10 @@ export interface Letters_letters_survey_surveyDimensions_surveyIndices {
 }
 
 export interface Letters_letters_survey_surveyDimensions {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   survey: Letters_letters_survey_surveyDimensions_survey;
   /**
    * Sequence number; dimension are displayed in this order.
@@ -134,6 +150,10 @@ export interface Letters_letters_survey_surveyDimensions {
 }
 
 export interface Letters_letters_survey {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   /**
    * Title for this survey in Capernaum
    */

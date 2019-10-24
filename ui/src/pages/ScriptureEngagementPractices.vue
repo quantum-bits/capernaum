@@ -4,7 +4,7 @@
       <v-dialog
         v-model="createUpdateSEPracticeDialog"
         persistent
-        max-width="600"
+        max-width="800"
       >
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card>
@@ -26,6 +26,15 @@
                 label="Description"
                 :rules="descriptionRules"
                 :counter="120"
+                outlined
+                required
+                persistent-hint
+              ></v-text-field>
+              <v-text-field
+                v-model="moreInfoUrl"
+                label="Scripture Engagement Website URL"
+                :rules="urlRules"
+                hint="e.g., https://www.biblegateway.com/resources/scripture-engagement/journaling-scripture/home"
                 outlined
                 required
                 persistent-hint
@@ -68,6 +77,11 @@
               <td class="text-xs-right">{{ item.title }}</td>
               <td class="text-xs-right">{{ item.description }}</td>
               <td class="text-xs-right">
+                <v-btn text v-on:click="browseToMoreInfoUrl(item)">
+                  More Info
+                </v-btn>
+              </td>
+              <td class="text-xs-right">
                 <v-btn text v-on:click="editSEPractice(item)">
                   Edit
                 </v-btn>
@@ -87,7 +101,8 @@ import Vue from "vue";
 
 import {
   ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
-  ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
+  ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
+  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
 } from "@/graphql/scripture-engagement-practices.graphql";
 import {
   ScriptureEngagementPractices,
@@ -117,14 +132,18 @@ export default Vue.extend({
           sortable: false,
           value: "description"
         },
+        { text: "More Information", sortable: false },
         { text: "Action", sortable: false }
       ],
       scriptureEngagementPractices: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
-      createUpdateSEPracticeDialog: false,
-      valid: true,
-      scriptureEngagementPracticeTitle: "",
-      scriptureEngagementPracticeDescription: "",
-      editOn: false, //true when editing an existing SE practice (as opposed to creating a new one)
+      createUpdateSEPracticeDialog: false as boolean,
+      valid: true as boolean,
+      scriptureEngagementPracticeTitle: "" as string,
+      scriptureEngagementPracticeDescription: "" as string,
+      moreInfoUrl: "" as string,
+      scriptureEngagementPracticeSequence: 0 as number, // only used when updating a current SE practice
+      scriptureEngagementPracticeId: -1 as number, // only used when updating a current SE practice
+      editOn: false as boolean, //true when editing an existing SE practice (as opposed to creating a new one)
       titleRules: [
         (v: any) => !!v || "Title is required",
         (v: any) =>
@@ -136,29 +155,44 @@ export default Vue.extend({
         (v: any) =>
           (v && v.length <= 120) ||
           "Description must be fewer than 120 characters"
-      ]
+      ],
+      urlRules: [(v: any) => !!v || "A URL is required"]
     };
   },
 
   methods: {
+    browseToMoreInfoUrl(
+      practice: ScriptureEngagementPractices_scriptureEngagementPractices
+    ) {
+      window.open(practice.moreInfoUrl);
+    },
+    resetForm() {
+      this.scriptureEngagementPracticeTitle = "";
+      this.scriptureEngagementPracticeDescription = "";
+      this.moreInfoUrl = "";
+      this.scriptureEngagementPracticeSequence = 0;
+      this.scriptureEngagementPracticeId = -1;
+      this.editOn = false;
+    },
     newSEPractice() {
       console.log("new SE practice!");
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
         (this.$refs.form as any).resetValidation();
       }
-      this.scriptureEngagementPracticeTitle = "";
-      this.scriptureEngagementPracticeDescription = "";
-      this.editOn = false;
+      this.resetForm();
       this.createUpdateSEPracticeDialog = true;
     },
     editSEPractice(
       practice: ScriptureEngagementPractices_scriptureEngagementPractices
     ) {
       console.log("edit SE practice!");
-      this.editOn = true;
       this.scriptureEngagementPracticeTitle = practice.title;
       this.scriptureEngagementPracticeDescription = practice.description;
+      this.moreInfoUrl = practice.moreInfoUrl;
+      this.scriptureEngagementPracticeSequence = practice.sequence;
+      this.scriptureEngagementPracticeId = practice.id;
+      this.editOn = true;
       this.createUpdateSEPracticeDialog = true;
     },
     cancelDialog() {
@@ -166,9 +200,7 @@ export default Vue.extend({
         // FIXME: Replace the `as any` hack.
         (this.$refs.form as any).resetValidation();
       }
-      this.scriptureEngagementPracticeTitle = "";
-      this.scriptureEngagementPracticeDescription = "";
-      this.editOn = false;
+      this.resetForm();
       this.createUpdateSEPracticeDialog = false;
     },
     refetchSEPracticeData() {
@@ -201,7 +233,8 @@ export default Vue.extend({
                 createInput: {
                   sequence: newSequence,
                   title: this.scriptureEngagementPracticeTitle,
-                  description: this.scriptureEngagementPracticeDescription
+                  description: this.scriptureEngagementPracticeDescription,
+                  moreInfoUrl: this.moreInfoUrl
                 }
               }
             })
@@ -219,6 +252,31 @@ export default Vue.extend({
             });
         } else {
           // update existing SE practice
+          this.$apollo
+            .mutate({
+              mutation: UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
+              variables: {
+                updateData: {
+                  id: this.scriptureEngagementPracticeId,
+                  sequence: this.scriptureEngagementPracticeSequence,
+                  title: this.scriptureEngagementPracticeTitle,
+                  description: this.scriptureEngagementPracticeDescription,
+                  moreInfoUrl: this.moreInfoUrl
+                }
+              }
+            })
+            .then(({ data }) => {
+              console.log("done!", data);
+              this.cancelDialog();
+              this.refetchSEPracticeData();
+              //this.cancelIndexDialog();
+            })
+            .catch(error => {
+              console.log("there appears to have been an error: ", error);
+              (this.$refs.form as any).resetValidation();
+              //this.serverError = true;
+              //this.serverError = true
+            });
         }
       }
     }

@@ -65,7 +65,16 @@ export interface QualtricsImportInput {
 export interface ScriptureEngagementPracticeCreateInput {
   title: string;
   description: string;
+  moreInfoUrl: string;
   sequence: number;
+}
+
+export interface ScriptureEngagementPracticeUpdateInput {
+  id: number;
+  title?: string | null;
+  description?: string | null;
+  moreInfoUrl?: string | null;
+  sequence?: number | null;
 }
 
 //==============================================================

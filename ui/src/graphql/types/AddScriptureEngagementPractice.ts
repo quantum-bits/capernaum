@@ -16,6 +16,7 @@ export interface AddScriptureEngagementPractice_createScriptureEngagementPractic
   title: string;
   description: string;
   sequence: number;
+  moreInfoUrl: string;
 }
 
 export interface AddScriptureEngagementPractice {

@@ -7,6 +7,7 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY = gql`
       title
       description
       sequence
+      moreInfoUrl
     }
   }
 `;
@@ -20,6 +21,21 @@ export const ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       title
       description
       sequence
+      moreInfoUrl
+    }
+  }
+`;
+
+export const UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
+  mutation UpdateScriptureEngagementPractice(
+    $updateData: ScriptureEngagementPracticeUpdateInput!
+  ) {
+    updateScriptureEngagementPractice(updateData: $updateData) {
+      id
+      title
+      description
+      sequence
+      moreInfoUrl
     }
   }
 `;

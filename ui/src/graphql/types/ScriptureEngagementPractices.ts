@@ -14,6 +14,7 @@ export interface ScriptureEngagementPractices_scriptureEngagementPractices {
   title: string;
   description: string;
   sequence: number;
+  moreInfoUrl: string;
 }
 
 export interface ScriptureEngagementPractices {
