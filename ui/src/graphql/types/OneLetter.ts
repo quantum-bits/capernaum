@@ -64,16 +64,6 @@ export interface OneLetter_letter_letterElements_letterElementType {
   description: string;
 }
 
-export interface OneLetter_letter_letterElements_textDelta_ops {
-  insert: string | null;
-  delete: number | null;
-  retain: number | null;
-}
-
-export interface OneLetter_letter_letterElements_textDelta {
-  ops: OneLetter_letter_letterElements_textDelta_ops[] | null;
-}
-
 export interface OneLetter_letter_letterElements_surveyDimension {
   /**
    * Unique ID for this entity
@@ -100,7 +90,7 @@ export interface OneLetter_letter_letterElements {
    */
   id: number;
   sequence: number;
-  textDelta: OneLetter_letter_letterElements_textDelta | null;
+  textDelta: any | null;
   surveyDimension: OneLetter_letter_letterElements_surveyDimension | null;
 }
 
