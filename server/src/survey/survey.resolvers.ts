@@ -27,6 +27,7 @@ import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { WhichItems } from "./survey.types";
+import { PredictionTableEntry } from "../prediction/entities";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -273,6 +274,11 @@ export class SurveyIndexResolver {
       SurveyDimension,
       surveyIndex.surveyDimensionId
     );
+  }
+
+  @ResolveProperty("predictionTableEntries", type => [PredictionTableEntry])
+  resolvePredictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
+    return this.surveyService.find(PredictionTableEntry, { surveyIndex });
   }
 }
 
