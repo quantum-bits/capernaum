@@ -112,10 +112,13 @@ export const ALL_LETTERS_QUERY = gql`
         sequence
       }
       tableEntries {
+        id
         surveyIndex {
+          id
           abbreviation
           title
           surveyItems {
+            id
             qualtricsId
             qualtricsText
           }
@@ -138,10 +141,12 @@ export const ALL_LETTERS_QUERY = gql`
         }
       }
       survey {
+        id
         title
         qualtricsId
         qualtricsName
         surveyDimensions {
+          id
           survey {
             qualtricsName
           }

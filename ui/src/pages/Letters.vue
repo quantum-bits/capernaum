@@ -80,7 +80,7 @@ export default class LettersPage extends Vue {
     { text: "Action", sortable: false }
   ];
 
-  letters: Letters_letters | [] = [];
+  letters: Letters_letters[] = [];
 
   newLetter() {
     console.log("create new letter");
