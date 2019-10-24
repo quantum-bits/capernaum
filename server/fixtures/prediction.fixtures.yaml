@@ -4,18 +4,22 @@ fixtures:
       journaling-scripture:
         title: Journaling Scripture
         description: Here's how to journal Scripture
+        moreInfoUrl: "https://www.biblegateway.com/resources/scripture-engagement/journaling-scripture/home"
         sequence: 1
       dramatizing-scripture:
         title: Dramatizing Scripture
         description: Here's how to dramatize Scripture
+        moreInfoUrl: "https://www.biblegateway.com/resources/scripture-engagement/dramatizing-scripture/home"
         sequence: 2
       copying-scripture:
         title: Copying Scripture
         description: Method for copying scripture
+        moreInfoUrl: "https://www.biblegateway.com/resources/scripture-engagement/hand-copying-scripture/home"
         sequence: 3
       singing-scripture:
         title: Singing Scripture
         description: Sing to the Lord a new song!
+        moreInfoUrl: "https://www.biblegateway.com/resources/scripture-engagement/singing-scripture/home"
         sequence: 4
   - table: prediction_table_entry
     rows:

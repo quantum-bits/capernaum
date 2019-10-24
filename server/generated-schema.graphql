@@ -213,12 +213,14 @@ type ScriptureEngagementPractice {
   id: Int!
   title: String!
   description: String!
+  moreInfoUrl: String!
   sequence: Int!
 }
 
 input ScriptureEngagementPracticeCreateInput {
   title: String!
   description: String!
+  moreInfoUrl: String!
   sequence: Int!
 }
 
@@ -226,6 +228,7 @@ input ScriptureEngagementPracticeUpdateInput {
   id: Int!
   title: String
   description: String
+  moreInfoUrl: String
   sequence: Int
 }
 
