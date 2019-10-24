@@ -108,4 +108,13 @@ export class ScriptureEngagementPracticeResolver {
   ) {
     return this.predictionService.delete(ScriptureEngagementPractice, id);
   }
+
+  @ResolveProperty("predictionTableEntries", type => [PredictionTableEntry])
+  resolvePredictionTableEntries(
+    @Parent() scriptureEngagementPractice: ScriptureEngagementPractice
+  ) {
+    return this.predictionService.find(PredictionTableEntry, {
+      practiceId: scriptureEngagementPractice.id
+    });
+  }
 }
