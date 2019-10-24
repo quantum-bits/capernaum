@@ -11,12 +11,13 @@ import {
   PredictionTableEntryCreateInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
-  PredictionTableEntryReplaceInput
+  PredictionTableEntryReplaceInput,
+  ScriptureEngagementPracticeUpdateInput
 } from "./entities";
 import { PredictionService } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
-import { Letter } from "../letter/entities";
+import { Letter, LetterUpdateInput } from "../letter/entities";
 
 @Resolver(of => PredictionTableEntry)
 export class PredictionTableEntryResolver {
@@ -89,5 +90,22 @@ export class ScriptureEngagementPracticeResolver {
   @Query(returns => [ScriptureEngagementPractice])
   scriptureEngagementPractices() {
     return this.predictionService.find(ScriptureEngagementPractice);
+  }
+
+  @Mutation(returns => ScriptureEngagementPractice)
+  updateScriptureEngagementPractice(
+    @Args("updateData") updateData: ScriptureEngagementPracticeUpdateInput
+  ) {
+    return this.predictionService.update(
+      ScriptureEngagementPractice,
+      updateData
+    );
+  }
+
+  @Mutation(returns => Int)
+  deleteScriptureEngagementPractice(
+    @Args({ name: "id", type: () => Int }) id: number
+  ) {
+    return this.predictionService.delete(ScriptureEngagementPractice, id);
   }
 }

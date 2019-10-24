@@ -10,26 +10,30 @@ const QuillDelta = new GraphQLScalarType({
   // Called when value is going to be sent to the client as a response.
   // Value can be anything (string, number, array, object, etc.)
   serialize(value: Delta) {
-    console.log("SERIALIZE", value);
-    return JSON.stringify(value);
+    const serializedValue = JSON.stringify(value);
+    console.log(`Serialize '${value}' to '${serializedValue}'`);
+    return serializedValue;
   },
 
   // Parse a value passed in a variable binding
   // For example, `query($howMany: CustomType) { users(first: $howMany) { ... } }`.
   // Variables are already JSON/JavaScript so no AST; just deal with JS directly.
   parseValue(value: string) {
-    console.log("VALUE", value);
-    return JSON.parse(value);
+    const parsedValue = JSON.parse(value);
+    console.log(`Parsed value '${value}' to '${parsedValue}'`);
+    return parsedValue;
   },
 
   // Parse a literal value in the AST that was created while parsing a query
   // For example, the parameter in `query { letter(id: 10) ... }`.
   parseLiteral(ast) {
+    let parsedLiteral = null;
     if (ast.kind == Kind.STRING) {
-      console.log("LITERAL", ast);
-      return JSON.parse(ast.value);
+      parsedLiteral = JSON.parse(ast.value);
     }
-    return null;
+
+    console.log(`Parsed literal '${ast}' to '${parsedLiteral}'`);
+    return parsedLiteral;
   }
 });
 

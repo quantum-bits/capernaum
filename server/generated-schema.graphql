@@ -130,6 +130,8 @@ type Mutation {
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
+  updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
+  deleteScriptureEngagementPractice(id: Int!): Int!
 }
 
 input PartialPredictionTableEntry {
