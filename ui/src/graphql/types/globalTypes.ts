@@ -23,19 +23,18 @@ export interface LetterCreateInput {
 }
 
 export interface LetterElementCreateInput {
-  sequence: number;
-  textDelta?: string;
   letterId: number;
+  sequence: number;
   letterElementTypeId: number;
+  textDelta?: any | null;
   surveyDimensionId?: number | null;
 }
 
 export interface LetterElementUpdateInput {
   id: number;
   sequence?: number | null;
-  textDelta?: string;
-  letterId?: number | null;
   letterElementTypeId?: number | null;
+  textDelta?: any | null;
   surveyDimensionId?: number | null;
 }
 
