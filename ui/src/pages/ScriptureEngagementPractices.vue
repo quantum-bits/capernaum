@@ -164,6 +164,7 @@ export default Vue.extend({
     browseToMoreInfoUrl(
       practice: ScriptureEngagementPractices_scriptureEngagementPractices
     ) {
+      // https://forum.vuejs.org/t/navigate-to-external-url-with-vue-router/45099
       window.open(practice.moreInfoUrl);
     },
     resetForm() {
