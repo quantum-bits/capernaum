@@ -90,7 +90,7 @@ export interface OneLetter_letter_letterElements {
    */
   id: number;
   sequence: number;
-  textDelta: any | null;
+  textDelta: string | null;
   surveyDimension: OneLetter_letter_letterElements_surveyDimension | null;
 }
 

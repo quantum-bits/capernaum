@@ -5,9 +5,11 @@
         <v-card-title primary-title>
           <div>
             <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
-            <vue-editor ref="editor" v-model="textArea"></vue-editor>
           </div>
         </v-card-title>
+        <v-card-text>
+          <vue-editor ref="editor" v-model="htmlForEditor"></vue-editor>
+        </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="save">Save</v-btn>
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
@@ -19,6 +21,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+
       <v-card v-show="!editModeOn">
         <v-card-title primary-title>
           <div>
@@ -26,7 +29,7 @@
           </div>
         </v-card-title>
         <v-card-text>
-          <div v-html="textArea"></div>
+          <div v-html="htmlForEditor"></div>
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="openEditor">Edit</v-btn>
@@ -49,12 +52,8 @@ import { VueEditor } from "vue2-editor";
 
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-import axios, { AxiosResponse } from "axios";
-
 import { LetterElementType } from "@/types/letter.types";
 import { UPDATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
-
-import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
 import Delta from "quill-delta/dist/Delta";
 import Quill from "quill";
@@ -70,7 +69,7 @@ export default class LetterTextArea extends Vue {
   @Prop() order!: number;
   @Prop() largestSequenceNumber!: number;
   @Prop() smallestSequenceNumber!: number;
-  @Prop() initialTextDelta!: Delta;
+  @Prop() initialTextDelta!: string;
   @Prop({ default: false }) initialEditModeOn!: boolean;
   @Prop() letterElementKey!: string;
   @Prop() description!: string;
@@ -78,11 +77,8 @@ export default class LetterTextArea extends Vue {
 
   letterElements: LetterElementType[] = [];
 
-  textDelta: any = this.initialTextDelta;
-
-  cfg: any = {};
-  converter: any = new QuillDeltaToHtmlConverter(this.textDelta.ops, this.cfg);
-  textArea: string = this.converter.convert();
+  textDelta = JSON.parse(this.initialTextDelta);
+  htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
 
   @Emit("move-up")
   moveUp() {}
@@ -97,14 +93,14 @@ export default class LetterTextArea extends Vue {
 
   // https://quilljs.com/docs/modules/toolbar/
   /*
-                    customToolbar: any = [
-                            ["bold", "italic", "underline", "blockquote"],
-                            [{ list: "ordered" }, { list: "bullet" }],
-                            ["link"],
-                            [{'align': []}],
-                            ['clean']
-                    ];
-                    */
+            customToolbar: any = [
+                    ["bold", "italic", "underline", "blockquote"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    ["link"],
+                    [{'align': []}],
+                    ['clean']
+            ];
+        */
 
   get showMoveDown() {
     return this.order < this.largestSequenceNumber;
@@ -121,34 +117,9 @@ export default class LetterTextArea extends Vue {
   }
 
   save() {
-    // save
     this.editModeOn = false;
-    let delta: Delta = this.quillEditor.getContents();
+    let delta = this.quillEditor.getContents();
     console.log("delta object to save: ", delta);
-
-    /*
-    if (letterElementType.key === LetterElementEnum.BOILERPLATE) {
-      createInput = {
-        sequence: newSequence,
-        letterId: this.theLetter.id,
-        letterElementTypeId: letterElementType.id,
-        textDelta: {
-          ops: []
-        }
-      };
-    } else {
-      createInput = {
-        sequence: newSequence,
-        letterId: this.theLetter.id,
-        letterElementTypeId: letterElementType.id
-      };
-    }
-    */
-    //,
-    //title: this.title,
-    //description: this.description,
-    //isFrozen: false,
-    //surveyId: this.surveySelect.value
 
     this.$apollo
       .mutate({
@@ -156,7 +127,7 @@ export default class LetterTextArea extends Vue {
         variables: {
           updateInput: {
             id: this.id,
-            textDelta: delta
+            textDelta: JSON.stringify(delta)
           }
         }
       })
@@ -174,32 +145,7 @@ export default class LetterTextArea extends Vue {
 
   openEditor() {
     this.editModeOn = true;
-    // don't need to use setContents, since the editor is already tied to this.textArea via v-model....
-    /*
-                            this works, in case we ever need to use setContents directly:
-                            this.$refs.editor.quill.setContents({
-                              ops: [
-                                {insert: "some text"}
-                              ]
-                            });
-                            */
+    this.quillEditor.setContents(this.textDelta);
   }
-  mounted() {
-    console.log("description", this.description);
-    console.log("initial text delta: ", this.textDelta);
-  }
-  // mounted() {
-  //   axios
-  //     .get("http://localhost:4000/letter-elements/")
-  //     .then((response: AxiosResponse) => {
-  //       console.log(response);
-  //       this.letterElements = response.data;
-  //       for (let letterElement of this.letterElements) {
-  //         if (letterElement.key === this.letterElementKey) {
-  //           this.description = letterElement.description;
-  //         }
-  //       }
-  //     });
-  // }
 }
 </script>

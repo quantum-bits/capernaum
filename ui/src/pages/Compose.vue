@@ -25,15 +25,15 @@
                   color="green darken-1"
                   text
                   @click="cancelChartSelection()"
-                  >Cancel</v-btn
-                >
+                  >Cancel
+                </v-btn>
                 <v-btn
                   color="green darken-1"
                   :disabled="!chartSelectionValid"
                   text
                   @click="submitChartSelection()"
-                  >Submit</v-btn
-                >
+                  >Submit
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-form>
@@ -163,19 +163,19 @@
       </v-flex>
     </v-layout>
     <!--
-      Next:
-          - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-          - might need to update the db every time a change is made (to the order, too)
-
-          - ordering within categories for letters (order by survey, and then more ordering below this level)
-
-
-          - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-
-          - if the letter contains the "SE strategies for user" element, and the boolean association
-          table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-          the user should get a warning message or something)
-      -->
+          Next:
+              - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+              - might need to update the db every time a change is made (to the order, too)
+    
+              - ordering within categories for letters (order by survey, and then more ordering below this level)
+    
+    
+              - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+    
+              - if the letter contains the "SE strategies for user" element, and the boolean association
+              table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+              the user should get a warning message or something)
+          -->
   </v-container>
 </template>
 
@@ -188,15 +188,14 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementEnum } from "../types/letter.types";
-
 //import { BooleanAssociationBriefType } from "../types/association-table.types";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 
 import {
-  ONE_LETTER_QUERY,
   CREATE_LETTER_ELEMENT_MUTATION,
-  UPDATE_LETTER_ELEMENT_MUTATION,
-  DELETE_LETTER_ELEMENT_MUTATION
+  DELETE_LETTER_ELEMENT_MUTATION,
+  ONE_LETTER_QUERY,
+  UPDATE_LETTER_ELEMENT_MUTATION
 } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
@@ -204,9 +203,9 @@ import {
   OneLetter,
   OneLetter_letter,
   OneLetter_letter_letterElements,
-  OneLetter_letter_letterElements_letterElementType,
-  OneLetter_letter_survey_surveyDimensions
+  OneLetter_letter_letterElements_letterElementType
 } from "@/graphql/types/OneLetter";
+import Delta from "quill-delta/dist/Delta";
 
 interface LetterElement extends OneLetter_letter_letterElements {
   editModeOn: boolean;
@@ -278,6 +277,7 @@ export default class Compose extends Vue {
       surveyDimensions: []
     }
   };
+
   //booleanAssociation: BooleanAssociationBriefType | null = null;
 
   get predictionTableEntriesExist() {
@@ -563,14 +563,16 @@ export default class Compose extends Vue {
       }
     });
     let newSequence: number = maxSequence + 1;
+
     console.log("letter element type: ", letterElementType);
     let createInput: LetterElementCreateInput;
     if (letterElementType.key === LetterElementEnum.BOILERPLATE) {
+      const emptyTextDelta = new Delta();
       createInput = {
         sequence: newSequence,
         letterId: this.theLetter.id,
         letterElementTypeId: letterElementType.id,
-        textDelta: ""
+        textDelta: JSON.stringify(emptyTextDelta)
       };
     } else {
       createInput = {
@@ -605,12 +607,12 @@ export default class Compose extends Vue {
   }
 
   /* itemDisabled(key: string) {
-    console.log("key: ", key);
-    return (
-      key === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS &&
-      this.booleanAssociation === null
-    );
-  } */
+          console.log("key: ", key);
+          return (
+            key === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS &&
+            this.booleanAssociation === null
+          );
+        } */
 
   refreshPage() {
     this.$apollo.queries.theLetter.refetch().then(({ data }) => {
