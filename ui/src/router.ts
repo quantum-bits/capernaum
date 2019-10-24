@@ -62,6 +62,11 @@ export default new Router({
       path: "/responses",
       name: "responses",
       component: () => import("./pages/Responses.vue")
+    },
+    {
+      path: "/scripture-engagement-practices",
+      name: "scripture-engagement-practices",
+      component: () => import("./pages/ScriptureEngagementPractices.vue")
     }
   ]
 });

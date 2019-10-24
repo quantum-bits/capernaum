@@ -52,16 +52,6 @@ export interface Letters_letters_letterElements_letterElementType {
   description: string;
 }
 
-export interface Letters_letters_letterElements_textDelta_ops {
-  insert: string | null;
-  delete: number | null;
-  retain: number | null;
-}
-
-export interface Letters_letters_letterElements_textDelta {
-  ops: Letters_letters_letterElements_textDelta_ops[] | null;
-}
-
 export interface Letters_letters_letterElements_surveyDimension {
   /**
    * Unique ID for this entity
@@ -88,7 +78,7 @@ export interface Letters_letters_letterElements {
    */
   id: number;
   sequence: number;
-  textDelta: Letters_letters_letterElements_textDelta | null;
+  textDelta: any | null;
   surveyDimension: Letters_letters_letterElements_surveyDimension | null;
 }
 

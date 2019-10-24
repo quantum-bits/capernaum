@@ -10,3 +10,16 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY = gql`
     }
   }
 `;
+
+export const ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
+  mutation AddScriptureEngagementPractice(
+    $createInput: ScriptureEngagementPracticeCreateInput!
+  ) {
+    createScriptureEngagementPractice(createInput: $createInput) {
+      id
+      title
+      description
+      sequence
+    }
+  }
+`;

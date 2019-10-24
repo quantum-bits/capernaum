@@ -36,6 +36,12 @@
         </v-btn>
       </v-form>
     </v-flex>
+    <v-flex v-if="!isNew" xs12 sm11 offset-sm1>
+      <h2 class="title font-weight-regular mb-1 mt-6">
+        Survey:
+        <span class="font-weight-light">{{ surveyTitle }}</span>
+      </h2>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -183,6 +189,18 @@ export default class LetterInfoForm extends Vue {
       text: survey.title,
       value: survey.id
     }));
+  }
+
+  get surveyTitle() {
+    let surveyTitle = "";
+    if (!this.isNew) {
+      this.surveys.forEach(survey => {
+        if (survey.id === this.initialSurveyId) {
+          surveyTitle = survey.title;
+        }
+      });
+    }
+    return surveyTitle;
   }
 
   mounted() {

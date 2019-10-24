@@ -115,6 +115,12 @@ export default Vue.extend({
         route: "imported-surveys",
         icon: "mdi-download",
         divider: true
+      },
+      {
+        title: "Scripture Engagement Practices",
+        route: "scripture-engagement-practices",
+        icon: "mdi-book-open",
+        divider: true
       }
     ];
     return {
