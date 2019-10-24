@@ -217,6 +217,7 @@ type ScriptureEngagementPractice {
   description: String!
   moreInfoUrl: String!
   sequence: Int!
+  predictionTableEntries: [PredictionTableEntry!]!
 }
 
 input ScriptureEngagementPracticeCreateInput {
@@ -326,6 +327,7 @@ type SurveyIndex {
 
   """Title of this index"""
   title: String!
+  predictionTableEntries: [PredictionTableEntry!]!
 }
 
 input SurveyIndexCreateInput {
