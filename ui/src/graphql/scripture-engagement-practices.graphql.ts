@@ -8,6 +8,9 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY = gql`
       description
       sequence
       moreInfoUrl
+      predictionTableEntries {
+        id
+      }
     }
   }
 `;
@@ -37,5 +40,11 @@ export const UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       sequence
       moreInfoUrl
     }
+  }
+`;
+
+export const DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
+  mutation DeleteScriptureEngagementPractice($id: Int!) {
+    deleteScriptureEngagementPractice(id: $id)
   }
 `;

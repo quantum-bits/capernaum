@@ -77,13 +77,28 @@
               <td class="text-xs-right">{{ item.title }}</td>
               <td class="text-xs-right">{{ item.description }}</td>
               <td class="text-xs-right">
-                <v-btn text v-on:click="browseToMoreInfoUrl(item)">
-                  More Info
+                <!-- https://stackoverflow.com/questions/40899532/how-to-pass-a-value-from-vue-data-to-href -->
+                <v-btn text :href="item.moreInfoUrl" target="_blank"
+                  >More Info
                 </v-btn>
               </td>
               <td class="text-xs-right">
                 <v-btn text v-on:click="editSEPractice(item)">
                   Edit
+                </v-btn>
+                <v-tooltip v-if="!item.canDelete" top>
+                  <template v-slot:activator="{ on }">
+                    <span v-on="on">
+                      <v-btn text disabled> Delete</v-btn>
+                    </span>
+                  </template>
+                  <span
+                    >This SE Practice cannot be deleted because it has boolean
+                    associations.</span
+                  >
+                </v-tooltip>
+                <v-btn v-else text v-on:click="deleteSEPractice(item)">
+                  Delete
                 </v-btn>
               </td>
             </tr>
@@ -102,7 +117,8 @@ import Vue from "vue";
 import {
   ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
   ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
-  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
+  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
+  DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
 } from "@/graphql/scripture-engagement-practices.graphql";
 import {
   ScriptureEngagementPractices,
@@ -135,7 +151,7 @@ export default Vue.extend({
         { text: "More Information", sortable: false },
         { text: "Action", sortable: false }
       ],
-      scriptureEngagementPractices: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
+      scriptureEngagementPracticeData: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
       createUpdateSEPracticeDialog: false as boolean,
       valid: true as boolean,
       scriptureEngagementPracticeTitle: "" as string,
@@ -161,12 +177,6 @@ export default Vue.extend({
   },
 
   methods: {
-    browseToMoreInfoUrl(
-      practice: ScriptureEngagementPractices_scriptureEngagementPractices
-    ) {
-      // https://forum.vuejs.org/t/navigate-to-external-url-with-vue-router/45099
-      window.open(practice.moreInfoUrl);
-    },
     resetForm() {
       this.scriptureEngagementPracticeTitle = "";
       this.scriptureEngagementPracticeDescription = "";
@@ -185,9 +195,9 @@ export default Vue.extend({
       this.createUpdateSEPracticeDialog = true;
     },
     editSEPractice(
-      practice: ScriptureEngagementPractices_scriptureEngagementPractices
+      practice: any // not really of type ScriptureEngagementPractices_scriptureEngagementPractices anymore, since it is a computed property that is passed in
     ) {
-      console.log("edit SE practice!");
+      console.log("edit SE practice!", practice);
       this.scriptureEngagementPracticeTitle = practice.title;
       this.scriptureEngagementPracticeDescription = practice.description;
       this.moreInfoUrl = practice.moreInfoUrl;
@@ -196,6 +206,30 @@ export default Vue.extend({
       this.editOn = true;
       this.createUpdateSEPracticeDialog = true;
     },
+
+    deleteSEPractice(
+      practice: any // not really of type ScriptureEngagementPractices_scriptureEngagementPractices anymore, since it is a computed property that is passed in
+    ) {
+      console.log("delete practice: ", practice);
+      this.$apollo
+        .mutate({
+          mutation: DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
+          variables: {
+            id: practice.id
+          }
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          this.refetchSEPracticeData();
+          //this.cancelIndexDialog();
+        })
+        .catch(error => {
+          console.log("there appears to have been an error: ", error);
+          //this.serverError = true;
+          //this.serverError = true
+        });
+    },
+
     cancelDialog() {
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
@@ -205,7 +239,7 @@ export default Vue.extend({
       this.createUpdateSEPracticeDialog = false;
     },
     refetchSEPracticeData() {
-      this.$apollo.queries.scriptureEngagementPractices
+      this.$apollo.queries.scriptureEngagementPracticeData
         .refetch()
         .then(({ data }) => {
           console.log("survey data refetched! ", data);
@@ -217,7 +251,7 @@ export default Vue.extend({
         if (!this.editOn) {
           // create new SE practice
           let maxSequence = 0;
-          this.scriptureEngagementPractices.forEach(
+          this.scriptureEngagementPracticeData.forEach(
             (
               practice: ScriptureEngagementPractices_scriptureEngagementPractices
             ) => {
@@ -284,7 +318,7 @@ export default Vue.extend({
   },
 
   apollo: {
-    scriptureEngagementPractices: {
+    scriptureEngagementPracticeData: {
       query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
       update(scriptureEngagementPractices: ScriptureEngagementPractices) {
         console.log(
@@ -297,7 +331,22 @@ export default Vue.extend({
     }
   },
 
-  computed: {},
+  computed: {
+    scriptureEngagementPractices(): object {
+      return this.scriptureEngagementPracticeData.map(
+        (
+          practice: ScriptureEngagementPractices_scriptureEngagementPractices
+        ) => ({
+          id: practice.id,
+          title: practice.title,
+          description: practice.description,
+          sequence: practice.sequence,
+          moreInfoUrl: practice.moreInfoUrl,
+          canDelete: practice.predictionTableEntries.length === 0
+        })
+      );
+    }
+  },
 
   mounted() {
     console.log("mounted....");

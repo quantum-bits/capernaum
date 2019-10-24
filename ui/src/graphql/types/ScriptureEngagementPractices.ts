@@ -6,6 +6,13 @@
 // GraphQL query operation: ScriptureEngagementPractices
 // ====================================================
 
+export interface ScriptureEngagementPractices_scriptureEngagementPractices_predictionTableEntries {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
 export interface ScriptureEngagementPractices_scriptureEngagementPractices {
   /**
    * Unique ID for this entity
@@ -15,6 +22,7 @@ export interface ScriptureEngagementPractices_scriptureEngagementPractices {
   description: string;
   sequence: number;
   moreInfoUrl: string;
+  predictionTableEntries: ScriptureEngagementPractices_scriptureEngagementPractices_predictionTableEntries[];
 }
 
 export interface ScriptureEngagementPractices {
