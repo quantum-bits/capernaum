@@ -27,6 +27,13 @@ export interface OneSurvey_survey_surveyItems {
   qualtricsText: string;
 }
 
+export interface OneSurvey_survey_surveyDimensions_surveyIndices_predictionTableEntries {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
 export interface OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems {
   /**
    * Unique ID for this entity
@@ -55,6 +62,7 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices {
    * Abbreviation for this index (e.g., 'FOG')
    */
   abbreviation: string;
+  predictionTableEntries: OneSurvey_survey_surveyDimensions_surveyIndices_predictionTableEntries[];
   surveyItems: OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems[];
 }
 

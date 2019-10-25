@@ -171,6 +171,9 @@ export const ONE_SURVEY_QUERY = gql`
           id
           title
           abbreviation
+          predictionTableEntries {
+            id
+          }
           surveyItems {
             id
             qualtricsId

@@ -83,6 +83,7 @@ export interface SurveyIndexView {
   name: string;
   abbrev: string;
   type: string;
+  canDelete: boolean;
   children: SurveyItemView[];
 }
 
@@ -90,5 +91,7 @@ export interface SurveyDimensionView {
   id: number;
   name: string;
   type: string;
+  useForPredictions: boolean;
+  canDelete: boolean;
   children: SurveyIndexView[];
 }

@@ -163,6 +163,7 @@
       </v-flex>
       <v-flex v-if="surveyData" xs10 offset-xs1>
         <template>
+          {{ surveyDimensions }}
           <v-treeview dense rounded hoverable :items="surveyDimensions">
             <template v-slot:label="{ item }">
               <div v-html="item.name"></div>
@@ -187,7 +188,7 @@
                     survey items.</span
                   >
                 </v-tooltip>
-                <v-tooltip top>
+                <v-tooltip v-if="item.canDelete" top>
                   <template v-slot:activator="{ on }">
                     <a @click="deleteIndex(item)" v-on="on">
                       <v-icon>
@@ -198,6 +199,17 @@
                   <span
                     >Delete this survey index and the associations to survey
                     items.</span
+                  >
+                </v-tooltip>
+                <v-tooltip v-else top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="grey--text text--lighten-1">
+                      {{ "mdi-close-circle" }}
+                    </v-icon>
+                  </template>
+                  <span
+                    >This survey index has boolean associations and cannot be
+                    deleted.</span
                   >
                 </v-tooltip>
               </span>
@@ -235,7 +247,7 @@
                   </template>
                   <span>Edit this survey dimension.</span>
                 </v-tooltip>
-                <v-tooltip top>
+                <v-tooltip v-if="item.canDelete" top>
                   <template v-slot:activator="{ on }">
                     <a @click="deleteDimension(item)" v-on="on">
                       <v-icon>
@@ -246,6 +258,18 @@
                   <span
                     >Delete this survey dimension and all associated survey
                     indexes.</span
+                  >
+                </v-tooltip>
+                <v-tooltip v-else top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="grey--text text--lighten-1">
+                      {{ "mdi-close-circle" }}
+                    </v-icon>
+                  </template>
+                  <span
+                    >One or more survey indexes associated with this survey
+                    dimension have boolean associations, so it cannot be
+                    deleted.</span
                   >
                 </v-tooltip>
               </span>
@@ -282,6 +306,11 @@ import {
   SurveyItemView,
   SurveySelection
 } from "./survey.types";
+
+import {
+  OneSurvey_survey_surveyDimensions,
+  OneSurvey_survey_surveyDimensions_surveyIndices
+} from "@/graphql/types/OneSurvey";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
@@ -330,6 +359,23 @@ export default Vue.extend({
   },
 
   methods: {
+    canDeleteSurveyDimension(
+      surveyDimension: OneSurvey_survey_surveyDimensions
+    ) {
+      // check all indices for this survey dimension to see if any of them have prediction table entries; if so, the dimension may not be deleted
+      let canDelete = true;
+      surveyDimension.surveyIndices.forEach(surveyIndex => {
+        if (surveyIndex.predictionTableEntries.length > 0) {
+          canDelete = false;
+        }
+      });
+      return canDelete;
+    },
+
+    canDeleteSurveyIndex( surveyIndex: OneSurvey_survey_surveyDimensions_surveyIndices) {
+      return surveyIndex.predictionTableEntries.length === 0;
+    },
+    
     refetchSurveyData() {
       this.$apollo.queries.surveyData.refetch().then(({ data }) => {
         console.log("survey data refetched! ", data);
@@ -646,26 +692,30 @@ export default Vue.extend({
     },
 
     surveyDimensions(): SurveyDimensionView[] {
-      return this.surveyData.surveyDimensions.map(dimension => ({
-        id: dimension.id,
-        name: dimension.title,
-        useForPredictions: dimension.useForPredictions,
-        //abbrev: dimension.abbreviation,
-        type: "survey-dimension",
-        children: dimension.surveyIndices.map(index => ({
-          id: index.id,
-          parentId: dimension.id,
-          parentName: dimension.title,
-          name: index.title,
-          abbrev: index.abbreviation,
-          type: "survey-index",
-          children: index.surveyItems.map(surveyItem => ({
-            id: surveyItem.id,
-            name: surveyItem.qualtricsText,
-            type: "survey-item"
+      return this.surveyData.surveyDimensions.map(
+        (dimension: OneSurvey_survey_surveyDimensions) => ({
+          id: dimension.id,
+          name: dimension.title,
+          useForPredictions: dimension.useForPredictions,
+          //abbrev: dimension.abbreviation,
+          type: "survey-dimension",
+          canDelete: this.canDeleteSurveyDimension(dimension),
+          children: dimension.surveyIndices.map( (index: OneSurvey_survey_surveyDimensions_surveyIndices) => ({
+            id: index.id,
+            parentId: dimension.id,
+            parentName: dimension.title,
+            name: index.title,
+            abbrev: index.abbreviation,
+            type: "survey-index",
+            canDelete: this.canDeleteSurveyIndex(index),
+            children: index.surveyItems.map(surveyItem => ({
+              id: surveyItem.id,
+              name: surveyItem.qualtricsText,
+              type: "survey-item"
+            }))
           }))
-        }))
-      }));
+        })
+      );
     },
 
     surveyItems(): SurveyItemView[] {
