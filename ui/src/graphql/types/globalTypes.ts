@@ -26,7 +26,7 @@ export interface LetterElementCreateInput {
   letterId: number;
   sequence: number;
   letterElementTypeId: number;
-  textDelta?: any | null;
+  textDelta?: string | null;
   surveyDimensionId?: number | null;
 }
 
@@ -34,7 +34,7 @@ export interface LetterElementUpdateInput {
   id: number;
   sequence?: number | null;
   letterElementTypeId?: number | null;
-  textDelta?: any | null;
+  textDelta?: string | null;
   surveyDimensionId?: number | null;
 }
 
