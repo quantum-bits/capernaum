@@ -163,7 +163,6 @@
       </v-flex>
       <v-flex v-if="surveyData" xs10 offset-xs1>
         <template>
-          {{ surveyDimensions }}
           <v-treeview dense rounded hoverable :items="surveyDimensions">
             <template v-slot:label="{ item }">
               <div v-html="item.name"></div>
@@ -375,7 +374,7 @@ export default Vue.extend({
     canDeleteSurveyIndex( surveyIndex: OneSurvey_survey_surveyDimensions_surveyIndices) {
       return surveyIndex.predictionTableEntries.length === 0;
     },
-    
+
     refetchSurveyData() {
       this.$apollo.queries.surveyData.refetch().then(({ data }) => {
         console.log("survey data refetched! ", data);
@@ -679,7 +678,8 @@ export default Vue.extend({
       },
       skip() {
         return this.surveySelect === null;
-      }
+      },
+      fetchPolicy: 'network-only',
     }
   },
 

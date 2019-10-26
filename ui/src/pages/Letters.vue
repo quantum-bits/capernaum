@@ -15,7 +15,7 @@
             <tr>
               <td>{{ item.title }}</td>
               <!--<td class="text-xs-right">{{ item.description }}</td>-->
-              <td class="text-xs-right">{{ item.survey.title }}</td>
+              <td class="text-xs-right">{{ item.surveyTitle }}</td>
               <td class="text-xs-right">{{ item.updated | dateAndTime }}</td>
               <td class="text-xs-center">
                 <span v-if="item.isFrozen">
@@ -32,9 +32,37 @@
                 </v-btn>
               </td>
               <td class="text-xs-right">
-                <v-btn text v-on:click="viewLetter(item)">
-                  View Letter
-                </v-btn>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="viewLetter(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-pencil" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span>View details and/or edit this letter.</span>
+                </v-tooltip>
+                <v-tooltip v-if="item.canDelete" top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="deleteLetter(item.id)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-close-circle" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span>Delete this letter.</span>
+                </v-tooltip>
+                <v-tooltip v-else top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="grey--text text--lighten-1">
+                      {{ "mdi-close-circle" }}
+                    </v-icon>
+                  </template>
+                  <span
+                    >This letter has letter elements and/or boolean
+                    associations, and so cannot be deleted.</span
+                  >
+                </v-tooltip>
               </td>
             </tr>
           </template>
@@ -47,19 +75,24 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
-import { ALL_LETTERS_QUERY } from "@/graphql/letters.graphql";
+import {
+  ALL_LETTERS_QUERY,
+  DELETE_LETTER_MUTATION
+} from "@/graphql/letters.graphql";
 
+import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
 
 @Component({
   apollo: {
-    letters: {
+    letterData: {
       query: ALL_LETTERS_QUERY,
       update(letters: Letters) {
         console.log("letter data: ", letters.letters);
 
         return letters.letters;
-      }
+      },
+      fetchPolicy: "network-only"
     }
   }
 })
@@ -77,10 +110,48 @@ export default class LettersPage extends Vue {
     { text: "Frozen?", value: "isFrozen" },
     { text: "Active?", value: "isActive" },
     { text: "Boolean Association Table", value: "booleanAssociationTable" },
-    { text: "Action", sortable: false }
+    { text: "Actions", sortable: false }
   ];
 
-  letters: Letters_letters[] = [];
+  letterData: Letters_letters[] = [];
+
+  get letters() {
+    return this.letterData.map((letter: Letters_letters) => ({
+      title: letter.title,
+      isFrozen: letter.isFrozen,
+      surveyTitle: letter.survey.title,
+      updated: letter.updated,
+      id: letter.id,
+      canDelete: this.canDeleteLetter(letter)
+    }));
+  }
+
+  canDeleteLetter(letter: Letters_letters) {
+    return (
+      letter.letterElements.length === 0 && letter.tableEntries.length === 0
+    );
+  }
+
+  deleteLetter(id: number) {
+    console.log("delete letter!", id);
+    this.$apollo
+      .mutate({
+        mutation: DELETE_LETTER_MUTATION,
+        variables: {
+          id: id
+        }
+      })
+      .then(({ data }) => {
+        console.log("letter successfully deleted!", data);
+        this.refreshLetterData();
+      })
+      .catch(error => {
+        console.log(
+          "there appears to have been an error when attempting to delete the letter: ",
+          error
+        );
+      });
+  }
 
   newLetter() {
     console.log("create new letter");
@@ -101,11 +172,17 @@ export default class LettersPage extends Vue {
     this.$router.push({ name: "compose", params: { letterId: item.id } });
   }
 
-  mounted() {
-    console.log("inside mounted!");
-    this.$apollo.queries.letters.refetch().then(({ data }) => {
+  refreshLetterData() {
+    this.$apollo.queries.letterData.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });
+  }
+
+  mounted() {
+    console.log("inside mounted!");
+    //this.$apollo.queries.letters.refetch().then(({ data }) => {
+    //  console.log("item(s) refetched!", data);
+    //});
   }
 }
 </script>

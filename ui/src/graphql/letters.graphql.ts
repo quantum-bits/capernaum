@@ -24,6 +24,12 @@ export const UPDATE_LETTER_MUTATION = gql`
   }
 `;
 
+export const DELETE_LETTER_MUTATION = gql`
+  mutation DeleteLetter($id: Int!) {
+    deleteLetter(id: $id)
+  }
+`;
+
 export const ONE_LETTER_QUERY = gql`
   query OneLetter($letterId: Int!) {
     letter(id: $letterId) {

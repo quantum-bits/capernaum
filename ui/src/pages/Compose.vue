@@ -646,6 +646,7 @@ export default class Compose extends Vue {
     //https://www.w3schools.com/jsref/jsref_tostring_number.asp
     let idString: string = id.toString();
     this.editModeOn = false;
+    this.isNew = false;
     this.$router.push({ name: "compose", params: { letterId: idString } });
     // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
     // https://router.vuejs.org/guide/essentials/navigation.html
@@ -671,32 +672,6 @@ export default class Compose extends Vue {
       this.isNew = true;
       console.log("new letter....");
     }
-    // else {
-    //   axios
-    //     .get("http://localhost:4000/letter-data/" + this.$route.params.id)
-    //     .then((response: AxiosResponse) => {
-    //       console.log(response);
-    //       let localElements: LetterElement[] = [];
-    //       response.data.elements.forEach((element: any) => {
-    //         localElements.push(element);
-    //       });
-    //       this.letterElements = _.orderBy(localElements, "order");
-    //       // add two convenience properties to the elements....
-    //       for (let box of this.letterElements) {
-    //         box.editModeOn = false;
-    //         box.isNew = false;
-    //       }
-    //       this.resetSequenceProperty();
-    //       this.survey = {
-    //         id: response.data.survey.id,
-    //         title: response.data.survey.title
-    //       };
-    //       this.lastUpdate = response.data.lastUpdate;
-    //       this.id = response.data.id;
-    //       this.isFrozen = response.data.isFrozen;
-    //       this.booleanAssociation = response.data.booleanAssociation;
-    //     });
-    // }
   }
 }
 </script>

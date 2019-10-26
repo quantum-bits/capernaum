@@ -80,7 +80,8 @@ export default Vue.extend({
       update(data) {
         console.log("inside update: ", data);
         return data.surveys;
-      }
+      },
+      fetchPolicy: 'network-only',
     }
   },
 
@@ -89,9 +90,9 @@ export default Vue.extend({
     this.surveys
       ? console.log("surveys exist!")
       : console.log("surveys do not yet exist....");
-    this.$apollo.queries.surveys.refetch().then(({ data }) => {
-      console.log("item(s) refetched!", data);
-    });
+    //this.$apollo.queries.surveys.refetch().then(({ data }) => {
+    //  console.log("item(s) refetched!", data);
+    //});
   }
 });
 </script>

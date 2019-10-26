@@ -327,7 +327,8 @@ export default Vue.extend({
         );
 
         return scriptureEngagementPractices.scriptureEngagementPractices;
-      }
+      },
+      fetchPolicy: 'network-only',
     }
   },
 
@@ -350,7 +351,7 @@ export default Vue.extend({
 
   mounted() {
     console.log("mounted....");
-    this.refetchSEPracticeData();
+    //this.refetchSEPracticeData();
   }
 });
 </script>
