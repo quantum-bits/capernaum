@@ -560,7 +560,7 @@ export default class Compose extends Vue {
         letterElementTypeId: letterElementType.id
       };
     }
-   
+
     this.$apollo
       .mutate({
         mutation: CREATE_LETTER_ELEMENT_MUTATION,

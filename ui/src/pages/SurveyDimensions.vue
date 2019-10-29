@@ -307,6 +307,7 @@ import {
 } from "./survey.types";
 
 import {
+  OneSurvey_survey,
   OneSurvey_survey_surveyDimensions,
   OneSurvey_survey_surveyDimensions_surveyIndices
 } from "@/graphql/types/OneSurvey";
@@ -328,7 +329,7 @@ export default Vue.extend({
       deleteItemDialogTitle: "", // custom title sent to the confirm delete dialog
       deleteItemDialogText: "", // custom text sent to the confirm delete dialog
       serverError: false,
-      surveyData: (null as any) as Survey,
+      surveyData: (null as any) as OneSurvey_survey,
       surveyDimensionEditOn: false, // true when editing a survey dimension (as opposed to adding a new one)
       surveyDimensionDialog: false,
       surveyDimensionText: "",
@@ -371,7 +372,9 @@ export default Vue.extend({
       return canDelete;
     },
 
-    canDeleteSurveyIndex( surveyIndex: OneSurvey_survey_surveyDimensions_surveyIndices) {
+    canDeleteSurveyIndex(
+      surveyIndex: OneSurvey_survey_surveyDimensions_surveyIndices
+    ) {
       return surveyIndex.predictionTableEntries.length === 0;
     },
 
@@ -679,7 +682,7 @@ export default Vue.extend({
       skip() {
         return this.surveySelect === null;
       },
-      fetchPolicy: 'network-only',
+      fetchPolicy: "network-only"
     }
   },
 
@@ -700,20 +703,22 @@ export default Vue.extend({
           //abbrev: dimension.abbreviation,
           type: "survey-dimension",
           canDelete: this.canDeleteSurveyDimension(dimension),
-          children: dimension.surveyIndices.map( (index: OneSurvey_survey_surveyDimensions_surveyIndices) => ({
-            id: index.id,
-            parentId: dimension.id,
-            parentName: dimension.title,
-            name: index.title,
-            abbrev: index.abbreviation,
-            type: "survey-index",
-            canDelete: this.canDeleteSurveyIndex(index),
-            children: index.surveyItems.map(surveyItem => ({
-              id: surveyItem.id,
-              name: surveyItem.qualtricsText,
-              type: "survey-item"
-            }))
-          }))
+          children: dimension.surveyIndices.map(
+            (index: OneSurvey_survey_surveyDimensions_surveyIndices) => ({
+              id: index.id,
+              parentId: dimension.id,
+              parentName: dimension.title,
+              name: index.title,
+              abbrev: index.abbreviation,
+              type: "survey-index",
+              canDelete: this.canDeleteSurveyIndex(index),
+              children: index.surveyItems.map(surveyItem => ({
+                id: surveyItem.id,
+                name: surveyItem.qualtricsText,
+                type: "survey-item"
+              }))
+            })
+          )
         })
       );
     },
