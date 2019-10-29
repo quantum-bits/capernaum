@@ -11,12 +11,14 @@
               :src="require('@/images/spiritual-foci.png')"
               :width="400"
             ></v-img>
-            <span v-if="displaySEStrategies">
+          </div>
+        </v-card-title>
+        <v-card-text>
+          <span v-if="displaySEStrategies">
               Auto-generated list of Scripture Engagement strategies that the
               user may find to be helpful.
             </span>
-          </div>
-        </v-card-title>
+        </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="order > 0" text color="orange" @click="moveUp">

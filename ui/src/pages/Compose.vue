@@ -252,9 +252,8 @@ export default class Compose extends Vue {
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
   chooseChartTypeDialog: boolean = false;
-  selectedChartTypeId: number | null = null;
   chartSelectionValid: boolean = false;
-  selectedSurveyDimension: any = {};
+  selectedSurveyDimension: null | any = null;
   chartTypeElementId: number = -1; //used when creating a chart type of letter element
 
   name: string = "";
@@ -373,20 +372,17 @@ export default class Compose extends Vue {
   }
 
   cancelChartSelection() {
-    this.selectedChartTypeId = null;
-    this.chartSelectionValid = false;
+    (this.$refs.form as any).resetValidation();
+    this.chartSelectionValid = true;
+    this.selectedSurveyDimension = null;
     this.chooseChartTypeDialog = false;
     this.chartTypeElementId = -1;
   }
 
   submitChartSelection() {
-    console.log("chart selection: ", this.selectedChartTypeId);
-
+    console.log("chart selection: ", this.selectedSurveyDimension);
     if ((this.$refs.form as any).validate()) {
       console.log("form is valid!");
-      this.chartSelectionValid = false;
-      this.selectedChartTypeId = null;
-      this.chooseChartTypeDialog = false;
       this.addChartElement();
     } else {
       console.log("form is not valid!");
@@ -503,18 +499,9 @@ export default class Compose extends Vue {
     }
   }
 
-  // WORKING HERE:
-  // ...code is sort of working, but it's a bit buggy:
-  // - editModeOn/Off not really working for letter elements
-  // - for some reason can't yet create a letter element that connects to a survey dimension
-  // - the validation on the dialog submit seems messed up
-
   addChartElement() {
-    //this.selectedChartTypeId;
     console.log("survey dimension id: ", this.selectedSurveyDimension.value);
     const letterElements = this.surveyLetterElements;
-    //let numElements: number = letterElements.length;
-    //let maxId: number = 0;
     let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
     letterElements.forEach(letterElement => {
       if (maxSequence < letterElement.sequence) {
@@ -531,22 +518,16 @@ export default class Compose extends Vue {
             letterId: this.theLetter.id,
             letterElementTypeId: this.chartTypeElementId,
             surveyDimensionId: this.selectedSurveyDimension.value
-            //title: this.title,
-            //description: this.description,
-            //isFrozen: false,
-            //surveyId: this.surveySelect.value
           }
         }
       })
       .then(({ data }) => {
         console.log("done!", data);
+        this.cancelChartSelection();
         this.refreshPage();
-        //this.$emit("letter-created", data.createLetter.id);
       })
       .catch(error => {
         console.log("there appears to have been an error: ", error);
-        //this.errorMessage =
-        //  "Sorry, there appears to have been an error.  Please tray again later.";
       });
   }
 
@@ -554,8 +535,6 @@ export default class Compose extends Vue {
     letterElementType: OneLetter_letter_letterElements_letterElementType
   ) {
     const letterElements = this.surveyLetterElements;
-    //let numElements: number = letterElements.length;
-    //let maxId: number = 0;
     let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
     letterElements.forEach(letterElement => {
       if (maxSequence < letterElement.sequence) {
@@ -581,12 +560,7 @@ export default class Compose extends Vue {
         letterElementTypeId: letterElementType.id
       };
     }
-    //,
-    //title: this.title,
-    //description: this.description,
-    //isFrozen: false,
-    //surveyId: this.surveySelect.value
-
+   
     this.$apollo
       .mutate({
         mutation: CREATE_LETTER_ELEMENT_MUTATION,
@@ -601,18 +575,8 @@ export default class Compose extends Vue {
       })
       .catch(error => {
         console.log("there appears to have been an error: ", error);
-        //this.errorMessage =
-        //  "Sorry, there appears to have been an error.  Please tray again later.";
       });
   }
-
-  /* itemDisabled(key: string) {
-          console.log("key: ", key);
-          return (
-            key === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS &&
-            this.booleanAssociation === null
-          );
-        } */
 
   refreshPage() {
     this.$apollo.queries.theLetter.refetch().then(({ data }) => {
