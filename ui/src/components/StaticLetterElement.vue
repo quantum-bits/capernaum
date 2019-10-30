@@ -15,9 +15,9 @@
         </v-card-title>
         <v-card-text>
           <span v-if="displaySEStrategies">
-              Auto-generated list of Scripture Engagement strategies that the
-              user may find to be helpful.
-            </span>
+            Auto-generated list of Scripture Engagement strategies that the user
+            may find to be helpful.
+          </span>
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
@@ -34,13 +34,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from "vue-property-decorator";
-
-import axios from "axios";
-import { AxiosResponse } from "axios";
+import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import Delta from "quill-delta";
 
-import { LetterElementType, LetterElementEnum } from "../types/letter.types";
+import { LetterElementEnum, LetterElementType } from "../types/letter.types";
 
 @Component({})
 export default class StaticLetterElement extends Vue {
@@ -83,19 +80,5 @@ export default class StaticLetterElement extends Vue {
       this.letterElementKey === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS
     );
   }
-
-  // mounted() {
-  //   axios
-  //     .get("http://localhost:4000/letter-elements/")
-  //     .then((response: AxiosResponse) => {
-  //       console.log(response);
-  //       this.letterElements = response.data;
-  //       for (let letterElement of this.letterElements) {
-  //         if (letterElement.key === this.letterElementKey) {
-  //           this.description = letterElement.description;
-  //         }
-  //       }
-  //     });
-  // }
 }
 </script>

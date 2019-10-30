@@ -1,7 +1,10 @@
 import { ConfigureOptions, Environment, FileSystemLoader } from "nunjucks";
-import { Letter } from "./entities";
+import { Letter, LetterWriterOutput } from "./entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
+import { format, join } from "path";
+
+const WORKING_DIR = "/Users/tom/Scratch";
 
 const VALID_ELEMENT_TYPES = [
   "boilerplate",
@@ -17,12 +20,19 @@ export default class LetterWriter {
   constructor() {
     const loader = new FileSystemLoader("./src/letter/templates");
     const configuration: ConfigureOptions = {
-      autoescape: true
+      autoescape: false,
+      tags: {
+        variableStart: "<$",
+        variableEnd: "$>"
+      }
     };
     this.environment = new Environment(loader, configuration);
   }
 
-  async render(letter: Letter) {
+  async render(
+    letter: Letter,
+    surveyResponseId: number
+  ): Promise<LetterWriterOutput> {
     // Validate element types.
     for (const letterElement of letter.letterElements) {
       const key = letterElement.letterElementType.key;
@@ -31,23 +41,39 @@ export default class LetterWriter {
       }
     }
 
-    this.environment.render("letter.tex", { letter }, (err, result) => {
-      if (err) {
-        throw err;
-      }
-      writeFile("./foo.tex", result, "utf8", err => {
+    const templateDir = join(process.cwd(), "src/letter/templates");
+    const pathObject = {
+      dir: WORKING_DIR,
+      name: `${letter.id}-${surveyResponseId}`
+    };
+    const texFilePath = format({ ...pathObject, ext: ".tex" });
+    const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
+
+    this.environment.render(
+      "letter.tex",
+      { letter, templateDir },
+      (err, result) => {
         if (err) {
           throw err;
         }
-        exec("pdflatex foo.tex", (err, stdout, stderr) => {
+        writeFile(texFilePath, result, "utf8", err => {
           if (err) {
             throw err;
           }
-          console.log("STDOUT", stdout);
-          console.log("STDERR", stderr);
-          return "OK";
+          exec(
+            `pdflatex ${texFilePath}`,
+            { cwd: WORKING_DIR },
+            (err, stdout, stderr) => {
+              if (err) {
+                throw err;
+              }
+              console.log("STDOUT", stdout);
+              console.log("STDERR", stderr);
+            }
+          );
         });
-      });
-    });
+      }
+    );
+    return { ok: true, pdfFilePath };
   }
 }

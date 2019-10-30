@@ -80,6 +80,11 @@ input LetterWriterInput {
   surveyResponseId: Int!
 }
 
+type LetterWriterOutput {
+  ok: Boolean!
+  pdfFilePath: String!
+}
+
 type Mutation {
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
@@ -87,7 +92,7 @@ type Mutation {
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
   deleteLetter(id: Int!): Int!
   deleteLetterElement(id: Int!): Int!
-  writeLetter(letterWriterInput: LetterWriterInput!): String!
+  writeLetter(letterWriterInput: LetterWriterInput!): LetterWriterOutput!
 
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
