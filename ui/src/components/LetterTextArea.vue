@@ -59,9 +59,8 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import { LetterElementType } from "@/types/letter.types";
 import { UPDATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
-
-import Delta from "quill-delta/dist/Delta";
 import Quill from "quill";
+import cloneDeep from "lodash/cloneDeep";
 
 @Component({
   components: {
@@ -100,9 +99,40 @@ export default class LetterTextArea extends Vue {
     //[{ header: [1, 2, false] }],
     ["link"]
   ];
+
+  // Authoritative source for the boilerplate content.
+  // Initialize from the prop. Update with each edit.
   textDelta = JSON.parse(this.initialTextDelta);
-  htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
-  //uneditedTextDelta = this.textDelta;
+
+  // The vue2-editor component is an HTML editor. This value is used as the v-model
+  // for the editor, as well as the v-html for the "not editing" state.
+  htmlForEditor = "";
+
+  // Current value of textDelta while the editor is open. Used to restore the previous
+  // value when edit is canceled.
+  savedTextDelta = [];
+
+  // Grab a copy of the current content so we can support canceling and edit.
+  saveTextDelta() {
+    this.savedTextDelta = cloneDeep(this.textDelta);
+  }
+
+  // Restore the content from the saved version.
+  restoreTextDelta() {
+    this.textDelta = cloneDeep(this.savedTextDelta);
+  }
+
+  // Update the HTML version of the content for use by the editor and by the non-editing display.
+  updateHtmlFromTextDelta() {
+    this.htmlForEditor = new QuillDeltaToHtmlConverter(
+      this.textDelta.ops
+    ).convert();
+  }
+
+  // Make sure to initialize the HTML version of the content.
+  mounted() {
+    this.updateHtmlFromTextDelta();
+  }
 
   @Emit("move-up")
   moveUp() {}
@@ -114,17 +144,6 @@ export default class LetterTextArea extends Vue {
   deleteElement() {}
 
   editModeOn: boolean = this.initialEditModeOn;
-
-  // https://quilljs.com/docs/modules/toolbar/
-  /*
-            customToolbar: any = [
-                    ["bold", "italic", "underline", "blockquote"],
-                    [{ list: "ordered" }, { list: "bullet" }],
-                    ["link"],
-                    [{'align': []}],
-                    ['clean']
-            ];
-        */
 
   get showMoveDown() {
     return this.order < this.largestSequenceNumber;
@@ -140,19 +159,20 @@ export default class LetterTextArea extends Vue {
     return (this.$refs.editor as Vue & { quill: Quill }).quill;
   }
 
+  // User canceled the edit. Restore the content and the HTML to their values
+  // prior to editing.
   cancelEdits() {
     this.editModeOn = false;
-    this.textDelta = JSON.parse(this.initialTextDelta);
-    //this.textDelta = this.uneditedTextDelta; // revert to the former text delta
-    this.htmlForEditor = new QuillDeltaToHtmlConverter(
-      this.textDelta.ops
-    ).convert();
+    this.restoreTextDelta();
+    this.updateHtmlFromTextDelta();
   }
 
+  // User wants to save the edit. Update content and HTML to their new values.
+  // Send a mutation to the server to update the database.
   save() {
     this.editModeOn = false;
-    let delta = this.quillEditor.getContents();
-    console.log("delta object to save: ", delta);
+    this.textDelta = this.quillEditor.getContents();
+    this.updateHtmlFromTextDelta();
 
     this.$apollo
       .mutate({
@@ -160,7 +180,7 @@ export default class LetterTextArea extends Vue {
         variables: {
           updateInput: {
             id: this.id,
-            textDelta: JSON.stringify(delta)
+            textDelta: JSON.stringify(this.textDelta)
           }
         }
       })
@@ -177,10 +197,11 @@ export default class LetterTextArea extends Vue {
       });
   }
 
+  // Open the editor. Hang on to the current content for a possible cancellation.
+  // Update the editor to contain the content.
   openEditor() {
     this.editModeOn = true;
-    console.log("text delta: ", this.textDelta);
-    //this.uneditedTextDelta = this.textDelta; // save for later, in case the user decides to cancel....
+    this.saveTextDelta();
     this.quillEditor.setContents(this.textDelta);
   }
 }
