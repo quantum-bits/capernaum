@@ -8,7 +8,11 @@
           </div>
         </v-card-title>
         <v-card-text>
-          <vue-editor ref="editor" v-model="htmlForEditor"></vue-editor>
+          <vue-editor
+            ref="editor"
+            v-model="htmlForEditor"
+            :editor-toolbar="customToolbar"
+          ></vue-editor>
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="cancelEdits">Cancel</v-btn>
@@ -78,6 +82,24 @@ export default class LetterTextArea extends Vue {
 
   letterElements: LetterElementType[] = [];
 
+  // https://github.com/KillerCodeMonkey/ngx-quill/issues/295
+  // https://www.vue2editor.com/examples/#custom-toolbar
+  // https://quilljs.com/docs/formats/
+  // https://github.com/davidroyer/vue2-editor/issues/106
+  customToolbar: any = [
+    [{ header: [1, 2, false] }],
+    ["bold", "italic"],
+    [
+      { align: "" },
+      { align: "center" },
+      { align: "right" },
+      { align: "justify" }
+    ],
+    //[{ size: ["small", false, "large", "huge"] }], // custom dropdown
+    [{ list: "ordered" }, { list: "bullet" }],
+    //[{ header: [1, 2, false] }],
+    ["link"]
+  ];
   textDelta = JSON.parse(this.initialTextDelta);
   htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
   //uneditedTextDelta = this.textDelta;
@@ -122,7 +144,9 @@ export default class LetterTextArea extends Vue {
     this.editModeOn = false;
     this.textDelta = JSON.parse(this.initialTextDelta);
     //this.textDelta = this.uneditedTextDelta; // revert to the former text delta
-    this.htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
+    this.htmlForEditor = new QuillDeltaToHtmlConverter(
+      this.textDelta.ops
+    ).convert();
   }
 
   save() {
@@ -155,8 +179,8 @@ export default class LetterTextArea extends Vue {
 
   openEditor() {
     this.editModeOn = true;
-    console.log('text delta: ', this.textDelta);
-    //this.uneditedTextDelta = this.textDelta; // save for later, in case the user decides to cancel.... 
+    console.log("text delta: ", this.textDelta);
+    //this.uneditedTextDelta = this.textDelta; // save for later, in case the user decides to cancel....
     this.quillEditor.setContents(this.textDelta);
   }
 }
