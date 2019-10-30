@@ -9,8 +9,8 @@
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card>
             <v-card-title class="headline"
-              >Scripture Engagement Practice</v-card-title
-            >
+              >Scripture Engagement Practice
+            </v-card-title>
             <v-card-text>
               <v-text-field
                 v-model="scriptureEngagementPracticeTitle"
@@ -43,15 +43,15 @@
             <v-card-actions>
               <div class="flex-grow-1"></div>
               <v-btn color="green darken-1" text @click="cancelDialog()"
-                >Cancel</v-btn
-              >
+                >Cancel
+              </v-btn>
               <v-btn
                 color="green darken-1"
                 :disabled="!valid"
                 text
                 @click="submitSEPractice()"
-                >Submit</v-btn
-              >
+                >Submit
+              </v-btn>
             </v-card-actions>
           </v-card>
         </v-form>
@@ -111,19 +111,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-
-//import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
-
 import {
-  ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
   ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
-  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
-  DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
+  ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
+  DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
+  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
 } from "@/graphql/scripture-engagement-practices.graphql";
 import {
   ScriptureEngagementPractices,
   ScriptureEngagementPractices_scriptureEngagementPractices
 } from "@/graphql/types/ScriptureEngagementPractices";
+
+//import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
@@ -328,7 +327,7 @@ export default Vue.extend({
 
         return scriptureEngagementPractices.scriptureEngagementPractices;
       },
-      fetchPolicy: 'network-only',
+      fetchPolicy: "network-only"
     }
   },
 

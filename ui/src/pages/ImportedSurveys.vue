@@ -39,7 +39,7 @@
 import Vue from "vue";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { AllSurveys, AllSurveys_surveys } from "@/graphql/types/AllSurveys";
+import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 
 // Next: make the divs open-able, with the questions inside(?)
 
@@ -81,7 +81,7 @@ export default Vue.extend({
         console.log("inside update: ", data);
         return data.surveys;
       },
-      fetchPolicy: 'network-only',
+      fetchPolicy: "network-only"
     }
   },
 

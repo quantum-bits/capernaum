@@ -14,7 +14,7 @@ import {
   LetterElementType,
   LetterElementUpdateInput,
   LetterUpdateInput,
-  LetterWriterInput
+  LetterWriterInput, LetterWriterOutput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
@@ -73,14 +73,17 @@ export class LetterResolver {
     return this.letterService.delete(LetterElement, id);
   }
 
-  @Mutation(returns => String)
+  @Mutation(returns => LetterWriterOutput)
   async writeLetter(
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
     // await this.surveyAnalyst.scoreSurveyDimension(56, 1);
     const letter = await this.letterService.letter(letterWriterInput.letterId);
     const writer = new LetterWriter();
-    const result = await writer.render(letter);
+    const result = await writer.render(
+      letter,
+      letterWriterInput.surveyResponseId
+    );
     return result;
   }
 

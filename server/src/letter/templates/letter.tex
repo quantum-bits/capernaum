@@ -9,23 +9,21 @@
 \pgfplotsset{compat=1.16}
 
 \begin{document}
-{% include "header.tex" %}
 
 {% for elt in letter.letterElements %}
   {% if elt.letterElementType.key == "boilerplate" %}
-    {{ elt.textDelta }}
+    <$ elt.textDelta $>
   {% elif elt.letterElementType.key == "boolean-calculation-results" %}
     boolean calculation results
   {% elif elt.letterElementType.key == "footer" %}
-    footer
+    {% include "footer.tex" %}
   {% elif elt.letterElementType.key == "header" %}
     {% include "header.tex" %}
-  {% elif elt.letterElementType.key == "spiritual-focus-chart" %}
-    spiritual-focus-chart
-  {% elif elt.letterElementType.key == "spiritual-orientations-chart" %}
-    spiritual-orientations-chart
+  {% elif elt.letterElementType.key == "chart" %}
+    chart
   {% else %}
-    {{ elt }}
+    <$ elt $>
   {% endif %}
 {% endfor %}
+
 \end{document}
