@@ -11,6 +11,7 @@
           <vue-editor ref="editor" v-model="htmlForEditor"></vue-editor>
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
+          <v-btn text color="orange" @click="cancelEdits">Cancel</v-btn>
           <v-btn text color="orange" @click="save">Save</v-btn>
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
           <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
@@ -79,6 +80,7 @@ export default class LetterTextArea extends Vue {
 
   textDelta = JSON.parse(this.initialTextDelta);
   htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
+  //uneditedTextDelta = this.textDelta;
 
   @Emit("move-up")
   moveUp() {}
@@ -116,6 +118,13 @@ export default class LetterTextArea extends Vue {
     return (this.$refs.editor as Vue & { quill: Quill }).quill;
   }
 
+  cancelEdits() {
+    this.editModeOn = false;
+    this.textDelta = JSON.parse(this.initialTextDelta);
+    //this.textDelta = this.uneditedTextDelta; // revert to the former text delta
+    this.htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops).convert();
+  }
+
   save() {
     this.editModeOn = false;
     let delta = this.quillEditor.getContents();
@@ -133,6 +142,7 @@ export default class LetterTextArea extends Vue {
       })
       .then(({ data }) => {
         console.log("done!", data);
+        //this.$emit("refresh-page");
         //this.refreshPage();
         //this.$emit("letter-created", data.createLetter.id);
       })
@@ -145,6 +155,8 @@ export default class LetterTextArea extends Vue {
 
   openEditor() {
     this.editModeOn = true;
+    console.log('text delta: ', this.textDelta);
+    //this.uneditedTextDelta = this.textDelta; // save for later, in case the user decides to cancel.... 
     this.quillEditor.setContents(this.textDelta);
   }
 }

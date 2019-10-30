@@ -142,6 +142,7 @@
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
             v-on:delete-element="deleteElement(element.id)"
+            v-on:refresh-page="refreshPage()"
           ></component>
         </div>
       </v-flex>
