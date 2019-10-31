@@ -21,7 +21,7 @@
                   <v-card-title class="headline">
                     {{ surveyIndexDialogTitle }}
                   </v-card-title>
-                  <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-form ref="indexForm" v-model="valid" lazy-validation>
                     <v-card-text>
                       <v-text-field
                         v-model="surveyIndexText"
@@ -87,7 +87,7 @@
                   <v-card-title class="headline">
                     {{ surveyDimensionDialogTitle }}
                   </v-card-title>
-                  <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-form ref="dimensionForm" v-model="valid" lazy-validation>
                     <v-card-text>
                       <v-text-field
                         v-model="surveyDimensionText"
@@ -426,9 +426,9 @@ export default Vue.extend({
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
       console.log("valid? ", this.valid);
-      if (this.$refs.form) {
+      if (this.$refs.dimensionForm) {
         // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
+        (this.$refs.dimensionForm as any).resetValidation();
       }
     },
     editSurveyDimension(dimension: any) {
@@ -455,13 +455,13 @@ export default Vue.extend({
       this.surveyDimensionDialog = false;
       //this.valid = true;
       // FIXME: Replace the `as any` hack.
-      (this.$refs.form as any).resetValidation();
+      (this.$refs.dimensionForm as any).resetValidation();
       this.serverError = false;
       this.surveyDimensionEditOn = false;
     },
     submitSurveyDimension() {
       // FIXME: Replace the `as any` hack.
-      if ((this.$refs.form as any).validate()) {
+      if ((this.$refs.dimensionForm as any).validate()) {
         console.log("save info");
         if (!this.surveyDimensionEditOn) {
           //adding a new dimension
@@ -490,7 +490,7 @@ export default Vue.extend({
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as any).resetValidation();
+              (this.$refs.dimensionForm as any).resetValidation();
               this.serverError = true;
               //this.serverError = true
             });
@@ -515,7 +515,7 @@ export default Vue.extend({
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as any).resetValidation();
+              (this.$refs.dimensionForm as any).resetValidation();
               this.serverError = true;
               //this.serverError = true
             });
@@ -534,9 +534,9 @@ export default Vue.extend({
         "Add a New Survey Index for " + "'" + dimension.name + "'";
       this.surveyIndexDialogHint = "e.g., 'A Focus on Others'";
       this.surveyIndexAbbrevHint = "e.g., 'FOO'";
-      if (this.$refs.form) {
+      if (this.$refs.indexForm) {
         // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
+        (this.$refs.indexForm as any).resetValidation();
       }
     },
     editIndex(indexItem: SurveyIndexView) {
@@ -579,13 +579,13 @@ export default Vue.extend({
       this.surveyIndexDialog = false;
       //this.valid = true;
       // FIXME: Replace the `as any` hack.
-      (this.$refs.form as any).resetValidation();
+      (this.$refs.indexForm as any).resetValidation();
       this.serverError = false;
       this.surveyIndexEditOn = false;
     },
     submitSurveyIndex() {
       // FIXME: Replace the `as any` hack.
-      if ((this.$refs.form as any).validate()) {
+      if ((this.$refs.indexForm as any).validate()) {
         console.log("save info");
 
         if (!this.surveyIndexEditOn) {
@@ -611,7 +611,7 @@ export default Vue.extend({
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as any).resetValidation();
+              (this.$refs.indexForm as any).resetValidation();
               this.serverError = true;
               //this.serverError = true
             });
@@ -639,7 +639,7 @@ export default Vue.extend({
             })
             .catch(error => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as any).resetValidation();
+              (this.$refs.indexForm as any).resetValidation();
               this.serverError = true;
               //this.serverError = true
             });
