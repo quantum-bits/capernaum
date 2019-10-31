@@ -61,15 +61,15 @@
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
-            <span class="font-weight-light">{{
-              theLetter.survey.qualtricsName
-            }}</span>
+            <span class="font-weight-light">
+              {{ theLetter.survey.qualtricsName }}
+            </span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Boolean Association Table:
-            <span v-if="predictionTableEntriesExist" class="font-weight-light"
-              >{{ theLetter.tableEntries.length }} entries</span
-            >
+            <span v-if="predictionTableEntriesExist" class="font-weight-light">
+              {{ theLetter.tableEntries.length }} entries
+            </span>
             <span v-else class="font-weight-light"> None </span>
           </h2>
           <h2 class="title font-weight-regular mb-5">
@@ -148,15 +148,14 @@
       </v-flex>
 
       <v-flex xs10 offset-xs1 class="text-xs-right">
-        <v-btn
-          class="mr-2"
+        <SpinnerBtn
           v-if="surveyLetterElements.length > 0"
-          color="primary"
-          dark
+          :loading="generatingPDF"
           @click="viewPDF"
         >
           Generate PDF
-        </v-btn>
+        </SpinnerBtn>
+
         <LetterElementMenu
           v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
           @click="addElement($event)"
@@ -200,7 +199,9 @@ import {
   UPDATE_LETTER_ELEMENT_MUTATION,
   WRITE_LETTER_MUTATION
 } from "@/graphql/letters.graphql";
+
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
+import SpinnerBtn from "@/components/SpinnerBtn.vue";
 
 import {
   OneLetter,
@@ -221,7 +222,8 @@ interface LetterElement extends OneLetter_letter_letterElements {
     LetterTextArea,
     StaticLetterElement,
     LetterInfoForm,
-    LetterElementMenu
+    LetterElementMenu,
+    SpinnerBtn
   },
   apollo: {
     theLetter: {
@@ -260,7 +262,8 @@ export default class Compose extends Vue {
   chartTypeElementId: number = -1; //used when creating a chart type of letter element
 
   name: string = "";
-  letterExists: boolean = false;
+  letterExists = false;
+  generatingPDF = false;
 
   theLetter: OneLetter_letter = {
     id: -1,
@@ -623,6 +626,8 @@ export default class Compose extends Vue {
   }
 
   viewPDF() {
+    console.log("GENERATING");
+    this.generatingPDF = true;
     this.$apollo
       .mutate({
         mutation: WRITE_LETTER_MUTATION,
@@ -634,7 +639,8 @@ export default class Compose extends Vue {
         }
       })
       .then(({ data }) => {
-        console.log("done!", data);
+        this.generatingPDF = false;
+        console.log("DONE GENERATING");
       })
       .catch(error => {
         console.log("there appears to have been an error: ", error);

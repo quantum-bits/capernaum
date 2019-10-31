@@ -29,51 +29,50 @@ export default class LetterWriter {
     this.environment = new Environment(loader, configuration);
   }
 
-  async render(
+  render(
     letter: Letter,
     surveyResponseId: number
   ): Promise<LetterWriterOutput> {
-    // Validate element types.
-    for (const letterElement of letter.letterElements) {
-      const key = letterElement.letterElementType.key;
-      if (!VALID_ELEMENT_TYPES.includes(key)) {
-        throw Error(`Invalid element type '${key}'`);
-      }
-    }
-
-    const templateDir = join(process.cwd(), "src/letter/templates");
-    const pathObject = {
-      dir: WORKING_DIR,
-      name: `${letter.id}-${surveyResponseId}`
-    };
-    const texFilePath = format({ ...pathObject, ext: ".tex" });
-    const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
-
-    this.environment.render(
-      "letter.tex",
-      { letter, templateDir },
-      (err, result) => {
-        if (err) {
-          throw err;
+    return new Promise((resolve, reject) => {
+      // Validate element types.
+      for (const letterElement of letter.letterElements) {
+        const key = letterElement.letterElementType.key;
+        if (!VALID_ELEMENT_TYPES.includes(key)) {
+          reject(`Invalid element type '${key}'`);
         }
-        writeFile(texFilePath, result, "utf8", err => {
-          if (err) {
-            throw err;
-          }
-          exec(
-            `pdflatex ${texFilePath}`,
-            { cwd: WORKING_DIR },
-            (err, stdout, stderr) => {
-              if (err) {
-                throw err;
-              }
-              // console.log("STDOUT", stdout);
-              // console.log("STDERR", stderr);
-            }
-          );
-        });
       }
-    );
-    return { ok: true, pdfFilePath };
+
+      const templateDir = join(process.cwd(), "src/letter/templates");
+      const pathObject = {
+        dir: WORKING_DIR,
+        name: `${letter.id}-${surveyResponseId}`
+      };
+      const texFilePath = format({ ...pathObject, ext: ".tex" });
+      const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
+
+      const result = this.environment.render("letter.tex", {
+        letter,
+        templateDir
+      });
+
+      writeFile(texFilePath, result, "utf8", err => {
+        if (err) {
+          reject(err);
+        }
+        exec(
+          `pdflatex ${texFilePath}`,
+          { cwd: WORKING_DIR },
+          (err, stdout, stderr) => {
+            if (err) {
+              reject(err);
+            }
+            // console.log("STDOUT", stdout);
+            // console.log("STDERR", stderr);
+          }
+        );
+      });
+
+      resolve({ ok: true, pdfFilePath });
+    });
   }
 }
