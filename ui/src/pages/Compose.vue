@@ -110,8 +110,8 @@
         <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
       </v-flex>
       <v-flex xs10 offset-xs1 class="text-xs-right">
-        <v-btn color="primary" dark @click="viewPDF">
-          View PDF
+        <v-btn class="mr-2" color="primary" dark @click="viewPDF">
+          Generate PDF
         </v-btn>
         <LetterElementMenu
           v-if="!surveyLetterIsFrozen"
@@ -149,12 +149,13 @@
 
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <v-btn
+          class="mr-2"
           v-if="surveyLetterElements.length > 0"
           color="primary"
           dark
           @click="viewPDF"
         >
-          View PDF
+          Generate PDF
         </v-btn>
         <LetterElementMenu
           v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
@@ -164,19 +165,19 @@
       </v-flex>
     </v-layout>
     <!--
-          Next:
-              - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-              - might need to update the db every time a change is made (to the order, too)
-    
-              - ordering within categories for letters (order by survey, and then more ordering below this level)
-    
-    
-              - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-    
-              - if the letter contains the "SE strategies for user" element, and the boolean association
-              table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-              the user should get a warning message or something)
-          -->
+              Next:
+                  - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+                  - might need to update the db every time a change is made (to the order, too)
+        
+                  - ordering within categories for letters (order by survey, and then more ordering below this level)
+        
+        
+                  - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+        
+                  - if the letter contains the "SE strategies for user" element, and the boolean association
+                  table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+                  the user should get a warning message or something)
+              -->
   </v-container>
 </template>
 
@@ -189,14 +190,15 @@ import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
 import { LetterElementEnum } from "../types/letter.types";
-//import { BooleanAssociationBriefType } from "../types/association-table.types";
+
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
   ONE_LETTER_QUERY,
-  UPDATE_LETTER_ELEMENT_MUTATION
+  UPDATE_LETTER_ELEMENT_MUTATION,
+  WRITE_LETTER_MUTATION
 } from "@/graphql/letters.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 
@@ -621,7 +623,22 @@ export default class Compose extends Vue {
   }
 
   viewPDF() {
-    console.log("view sample pdf....");
+    this.$apollo
+      .mutate({
+        mutation: WRITE_LETTER_MUTATION,
+        variables: {
+          letterWriterInput: {
+            letterId: this.theLetter.id,
+            surveyResponseId: 12
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+      });
   }
 
   // https://github.com/vuejs/vue-class-component/issues/270

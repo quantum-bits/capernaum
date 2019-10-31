@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{multicol}
 \usepackage[colorlinks]{hyperref}
+\usepackage{framed}
 
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.16}
@@ -14,13 +15,13 @@
   {% if elt.letterElementType.key == "boilerplate" %}
     <$ elt.asLaTeX() $>
   {% elif elt.letterElementType.key == "boolean-calculation-results" %}
-    boolean calculation results
+    {% include "se-results.tex" %}
   {% elif elt.letterElementType.key == "footer" %}
     {% include "footer.tex" %}
   {% elif elt.letterElementType.key == "header" %}
     {% include "header.tex" %}
   {% elif elt.letterElementType.key == "chart" %}
-    chart
+    {% include "chart.tex" %}
   {% else %}
     <$ elt $>
   {% endif %}

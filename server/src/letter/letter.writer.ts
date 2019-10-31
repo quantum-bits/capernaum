@@ -33,8 +33,6 @@ export default class LetterWriter {
     letter: Letter,
     surveyResponseId: number
   ): Promise<LetterWriterOutput> {
-    console.log("RENDER", letter, surveyResponseId);
-
     // Validate element types.
     for (const letterElement of letter.letterElements) {
       const key = letterElement.letterElementType.key;

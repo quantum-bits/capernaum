@@ -6,34 +6,39 @@ import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
 import * as assert from "assert";
 
+function formatLaTeX(command: string, content: string) {
+  return `\\${command}{${content}}`;
+}
+
 class LineBuffer {
   constructor(private allLines = [], private currentLine = "") {}
 
   flushCurrentLine() {
-    if (this.currentLine.length > 0) {
-      this.allLines.push(this.currentLine);
-    }
+    this.allLines.push(this.currentLine);
     this.currentLine = "";
   }
 
-  setCurrentLine(line: string) {
-    this.flushCurrentLine();
-    this.currentLine = line;
+  appendToCurrentLine(moreChars: string) {
+    this.currentLine += moreChars;
   }
 
-  wrapCurrentLine(prefix: string, suffix: string) {
-    this.currentLine = prefix + this.currentLine + suffix;
+  wrapCurrentLine(wrapper: string) {
+    this.currentLine = formatLaTeX(wrapper, this.currentLine);
   }
 
   unpackMultipleLines(packed: string) {
-    const unpacked = packed.split("\n");
-    this.currentLine = unpacked.pop();
-    this.allLines.push(...unpacked);
+    for (let char of packed) {
+      if (char === "\n") {
+        this.flushCurrentLine();
+      } else {
+        this.currentLine += char;
+      }
+    }
   }
 
   concatenateLines() {
     this.flushCurrentLine();
-    return this.allLines.join("\n");
+    return this.allLines.join("\n\n");
   }
 }
 
@@ -71,7 +76,7 @@ export class LetterElement extends AbstractEntity {
 
     for (let op of quillDelta.ops) {
       assert.ok(op.hasOwnProperty("insert"));
-      console.log(JSON.stringify(op, null, 2));
+      // console.log(JSON.stringify(op, null, 2));
 
       if (op.insert === "\n") {
         // Insert op that is just a newline.
@@ -89,27 +94,26 @@ export class LetterElement extends AbstractEntity {
         if (op.attributes.hasOwnProperty("list")) {
           wrapper = "item";
         }
-        lineBuffer.wrapCurrentLine(`\\${wrapper}{`, "}");
+        lineBuffer.wrapCurrentLine(wrapper);
         lineBuffer.flushCurrentLine();
       } else {
         // Insert op that is not just a newline.
         if (op.hasOwnProperty("attributes")) {
           // More than a newline and has attributes.
-          lineBuffer.setCurrentLine(op.insert);
           for (let attribute of Object.keys(op.attributes)) {
-            console.log("ATTRIBUTE", attribute);
             switch (attribute) {
               case "bold":
-                lineBuffer.wrapCurrentLine("\\textbf{", "}");
+                lineBuffer.appendToCurrentLine(
+                  formatLaTeX("textbf", op.insert)
+                );
                 break;
               case "italic":
-                lineBuffer.wrapCurrentLine("\\emph{", "}");
+                lineBuffer.appendToCurrentLine(formatLaTeX("emph", op.insert));
                 break;
               default:
                 throw Error(`Unknown attribute ${attribute}`);
             }
           }
-          lineBuffer.flushCurrentLine();
         } else {
           // More than a newline and don't have attributes.
           lineBuffer.unpackMultipleLines(op.insert);

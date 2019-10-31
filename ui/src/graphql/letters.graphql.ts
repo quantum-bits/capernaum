@@ -207,3 +207,12 @@ export const DELETE_LETTER_ELEMENT_MUTATION = gql`
     deleteLetterElement(id: $id)
   }
 `;
+
+export const WRITE_LETTER_MUTATION = gql`
+  mutation WriteLetter($letterWriterInput: LetterWriterInput!) {
+    writeLetter(letterWriterInput: $letterWriterInput) {
+      ok
+      pdfFilePath
+    }
+  }
+`;
