@@ -12,7 +12,7 @@
 
 {% for elt in letter.letterElements %}
   {% if elt.letterElementType.key == "boilerplate" %}
-    <$ elt.textDelta $>
+    <$ elt.asLaTeX() $>
   {% elif elt.letterElementType.key == "boolean-calculation-results" %}
     boolean calculation results
   {% elif elt.letterElementType.key == "footer" %}

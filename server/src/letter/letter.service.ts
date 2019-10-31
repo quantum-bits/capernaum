@@ -22,9 +22,13 @@ export class LetterService extends BaseService {
   }
 
   letter(id: number) {
-    return this.letterRepo.findOneOrFail(id, {
-      relations: ["letterElements", "letterElements.letterElementType"]
-    });
+    return this.letterRepo
+      .createQueryBuilder("letter")
+      .innerJoinAndSelect("letter.letterElements", "element")
+      .innerJoinAndSelect("element.letterElementType", "type")
+      .where("letter.id = :id", { id })
+      .orderBy("element.sequence", "ASC")
+      .getOne();
   }
 
   letterElementTypes() {
