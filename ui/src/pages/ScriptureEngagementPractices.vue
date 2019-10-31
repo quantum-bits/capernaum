@@ -25,7 +25,7 @@
                 v-model="scriptureEngagementPracticeDescription"
                 label="Description"
                 :rules="descriptionRules"
-                :counter="120"
+                :counter="500"
                 outlined
                 required
                 persistent-hint
@@ -168,8 +168,8 @@ export default Vue.extend({
       descriptionRules: [
         (v: any) => !!v || "Description is required",
         (v: any) =>
-          (v && v.length <= 120) ||
-          "Description must be fewer than 120 characters"
+          (v && v.length <= 500) ||
+          "Description must be fewer than 500 characters"
       ],
       urlRules: [(v: any) => !!v || "A URL is required"]
     };

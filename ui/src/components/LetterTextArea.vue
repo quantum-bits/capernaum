@@ -100,6 +100,10 @@ export default class LetterTextArea extends Vue {
     ["link"]
   ];
 
+  cfg: any = {
+    multiLineParagraph: false
+  };
+
   // Authoritative source for the boilerplate content.
   // Initialize from the prop. Update with each edit.
   textDelta = JSON.parse(this.initialTextDelta);
@@ -125,7 +129,8 @@ export default class LetterTextArea extends Vue {
   // Update the HTML version of the content for use by the editor and by the non-editing display.
   updateHtmlFromTextDelta() {
     this.htmlForEditor = new QuillDeltaToHtmlConverter(
-      this.textDelta.ops
+      this.textDelta.ops,
+      this.cfg
     ).convert();
   }
 
