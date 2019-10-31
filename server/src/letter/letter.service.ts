@@ -24,8 +24,8 @@ export class LetterService extends BaseService {
   letter(id: number) {
     return this.letterRepo
       .createQueryBuilder("letter")
-      .innerJoinAndSelect("letter.letterElements", "element")
-      .innerJoinAndSelect("element.letterElementType", "type")
+      .leftJoinAndSelect("letter.letterElements", "element")
+      .leftJoinAndSelect("element.letterElementType", "type")
       .where("letter.id = :id", { id })
       .orderBy("element.sequence", "ASC")
       .getOne();
