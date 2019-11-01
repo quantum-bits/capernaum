@@ -100,6 +100,9 @@ export default class LetterTextArea extends Vue {
     ["link"]
   ];
 
+  // used with QuillDeltaToHtmlConverter; for more configuration options, see: https://github.com/nozer/quill-delta-to-html
+  // might possibly want to set allowBackgroundClasses or classPrefix to non-default values in order to mess with the css styling
+  // inside the boilerplate text area
   cfg: any = {
     multiLineParagraph: false
   };

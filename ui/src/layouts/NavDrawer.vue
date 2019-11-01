@@ -117,6 +117,12 @@ export default Vue.extend({
         divider: true
       },
       {
+        title: "Uploaded Images",
+        route: "images",
+        icon: "mdi-image",
+        divider: true
+      },
+      {
         title: "Scripture Engagement Practices",
         route: "scripture-engagement-practices",
         icon: "mdi-book-open",

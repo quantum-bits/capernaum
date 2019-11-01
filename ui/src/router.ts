@@ -67,6 +67,11 @@ export default new Router({
       path: "/scripture-engagement-practices",
       name: "scripture-engagement-practices",
       component: () => import("./pages/ScriptureEngagementPractices.vue")
+    },
+    {
+      path: "/images",
+      name: "images",
+      component: () => import("./pages/Images.vue")
     }
   ]
 });
