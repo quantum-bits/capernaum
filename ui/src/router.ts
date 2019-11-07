@@ -46,7 +46,7 @@ export default new Router({
     {
       path: "/association-table/:letterId",
       name: "association-table",
-      component: () => import("./pages/AssociationTable.vue")
+      component: () => import("./pages/BooleanAssociations.vue")
     },
     {
       path: "/about-more",

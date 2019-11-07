@@ -65,13 +65,6 @@
               {{ theLetter.survey.qualtricsName }}
             </span>
           </h2>
-          <h2 class="title font-weight-regular mb-1">
-            Boolean Association Table:
-            <span v-if="predictionTableEntriesExist" class="font-weight-light">
-              {{ theLetter.tableEntries.length }} entries
-            </span>
-            <span v-else class="font-weight-light"> None </span>
-          </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
             <span class="font-weight-light">{{
@@ -104,7 +97,27 @@
       >
       </LetterInfoForm>
     </div>
-
+    <div v-if="letterExists">
+      <v-layout row wrap>
+        <v-flex xs7 offset-xs1>
+          <h2 class="title font-weight-regular mb-1">
+            Boolean Association Table:
+            <span v-if="predictionTableEntriesExist" class="font-weight-light">
+              {{ theLetter.tableEntries.length }} entries
+            </span>
+            <span v-else class="font-weight-light"> None </span>
+          </h2>
+        </v-flex>
+        <v-flex xs3 class="text-xs-right">
+          <v-btn color="primary" dark @click="toggleEditMode">
+            Show
+          </v-btn>
+        </v-flex>
+        <v-flex xs10 offset-xs1>
+          <AssociationTable :letterId="theLetter.id"></AssociationTable>
+        </v-flex>
+      </v-layout>
+    </div>
     <v-layout row wrap>
       <v-flex xs10 offset-xs1>
         <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
@@ -201,6 +214,7 @@ import {
 } from "@/graphql/letters.graphql";
 
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
+import AssociationTable from "../components/AssociationTable.vue";
 import SpinnerBtn from "@/components/SpinnerBtn.vue";
 
 import {
@@ -217,12 +231,17 @@ interface LetterElement extends OneLetter_letter_letterElements {
   key: string;
 }
 
+/**
+ * loading in components with tabs: https://jsfiddle.net/jjloneman/e5a6L27u/26/
+ */
+
 @Component({
   components: {
     LetterTextArea,
     StaticLetterElement,
     LetterInfoForm,
     LetterElementMenu,
+    AssociationTable,
     SpinnerBtn
   },
   apollo: {

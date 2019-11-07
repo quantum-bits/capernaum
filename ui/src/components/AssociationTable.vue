@@ -9,26 +9,6 @@
       </v-flex>
     </v-layout>
 
-    <v-layout row wrap>
-      <v-flex xs8>
-        <h1 class="headline mb-3">Boolean Association Table</h1>
-        <h2 class="title font-weight-regular mb-1">
-          Survey:
-          <span class="font-weight-light">{{ oneLetter.survey.title }}</span>
-        </h2>
-        <h2 class="title font-weight-regular mb-1">
-          Letter:
-          <span class="font-weight-light">{{ oneLetter.title }}</span>
-        </h2>
-        <h2 class="title font-weight-regular mb-5">
-          Last Update:
-          <span class="font-weight-light">{{
-            oneLetter.updated | dateAndTime
-          }}</span>
-        </h2>
-      </v-flex>
-    </v-layout>
-
     <v-layout v-if="!tableEditModeOn" row wrap>
       <v-flex xs9>
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
@@ -105,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { orderBy } from "lodash";
 
 import {
@@ -132,7 +112,7 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
       query: ONE_LETTER_QUERY,
       variables() {
         return {
-          letterId: parseInt(this.$route.params.letterId)
+          letterId: parseInt(this.letterId)
         };
       },
       update(oneLetter: OneLetter) {
@@ -202,12 +182,13 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
       },
       skip() {
         console.log("skipping fetch of letter data....");
-        return this.$route.params.letterId === undefined;
+        return this.letterId === null;
       }
     }
   }
 })
 export default class AssociationTable extends Vue {
+    @Prop({ default: null }) letterId!: number; // letter id
   oneLetter: OneLetter_letter | null = null;
   //survey: OneSurvey | null = null;
   //scriptureEngagementPractices: ScriptureEngagementPractices | null = null;

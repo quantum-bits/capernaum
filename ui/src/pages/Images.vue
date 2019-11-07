@@ -24,7 +24,6 @@
                   <FilePond />
                 </v-flex>
               </v-layout>
-
             </v-card-text>
             <v-card-actions>
               <div class="flex-grow-1"></div>
