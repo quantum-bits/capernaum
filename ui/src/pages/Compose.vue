@@ -303,9 +303,11 @@ export default class Compose extends Vue {
     largestSequenceNumber: 0,
     smallestSequenceNumber: 0,
     initialTextDelta: JSON.stringify({
-      ops: [{
-        insert: "Here is some text for the email!"
-      }]
+      ops: [
+        {
+          insert: "Here is some text for the email!"
+        }
+      ]
     }),
     letterElementKey: "",
     description: "Email message to respondent",

@@ -14,10 +14,16 @@
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
       </v-flex>
       <v-flex xs4 class="text-xs-right">
-        <v-btn class="mr-2" v-if="allowHideTable" color="primary" dark @click="hideTable">
+        <v-btn
+          class="mr-2"
+          v-if="allowHideTable"
+          color="primary"
+          dark
+          @click="hideTable"
+        >
           Hide Table
         </v-btn>
-        <v-btn 
+        <v-btn
           v-if="!oneLetter.isFrozen"
           color="primary"
           dark

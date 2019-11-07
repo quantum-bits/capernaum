@@ -29,7 +29,10 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <AssociationTable :letterId="oneLetter.id" :allowHideTable="allowHideTable"></AssociationTable>
+        <AssociationTable
+          :letterId="oneLetter.id"
+          :allowHideTable="allowHideTable"
+        ></AssociationTable>
       </v-flex>
     </v-layout>
   </v-container>
@@ -42,10 +45,7 @@ import AssociationTable from "../components/AssociationTable.vue";
 
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 
-import {
-  OneLetter,
-  OneLetter_letter,
-} from "@/graphql/types/OneLetter";
+import { OneLetter, OneLetter_letter } from "@/graphql/types/OneLetter";
 
 @Component({
   components: { AssociationTable },
