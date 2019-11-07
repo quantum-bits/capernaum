@@ -26,12 +26,19 @@
               <td class="text-xs-center">
                 -- is active ? --
               </td>
-              <td class="text-xs-center">
-                <v-btn text v-on:click="viewAssociationTable(item)">
-                  Update Entries
-                </v-btn>
-              </td>
               <td class="text-xs-right">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="viewAssociationTable(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-table" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span
+                    >View/edit boolean association table for this letter.</span
+                  >
+                </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
                     <a @click="viewLetter(item)" v-on="on">
@@ -109,7 +116,6 @@ export default class LettersPage extends Vue {
     { text: "Last Update", value: "lastUpdate" },
     { text: "Frozen?", value: "isFrozen" },
     { text: "Active?", value: "isActive" },
-    { text: "Boolean Association Table", value: "booleanAssociationTable" },
     { text: "Actions", sortable: false }
   ];
 

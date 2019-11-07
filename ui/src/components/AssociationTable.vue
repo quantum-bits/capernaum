@@ -10,11 +10,19 @@
     </v-layout>
 
     <v-layout v-if="!tableEditModeOn" row wrap>
-      <v-flex xs9>
+      <v-flex xs8>
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
       </v-flex>
-      <v-flex v-if="!oneLetter.isFrozen" xs3 class="text-xs-right">
-        <v-btn color="primary" dark @click="editTable">
+      <v-flex xs4 class="text-xs-right">
+        <v-btn class="mr-2" v-if="allowHideTable" color="primary" dark @click="hideTable">
+          Hide Table
+        </v-btn>
+        <v-btn 
+          v-if="!oneLetter.isFrozen"
+          color="primary"
+          dark
+          @click="editTable"
+        >
           Edit Table
         </v-btn>
       </v-flex>
@@ -188,7 +196,8 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
   }
 })
 export default class AssociationTable extends Vue {
-    @Prop({ default: null }) letterId!: number; // letter id
+  @Prop({ default: null }) letterId!: number; // letter id
+  @Prop({ default: false }) allowHideTable!: boolean; // whether or not the table may be hidden
   oneLetter: OneLetter_letter | null = null;
   //survey: OneSurvey | null = null;
   //scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
@@ -198,6 +207,10 @@ export default class AssociationTable extends Vue {
   headers: AssociationTableHeader[] = [];
 
   tableEditModeOn: boolean = false;
+
+  hideTable() {
+    this.$emit("hide-table");
+  }
 
   editTable() {
     this.tableEditModeOn = true;

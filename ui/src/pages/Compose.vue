@@ -109,12 +109,16 @@
           </h2>
         </v-flex>
         <v-flex xs3 class="text-xs-right">
-          <v-btn color="primary" dark @click="toggleEditMode">
-            Show
+          <v-btn v-if="tableIsHidden" color="primary" dark @click="showTable">
+            Show Table
           </v-btn>
         </v-flex>
-        <v-flex xs10 offset-xs1>
-          <AssociationTable :letterId="theLetter.id"></AssociationTable>
+        <v-flex v-if="!tableIsHidden" xs10 offset-xs1>
+          <AssociationTable
+            :letterId="theLetter.id"
+            :allowHideTable="allowHideTable"
+            v-on:hide-table="hideTable"
+          ></AssociationTable>
         </v-flex>
       </v-layout>
     </div>
@@ -273,6 +277,8 @@ interface LetterElement extends OneLetter_letter_letterElements {
   }
 })
 export default class Compose extends Vue {
+  allowHideTable: boolean = true;
+  tableIsHidden: boolean = true;
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
   chooseChartTypeDialog: boolean = false;
@@ -394,6 +400,14 @@ export default class Compose extends Vue {
       }
     });
     return smallestSN;
+  }
+
+  showTable() {
+    this.tableIsHidden = false;
+  }
+
+  hideTable() {
+    this.tableIsHidden = true;
   }
 
   cancelChartSelection() {
