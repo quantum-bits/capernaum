@@ -21,10 +21,15 @@
               ></v-text-field>
               <v-layout>
                 <v-flex xs6 offset-xs3>
-                  <FilePond />
+                  <file-pond
+                    name="filepondUpload"
+                    :server="{
+                      url: 'http://localhost:3000/upload/',
+                      process: 'process'
+                    }"
+                  />
                 </v-flex>
               </v-layout>
-
             </v-card-text>
             <v-card-actions>
               <div class="flex-grow-1"></div>
@@ -36,7 +41,8 @@
                 :disabled="!valid"
                 text
                 @click="submitSEPractice()"
-                >Submit
+              >
+                Submit
               </v-btn>
             </v-card-actions>
           </v-card>
