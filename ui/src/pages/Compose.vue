@@ -122,7 +122,7 @@
         </v-flex>
       </v-layout>
     </div>
-    <v-layout row wrap>
+    <v-layout v-if="letterExists" row wrap>
       <v-flex xs10 offset-xs1>
         <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
       </v-flex>
@@ -150,7 +150,6 @@
             :order="element.sequence"
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
-            :numItems="surveyLetterElements.length"
             :largestSequenceNumber="largestSequenceNumber"
             :smallestSequenceNumber="smallestSequenceNumber"
             :letterElementKey="element.letterElementType.key"
@@ -178,6 +177,26 @@
           @click="addElement($event)"
           offset-y
         />
+      </v-flex>
+    </v-layout>
+    <v-layout v-if="letterExists">
+      <v-flex xs11 offset-xs1>
+        <h2 class="title font-weight-regular mb-3 mt-5">Text for Email:</h2>
+      </v-flex>
+    </v-layout>
+    <v-layout v-if="letterExists">
+      <v-flex xs10 offset-xs1>
+        <LetterTextArea
+          :id="mockEmail.id"
+          :order="mockEmail.order"
+          :initialTextDelta="mockEmail.initialTextDelta"
+          :largestSequenceNumber="mockEmail.largestSequenceNumber"
+          :smallestSequenceNumber="mockEmail.smallestSequenceNumber"
+          :letterElementKey="mockEmail.letterElementKey"
+          :description="mockEmail.description"
+          :parentIsFrozen="surveyLetterIsFrozen"
+          :isEmailText="mockEmail.isEmailText"
+        ></LetterTextArea>
       </v-flex>
     </v-layout>
     <!--
@@ -277,6 +296,21 @@ interface LetterElement extends OneLetter_letter_letterElements {
   }
 })
 export default class Compose extends Vue {
+  mockEmail: any = {
+    isEmailText: true,
+    id: 1,
+    order: 0,
+    largestSequenceNumber: 0,
+    smallestSequenceNumber: 0,
+    initialTextDelta: JSON.stringify({
+      ops: [{
+        insert: "Here is some text for the email!"
+      }]
+    }),
+    letterElementKey: "",
+    description: "Email message to respondent",
+    parentIsFrozen: false
+  };
   allowHideTable: boolean = true;
   tableIsHidden: boolean = true;
   isNew: boolean = false; // true if this is a new letter
