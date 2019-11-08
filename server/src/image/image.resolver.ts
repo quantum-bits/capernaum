@@ -19,9 +19,9 @@ export class ImageResolver {
     return this.imageService.findOne(Image, id);
   }
 
-  @Mutation(returns => Image)
+  @Mutation(returns => Int)
   updateImage(@Args("updateInput") updateInput: ImageUpdateInput) {
-    return this.imageService.update(Image, updateInput);
+    return this.imageService.updateDetails(updateInput);
   }
 
   @Mutation(returns => Int)

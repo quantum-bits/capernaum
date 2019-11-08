@@ -19,7 +19,7 @@ export class ImageController {
   @Post("process")
   @Header("Content-Type", "text/plain")
   @UseInterceptors(FileInterceptor("filepondUpload"))
-  async process(@UploadedFile() file): Promise<number> {
+  async process(@UploadedFile() file): Promise<string> {
     const fileDetails = await this.fileService.saveFile(
       file.mimetype,
       file.buffer
@@ -31,6 +31,6 @@ export class ImageController {
       fileDetails.uuid
     );
 
-    return result.id;
+    return result.uuid;
   }
 }
