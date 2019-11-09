@@ -64,38 +64,6 @@
           :items="imageDetails"
           class="elevation-1"
         >
-          <template v-slot:item="{ item }">
-            <tr>
-              <!--<td class="text-xs-right">{{ item.description }}</td>-->
-              <td class="text-xs-right">{{ item.title }}</td>
-              <td class="text-xs-right">{{ item.description }}</td>
-              <td class="text-xs-right">
-                <!-- https://stackoverflow.com/questions/40899532/how-to-pass-a-value-from-vue-data-to-href -->
-                <v-btn text :href="item.moreInfoUrl" target="_blank"
-                  >More Info
-                </v-btn>
-              </td>
-              <td class="text-xs-right">
-                <v-btn text v-on:click="editSEPractice(item)">
-                  Edit
-                </v-btn>
-                <v-tooltip v-if="!item.canDelete" top>
-                  <template v-slot:activator="{ on }">
-                    <span v-on="on">
-                      <v-btn text disabled> Delete</v-btn>
-                    </span>
-                  </template>
-                  <span
-                    >This SE Practice cannot be deleted because it has boolean
-                    associations.</span
-                  >
-                </v-tooltip>
-                <v-btn v-else text v-on:click="deleteSEPractice(item)">
-                  Delete
-                </v-btn>
-              </td>
-            </tr>
-          </template>
         </v-data-table>
       </v-flex>
     </v-layout>
@@ -134,18 +102,21 @@ export default Vue.extend({
     return {
       headers: [
         {
+          text: "Id",
+          value: "id"
+        },
+        {
           text: "Title",
-          align: "left",
-          sortable: true,
           value: "title"
         },
         {
           text: "Image",
-          align: "left",
-          sortable: false,
-          value: "image"
+          value: "uuid"
         },
-        { text: "Action", sortable: false }
+        {
+          text: "Action",
+          sortable: false
+        }
       ],
 
       isDialogOpen: false,
