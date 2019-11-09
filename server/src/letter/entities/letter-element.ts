@@ -5,6 +5,7 @@ import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
 import * as assert from "assert";
+import { DEFAULT_QUILL_DELTA } from "../letter.types";
 
 function formatLaTeX(command: string, content: string) {
   return `\\${command}{${content}}`;
@@ -49,7 +50,7 @@ export class LetterElement extends AbstractEntity {
   @Column("int")
   sequence: number;
 
-  @Column("text", { nullable: true })
+  @Column({ type: "text", default: DEFAULT_QUILL_DELTA })
   @Field({ nullable: true })
   textDelta?: string;
 

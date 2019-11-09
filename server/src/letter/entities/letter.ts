@@ -11,6 +11,7 @@ import { AbstractEntity } from "../../shared/abstract-entity";
 import { LetterElement } from "./letter-element";
 import { PredictionTableEntry } from "../../prediction/entities";
 import { Survey } from "../../survey/entities";
+import { DEFAULT_QUILL_DELTA } from "../letter.types";
 
 @Entity()
 @ObjectType()
@@ -24,7 +25,7 @@ export class Letter extends AbstractEntity {
   description: string;
 
   @Field()
-  @Column("text")
+  @Column({ type: "text", default: DEFAULT_QUILL_DELTA })
   emailMessage: string;
 
   @Field()

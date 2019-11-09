@@ -4,7 +4,6 @@ fixtures:
       abide-letter:
         title: Abide Bible Letter
         description: Letter to send out to Abide Bible readers
-        emailMessage: Hello! Here are your results from the Christian Life Survey.
         survey: ^survey.christian-life-survey
         created: 2018-01-10
         updated: 2018-03-25
@@ -18,12 +17,10 @@ fixtures:
         sequence: 1
         letter: ^letter.abide-letter
         letterElementType: ^letter_element_type.boilerplate
-        textDelta: Hello, reader.
       boilerplate-2:
         sequence: 2
         letter: ^letter.abide-letter
         letterElementType: ^letter_element_type.boilerplate
-        textDelta: Hello, reader 2.
       sf-chart:
         sequence: 3
         letter: ^letter.abide-letter
@@ -38,7 +35,6 @@ fixtures:
         sequence: 5
         letter: ^letter.abide-letter
         letterElementType: ^letter_element_type.boilerplate
-        textDelta: People who have your mix of spiritual foci and spiritual orientations tend to find these kinds of scripture engagement more appealing
       bool-calc:
         sequence: 6
         letter: ^letter.abide-letter
@@ -47,7 +43,6 @@ fixtures:
         sequence: 7
         letter: ^letter.abide-letter
         letterElementType: ^letter_element_type.boilerplate
-        textDelta: Closing remarks.
   - table: letter_element_type
     rows:
       chart:
