@@ -17,3 +17,9 @@ export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
     updateImage(updateInput: $updateInput)
   }
 `;
+
+export const DELETE_IMAGE_MUTATION = gql`
+  mutation DeleteImage($id: Int!) {
+    deleteImage(id: $id)
+  }
+`;

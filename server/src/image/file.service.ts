@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { join, normalize } from "path";
-import { access, close, open, write } from "fs";
+import { access, close, open, read, readFile, write } from "fs";
 import { v4 } from "uuid";
 
 interface FileDetails {
@@ -34,7 +34,7 @@ export class FileService {
     return `${uuid}.${this.extensionFromMimeType(mimeType)}`;
   }
 
-  private fullPath(uuid: string, mimeType: string) {
+  fullPath(uuid: string, mimeType: string) {
     return join(this.fileBaseDir, this.fileName(uuid, mimeType));
   }
 
@@ -73,5 +73,17 @@ export class FileService {
     });
   }
 
-  loadFile(uuid: string) {}
+  loadFile(uuid: string, mimeType: string) {
+    const fullPath = this.fullPath(uuid, mimeType);
+    console.log("LOADING", fullPath);
+
+    return new Promise((resolve, reject) => {
+      readFile(fullPath, (err, data) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(data);
+      });
+    });
+  }
 }
