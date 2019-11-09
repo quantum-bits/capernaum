@@ -93,17 +93,7 @@ import {
   UPDATE_IMAGE_DETAILS_MUTATION
 } from "@/graphql/images.graphql";
 import { AllImages_images } from "@/graphql/types/AllImages";
-
-interface FilePondFile {
-  id: string;
-  serverId: string;
-  origin: number;
-  status: number;
-  fileExtension: string;
-  fileSize: number;
-  filename: string;
-  filenameWithoutExtension: string;
-}
+import { FilePondFile } from "@/types/filepond.types";
 
 export default Vue.extend({
   name: "Images",
@@ -146,7 +136,7 @@ export default Vue.extend({
           "Title of letter must be fewer than 50 characters"
       ],
 
-      uploadFileServerId: ""
+      uploadFileDetails: {} as FilePondFile
     };
   },
 
@@ -162,25 +152,29 @@ export default Vue.extend({
       if (err) {
         throw err;
       }
-      this.uploadFileServerId = file.serverId;
+      console.log("FILE FILE FILE", file);
+      this.uploadFileDetails = file;
     },
 
     submitUploadDetails() {
-      if (this.uploadFileServerId.length === 0) {
-        throw Error("Upload file ID not set");
+      if (!this.uploadFileDetails) {
+        throw Error("Upload file details not set");
       }
-
-      this.closeDialog();
 
       this.$apollo
         .mutate({
           mutation: UPDATE_IMAGE_DETAILS_MUTATION,
           variables: {
             updateInput: {
-              serverId: this.uploadFileServerId,
+              id: parseInt(this.uploadFileDetails.serverId),
               title: this.imageDetailsTitle
             }
           }
+        })
+        .then(response => {
+          console.log(JSON.stringify(response, null, 2));
+          this.imageDetails.push(response.data.updateImage);
+          this.closeDialog();
         })
         .catch(err => {
           throw err;

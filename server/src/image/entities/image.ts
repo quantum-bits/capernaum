@@ -32,6 +32,6 @@ export class Image extends AbstractEntity {
 
 @InputType()
 export class ImageUpdateInput {
-  @Field() serverId: string;
+  @Field(type => Int) id: number;
   @Field() title: string;
 }

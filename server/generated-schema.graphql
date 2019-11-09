@@ -25,7 +25,7 @@ type Image {
 }
 
 input ImageUpdateInput {
-  serverId: String!
+  id: Int!
   title: String!
 }
 
@@ -157,7 +157,7 @@ type Mutation {
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
-  updateImage(updateInput: ImageUpdateInput!): Int!
+  updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
 }
 

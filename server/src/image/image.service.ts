@@ -1,9 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
 import { EntityManager, Repository } from "typeorm";
-import { Image, ImageUpdateInput } from "./entities";
+import { Image } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FileService } from "./file.service";
 
 @Injectable()
 export class ImageService extends BaseService {
@@ -23,13 +22,5 @@ export class ImageService extends BaseService {
         uuid
       })
     );
-  }
-
-  async updateDetails(updateInput: ImageUpdateInput) {
-    const result = await this.imageRepo.update(
-      { uuid: updateInput.serverId },
-      { title: updateInput.title }
-    );
-    return result.affected;
   }
 }

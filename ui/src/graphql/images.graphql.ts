@@ -14,7 +14,13 @@ export const ALL_IMAGES_QUERY = gql`
 
 export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
   mutation UpdateImageDetails($updateInput: ImageUpdateInput!) {
-    updateImage(updateInput: $updateInput)
+    updateImage(updateInput: $updateInput) {
+      id
+      title
+      uuid
+      mimeType
+      originalName
+    }
   }
 `;
 

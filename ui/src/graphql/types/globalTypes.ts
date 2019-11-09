@@ -16,7 +16,7 @@ export enum WhichItems {
 }
 
 export interface ImageUpdateInput {
-  serverId: string;
+  id: number;
   title: string;
 }
 
