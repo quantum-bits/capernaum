@@ -53,6 +53,10 @@ export class LetterElement extends AbstractEntity {
   @Field({ nullable: true })
   textDelta?: string;
 
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  imageUuid?: string;
+
   @Column("integer") letterId: number;
   @ManyToOne(type => Letter, letter => letter.letterElements)
   @Field(type => Letter)

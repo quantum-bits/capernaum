@@ -15,9 +15,15 @@ export enum WhichItems {
   WithoutIndex = "WithoutIndex",
 }
 
+export interface ImageUpdateInput {
+  id: number;
+  title: string;
+}
+
 export interface LetterCreateInput {
   title: string;
   description: string;
+  emailMessage: string;
   isFrozen?: boolean | null;
   surveyId: number;
 }
@@ -42,8 +48,14 @@ export interface LetterUpdateInput {
   id: number;
   title?: string | null;
   description?: string | null;
+  emailMessage?: string | null;
   isFrozen?: boolean | null;
   surveyId: number;
+}
+
+export interface LetterWriterInput {
+  letterId: number;
+  surveyResponseId: number;
 }
 
 export interface PartialPredictionTableEntry {

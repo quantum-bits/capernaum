@@ -14,6 +14,7 @@ import {
   PredictionTableEntry,
   ScriptureEngagementPractice
 } from "./prediction/entities";
+import { Image } from "./image/entities";
 
 config();
 
@@ -34,7 +35,8 @@ const options: ConnectionOptions = {
     SurveyIndex,
     SurveyItem,
     ScriptureEngagementPractice,
-    PredictionTableEntry
+    PredictionTableEntry,
+    Image
   ]
 };
 

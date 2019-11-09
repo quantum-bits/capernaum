@@ -24,6 +24,10 @@ export class Letter extends AbstractEntity {
   description: string;
 
   @Field()
+  @Column("text")
+  emailMessage: string;
+
+  @Field()
   @CreateDateColumn()
   created: Date;
 
@@ -53,6 +57,7 @@ export class Letter extends AbstractEntity {
 export class LetterCreateInput {
   @Field() title: string;
   @Field() description: string;
+  @Field() emailMessage: string;
   @Field({ nullable: true, defaultValue: false }) isFrozen?: boolean;
   @Field(type => Int) surveyId: number;
 }
@@ -62,6 +67,7 @@ export class LetterUpdateInput {
   @Field(type => Int) id: number;
   @Field({ nullable: true }) title: string;
   @Field({ nullable: true }) description: string;
+  @Field({ nullable: true }) emailMessage: string;
   @Field({ nullable: true }) isFrozen: boolean;
   @Field(type => Int) surveyId: number;
 }

@@ -6,6 +6,7 @@ import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { SurveyModule } from "./survey/survey.module";
 import typeORMConfig from "./typeorm-config";
 import { PredictionModule } from "./prediction/prediction.module";
+import { ImageModule } from "./image/image.module";
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { PredictionModule } from "./prediction/prediction.module";
     LetterModule,
     QualtricsModule,
     SurveyModule,
-    PredictionModule
+    PredictionModule,
+    ImageModule
   ]
 })
 export class AppModule {}

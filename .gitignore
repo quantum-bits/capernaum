@@ -7,3 +7,4 @@ private/
 server/dist
 auto/
 foo.*
+uploaded-files/

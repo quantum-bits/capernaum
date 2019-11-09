@@ -13,11 +13,28 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+type Image {
+  """Unique ID for this entity"""
+  id: Int!
+  originalName: String!
+  mimeType: String!
+  uuid: String!
+  title: String!
+  created: DateTime!
+  updated: DateTime!
+}
+
+input ImageUpdateInput {
+  id: Int!
+  title: String!
+}
+
 type Letter {
   """Unique ID for this entity"""
   id: Int!
   title: String!
   description: String!
+  emailMessage: String!
   created: DateTime!
   updated: DateTime!
   isFrozen: Boolean
@@ -30,6 +47,7 @@ type Letter {
 input LetterCreateInput {
   title: String!
   description: String!
+  emailMessage: String!
   isFrozen: Boolean = false
   surveyId: Int!
 }
@@ -39,6 +57,7 @@ type LetterElement {
   id: Int!
   sequence: Int!
   textDelta: String
+  imageUuid: String
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension
@@ -71,6 +90,7 @@ input LetterUpdateInput {
   id: Int!
   title: String
   description: String
+  emailMessage: String
   isFrozen: Boolean
   surveyId: Int!
 }
@@ -137,6 +157,8 @@ type Mutation {
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
+  updateImage(updateInput: ImageUpdateInput!): Image!
+  deleteImage(id: Int!): Int!
 }
 
 input PartialPredictionTableEntry {
@@ -209,6 +231,8 @@ type Query {
   updateSurveyDimension: SurveyDimension!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+  images: [Image!]!
+  image(id: Int!): Image!
 }
 
 """Scripture engagement practice"""

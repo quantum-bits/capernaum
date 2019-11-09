@@ -4,6 +4,7 @@ fixtures:
       abide-letter:
         title: Abide Bible Letter
         description: Letter to send out to Abide Bible readers
+        emailMessage: Hello! Here are your results from the Christian Life Survey.
         survey: ^survey.christian-life-survey
         created: 2018-01-10
         updated: 2018-03-25
@@ -64,3 +65,6 @@ fixtures:
       boilerplate:
         key: boilerplate
         description: Boilerplate Text
+      image:
+        key: image
+        description: Image
