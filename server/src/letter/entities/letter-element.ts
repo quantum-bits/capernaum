@@ -54,11 +54,11 @@ export class LetterElement extends AbstractEntity {
   @Field({ nullable: true })
   textDelta?: string;
 
-  @Column({ nullable: true })
-  @Field({ nullable: true })
-  imageUuid?: string;
+  @Column({ type: "int", nullable: true })
+  @Field(type => Int, { nullable: true })
+  imageId?: number;
 
-  @Column("integer") letterId: number;
+  @Column("int") letterId: number;
   @ManyToOne(type => Letter, letter => letter.letterElements)
   @Field(type => Letter)
   letter: Letter;
@@ -68,8 +68,8 @@ export class LetterElement extends AbstractEntity {
   @Field(type => LetterElementType)
   letterElementType: LetterElementType;
 
-  @Column("integer", { nullable: true }) surveyDimensionId: number;
-  @ManyToOne(type => SurveyDimension)
+  @Column({ type: "int", nullable: true }) surveyDimensionId: number;
+  @ManyToOne(type => SurveyDimension, { nullable: true })
   @Field(type => SurveyDimension, { nullable: true })
   surveyDimension?: SurveyDimension;
 

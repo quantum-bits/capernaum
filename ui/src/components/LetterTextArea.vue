@@ -17,7 +17,9 @@
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="cancelEdits">Cancel</v-btn>
           <v-btn text color="orange" @click="save">Save</v-btn>
-          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement">Delete</v-btn>
+          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement"
+            >Delete</v-btn
+          >
           <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
             <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
@@ -38,7 +40,9 @@
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="openEditor">Edit</v-btn>
-          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement">Delete</v-btn>
+          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement"
+            >Delete</v-btn
+          >
           <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
             <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
@@ -208,7 +212,7 @@ export default class LetterTextArea extends Vue {
           //  "Sorry, there appears to have been an error.  Please tray again later.";
         });
     } else {
-      console.log('this is an email!  save it....');
+      console.log("this is an email!  save it....");
     }
   }
 

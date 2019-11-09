@@ -57,7 +57,7 @@ type LetterElement {
   id: Int!
   sequence: Int!
   textDelta: String
-  imageUuid: String
+  imageId: Int
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension
@@ -300,7 +300,7 @@ input SurveyCreateInput {
 type SurveyDimension {
   """Unique ID for this entity"""
   id: Int!
-  survey: Survey!
+  survey: Survey
   surveyIndices: [SurveyIndex!]!
 
   """Title of this dimension (e.g., 'Focus on Prayer')"""

@@ -16,7 +16,7 @@ import { AbstractEntity } from "../../shared/abstract-entity";
 })
 export class SurveyDimension extends AbstractEntity {
   @ManyToOne(type => Survey, survey => survey.surveyDimensions)
-  @Field(type => Survey)
+  @Field(type => Survey, { nullable: true })
   survey: Survey;
   @Column("integer")
   surveyId: number;

@@ -14,16 +14,18 @@ import {
   LetterElementType,
   LetterElementUpdateInput,
   LetterUpdateInput,
-  LetterWriterInput, LetterWriterOutput
+  LetterWriterInput,
+  LetterWriterOutput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
-import { Survey } from "../survey/entities";
+import { Survey, SurveyDimension } from "../survey/entities";
 import {
   PredictionTableEntry,
   ScriptureEngagementPractice
 } from "../prediction/entities";
 import LetterWriter from "./letter.writer";
+import { Optional } from "@nestjs/common";
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -120,6 +122,21 @@ export class LetterElementResolver {
       LetterElementType,
       letterElement.letterElementTypeId
     );
+  }
+
+  @ResolveProperty("surveyDimension", type => SurveyDimension, {
+    nullable: true
+  })
+  resolveSurveyDimension(@Parent() letterElement: LetterElement) {
+    console.log("LETTER ELT", letterElement);
+    if (letterElement.surveyDimensionId) {
+      return this.letterService.findOneOrFail(
+        SurveyDimension,
+        letterElement.surveyDimensionId
+      );
+    } else {
+      return null;
+    }
   }
 }
 
