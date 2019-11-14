@@ -170,7 +170,7 @@
             :largestSequenceNumber="largestSequenceNumber"
             :smallestSequenceNumber="smallestSequenceNumber"
             :letterElementKey="element.letterElementType.key"
-            :description="element.letterElementType.description"
+            :description="letterElementDescription(element)"
             :parentIsFrozen="surveyLetterIsFrozen"
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
@@ -610,7 +610,7 @@ export default class Compose extends Vue {
     letterElementType: OneLetter_letter_letterElements_letterElementType
   ) {
     const letterElements = this.surveyLetterElements;
-    let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
+    let maxSequence: number = -Infinity; //assuming the max sequence will be 0 or greater....
     letterElements.forEach(letterElement => {
       if (maxSequence < letterElement.sequence) {
         maxSequence = letterElement.sequence;
@@ -664,6 +664,21 @@ export default class Compose extends Vue {
       return "LetterTextArea";
     } else {
       return "StaticLetterElement";
+    }
+  }
+
+  letterElementDescription(element: OneLetter_letter_letterElements) {
+    if (
+      element.letterElementType.key === LetterElementEnum.CHART &&
+      element.surveyDimension !== null
+    ) {
+      return (
+        element.letterElementType.description +
+        " -- " +
+        element.surveyDimension.title
+      );
+    } else {
+      return element.letterElementType.description;
     }
   }
 

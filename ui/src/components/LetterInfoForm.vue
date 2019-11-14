@@ -82,7 +82,7 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
   @Prop({ default: null }) initialDescription!: string;
-  @Prop({ default: Number.NEGATIVE_INFINITY }) surveyId!: number; // no id will be -Infinity, so this is presumably safe
+  @Prop({ default: -Infinity }) surveyId!: number; // no id will be -Infinity, so this is presumably safe
   //@Prop({ default: null })
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
@@ -95,7 +95,7 @@ export default class LetterInfoForm extends Vue {
   //https://www.geeksforgeeks.org/what-is-negative-infinity-in-javascript/
   surveySelect: { text: string; value: number } = {
     text: "",
-    value: Number.NEGATIVE_INFINITY
+    value: -Infinity
   };
 
   valid: boolean = true;
@@ -111,8 +111,7 @@ export default class LetterInfoForm extends Vue {
       (v && v.length <= 120) || "Description must be fewer than 120 characters"
   ];
   surveySelectionRules: any = [
-    (v: any) =>
-      (v && v.value !== Number.NEGATIVE_INFINITY) || "Survey is required"
+    (v: any) => (v && v.value !== -Infinity) || "Survey is required"
   ];
 
   submit() {

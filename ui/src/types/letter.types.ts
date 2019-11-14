@@ -55,5 +55,6 @@ export interface SurveyLetter {
 export enum LetterElementEnum {
   BOILERPLATE = "boilerplate",
   CHART = "chart",
-  BOOLEAN_CALCULATION_RESULTS = "boolean-calculation-results"
+  BOOLEAN_CALCULATION_RESULTS = "boolean-calculation-results",
+  IMAGE = "image"
 }
