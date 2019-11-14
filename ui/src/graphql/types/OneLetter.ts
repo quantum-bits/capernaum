@@ -133,7 +133,7 @@ export interface OneLetter_letter_survey_surveyDimensions_surveyIndices {
 }
 
 export interface OneLetter_letter_survey_surveyDimensions {
-  survey: OneLetter_letter_survey_surveyDimensions_survey;
+  survey: OneLetter_letter_survey_surveyDimensions_survey | null;
   /**
    * Unique ID for this entity
    */

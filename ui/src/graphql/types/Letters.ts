@@ -133,7 +133,7 @@ export interface Letters_letters_survey_surveyDimensions {
    * Unique ID for this entity
    */
   id: number;
-  survey: Letters_letters_survey_surveyDimensions_survey;
+  survey: Letters_letters_survey_surveyDimensions_survey | null;
   /**
    * Sequence number; dimension are displayed in this order.
    */
