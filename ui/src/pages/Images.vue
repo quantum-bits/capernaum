@@ -4,9 +4,9 @@
       <v-dialog v-model="showDialog" persistent max-width="800">
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card>
-            <v-card-title class="headline">{{
-              dialogState.heading
-            }}</v-card-title>
+            <v-card-title class="headline"
+              >{{ dialogState.heading }}
+            </v-card-title>
 
             <v-card-text>
               <v-text-field
@@ -18,7 +18,7 @@
                 required
                 persistent-hint
               />
-              <v-layout>
+              <v-layout v-if="showFilePond">
                 <v-flex xs6 offset-xs3>
                   <file-pond
                     name="filepondUpload"
@@ -41,7 +41,7 @@
                 color="green darken-1"
                 :disabled="!valid"
                 text
-                @click="createUploadDetails()"
+                @click="handleDialogSubmit"
               >
                 Submit
               </v-btn>
@@ -100,7 +100,6 @@ import {
 } from "@/graphql/images.graphql";
 import { AllImages_images } from "@/graphql/types/AllImages";
 import { FilePondFile } from "@/types/filepond.types";
-import { VForm } from "vuetify/lib";
 
 enum DialogMode {
   CLOSED,
@@ -143,7 +142,8 @@ export default Vue.extend({
       dialogState: {
         heading: "",
         mode: DialogMode.CLOSED,
-        title: ""
+        title: "",
+        itemForUpdate: {} as AllImages_images
       },
 
       titleRules: [
@@ -196,7 +196,38 @@ export default Vue.extend({
         });
     },
 
-    updateUploadDetails() {},
+    updateUploadDetails() {
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_IMAGE_DETAILS_MUTATION,
+          variables: {
+            updateInput: {
+              id: this.dialogState.itemForUpdate.id,
+              title: this.dialogState.title
+            }
+          }
+        })
+        .then(_ => {
+          this.dialogState.itemForUpdate.title = this.dialogState.title;
+          this.closeDialog();
+        })
+        .catch(err => {
+          throw err;
+        });
+    },
+
+    handleDialogSubmit() {
+      switch (this.dialogState.mode) {
+        case DialogMode.OPEN_FOR_CREATE:
+          this.createUploadDetails();
+          break;
+        case DialogMode.OPEN_FOR_EDIT:
+          this.updateUploadDetails();
+          break;
+        default:
+          throw Error(`Invalid dialog state '${this.dialogState}'`);
+      }
+    },
 
     deleteImage(id: number) {
       this.$apollo
@@ -216,10 +247,6 @@ export default Vue.extend({
         });
     },
 
-    closeDialog() {
-      this.dialogState.mode = DialogMode.CLOSED;
-    },
-
     openDialogForCreate() {
       this.dialogState.heading = "Upload a new image";
       (this.$refs.form as any).reset(); // FIXME - Don't cast to any.
@@ -230,12 +257,21 @@ export default Vue.extend({
       this.dialogState.heading = "Update image details";
       this.dialogState.title = item.title;
       this.dialogState.mode = DialogMode.OPEN_FOR_EDIT;
+      this.dialogState.itemForUpdate = item;
+    },
+
+    closeDialog() {
+      this.dialogState.mode = DialogMode.CLOSED;
     }
   },
 
   computed: {
     showDialog(): boolean {
-      return this.dialogState.mode != DialogMode.CLOSED;
+      return this.dialogState.mode !== DialogMode.CLOSED;
+    },
+
+    showFilePond(): boolean {
+      return this.dialogState.mode === DialogMode.OPEN_FOR_CREATE;
     }
   }
 });
