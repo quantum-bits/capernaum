@@ -84,7 +84,6 @@
         :id="letter.id"
         :initialTitle="letter.title"
         :initialDescription="letter.description"
-        :initialSurveyId="letter.survey.id"
         :isNew="isNew"
         v-on:letter-info-updated="letterInfoUpdated"
       >
@@ -130,7 +129,6 @@
         <v-flex xs10 offset-xs1>
           <LetterTextArea
             :letterId="letter.id"
-            :surveyId="letter.survey.id"
             :initialTextDelta="letter.emailMessage"
             :description="'Email message to respondent'"
             :parentIsFrozen="surveyLetterIsFrozen"

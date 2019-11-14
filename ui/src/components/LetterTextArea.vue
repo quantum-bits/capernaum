@@ -78,7 +78,6 @@ export default class LetterTextArea extends Vue {
   /** Item to display */
   @Prop({ default: -1 }) letterElementId!: number;
   @Prop({ default: -1 }) letterId!: number;
-  @Prop({ default: -1 }) surveyId!: number;
   @Prop({ default: 0 }) order!: number;
   @Prop({ default: 0 }) largestSequenceNumber!: number;
   @Prop({ default: 0 }) smallestSequenceNumber!: number;
@@ -224,8 +223,7 @@ export default class LetterTextArea extends Vue {
           variables: {
             letterData: {
               id: this.letterId,
-              emailMessage: JSON.stringify(this.textDelta),
-              surveyId: this.surveyId
+              emailMessage: JSON.stringify(this.textDelta)
             }
           }
         })

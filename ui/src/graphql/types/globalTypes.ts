@@ -50,7 +50,7 @@ export interface LetterUpdateInput {
   description?: string | null;
   emailMessage?: string | null;
   isFrozen?: boolean | null;
-  surveyId: number;
+  surveyId?: number | null;
 }
 
 export interface LetterWriterInput {

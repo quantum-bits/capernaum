@@ -92,7 +92,7 @@ input LetterUpdateInput {
   description: String
   emailMessage: String
   isFrozen: Boolean
-  surveyId: Int!
+  surveyId: Int
 }
 
 input LetterWriterInput {

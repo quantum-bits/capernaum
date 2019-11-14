@@ -82,7 +82,7 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
   @Prop({ default: null }) initialDescription!: string;
-  @Prop({ default: -1 }) initialSurveyId!: number; // no id will be -1, so this is presumably safe
+  //@Prop({ default: -1 }) initialSurveyId!: number; // no id will be -1, so this is presumably safe
   //@Prop({ default: null })
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
@@ -94,7 +94,7 @@ export default class LetterInfoForm extends Vue {
   errorMessage: string = "";
   surveySelect: { text: string; value: number } = {
     text: "",
-    value: this.initialSurveyId
+    value: -1
   };
 
   valid: boolean = true;
@@ -155,8 +155,7 @@ export default class LetterInfoForm extends Vue {
               letterData: {
                 id: this.id,
                 title: this.title,
-                description: this.description,
-                surveyId: this.initialSurveyId
+                description: this.description
               }
             }
           })

@@ -70,5 +70,5 @@ export class LetterUpdateInput {
   @Field({ nullable: true }) description: string;
   @Field({ nullable: true }) emailMessage: string;
   @Field({ nullable: true }) isFrozen: boolean;
-  @Field(type => Int) surveyId: number;
+  @Field(type => Int, { nullable: true }) surveyId: number;
 }
