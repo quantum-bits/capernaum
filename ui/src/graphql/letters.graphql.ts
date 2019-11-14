@@ -38,6 +38,7 @@ export const ONE_LETTER_QUERY = gql`
       updated
       description
       isFrozen
+      emailMessage
       scriptureEngagementPractices {
         id
         title

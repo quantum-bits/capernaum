@@ -23,7 +23,7 @@
           v-if="isNew"
           v-model="surveySelect"
           :items="selections"
-          :rules="[v => !!v || 'Survey is required']"
+          :rules="surveySelectionRules"
           label="Survey"
           required
           persistent-hint
@@ -82,7 +82,7 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
   @Prop({ default: null }) initialDescription!: string;
-  @Prop({ default: -1 }) initialSurveyId!: number; // no id will be -1, so this is presumably safe
+  @Prop({ default: Number.NEGATIVE_INFINITY }) surveyId!: number; // no id will be -Infinity, so this is presumably safe
   //@Prop({ default: null })
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
@@ -92,9 +92,10 @@ export default class LetterInfoForm extends Vue {
   title: string = this.initialTitle;
   description: string = this.initialDescription;
   errorMessage: string = "";
+  //https://www.geeksforgeeks.org/what-is-negative-infinity-in-javascript/
   surveySelect: { text: string; value: number } = {
     text: "",
-    value: this.initialSurveyId
+    value: Number.NEGATIVE_INFINITY
   };
 
   valid: boolean = true;
@@ -108,6 +109,10 @@ export default class LetterInfoForm extends Vue {
   descriptionRules: any = [
     (v: any) =>
       (v && v.length <= 120) || "Description must be fewer than 120 characters"
+  ];
+  surveySelectionRules: any = [
+    (v: any) =>
+      (v && v.value !== Number.NEGATIVE_INFINITY) || "Survey is required"
   ];
 
   submit() {
@@ -128,7 +133,10 @@ export default class LetterInfoForm extends Vue {
                 title: this.title,
                 description: this.description,
                 isFrozen: false,
-                surveyId: this.surveySelect.value
+                surveyId: this.surveySelect.value,
+                emailMessage: JSON.stringify({
+                  ops: []
+                })
               }
             }
           })
@@ -152,8 +160,7 @@ export default class LetterInfoForm extends Vue {
               letterData: {
                 id: this.id,
                 title: this.title,
-                description: this.description,
-                surveyId: this.initialSurveyId
+                description: this.description
               }
             }
           })
@@ -195,7 +202,7 @@ export default class LetterInfoForm extends Vue {
     let surveyTitle = "";
     if (!this.isNew) {
       this.surveys.forEach(survey => {
-        if (survey.id === this.initialSurveyId) {
+        if (survey.id === this.surveyId) {
           surveyTitle = survey.title;
         }
       });

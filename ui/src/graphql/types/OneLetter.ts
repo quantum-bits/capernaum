@@ -133,7 +133,7 @@ export interface OneLetter_letter_survey_surveyDimensions_surveyIndices {
 }
 
 export interface OneLetter_letter_survey_surveyDimensions {
-  survey: OneLetter_letter_survey_surveyDimensions_survey;
+  survey: OneLetter_letter_survey_surveyDimensions_survey | null;
   /**
    * Unique ID for this entity
    */
@@ -182,6 +182,7 @@ export interface OneLetter_letter {
   updated: any;
   description: string;
   isFrozen: boolean | null;
+  emailMessage: string;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
   tableEntries: OneLetter_letter_tableEntries[];
   letterElements: OneLetter_letter_letterElements[];

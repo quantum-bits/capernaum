@@ -62,7 +62,10 @@ import { VueEditor } from "vue2-editor";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 import { LetterElementType } from "@/types/letter.types";
-import { UPDATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
+import {
+  UPDATE_LETTER_MUTATION,
+  UPDATE_LETTER_ELEMENT_MUTATION
+} from "@/graphql/letters.graphql";
 import Quill from "quill";
 import cloneDeep from "lodash/cloneDeep";
 
@@ -73,13 +76,14 @@ import cloneDeep from "lodash/cloneDeep";
 })
 export default class LetterTextArea extends Vue {
   /** Item to display */
-  @Prop() id!: number;
-  @Prop() order!: number;
-  @Prop() largestSequenceNumber!: number;
-  @Prop() smallestSequenceNumber!: number;
+  @Prop({ default: -1 }) letterElementId!: number;
+  @Prop({ default: -1 }) letterId!: number;
+  @Prop({ default: 0 }) order!: number;
+  @Prop({ default: 0 }) largestSequenceNumber!: number;
+  @Prop({ default: 0 }) smallestSequenceNumber!: number;
   @Prop() initialTextDelta!: string;
   @Prop({ default: false }) initialEditModeOn!: boolean;
-  @Prop() letterElementKey!: string;
+  @Prop({ default: "" }) letterElementKey!: string;
   @Prop() description!: string;
   @Prop() parentIsFrozen!: boolean;
   @Prop({ default: false }) isEmailText!: boolean;
@@ -189,13 +193,14 @@ export default class LetterTextArea extends Vue {
     this.editModeOn = false;
     this.textDelta = this.quillEditor.getContents();
     this.updateHtmlFromTextDelta();
+    console.log("letter element id: ", this.letterElementId);
     if (!this.isEmailText) {
       this.$apollo
         .mutate({
           mutation: UPDATE_LETTER_ELEMENT_MUTATION,
           variables: {
             updateInput: {
-              id: this.id,
+              id: this.letterElementId,
               textDelta: JSON.stringify(this.textDelta)
             }
           }
@@ -212,7 +217,22 @@ export default class LetterTextArea extends Vue {
           //  "Sorry, there appears to have been an error.  Please tray again later.";
         });
     } else {
-      console.log("this is an email!  save it....");
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_LETTER_MUTATION,
+          variables: {
+            letterData: {
+              id: this.letterId,
+              emailMessage: JSON.stringify(this.textDelta)
+            }
+          }
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+        })
+        .catch(error => {
+          console.log("there appears to have been an error: ", error);
+        });
     }
   }
 
