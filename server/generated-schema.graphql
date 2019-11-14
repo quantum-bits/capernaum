@@ -64,10 +64,11 @@ type LetterElement {
 }
 
 input LetterElementCreateInput {
-  letterId: Int!
   sequence: Int!
-  letterElementTypeId: Int!
   textDelta: String
+  imageId: Int
+  letterId: Int!
+  letterElementTypeId: Int!
   surveyDimensionId: Int
 }
 
@@ -81,8 +82,9 @@ type LetterElementType {
 input LetterElementUpdateInput {
   id: Int!
   sequence: Int
-  letterElementTypeId: Int
   textDelta: String
+  imageId: Int
+  letterElementTypeId: Int
   surveyDimensionId: Int
 }
 
@@ -218,7 +220,6 @@ type Query {
   letter(id: Int!): Letter!
   letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
-  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   survey(id: Int!): Survey!
   surveys: [Survey!]!
   surveyDimensions: [SurveyDimension!]!
@@ -230,6 +231,7 @@ type Query {
   surveyResponses: [SurveyResponse!]!
   surveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
+  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   images: [Image!]!

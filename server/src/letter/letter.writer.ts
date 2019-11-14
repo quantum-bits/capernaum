@@ -3,6 +3,7 @@ import { Letter, LetterWriterOutput } from "./entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
 import { format, join } from "path";
+import { SurveyResponse } from "../survey/entities";
 
 const WORKING_DIR = "/Users/tom/Scratch";
 
@@ -31,7 +32,7 @@ export default class LetterWriter {
 
   render(
     letter: Letter,
-    surveyResponseId: number
+    surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
     return new Promise((resolve, reject) => {
       // Validate element types.
@@ -45,7 +46,7 @@ export default class LetterWriter {
       const templateDir = join(process.cwd(), "src/letter/templates");
       const pathObject = {
         dir: WORKING_DIR,
-        name: `${letter.id}-${surveyResponseId}`
+        name: `${letter.id}-${surveyResponse.id}`
       };
       const texFilePath = format({ ...pathObject, ext: ".tex" });
       const pdfFilePath = format({ ...pathObject, ext: ".pdf" });

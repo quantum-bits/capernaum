@@ -25,11 +25,14 @@ import {
   ScriptureEngagementPractice
 } from "../prediction/entities";
 import LetterWriter from "./letter.writer";
-import { Optional } from "@nestjs/common";
+import { SurveyService } from "../survey/survey.service";
 
 @Resolver(of => Letter)
 export class LetterResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    private readonly letterService: LetterService,
+    private readonly surveyService: SurveyService
+  ) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
@@ -81,11 +84,15 @@ export class LetterResolver {
   ) {
     // await this.surveyAnalyst.scoreSurveyDimension(56, 1);
     const letter = await this.letterService.letter(letterWriterInput.letterId);
-    const writer = new LetterWriter();
-    const result = await writer.render(
-      letter,
+    console.log("LETTER", letter);
+
+    const surveyResponse = await this.surveyService.surveyResponse(
       letterWriterInput.surveyResponseId
     );
+    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+
+    const writer = new LetterWriter();
+    const result = await writer.render(letter, surveyResponse);
     return result;
   }
 

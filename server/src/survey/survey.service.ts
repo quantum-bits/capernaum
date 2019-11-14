@@ -6,15 +6,13 @@ import {
   SurveyDimension,
   SurveyDimensionCreateInput,
   SurveyDimensionDeleteOutput,
-  SurveyDimensionUpdateInput,
   SurveyIndex,
   SurveyIndexCreateInput,
   SurveyIndexDeleteOutput,
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemResponse,
-  SurveyResponse,
-  SurveyUpdateInput
+  SurveyResponse
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, IsNull, Not, Repository } from "typeorm";
@@ -88,6 +86,17 @@ export class SurveyService extends BaseService {
       }
 
       return newIndex;
+    });
+  }
+
+  surveyResponse(responseId: number) {
+    return this.surveyResponseRepo.findOne(responseId, {
+      relations: [
+        "surveyItemResponses",
+        "surveyItemResponses.surveyItem",
+        "surveyItemResponses.surveyItem.surveyIndex",
+        "surveyItemResponses.surveyItem.surveyIndex.surveyDimension"
+      ]
     });
   }
 

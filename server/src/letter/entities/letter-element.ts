@@ -132,10 +132,11 @@ export class LetterElement extends AbstractEntity {
 
 @InputType()
 export class LetterElementCreateInput {
-  @Field(type => Int) letterId: number;
   @Field(type => Int) sequence: number;
-  @Field(type => Int) letterElementTypeId: number;
   @Field({ nullable: true }) textDelta?: string;
+  @Field(type => Int, { nullable: true }) imageId?: number;
+  @Field(type => Int) letterId: number;
+  @Field(type => Int) letterElementTypeId: number;
   @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }
 
@@ -143,7 +144,8 @@ export class LetterElementCreateInput {
 export class LetterElementUpdateInput {
   @Field(type => Int) id: number;
   @Field(type => Int, { nullable: true }) sequence?: number;
-  @Field(type => Int, { nullable: true }) letterElementTypeId?: number;
   @Field({ nullable: true }) textDelta?: string;
+  @Field(type => Int, { nullable: true }) imageId?: number;
+  @Field(type => Int, { nullable: true }) letterElementTypeId?: number;
   @Field(type => Int, { nullable: true }) surveyDimensionId?: number;
 }
