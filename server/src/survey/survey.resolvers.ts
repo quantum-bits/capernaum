@@ -240,6 +240,11 @@ export class SurveyDimensionResolver {
   }
 
   @Query(returns => SurveyDimension)
+  surveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyService.findOne(SurveyDimension, id);
+  }
+
+  @Query(returns => SurveyDimension)
   updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
     return this.surveyService.update(SurveyDimension, updateInput);
   }
