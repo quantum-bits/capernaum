@@ -128,7 +128,10 @@ export default class LetterInfoForm extends Vue {
                 title: this.title,
                 description: this.description,
                 isFrozen: false,
-                surveyId: this.surveySelect.value
+                surveyId: this.surveySelect.value,
+                emailMessage: JSON.stringify({
+                  ops: []
+                })
               }
             }
           })

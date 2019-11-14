@@ -121,10 +121,28 @@
           ></AssociationTable>
         </v-flex>
       </v-layout>
+      <v-layout row wrap>
+        <v-flex xs11 offset-xs1>
+          <h2 class="title font-weight-regular mb-3 mt-4">Text for Email:</h2>
+        </v-flex>
+      </v-layout>
+      <v-layout>
+        <v-flex xs10 offset-xs1>
+          <LetterTextArea
+            :letterId="letter.id"
+            :surveyId="letter.survey.id"
+            :initialTextDelta="letter.emailMessage"
+            :description="'Email message to respondent'"
+            :parentIsFrozen="surveyLetterIsFrozen"
+            :isEmailText="'true'"
+          ></LetterTextArea>
+        </v-flex>
+      </v-layout>
     </div>
+
     <v-layout v-if="letterExists" row wrap>
       <v-flex xs10 offset-xs1>
-        <h2 class="title font-weight-regular mb-3 mt-3">Content of Letter:</h2>
+        <h2 class="title font-weight-regular mb-3 mt-5">Content of Letter:</h2>
       </v-flex>
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <v-btn class="mr-2" color="primary" dark @click="viewPDF">
@@ -146,7 +164,7 @@
         >
           <component
             v-bind:is="letterElement(element.letterElementType.key)"
-            :id="element.id"
+            :letterElementId="element.id"
             :order="element.sequence"
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
@@ -177,26 +195,6 @@
           @click="addElement($event)"
           offset-y
         />
-      </v-flex>
-    </v-layout>
-    <v-layout v-if="letterExists">
-      <v-flex xs11 offset-xs1>
-        <h2 class="title font-weight-regular mb-3 mt-5">Text for Email:</h2>
-      </v-flex>
-    </v-layout>
-    <v-layout v-if="letterExists">
-      <v-flex xs10 offset-xs1>
-        <LetterTextArea
-          :id="mockEmail.id"
-          :order="mockEmail.order"
-          :initialTextDelta="mockEmail.initialTextDelta"
-          :largestSequenceNumber="mockEmail.largestSequenceNumber"
-          :smallestSequenceNumber="mockEmail.smallestSequenceNumber"
-          :letterElementKey="mockEmail.letterElementKey"
-          :description="mockEmail.description"
-          :parentIsFrozen="surveyLetterIsFrozen"
-          :isEmailText="mockEmail.isEmailText"
-        ></LetterTextArea>
       </v-flex>
     </v-layout>
     <!--
@@ -335,6 +333,9 @@ export default class Compose extends Vue {
     isFrozen: false,
     tableEntries: [],
     letterElements: [],
+    emailMessage: JSON.stringify({
+      ops: []
+    }),
     survey: {
       id: -1,
       title: "",
