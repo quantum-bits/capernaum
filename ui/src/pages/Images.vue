@@ -249,7 +249,9 @@ export default Vue.extend({
 
     openDialogForCreate() {
       this.dialogState.heading = "Upload a new image";
-      (this.$refs.form as any).reset(); // FIXME - Don't cast to any.
+      if (this.$refs.form) {
+        (this.$refs.form as any).reset(); // FIXME - Don't cast to any.
+      }
       this.dialogState.mode = DialogMode.OPEN_FOR_CREATE;
     },
 
