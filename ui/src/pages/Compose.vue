@@ -82,6 +82,7 @@
     <div v-if="letterExistsAndEditModeOn">
       <LetterInfoForm
         :id="letter.id"
+        :surveyId="letter.survey.id"
         :initialTitle="letter.title"
         :initialDescription="letter.description"
         :isNew="isNew"
