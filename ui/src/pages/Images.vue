@@ -1,14 +1,16 @@
 <template>
   <v-container>
     <v-layout row wrap>
-      <v-dialog v-model="isDialogOpen" persistent max-width="800">
+      <v-dialog v-model="showDialog" persistent max-width="800">
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card>
-            <v-card-title class="headline">Upload Image</v-card-title>
+            <v-card-title class="headline"
+              >{{ dialogState.heading }}
+            </v-card-title>
 
             <v-card-text>
               <v-text-field
-                v-model="imageDetailsTitle"
+                v-model="dialogState.title"
                 label="Title"
                 :rules="titleRules"
                 :counter="50"
@@ -16,7 +18,7 @@
                 required
                 persistent-hint
               />
-              <v-layout>
+              <v-layout v-if="showFilePond">
                 <v-flex xs6 offset-xs3>
                   <file-pond
                     name="filepondUpload"
@@ -32,14 +34,14 @@
 
             <v-card-actions>
               <div class="flex-grow-1"></div>
-              <v-btn color="green darken-1" text @click="closeDialog()">
+              <v-btn color="green darken-1" text @click="closeDialog">
                 Cancel
               </v-btn>
               <v-btn
                 color="green darken-1"
                 :disabled="!valid"
                 text
-                @click="submitUploadDetails()"
+                @click="handleDialogSubmit"
               >
                 Submit
               </v-btn>
@@ -53,7 +55,7 @@
       </v-flex>
 
       <v-flex xs3 class="text-xs-right">
-        <v-btn color="primary" dark @click="openDialog">
+        <v-btn color="primary" dark @click.stop="openDialogForCreate">
           Upload New Image
         </v-btn>
       </v-flex>
@@ -74,8 +76,12 @@
             />
           </template>
           <template v-slot:item.action="{ item }">
-            <v-icon small class="mr-2">mdi-pencil</v-icon>
-            <v-icon small @click="deleteImage(item.id)">mdi-delete</v-icon>
+            <v-icon small class="mr-2" @click.stop="openDialogForUpdate(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteImage(item.id)">
+              mdi-delete
+            </v-icon>
           </template>
         </v-data-table>
       </v-flex>
@@ -94,6 +100,12 @@ import {
 } from "@/graphql/images.graphql";
 import { AllImages_images } from "@/graphql/types/AllImages";
 import { FilePondFile } from "@/types/filepond.types";
+
+enum DialogMode {
+  CLOSED,
+  OPEN_FOR_CREATE,
+  OPEN_FOR_EDIT
+}
 
 export default Vue.extend({
   name: "Images",
@@ -124,10 +136,15 @@ export default Vue.extend({
         }
       ],
 
-      isDialogOpen: false,
-      valid: true,
-      imageDetailsTitle: "" as string,
+      valid: false,
+
       imageDetails: [] as AllImages_images[],
+      dialogState: {
+        heading: "",
+        mode: DialogMode.CLOSED,
+        title: "",
+        itemForUpdate: {} as AllImages_images
+      },
 
       titleRules: [
         (v: any) => !!v || "Title is required",
@@ -152,11 +169,10 @@ export default Vue.extend({
       if (err) {
         throw err;
       }
-      console.log("FILE FILE FILE", file);
       this.uploadFileDetails = file;
     },
 
-    submitUploadDetails() {
+    createUploadDetails() {
       if (!this.uploadFileDetails) {
         throw Error("Upload file details not set");
       }
@@ -167,18 +183,50 @@ export default Vue.extend({
           variables: {
             updateInput: {
               id: parseInt(this.uploadFileDetails.serverId),
-              title: this.imageDetailsTitle
+              title: this.dialogState.title
             }
           }
         })
         .then(response => {
-          console.log(JSON.stringify(response, null, 2));
           this.imageDetails.push(response.data.updateImage);
           this.closeDialog();
         })
         .catch(err => {
           throw err;
         });
+    },
+
+    updateUploadDetails() {
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_IMAGE_DETAILS_MUTATION,
+          variables: {
+            updateInput: {
+              id: this.dialogState.itemForUpdate.id,
+              title: this.dialogState.title
+            }
+          }
+        })
+        .then(_ => {
+          this.dialogState.itemForUpdate.title = this.dialogState.title;
+          this.closeDialog();
+        })
+        .catch(err => {
+          throw err;
+        });
+    },
+
+    handleDialogSubmit() {
+      switch (this.dialogState.mode) {
+        case DialogMode.OPEN_FOR_CREATE:
+          this.createUploadDetails();
+          break;
+        case DialogMode.OPEN_FOR_EDIT:
+          this.updateUploadDetails();
+          break;
+        default:
+          throw Error(`Invalid dialog state '${this.dialogState}'`);
+      }
     },
 
     deleteImage(id: number) {
@@ -199,12 +247,33 @@ export default Vue.extend({
         });
     },
 
-    openDialog() {
-      this.isDialogOpen = true;
+    openDialogForCreate() {
+      this.dialogState.heading = "Upload a new image";
+      if (this.$refs.form) {
+        (this.$refs.form as any).reset(); // FIXME - Don't cast to any.
+      }
+      this.dialogState.mode = DialogMode.OPEN_FOR_CREATE;
+    },
+
+    openDialogForUpdate(item: AllImages_images) {
+      this.dialogState.heading = "Update image details";
+      this.dialogState.title = item.title;
+      this.dialogState.mode = DialogMode.OPEN_FOR_EDIT;
+      this.dialogState.itemForUpdate = item;
     },
 
     closeDialog() {
-      this.isDialogOpen = false;
+      this.dialogState.mode = DialogMode.CLOSED;
+    }
+  },
+
+  computed: {
+    showDialog(): boolean {
+      return this.dialogState.mode !== DialogMode.CLOSED;
+    },
+
+    showFilePond(): boolean {
+      return this.dialogState.mode === DialogMode.OPEN_FOR_CREATE;
     }
   }
 });
