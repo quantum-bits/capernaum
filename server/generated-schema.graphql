@@ -22,6 +22,7 @@ type Image {
   title: String!
   created: DateTime!
   updated: DateTime!
+  url: String!
 }
 
 input ImageUpdateInput {
@@ -57,7 +58,7 @@ type LetterElement {
   id: Int!
   sequence: Int!
   textDelta: String
-  imageId: Int
+  image: Image
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension

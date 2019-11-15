@@ -26,6 +26,7 @@ import {
 } from "../prediction/entities";
 import LetterWriter from "./letter.writer";
 import { SurveyService } from "../survey/survey.service";
+import { Image } from "../image/entities";
 
 @Resolver(of => Letter)
 export class LetterResolver {
@@ -82,14 +83,11 @@ export class LetterResolver {
   async writeLetter(
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
-    // await this.surveyAnalyst.scoreSurveyDimension(56, 1);
     const letter = await this.letterService.letter(letterWriterInput.letterId);
-    console.log("LETTER", letter);
 
     const surveyResponse = await this.surveyService.surveyResponse(
       letterWriterInput.surveyResponseId
     );
-    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
 
     const writer = new LetterWriter();
     const result = await writer.render(letter, surveyResponse);
@@ -129,6 +127,15 @@ export class LetterElementResolver {
       LetterElementType,
       letterElement.letterElementTypeId
     );
+  }
+
+  @ResolveProperty("image", type => Image, { nullable: true })
+  resolveImage(@Parent() letterElement: LetterElement) {
+    if (letterElement.imageId) {
+      return this.letterService.findOneOrFail(Image, letterElement.imageId);
+    } else {
+      return null;
+    }
   }
 
   @ResolveProperty("surveyDimension", type => SurveyDimension, {

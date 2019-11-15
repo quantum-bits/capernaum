@@ -12,8 +12,46 @@ const VALID_ELEMENT_TYPES = [
   "boolean-calculation-results",
   "footer",
   "header",
-  "chart"
+  "chart",
+  "image"
 ];
+
+class SurveyItemResponse {
+  value: number;
+  label: string;
+}
+
+class SurveyItem {
+  id: number;
+  qualtricsId: string;
+  qualtricsText: string;
+  response: SurveyItemResponse;
+}
+
+class SurveyIndex {
+  id: number;
+  abbreviation: string;
+  title: string;
+  surveyItems: Map<number, SurveyItem>[];
+}
+
+class SurveyDimension {
+  id: number;
+  title: string;
+  useForPredictions: boolean;
+  surveyIndices: Map<number, SurveyIndex>;
+
+  constructor() {
+    this.surveyIndices = new Map([]);
+  }
+
+  public addIndex(index: SurveyIndex) {
+    if (this.surveyIndices.has(index.id)) {
+      throw Error(`Already have index '${index}'`);
+    }
+    this.surveyIndices.set(index.id, index);
+  }
+}
 
 export default class LetterWriter {
   private environment: Environment;
@@ -30,10 +68,17 @@ export default class LetterWriter {
     this.environment = new Environment(loader, configuration);
   }
 
+  private processResponses(itemResponses: SurveyItemResponse[]) {}
+
   render(
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
+    console.log("LETTER", JSON.stringify(letter, null, 2));
+    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+
+    this.processResponses(surveyResponse.surveyItemResponses);
+
     return new Promise((resolve, reject) => {
       // Validate element types.
       for (const letterElement of letter.letterElements) {
