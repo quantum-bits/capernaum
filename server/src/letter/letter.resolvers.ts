@@ -25,11 +25,15 @@ import {
   ScriptureEngagementPractice
 } from "../prediction/entities";
 import LetterWriter from "./letter.writer";
-import { Optional } from "@nestjs/common";
+import { SurveyService } from "../survey/survey.service";
+import { Image } from "../image/entities";
 
 @Resolver(of => Letter)
 export class LetterResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    private readonly letterService: LetterService,
+    private readonly surveyService: SurveyService
+  ) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
@@ -79,13 +83,14 @@ export class LetterResolver {
   async writeLetter(
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
-    // await this.surveyAnalyst.scoreSurveyDimension(56, 1);
     const letter = await this.letterService.letter(letterWriterInput.letterId);
-    const writer = new LetterWriter();
-    const result = await writer.render(
-      letter,
+
+    const surveyResponse = await this.surveyService.surveyResponse(
       letterWriterInput.surveyResponseId
     );
+
+    const writer = new LetterWriter();
+    const result = await writer.render(letter, surveyResponse);
     return result;
   }
 
@@ -122,6 +127,15 @@ export class LetterElementResolver {
       LetterElementType,
       letterElement.letterElementTypeId
     );
+  }
+
+  @ResolveProperty("image", type => Image, { nullable: true })
+  resolveImage(@Parent() letterElement: LetterElement) {
+    if (letterElement.imageId) {
+      return this.letterService.findOneOrFail(Image, letterElement.imageId);
+    } else {
+      return null;
+    }
   }
 
   @ResolveProperty("surveyDimension", type => SurveyDimension, {

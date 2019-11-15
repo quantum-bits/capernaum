@@ -5,9 +5,12 @@ export const ALL_IMAGES_QUERY = gql`
     images {
       id
       title
+      url
       uuid
       mimeType
       originalName
+      created
+      updated
     }
   }
 `;

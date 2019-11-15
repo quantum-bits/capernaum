@@ -4,8 +4,8 @@
       <v-dialog v-model="showDialog" persistent max-width="800">
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-card>
-            <v-card-title class="headline"
-              >{{ dialogState.heading }}
+            <v-card-title class="headline">
+              {{ dialogState.heading }}
             </v-card-title>
 
             <v-card-text>
@@ -68,7 +68,7 @@
         >
           <template v-slot:item.image="{ item }">
             <v-img
-              :src="`http://localhost:3000/images/${item.id}`"
+              :src="item.url"
               :alt="item.title"
               max-height="100"
               aspect-ratio="1"

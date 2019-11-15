@@ -1,11 +1,12 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
 import * as assert from "assert";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
+import { Image } from "../../image/entities";
 
 function formatLaTeX(command: string, content: string) {
   return `\\${command}{${content}}`;
@@ -54,11 +55,18 @@ export class LetterElement extends AbstractEntity {
   @Field({ nullable: true })
   textDelta?: string;
 
-  @Column({ type: "int", nullable: true })
-  @Field(type => Int, { nullable: true })
-  imageId?: number;
+  // @Column({ type: "int", nullable: true })
+  // @Field(type => Int, { nullable: true })
+  // imageId?: number;
 
-  @Column("int") letterId: number;
+  @Column("int", { nullable: true }) imageId?: number;
+  @Field(type => Image, { nullable: true })
+  @OneToOne(type => Image, { nullable: true })
+  @JoinColumn()
+  image?: Image;
+
+  @Column("int")
+  letterId: number;
   @ManyToOne(type => Letter, letter => letter.letterElements)
   @Field(type => Letter)
   letter: Letter;

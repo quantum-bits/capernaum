@@ -1,4 +1,11 @@
-import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver
+} from "@nestjs/graphql";
 import { ImageService } from "./image.service";
 import { Int } from "type-graphql";
 import { Image, ImageUpdateInput } from "./entities";
@@ -27,5 +34,10 @@ export class ImageResolver {
   @Mutation(returns => Int)
   deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
     return this.imageService.delete(Image, id);
+  }
+
+  @ResolveProperty(returns => String)
+  url(@Parent() image) {
+    return `http://localhost:3000/images/${image.id}`;
   }
 }

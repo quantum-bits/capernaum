@@ -14,13 +14,12 @@ import {
   SurveyDimension,
   SurveyIndex,
   SurveyItem,
-  SurveyResponse,
-  SurveyItemResponse
+  SurveyItemResponse,
+  SurveyResponse
 } from "./entities";
 import { QualtricsModule } from "../qualtrics/qualtrics.module";
 import { registerEnumType } from "type-graphql";
 import { WhichItems } from "./survey.types";
-import SurveyAnalyst from "./survey.analyst";
 
 @Module({
   imports: [
@@ -41,10 +40,9 @@ import SurveyAnalyst from "./survey.analyst";
     SurveyResponseResolver,
     SurveyItemResponseResolver,
     SurveyIndexResolver,
-    SurveyItemResolver,
-    SurveyAnalyst
+    SurveyItemResolver
   ],
-  exports: [SurveyAnalyst]
+  exports: [SurveyService]
 })
 export class SurveyModule {
   constructor() {

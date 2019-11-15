@@ -8,6 +8,7 @@ import {
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
+import { SurveyModule } from "../survey/survey.module";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { PredictionTableEntry } from "../prediction/entities";
       LetterElement,
       LetterElementType,
       PredictionTableEntry
-    ])
+    ]),
+    SurveyModule
   ],
   providers: [
     LetterService,
