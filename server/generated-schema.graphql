@@ -64,10 +64,11 @@ type LetterElement {
 }
 
 input LetterElementCreateInput {
-  letterId: Int!
   sequence: Int!
-  letterElementTypeId: Int!
   textDelta: String
+  imageId: Int
+  letterId: Int!
+  letterElementTypeId: Int!
   surveyDimensionId: Int
 }
 
@@ -81,8 +82,9 @@ type LetterElementType {
 input LetterElementUpdateInput {
   id: Int!
   sequence: Int
-  letterElementTypeId: Int
   textDelta: String
+  imageId: Int
+  letterElementTypeId: Int
   surveyDimensionId: Int
 }
 

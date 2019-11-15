@@ -29,18 +29,20 @@ export interface LetterCreateInput {
 }
 
 export interface LetterElementCreateInput {
-  letterId: number;
   sequence: number;
-  letterElementTypeId: number;
   textDelta?: string | null;
+  imageId?: number | null;
+  letterId: number;
+  letterElementTypeId: number;
   surveyDimensionId?: number | null;
 }
 
 export interface LetterElementUpdateInput {
   id: number;
   sequence?: number | null;
-  letterElementTypeId?: number | null;
   textDelta?: string | null;
+  imageId?: number | null;
+  letterElementTypeId?: number | null;
   surveyDimensionId?: number | null;
 }
 

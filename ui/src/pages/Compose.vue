@@ -40,6 +40,46 @@
         </v-dialog>
       </v-row>
     </template>
+    <template>
+      <v-row justify="center">
+        <v-dialog v-model="chooseImageDialog" persistent max-width="600">
+          <v-form ref="form" v-model="imageSelectionValid" lazy-validation>
+            <v-card>
+              <v-card-title class="headline">Image Letter Element</v-card-title>
+              <v-card-text>
+                Choose an image from the list
+                <v-select
+                  v-model="selectedImage"
+                  :items="imageElements"
+                  :rules="[v => !!v || 'Image is required']"
+                  label="Image"
+                  return-object
+                  required
+                  persistent-hint
+                  single-line
+                />
+              </v-card-text>
+              <v-card-actions>
+                <div class="flex-grow-1"></div>
+                <v-btn
+                  color="green darken-1"
+                  text
+                  @click="cancelImageSelection()"
+                  >Cancel
+                </v-btn>
+                <v-btn
+                  color="green darken-1"
+                  :disabled="!imageSelectionValid"
+                  text
+                  @click="submitImageSelection()"
+                  >Submit
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-form>
+        </v-dialog>
+      </v-row>
+    </template>
     <v-layout v-if="letterExistsAndIsFrozen" class="mb-3">
       <v-flex xs10 offset-xs1>
         <v-alert :value="true" type="info">
@@ -233,6 +273,8 @@ import {
   WRITE_LETTER_MUTATION
 } from "@/graphql/letters.graphql";
 
+import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
+
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import AssociationTable from "../components/AssociationTable.vue";
 import SpinnerBtn from "@/components/SpinnerBtn.vue";
@@ -243,6 +285,9 @@ import {
   OneLetter_letter_letterElements,
   OneLetter_letter_letterElements_letterElementType
 } from "@/graphql/types/OneLetter";
+
+import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
+
 import Delta from "quill-delta/dist/Delta";
 
 interface LetterElement extends OneLetter_letter_letterElements {
@@ -289,35 +334,29 @@ interface LetterElement extends OneLetter_letter_letterElements {
         }
         return this.$route.params.letterId === undefined;
       }
+    },
+    imageDetails: {
+      query: ALL_IMAGES_QUERY,
+      update(data: AllImages) {
+        return data.images;
+      }
     }
   }
 })
 export default class Compose extends Vue {
-  mockEmail: any = {
-    isEmailText: true,
-    id: 1,
-    order: 0,
-    largestSequenceNumber: 0,
-    smallestSequenceNumber: 0,
-    initialTextDelta: JSON.stringify({
-      ops: [
-        {
-          insert: "Here is some text for the email!"
-        }
-      ]
-    }),
-    letterElementKey: "",
-    description: "Email message to respondent",
-    parentIsFrozen: false
-  };
+  imageDetails: AllImages_images[] = [];
   allowHideTable: boolean = true;
   tableIsHidden: boolean = true;
   isNew: boolean = false; // true if this is a new letter
   editModeOn: boolean = false;
   chooseChartTypeDialog: boolean = false;
+  chooseImageDialog: boolean = false;
   chartSelectionValid: boolean = false;
+  imageSelectionValid: boolean = false;
   selectedSurveyDimension: null | any = null;
-  chartTypeElementId: number = -1; //used when creating a chart type of letter element
+  selectedImage: null | any = null;
+  chartTypeElementId: number = -Infinity; //used when creating a chart type of letter element
+  imageTypeElementId: number = -Infinity; //used when creating an image type of letter element
 
   name: string = "";
   letterExists = false;
@@ -368,6 +407,13 @@ export default class Compose extends Vue {
     } else {
       return [];
     }
+  }
+
+  get imageElements() {
+    return this.imageDetails.map(image => ({
+      text: image.title,
+      value: image.id
+    }));
   }
 
   get chartElements() {
@@ -451,7 +497,15 @@ export default class Compose extends Vue {
     this.chartSelectionValid = true;
     this.selectedSurveyDimension = null;
     this.chooseChartTypeDialog = false;
-    this.chartTypeElementId = -1;
+    this.chartTypeElementId = -Infinity;
+  }
+
+  cancelImageSelection() {
+    (this.$refs.form as any).resetValidation();
+    this.imageSelectionValid = true;
+    this.selectedImage = null;
+    this.chooseImageDialog = false;
+    this.imageTypeElementId = -Infinity;
   }
 
   submitChartSelection() {
@@ -459,6 +513,16 @@ export default class Compose extends Vue {
     if ((this.$refs.form as any).validate()) {
       console.log("form is valid!");
       this.addChartElement();
+    } else {
+      console.log("form is not valid!");
+    }
+  }
+
+  submitImageSelection() {
+    console.log("image selection: ", this.selectedImage);
+    if ((this.$refs.form as any).validate()) {
+      console.log("form is valid!");
+      this.addImageElement();
     } else {
       console.log("form is not valid!");
     }
@@ -568,6 +632,10 @@ export default class Compose extends Vue {
       console.log("we have a chart!");
       this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
       this.chooseChartTypeDialog = true;
+    } else if (letterElementType.key === LetterElementEnum.IMAGE) {
+      console.log("we have an image!");
+      this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
+      this.chooseImageDialog = true;
     } else {
       console.log("we do not have a chart!");
       this.addNonChartElement(letterElementType);
@@ -599,6 +667,38 @@ export default class Compose extends Vue {
       .then(({ data }) => {
         console.log("done!", data);
         this.cancelChartSelection();
+        this.refreshPage();
+      })
+      .catch(error => {
+        console.log("there appears to have been an error: ", error);
+      });
+  }
+
+  addImageElement() {
+    console.log("image id: ", this.selectedImage.value);
+    const letterElements = this.surveyLetterElements;
+    let maxSequence: number = -Infinity; //assuming the max sequence will be 0 or greater....
+    letterElements.forEach(letterElement => {
+      if (maxSequence < letterElement.sequence) {
+        maxSequence = letterElement.sequence;
+      }
+    });
+    let newSequence: number = maxSequence + 1;
+    this.$apollo
+      .mutate({
+        mutation: CREATE_LETTER_ELEMENT_MUTATION,
+        variables: {
+          createInput: {
+            sequence: newSequence,
+            letterId: this.theLetter.id,
+            letterElementTypeId: this.imageTypeElementId,
+            imageId: this.selectedImage.value
+          }
+        }
+      })
+      .then(({ data }) => {
+        console.log("done!", data);
+        this.cancelImageSelection();
         this.refreshPage();
       })
       .catch(error => {
