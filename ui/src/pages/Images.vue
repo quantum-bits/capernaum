@@ -190,6 +190,7 @@ export default Vue.extend({
         .then(response => {
           this.imageDetails.push(response.data.updateImage);
           this.closeDialog();
+          this.refreshImageData();
         })
         .catch(err => {
           throw err;
@@ -210,6 +211,7 @@ export default Vue.extend({
         .then(_ => {
           this.dialogState.itemForUpdate.title = this.dialogState.title;
           this.closeDialog();
+          this.refreshImageData();
         })
         .catch(err => {
           throw err;
@@ -217,16 +219,25 @@ export default Vue.extend({
     },
 
     handleDialogSubmit() {
-      switch (this.dialogState.mode) {
-        case DialogMode.OPEN_FOR_CREATE:
-          this.createUploadDetails();
-          break;
-        case DialogMode.OPEN_FOR_EDIT:
-          this.updateUploadDetails();
-          break;
-        default:
-          throw Error(`Invalid dialog state '${this.dialogState}'`);
+      if ((this.$refs.form as any).validate()) {
+        console.log(this.uploadFileDetails);
+        switch (this.dialogState.mode) {
+          case DialogMode.OPEN_FOR_CREATE:
+            this.createUploadDetails();
+            break;
+          case DialogMode.OPEN_FOR_EDIT:
+            this.updateUploadDetails();
+            break;
+          default:
+            throw Error(`Invalid dialog state '${this.dialogState}'`);
+        }
       }
+    },
+
+    refreshImageData() {
+      this.$apollo.queries.imageDetails.refetch().then(({ data }) => {
+        console.log("item(s) refetched!", data);
+      });
     },
 
     deleteImage(id: number) {

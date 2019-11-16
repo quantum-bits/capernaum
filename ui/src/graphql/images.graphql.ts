@@ -15,6 +15,20 @@ export const ALL_IMAGES_QUERY = gql`
   }
 `;
 
+export const ONE_IMAGE_QUERY = gql`
+  query OneImage($id: Int!) {
+    image(id: $id) {
+      id
+      title
+      originalName
+      mimeType
+      created
+      updated
+      url
+    }
+  }
+`;
+
 export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
   mutation UpdateImageDetails($updateInput: ImageUpdateInput!) {
     updateImage(updateInput: $updateInput) {

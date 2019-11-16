@@ -83,6 +83,15 @@ export interface OneLetter_letter_letterElements_surveyDimension {
   sequence: number;
 }
 
+export interface OneLetter_letter_letterElements_image {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  title: string;
+  url: string;
+}
+
 export interface OneLetter_letter_letterElements {
   letterElementType: OneLetter_letter_letterElements_letterElementType;
   /**
@@ -92,6 +101,7 @@ export interface OneLetter_letter_letterElements {
   sequence: number;
   textDelta: string | null;
   surveyDimension: OneLetter_letter_letterElements_surveyDimension | null;
+  image: OneLetter_letter_letterElements_image | null;
 }
 
 export interface OneLetter_letter_survey_surveyDimensions_survey {

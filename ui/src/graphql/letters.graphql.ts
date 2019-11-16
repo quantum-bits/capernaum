@@ -74,6 +74,11 @@ export const ONE_LETTER_QUERY = gql`
           useForPredictions
           sequence
         }
+        image {
+          id
+          title
+          url
+        }
       }
       survey {
         id

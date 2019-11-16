@@ -11,6 +11,15 @@
               :src="require('@/images/spiritual-foci.png')"
               :width="400"
             ></v-img>
+            <v-img
+              v-if="theImage"
+              :src="theImage.url"
+              :alt="theImage.title"
+              max-height="100"
+              :width="400"
+              aspect-ratio="1"
+              :contain="true"
+            />
           </div>
         </v-card-title>
         <v-card-text>
@@ -37,9 +46,34 @@
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 import Delta from "quill-delta";
 
+import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
+
+import { OneImage, OneImage_image } from "@/graphql/types/OneImage";
+
 import { LetterElementEnum, LetterElementType } from "../types/letter.types";
 
-@Component({})
+@Component({
+  apollo: {
+    theImage: {
+      query: ONE_IMAGE_QUERY,
+      variables() {
+        return {
+          id: this.imageId
+        };
+      },
+      update(data: OneImage) {
+        console.log("image fetched! ", data.image);
+        return data.image;
+      },
+      skip() {
+        if (this.imageId === -Infinity) {
+          console.log("skipping fetch of image....");
+        }
+        return this.imageId === -Infinity;
+      }
+    }
+  }
+})
 export default class StaticLetterElement extends Vue {
   /** Non-boilerplate letter element */
   @Prop() id!: number;
@@ -51,8 +85,10 @@ export default class StaticLetterElement extends Vue {
   @Prop() letterElementKey!: string;
   @Prop() description!: string;
   @Prop() parentIsFrozen!: boolean;
+  @Prop({ default: -Infinity }) imageId!: number;
 
   letterElements: LetterElementType[] = [];
+  theImage: OneImage_image | null = null;
 
   @Emit("move-up")
   moveUp() {}

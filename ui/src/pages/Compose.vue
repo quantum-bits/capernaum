@@ -204,6 +204,7 @@
           <component
             v-bind:is="letterElement(element.letterElementType.key)"
             :letterElementId="element.id"
+            :imageId="imageId(element)"
             :order="element.sequence"
             :initialTextDelta="element.textDelta"
             :initialEditModeOn="element.editModeOn"
@@ -634,7 +635,7 @@ export default class Compose extends Vue {
       this.chooseChartTypeDialog = true;
     } else if (letterElementType.key === LetterElementEnum.IMAGE) {
       console.log("we have an image!");
-      this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
+      this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
       this.chooseImageDialog = true;
     } else {
       console.log("we do not have a chart!");
@@ -767,6 +768,17 @@ export default class Compose extends Vue {
     }
   }
 
+  imageId(element: OneLetter_letter_letterElements) {
+    if (
+      element.letterElementType.key === LetterElementEnum.IMAGE &&
+      element.image !== null
+    ) {
+      return element.image.id;
+    } else {
+      return -Infinity;
+    }
+  }
+
   letterElementDescription(element: OneLetter_letter_letterElements) {
     if (
       element.letterElementType.key === LetterElementEnum.CHART &&
@@ -776,6 +788,13 @@ export default class Compose extends Vue {
         element.letterElementType.description +
         " -- " +
         element.surveyDimension.title
+      );
+    } else if (
+      element.letterElementType.key === LetterElementEnum.IMAGE &&
+      element.image !== null
+    ) {
+      return (
+        element.letterElementType.description + " -- " + element.image.title
       );
     } else {
       return element.letterElementType.description;

@@ -87,6 +87,7 @@ export default class LetterTextArea extends Vue {
   @Prop() description!: string;
   @Prop() parentIsFrozen!: boolean;
   @Prop({ default: false }) isEmailText!: boolean;
+  @Prop({ default: -Infinity }) imageId!: number;
 
   letterElements: LetterElementType[] = [];
 
