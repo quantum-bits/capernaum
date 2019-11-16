@@ -30,6 +30,11 @@
                   />
                 </v-flex>
               </v-layout>
+              <v-layout v-if="fileNotUploadedMessage">
+                <v-flex class="text-center red--text" xs6 offset-xs3>
+                  {{ fileNotUploadedMessage }}
+                </v-flex>
+              </v-layout>
             </v-card-text>
 
             <v-card-actions>
@@ -76,10 +81,10 @@
             />
           </template>
           <template v-slot:item.action="{ item }">
-            <v-icon small class="mr-2" @click.stop="openDialogForUpdate(item)">
+            <v-icon class="mr-2" @click.stop="openDialogForUpdate(item)">
               mdi-pencil
             </v-icon>
-            <v-icon small @click="deleteImage(item.id)">
+            <v-icon @click="deleteImage(item.id)">
               mdi-delete
             </v-icon>
           </template>
@@ -153,6 +158,9 @@ export default Vue.extend({
           "Title of letter must be fewer than 50 characters"
       ],
 
+      fileUploaded: false as boolean,
+      fileNotUploadedMessage: "",
+
       uploadFileDetails: {} as FilePondFile
     };
   },
@@ -160,41 +168,56 @@ export default Vue.extend({
   apollo: {
     imageDetails: {
       query: ALL_IMAGES_QUERY,
-      update: data => data.images
+      update: data => data.images,
+      fetchPolicy: "network-only"
     }
   },
 
   methods: {
     fileProcessed(err: Error, file: FilePondFile) {
       if (err) {
+        this.fileUploaded = false;
         throw err;
       }
       this.uploadFileDetails = file;
+      this.fileUploaded = true;
+      this.fileNotUploadedMessage = "";
+      if (!this.valid) { // if the form is currently not valid (possibly because of an attempted submission with no file uploaded), recheck it....
+        if ((this.$refs.form as any).validate()) {
+          this.valid = true;
+        }
+      }
     },
 
     createUploadDetails() {
-      if (!this.uploadFileDetails) {
-        throw Error("Upload file details not set");
-      }
-
-      this.$apollo
-        .mutate({
-          mutation: UPDATE_IMAGE_DETAILS_MUTATION,
-          variables: {
-            updateInput: {
-              id: parseInt(this.uploadFileDetails.serverId),
-              title: this.dialogState.title
+      //if (!this.fileUploaded) {
+      //  //!this.uploadFileDetails) {
+      //  throw Error("Upload file details not set");
+      //}
+      if (this.fileUploaded) {
+        this.$apollo
+          .mutate({
+            mutation: UPDATE_IMAGE_DETAILS_MUTATION,
+            variables: {
+              updateInput: {
+                id: parseInt(this.uploadFileDetails.serverId),
+                title: this.dialogState.title
+              }
             }
-          }
-        })
-        .then(response => {
-          this.imageDetails.push(response.data.updateImage);
-          this.closeDialog();
-          this.refreshImageData();
-        })
-        .catch(err => {
-          throw err;
-        });
+          })
+          .then(response => {
+            this.imageDetails.push(response.data.updateImage);
+            this.closeDialog();
+            this.refreshImageData();
+          })
+          .catch(err => {
+            throw err;
+          });
+      } else {
+        this.fileNotUploadedMessage =
+          "Please upload a file before attempting to submit the form.";
+        this.valid = false;
+      }
     },
 
     updateUploadDetails() {
@@ -274,6 +297,8 @@ export default Vue.extend({
     },
 
     closeDialog() {
+      this.fileUploaded = false;
+      this.fileNotUploadedMessage = "";
       this.dialogState.mode = DialogMode.CLOSED;
     }
   },
