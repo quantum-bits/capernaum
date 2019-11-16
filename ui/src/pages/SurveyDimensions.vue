@@ -97,12 +97,34 @@
                         outlined
                         persistent-hint
                       ></v-text-field>
-                      <v-switch
-                        v-model="surveyDimensionUseForPredictions"
-                        :label="
-                          `Use For Predictions in Boolean Association Table`
-                        "
-                      ></v-switch>
+                      <span v-if="!canTurnOffPredictions">
+                        <v-tooltip left max-width="300">
+                          <template v-slot:activator="{ on }">
+                            <span v-on="on">
+                              <v-switch
+                                v-model="surveyDimensionUseForPredictions"
+                                disabled
+                                :label="
+                                  `Use For Predictions in Boolean Association Table`
+                                "
+                              ></v-switch>
+                            </span>
+                          </template>
+                          <span
+                            >One or more survey indexes associated with this
+                            survey dimension have boolean associations, so this
+                            setting cannot be turned off.</span
+                          >
+                        </v-tooltip>
+                      </span>
+                      <span v-else>
+                        <v-switch
+                          v-model="surveyDimensionUseForPredictions"
+                          :label="
+                            `Use For Predictions in Boolean Association Table`
+                          "
+                        ></v-switch>
+                      </span>
                       <div v-if="serverError" class="red--text text-center">
                         Sorry, there appears to have been an error. Please try
                         again later.
@@ -334,6 +356,7 @@ export default Vue.extend({
       surveyDimensionDialog: false,
       surveyDimensionText: "",
       surveyDimensionUseForPredictions: true, // editable in the form
+      canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
       surveyDimensionDialogTitle: "",
       surveyDimensionDialogHint: "",
       surveyDimensionId: -1, //id of the survey dimension currently being edited
@@ -426,6 +449,7 @@ export default Vue.extend({
       this.surveyDimensionDialogTitle = "Add a New Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
       console.log("valid? ", this.valid);
+      this.canTurnOffPredictions = true;
       if (this.$refs.dimensionForm) {
         // FIXME: Replace the `as any` hack.
         (this.$refs.dimensionForm as any).resetValidation();
@@ -440,6 +464,7 @@ export default Vue.extend({
       this.surveyDimensionUseForPredictions = dimension.useForPredictions;
       this.surveyDimensionDialogTitle = "Edit Survey Dimension";
       this.surveyDimensionDialogHint = "e.g., 'Focal Dimension'";
+      this.canTurnOffPredictions = dimension.canDelete;
     },
     deleteDimension(dimension: any) {
       console.log("delete dimension!", dimension);
