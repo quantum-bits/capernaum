@@ -158,7 +158,7 @@ export default Vue.extend({
           "Title of letter must be fewer than 50 characters"
       ],
 
-      fileUploaded: false as boolean,
+      fileUploaded: false,
       fileNotUploadedMessage: "",
 
       uploadFileDetails: {} as FilePondFile
@@ -209,7 +209,6 @@ export default Vue.extend({
           .then(response => {
             this.imageDetails.push(response.data.updateImage);
             this.closeDialog();
-            this.refreshImageData();
           })
           .catch(err => {
             throw err;
@@ -235,7 +234,6 @@ export default Vue.extend({
         .then(_ => {
           this.dialogState.itemForUpdate.title = this.dialogState.title;
           this.closeDialog();
-          this.refreshImageData();
         })
         .catch(err => {
           throw err;
@@ -256,12 +254,6 @@ export default Vue.extend({
             throw Error(`Invalid dialog state '${this.dialogState}'`);
         }
       }
-    },
-
-    refreshImageData() {
-      this.$apollo.queries.imageDetails.refetch().then(({ data }) => {
-        console.log("item(s) refetched!", data);
-      });
     },
 
     deleteImage(id: number) {

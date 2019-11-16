@@ -37,6 +37,7 @@ export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
       uuid
       mimeType
       originalName
+      url
     }
   }
 `;

@@ -17,6 +17,7 @@ export interface UpdateImageDetails_updateImage {
   uuid: string;
   mimeType: string;
   originalName: string;
+  url: string;
 }
 
 export interface UpdateImageDetails {
