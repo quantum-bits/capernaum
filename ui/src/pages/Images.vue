@@ -182,7 +182,8 @@ export default Vue.extend({
       this.uploadFileDetails = file;
       this.fileUploaded = true;
       this.fileNotUploadedMessage = "";
-      if (!this.valid) { // if the form is currently not valid (possibly because of an attempted submission with no file uploaded), recheck it....
+      if (!this.valid) {
+        // if the form is currently not valid (possibly because of an attempted submission with no file uploaded), recheck it....
         if ((this.$refs.form as any).validate()) {
           this.valid = true;
         }

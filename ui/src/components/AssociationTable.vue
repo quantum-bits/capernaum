@@ -64,12 +64,7 @@
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
       </v-flex>
       <v-flex xs4 v-if="!oneLetter.isFrozen" xs3 class="text-xs-right">
-        <v-btn
-        class="mr-2"
-          color="primary"
-          dark
-          @click="cancelEdits"
-        >
+        <v-btn class="mr-2" color="primary" dark @click="cancelEdits">
           Cancel
         </v-btn>
         <v-btn color="success" dark @click="saveTableEdits">
