@@ -9,10 +9,14 @@ import {
 import { ImageService } from "./image.service";
 import { Int } from "type-graphql";
 import { Image, ImageUpdateInput } from "./entities";
+import { FileService } from "./file.service";
 
 @Resolver(of => Image)
 export class ImageResolver {
-  constructor(private readonly imageService: ImageService) {}
+  constructor(
+    private readonly imageService: ImageService,
+    private readonly fileService: FileService
+  ) {}
 
   // No createImage as that is handled by the upload controller.
 
@@ -32,7 +36,9 @@ export class ImageResolver {
   }
 
   @Mutation(returns => Int)
-  deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
+  async deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
+    const imageDetails = await this.imageService.findOne(Image, id);
+    await this.fileService.deleteFile(imageDetails.uuid, imageDetails.mimeType);
     return this.imageService.delete(Image, id);
   }
 

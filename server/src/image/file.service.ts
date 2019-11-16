@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { join, normalize } from "path";
-import { access, close, open, read, readFile, write } from "fs";
+import { access, close, open, unlink, write } from "fs";
 import { v4 } from "uuid";
 
 interface FileDetails {
@@ -26,16 +26,16 @@ export class FileService {
     });
   }
 
-  private extensionFromMimeType(mimeType: string) {
+  private static extensionFromMimeType(mimeType: string) {
     return mimeType.replace(/\//g, ".");
   }
 
-  private fileName(uuid: string, mimeType: string) {
-    return `${uuid}.${this.extensionFromMimeType(mimeType)}`;
+  private static fileName(uuid: string, mimeType: string) {
+    return `${uuid}.${FileService.extensionFromMimeType(mimeType)}`;
   }
 
   fullPath(uuid: string, mimeType: string) {
-    return join(this.fileBaseDir, this.fileName(uuid, mimeType));
+    return join(this.fileBaseDir, FileService.fileName(uuid, mimeType));
   }
 
   async saveFile(mimeType: string, buffer: Buffer): Promise<FileDetails> {
@@ -73,16 +73,15 @@ export class FileService {
     });
   }
 
-  loadFile(uuid: string, mimeType: string) {
+  deleteFile(uuid: string, mimeType: string) {
     const fullPath = this.fullPath(uuid, mimeType);
-    console.log("LOADING", fullPath);
 
     return new Promise((resolve, reject) => {
-      readFile(fullPath, (err, data) => {
+      unlink(fullPath, err => {
         if (err) {
           reject(err);
         }
-        resolve(data);
+        resolve(fullPath);
       });
     });
   }
