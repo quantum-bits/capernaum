@@ -60,12 +60,20 @@
     </v-layout>
 
     <v-layout v-if="tableEditModeOn" row wrap>
-      <v-flex xs9>
+      <v-flex xs8>
         <h2 class="title font-weight-regular mb-3 mt-3">Association Table:</h2>
       </v-flex>
-      <v-flex v-if="!oneLetter.isFrozen" xs3 class="text-xs-right">
+      <v-flex xs4 v-if="!oneLetter.isFrozen" xs3 class="text-xs-right">
+        <v-btn
+        class="mr-2"
+          color="primary"
+          dark
+          @click="cancelEdits"
+        >
+          Cancel
+        </v-btn>
         <v-btn color="success" dark @click="saveTableEdits">
-          Save Table Edits
+          Save Edits
         </v-btn>
       </v-flex>
       <v-flex xs12>
@@ -191,6 +199,7 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
           });
         });
         console.log("table data: ", this.tableData);
+        this.originalTableData = JSON.parse(JSON.stringify(this.tableData)); // this can be used later if the user clicks "cancel"
 
         return oneLetter.letter; // return oneLetter, but in the end we are not actually using it anywhere....
       },
@@ -210,6 +219,7 @@ export default class AssociationTable extends Vue {
 
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];
+  originalTableData: TableData[] = [];
   headers: AssociationTableHeader[] = [];
 
   tableEditModeOn: boolean = false;
@@ -220,6 +230,11 @@ export default class AssociationTable extends Vue {
 
   editTable() {
     this.tableEditModeOn = true;
+  }
+
+  cancelEdits() {
+    this.tableData = JSON.parse(JSON.stringify(this.originalTableData));
+    this.tableEditModeOn = false;
   }
 
   saveTableEdits() {
