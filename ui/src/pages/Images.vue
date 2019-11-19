@@ -27,6 +27,7 @@
                       process: 'process'
                     }"
                     @processfile="fileProcessed"
+                    @removefile="fileRemoved"
                   />
                 </v-flex>
               </v-layout>
@@ -216,6 +217,18 @@ export default Vue.extend({
           this.valid = true;
         }
       }
+    },
+
+    fileRemoved(err: Error, file: FilePondFile) {
+      console.log("file has been removed: ", file);
+      if (err) {
+        this.fileUploaded = false;
+        throw err;
+      }
+      this.fileUploaded = false;
+      this.valid = false;
+      this.fileNotUploadedMessage =
+        "Please upload a file before attempting to submit the form.";
     },
 
     createUploadDetails() {
