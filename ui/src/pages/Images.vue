@@ -84,9 +84,27 @@
             <v-icon class="mr-2" @click.stop="openDialogForUpdate(item)">
               mdi-pencil
             </v-icon>
-            <v-icon @click="deleteImage(item.id)">
-              mdi-delete
-            </v-icon>
+            <v-tooltip v-if="canDelete(item)" top>
+              <template v-slot:activator="{ on }">
+                <a @click="deleteImage(item.id)" v-on="on">
+                  <v-icon>
+                    {{ "mdi-close-circle" }}
+                  </v-icon>
+                </a>
+              </template>
+              <span>Delete this image.</span>
+            </v-tooltip>
+            <v-tooltip v-else top>
+              <template v-slot:activator="{ on }">
+                <v-icon v-on="on" class="grey--text text--lighten-1">
+                  {{ "mdi-close-circle" }}
+                </v-icon>
+              </template>
+              <span
+                >This image is being used in a letter and cannot be
+                deleted.</span
+              >
+            </v-tooltip>
           </template>
         </v-data-table>
       </v-flex>
@@ -173,7 +191,12 @@ export default Vue.extend({
   apollo: {
     imageDetails: {
       query: ALL_IMAGES_QUERY,
-      update: data => data.images,
+      update(data: any) {
+        console.log("image data: ", data.images);
+
+        return data.images;
+      },
+      //update: data => data.images,
       fetchPolicy: "network-only"
     }
   },
@@ -212,6 +235,7 @@ export default Vue.extend({
             }
           })
           .then(response => {
+            console.log("data for new image: ", response.data.updateImage);
             this.imageDetails.push(response.data.updateImage);
             this.closeDialog();
           })
@@ -298,6 +322,10 @@ export default Vue.extend({
       this.fileUploaded = false;
       this.fileNotUploadedMessage = "";
       this.dialogState.mode = DialogMode.CLOSED;
+    },
+
+    canDelete(item: AllImages_images) {
+      return item.letterElements.length === 0;
     }
   },
 

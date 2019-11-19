@@ -11,6 +11,9 @@ export const ALL_IMAGES_QUERY = gql`
       originalName
       created
       updated
+      letterElements {
+        id
+      }
     }
   }
 `;
@@ -20,11 +23,15 @@ export const ONE_IMAGE_QUERY = gql`
     image(id: $id) {
       id
       title
+      url
+      uuid
       originalName
       mimeType
       created
       updated
-      url
+      letterElements {
+        id
+      }
     }
   }
 `;
@@ -34,10 +41,15 @@ export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
     updateImage(updateInput: $updateInput) {
       id
       title
-      uuid
-      mimeType
-      originalName
       url
+      uuid
+      originalName
+      mimeType
+      created
+      updated
+      letterElements {
+        id
+      }
     }
   }
 `;
