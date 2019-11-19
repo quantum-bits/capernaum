@@ -352,13 +352,13 @@ type SurveyIndex {
   id: Int!
   surveyDimension: SurveyDimension!
   surveyItems: [SurveyItem!]!
+  predictionTableEntries: [PredictionTableEntry!]!
 
   """Abbreviation for this index (e.g., 'FOG')"""
   abbreviation: String!
 
   """Title of this index"""
   title: String!
-  predictionTableEntries: [PredictionTableEntry!]!
 }
 
 input SurveyIndexCreateInput {

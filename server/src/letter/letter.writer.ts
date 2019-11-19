@@ -74,8 +74,13 @@ export default class LetterWriter {
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    console.log("LETTER", JSON.stringify(letter, null, 2));
-    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+    // console.log("LETTER", JSON.stringify(letter, null, 2));
+    // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+
+    console.log(surveyResponse.survey.surveyDimensions);
+    for (let dim of surveyResponse.survey.surveyDimensions) {
+      console.log("DIM", dim.title);
+    }
 
     this.processResponses(surveyResponse.surveyItemResponses);
 

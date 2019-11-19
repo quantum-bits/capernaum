@@ -3,6 +3,7 @@ import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { PredictionTableEntry } from "../../prediction/entities";
 
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
@@ -16,6 +17,10 @@ export class SurveyIndex extends AbstractEntity {
   @OneToMany(type => SurveyItem, item => item.surveyIndex)
   @Field(type => [SurveyItem])
   surveyItems: SurveyItem[];
+
+  @OneToMany(type => PredictionTableEntry, ptEntry => ptEntry.surveyIndex)
+  @Field(type => [PredictionTableEntry])
+  predictionTableEntries: PredictionTableEntry[];
 
   @Column()
   @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })

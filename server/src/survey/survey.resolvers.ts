@@ -281,8 +281,8 @@ export class SurveyIndexResolver {
     );
   }
 
-  @ResolveProperty("predictionTableEntries", type => [PredictionTableEntry])
-  resolvePredictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
+  @ResolveProperty(type => [PredictionTableEntry])
+  predictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.find(PredictionTableEntry, { surveyIndex });
   }
 }

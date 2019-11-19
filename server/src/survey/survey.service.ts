@@ -90,14 +90,20 @@ export class SurveyService extends BaseService {
   }
 
   surveyResponse(responseId: number) {
-    return this.surveyResponseRepo.findOne(responseId, {
-      relations: [
-        "surveyItemResponses",
-        "surveyItemResponses.surveyItem",
-        "surveyItemResponses.surveyItem.surveyIndex",
-        "surveyItemResponses.surveyItem.surveyIndex.surveyDimension"
-      ]
-    });
+    return this.surveyResponseRepo
+      .createQueryBuilder("surveyResponse")
+      .innerJoinAndSelect("surveyResponse.survey", "survey")
+      .innerJoinAndSelect("survey.surveyDimensions", "dimensions")
+      .innerJoinAndSelect("dimensions.surveyIndices", "indices")
+      .innerJoinAndSelect("indices.surveyItems", "items")
+      .innerJoinAndSelect("items.surveyItemResponses", "responseItems")
+      .innerJoinAndSelect("indices.predictionTableEntries", "tableEntries")
+      .innerJoinAndSelect("tableEntries.practice", "practice")
+      .where("surveyResponse.id = :responseId", { responseId })
+      .andWhere("responseItems.surveyResponseId = :responseId", {
+        responseId
+      })
+      .getOne();
   }
 
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
