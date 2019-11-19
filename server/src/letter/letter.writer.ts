@@ -77,9 +77,24 @@ export default class LetterWriter {
     // console.log("LETTER", JSON.stringify(letter, null, 2));
     // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
 
-    console.log(surveyResponse.survey.surveyDimensions);
     for (let dim of surveyResponse.survey.surveyDimensions) {
-      console.log("DIM", dim.title);
+      console.log(`DIM (${dim.id}) ${dim.title}`);
+      for (let index of dim.surveyIndices) {
+        console.log(`  IDX (${index.id}), ${index.title}`);
+        for (let pte of index.predictionTableEntries) {
+          console.log(`    PTE (${pte.id}) ${pte.practice.title}`);
+        }
+        for (let item of index.surveyItems) {
+          console.log(
+            `    ITEM (${item.id} ${item.qualtricsId}) ${item.qualtricsText}`
+          );
+          for (let response of item.surveyItemResponses) {
+            console.log(
+              `      RESP (${response.id})-${response.label}, ${response.value}`
+            );
+          }
+        }
+      }
     }
 
     this.processResponses(surveyResponse.surveyItemResponses);

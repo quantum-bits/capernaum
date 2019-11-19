@@ -97,8 +97,8 @@ export class SurveyService extends BaseService {
       .innerJoinAndSelect("dimensions.surveyIndices", "indices")
       .innerJoinAndSelect("indices.surveyItems", "items")
       .innerJoinAndSelect("items.surveyItemResponses", "responseItems")
-      .innerJoinAndSelect("indices.predictionTableEntries", "tableEntries")
-      .innerJoinAndSelect("tableEntries.practice", "practice")
+      .leftJoinAndSelect("indices.predictionTableEntries", "tableEntries")
+      .leftJoinAndSelect("tableEntries.practice", "practice")
       .where("surveyResponse.id = :responseId", { responseId })
       .andWhere("responseItems.surveyResponseId = :responseId", {
         responseId
