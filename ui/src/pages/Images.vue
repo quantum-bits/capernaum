@@ -96,14 +96,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-import vueFilePond from "vue-filepond";
-import "filepond/dist/filepond.min.css";
 import {
   ALL_IMAGES_QUERY,
   DELETE_IMAGE_MUTATION,
   UPDATE_IMAGE_DETAILS_MUTATION
 } from "@/graphql/images.graphql";
 import { AllImages_images } from "@/graphql/types/AllImages";
+
+import vueFilePond from "vue-filepond";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js";
+
+import "filepond/dist/filepond.min.css";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+
 import { FilePondFile } from "@/types/filepond.types";
 
 enum DialogMode {
@@ -116,7 +121,7 @@ export default Vue.extend({
   name: "Images",
 
   components: {
-    FilePond: vueFilePond()
+    FilePond: vueFilePond(FilePondPluginImagePreview)
   },
 
   data() {
