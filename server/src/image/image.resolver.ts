@@ -10,6 +10,7 @@ import { ImageService } from "./image.service";
 import { Int } from "type-graphql";
 import { Image, ImageUpdateInput } from "./entities";
 import { FileService } from "./file.service";
+import { LetterElement } from "../letter/entities";
 
 @Resolver(of => Image)
 export class ImageResolver {
@@ -45,5 +46,10 @@ export class ImageResolver {
   @ResolveProperty(returns => String)
   url(@Parent() image) {
     return `http://localhost:3000/images/${image.id}`;
+  }
+
+  @ResolveProperty("letterElements", type => [LetterElement])
+  resolveLetterElements(@Parent() image: Image) {
+    return this.imageService.find(LetterElement, { image });
   }
 }

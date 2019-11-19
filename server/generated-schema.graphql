@@ -23,6 +23,7 @@ type Image {
   created: DateTime!
   updated: DateTime!
   url: String!
+  letterElements: [LetterElement!]!
 }
 
 input ImageUpdateInput {

@@ -238,19 +238,18 @@
       </v-flex>
     </v-layout>
     <!--
-              Next:
-                  - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
-                  - might need to update the db every time a change is made (to the order, too)
-        
-                  - ordering within categories for letters (order by survey, and then more ordering below this level)
-        
-        
-                  - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
-        
-                  - if the letter contains the "SE strategies for user" element, and the boolean association
-                  table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
-                  the user should get a warning message or something)
-              -->
+          Next:
+              - decide on specifics of how to add another text box...do it on the fly?  should probably update it every time the user hits "save"
+              - might need to update the db every time a change is made (to the order, too)
+    
+              - ordering within categories for letters (order by survey, and then more ordering below this level)
+    
+              - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+    
+              - if the letter contains the "SE strategies for user" element, and the boolean association
+              table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
+              the user should get a warning message or something)
+          -->
   </v-container>
 </template>
 
@@ -346,20 +345,20 @@ interface LetterElement extends OneLetter_letter_letterElements {
 })
 export default class Compose extends Vue {
   imageDetails: AllImages_images[] = [];
-  allowHideTable: boolean = true;
-  tableIsHidden: boolean = true;
-  isNew: boolean = false; // true if this is a new letter
-  editModeOn: boolean = false;
-  chooseChartTypeDialog: boolean = false;
-  chooseImageDialog: boolean = false;
-  chartSelectionValid: boolean = false;
-  imageSelectionValid: boolean = false;
+  allowHideTable = true;
+  tableIsHidden = true;
+  isNew = false; // true if this is a new letter
+  editModeOn = false;
+  chooseChartTypeDialog = false;
+  chooseImageDialog = false;
+  chartSelectionValid = false;
+  imageSelectionValid = false;
   selectedSurveyDimension: null | any = null;
   selectedImage: null | any = null;
-  chartTypeElementId: number = -Infinity; //used when creating a chart type of letter element
-  imageTypeElementId: number = -Infinity; //used when creating an image type of letter element
+  chartTypeElementId = -Infinity; //used when creating a chart type of letter element
+  imageTypeElementId = -Infinity; //used when creating an image type of letter element
 
-  name: string = "";
+  name = "";
   letterExists = false;
   generatingPDF = false;
 
@@ -675,22 +674,23 @@ export default class Compose extends Vue {
       });
   }
 
+  // Return the next sequence number larger than those in existing letter elements.
+  // If the list of letter elements is empty, return 1.
+  nextSequenceNumber(letterElements: LetterElement[]) {
+    const existingNumbers = letterElements.map(elt => elt.sequence);
+    return Math.max(0, ...existingNumbers) + 1;
+  }
+
   addImageElement() {
     console.log("image id: ", this.selectedImage.value);
-    const letterElements = this.surveyLetterElements;
-    let maxSequence: number = -Infinity; //assuming the max sequence will be 0 or greater....
-    letterElements.forEach(letterElement => {
-      if (maxSequence < letterElement.sequence) {
-        maxSequence = letterElement.sequence;
-      }
-    });
-    let newSequence: number = maxSequence + 1;
+    const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
+
     this.$apollo
       .mutate({
         mutation: CREATE_LETTER_ELEMENT_MUTATION,
         variables: {
           createInput: {
-            sequence: newSequence,
+            sequence: nextSequence,
             letterId: this.theLetter.id,
             letterElementTypeId: this.imageTypeElementId,
             imageId: this.selectedImage.value
@@ -710,28 +710,21 @@ export default class Compose extends Vue {
   addNonChartElement(
     letterElementType: OneLetter_letter_letterElements_letterElementType
   ) {
-    const letterElements = this.surveyLetterElements;
-    let maxSequence: number = -Infinity; //assuming the max sequence will be 0 or greater....
-    letterElements.forEach(letterElement => {
-      if (maxSequence < letterElement.sequence) {
-        maxSequence = letterElement.sequence;
-      }
-    });
-    let newSequence: number = maxSequence + 1;
+    const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
 
     console.log("letter element type: ", letterElementType);
     let createInput: LetterElementCreateInput;
     if (letterElementType.key === LetterElementEnum.BOILERPLATE) {
       const emptyTextDelta = new Delta();
       createInput = {
-        sequence: newSequence,
+        sequence: nextSequence,
         letterId: this.theLetter.id,
         letterElementTypeId: letterElementType.id,
         textDelta: JSON.stringify(emptyTextDelta)
       };
     } else {
       createInput = {
-        sequence: newSequence,
+        sequence: nextSequence,
         letterId: this.theLetter.id,
         letterElementTypeId: letterElementType.id
       };
