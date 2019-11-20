@@ -4,6 +4,7 @@ import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { PredictionTableEntry } from "../../prediction/entities";
+import { mean } from "lodash";
 
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
@@ -29,6 +30,12 @@ export class SurveyIndex extends AbstractEntity {
   @Column()
   @Field({ description: "Title of this index" })
   title: string;
+
+  public meanResponse() {
+    return mean(
+      this.surveyItems.map(item => item.surveyItemResponses[0].value)
+    );
+  }
 }
 
 @InputType()
