@@ -105,6 +105,10 @@ export class SurveyService extends BaseService {
       .getOne();
   }
 
+  findSurveyByQualtricsId(qualtricsId: string) {
+    return this.surveyRepo.find({ qualtricsId });
+  }
+
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
     const where = { survey };
 

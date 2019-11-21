@@ -216,6 +216,7 @@ type QualtricsSurveyListItem {
   qualtricsModDate: String!
   qualtricsCreationDate: String!
   qualtricsIsActive: Boolean!
+  importedAs: [Survey!]!
 }
 
 type Query {

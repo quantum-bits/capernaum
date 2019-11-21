@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   SurveyDimensionResolver,
@@ -31,7 +31,7 @@ import { WhichItems } from "./survey.types";
       SurveyItemResponse,
       SurveyItem
     ]),
-    QualtricsModule
+    forwardRef(() => QualtricsModule)
   ],
   providers: [
     SurveyService,
