@@ -55,7 +55,7 @@ export class QualtricsResolver {
       );
       for (const survey of surveys) {
         qualtricsSurvey.importedAs.push(survey);
-        console.log(JSON.stringify(survey, null, 2));
+        // console.log(JSON.stringify(survey, null, 2));
       }
     }
 

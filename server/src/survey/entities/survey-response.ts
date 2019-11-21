@@ -32,4 +32,82 @@ export class SurveyResponse extends AbstractEntity {
   @Column() @Field() ipAddress: string;
   @Column() @Field() latitude: string;
   @Column() @Field() longitude: string;
+
+  private tab(n: number, msge: string) {
+    return "  ".repeat(n) + msge;
+  }
+
+  public dump() {
+    for (let dim of this.survey.surveyDimensions) {
+      console.log(`DIM (${dim.id}) ${dim.title}`);
+
+      for (let index of dim.surveyIndices) {
+        console.log(
+          this.tab(
+            1,
+            `IDX (${index.id}), ${index.title} => ${index.meanResponse()}`
+          )
+        );
+
+        for (let pte of index.predictionTableEntries) {
+          console.log(this.tab(2, `PTE (${pte.id}) ${pte.practice.title}`));
+        }
+
+        for (let item of index.surveyItems) {
+          console.log(
+            this.tab(
+              3,
+              `ITEM (${item.id}-${item.qualtricsId}) ${item.qualtricsText}`
+            )
+          );
+
+          for (let response of item.surveyItemResponses) {
+            console.log(
+              this.tab(
+                4,
+                `RESP (${response.id}) ${response.label}, ${response.value}`
+              )
+            );
+          }
+        }
+      }
+    }
+  }
+
+  public asJSON() {
+    for (let dim of this.survey.surveyDimensions) {
+      console.log(`DIM (${dim.id}) ${dim.title}`);
+
+      for (let index of dim.surveyIndices) {
+        console.log(
+          this.tab(
+            1,
+            `IDX (${index.id}), ${index.title} => ${index.meanResponse()}`
+          )
+        );
+
+        for (let pte of index.predictionTableEntries) {
+          console.log(this.tab(2, `PTE (${pte.id}) ${pte.practice.title}`));
+        }
+
+        for (let item of index.surveyItems) {
+          console.log(
+            this.tab(
+              3,
+              `ITEM (${item.id}-${item.qualtricsId}) ${item.qualtricsText}`
+            )
+          );
+
+          for (let response of item.surveyItemResponses) {
+            console.log(
+              this.tab(
+                4,
+                `RESP (${response.id}) ${response.label}, ${response.value}`
+              )
+            );
+          }
+        }
+      }
+    }
+  }
 }
