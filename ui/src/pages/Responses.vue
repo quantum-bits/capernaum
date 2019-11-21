@@ -38,11 +38,17 @@
               >
                 {{ dimension.title }}
                 <ol>
-                  <li v-for="index in dimension.surveyIndices" :key="index.id">
-                    INDEX [ {{ index }} ]
-                    {{ index.title }} ({{ index.abbreviation }})
+                  <li
+                    v-for="surveyIndex in dimension.surveyIndices"
+                    :key="surveyIndex.id"
+                  >
+                    {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }})
+                    [[{{ meanResponse(surveyIndex.surveyItems) }}]]
                     <ol>
-                      <li v-for="item in index.surveyItems" :key="item.id">
+                      <li
+                        v-for="item in surveyIndex.surveyItems"
+                        :key="item.id"
+                      >
                         ({{ item.qualtricsId }} =
                         {{ item.surveyItemResponses[0].value }})
                         {{ item.qualtricsText }}
@@ -64,12 +70,14 @@
 <script lang="ts">
 import Vue from "vue";
 import {
+  IMPORT_SURVEY_RESPONSES,
   ONE_RESPONSE_DETAIL_QUERY,
-  RESPONSE_SUMMARY_QUERY,
-  IMPORT_SURVEY_RESPONSES
+  RESPONSE_SUMMARY_QUERY
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ResponseSummary } from "@/graphql/types/ResponseSummary";
+import mean from "lodash/mean";
+import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems as SurveyItem } from "@/graphql/types/ResponseDetails";
 
 interface ImportedSurvey {
   id: number;
@@ -139,6 +147,12 @@ export default Vue.extend({
   },
 
   methods: {
+    meanResponse(surveyItems: SurveyItem[]) {
+      return mean(
+        surveyItems.map(item => item.surveyItemResponses[0].value)
+      ).toPrecision(3);
+    },
+
     showDetails(item: any) {
       this.selectedResponse = item.id;
     },
