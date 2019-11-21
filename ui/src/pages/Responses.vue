@@ -29,13 +29,29 @@
     <v-row>
       <v-col>
         <div v-if="selectedResponse">
-          <div v-if="responseDetails.length">
-            <h4>Details ({{ responseDetails.length }} responses)</h4>
-            <v-data-table
-              :headers="detailHeaders"
-              :items="responseDetails"
-              class="elevation-1"
-            />
+          <div v-if="responseDetails">
+            <h4>Details</h4>
+            <ol>
+              <li
+                v-for="dimension in responseDetails.survey.surveyDimensions"
+                :key="dimension.id"
+              >
+                {{ dimension.title }}
+                <ol>
+                  <li v-for="index in dimension.surveyIndices" :key="index.id">
+                    INDEX [ {{ index }} ]
+                    {{ index.title }} ({{ index.abbreviation }})
+                    <ol>
+                      <li v-for="item in index.surveyItems" :key="item.id">
+                        ({{ item.qualtricsId }} =
+                        {{ item.surveyItemResponses[0].value }})
+                        {{ item.qualtricsText }}
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+            </ol>
           </div>
           <p v-else>This person submitted no responses.</p>
         </div>
@@ -83,7 +99,9 @@ export default Vue.extend({
           id: this.selectedResponse
         };
       },
-      update: data => data.surveyResponse.surveyItemResponses,
+
+      update: data => data.surveyResponse,
+
       skip() {
         return !this.selectedResponse;
       }
@@ -107,13 +125,7 @@ export default Vue.extend({
       ],
 
       selectedResponse: null,
-      responseDetails: [],
-      detailHeaders: [
-        { text: "ID", value: "surveyItem.qualtricsId" },
-        { text: "Text", value: "surveyItem.qualtricsText" },
-        { text: "Choice", value: "value" },
-        { text: "Response", value: "label" }
-      ]
+      responseDetails: null
     };
   },
 

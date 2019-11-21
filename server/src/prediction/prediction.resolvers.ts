@@ -50,7 +50,7 @@ export class PredictionTableEntryResolver {
     @Parent() predictionTableEntry: PredictionTableEntry
   ) {
     if (predictionTableEntry.practice) {
-      console.log("Already have practice");
+      // console.log("Already have practice");
       return predictionTableEntry.practice;
     } else {
       return this.predictionService.findOneOrFail(

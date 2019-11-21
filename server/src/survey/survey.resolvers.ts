@@ -148,7 +148,7 @@ export class SurveyResolver {
   @ResolveProperty("surveyDimensions", type => [SurveyDimension])
   resolveSurveyDimensions(@Parent() survey: Survey) {
     if (survey.surveyDimensions) {
-      console.log("Already have dimensions");
+      // console.log("Already have dimensions");
       return survey.surveyDimensions;
     } else {
       return this.surveyService.find(SurveyDimension, { survey });
@@ -199,7 +199,7 @@ export class SurveyResponseResolver {
   resolveSurvey(@Parent() surveyResponse: SurveyResponse) {
     console.log("SurveyResponseResolver.resolveSurvey");
     if (surveyResponse.survey) {
-      console.log("Already have a survey");
+      // console.log("Already have a survey");
       return surveyResponse.survey;
     } else {
       console.log("Fetching a survey");
@@ -280,7 +280,7 @@ export class SurveyDimensionResolver {
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
     if (surveyDimension.surveyIndices) {
-      console.log("Already have indices");
+      // console.log("Already have indices");
       return surveyDimension.surveyIndices;
     } else {
       return this.surveyService.find(SurveyIndex, { surveyDimension });
@@ -297,7 +297,7 @@ export class SurveyIndexResolver {
   })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
     if (surveyIndex.surveyItems) {
-      console.log("Already have survey items");
+      // console.log("Already have survey items");
       return surveyIndex.surveyItems;
     } else {
       return this.surveyService.find(SurveyItem, { surveyIndex });
@@ -315,7 +315,7 @@ export class SurveyIndexResolver {
   @ResolveProperty(type => [PredictionTableEntry])
   predictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
     if (surveyIndex.predictionTableEntries) {
-      console.log("Already have PTEs");
+      // console.log("Already have PTEs");
       return surveyIndex.predictionTableEntries;
     } else {
       return this.surveyService.find(PredictionTableEntry, { surveyIndex });
@@ -341,7 +341,7 @@ export class SurveyItemResolver {
   @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
     if (surveyItem.surveyItemResponses) {
-      console.log("Already have responses");
+      // console.log("Already have responses");
       return surveyItem.surveyItemResponses;
     } else {
       return this.surveyService.find(SurveyItemResponse, { surveyItem });
