@@ -10,7 +10,6 @@
       <v-flex xs7 offset-xs1>
         <v-form ref="form" v-model="valid" lazy-validation>
           <QualtricsSurveyMenu v-model="selectedSurvey" />
-
           <v-text-field
             v-model="title"
             :counter="100"
@@ -41,10 +40,12 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { isEmpty } from "lodash";
 
 import { IMPORT_QUALTRICS_SURVEY } from "@/graphql/surveys.graphql";
 
-import { QualtricsSurvey, QualtricsSurveySelection } from "./survey.types";
+import { QualtricsSurveySelection } from "./survey.types";
+import { QualtricsSurveys_qualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
 import QualtricsSurveyMenu from "@/components/QualtricsSurveyMenu.vue";
 
 export default Vue.extend({
@@ -55,7 +56,7 @@ export default Vue.extend({
 
   data() {
     return {
-      qualtricsSurveys: [] as QualtricsSurvey[],
+      qualtricsSurveys: [] as QualtricsSurveys_qualtricsSurveys[],
       selectedSurvey: {} as QualtricsSurveySelection,
       title: "" as string,
       valid: true,

@@ -54,6 +54,7 @@ import gql from "graphql-tag";
 //import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 import {
   ADD_LETTER_MUTATION,
   UPDATE_LETTER_MUTATION
@@ -73,7 +74,8 @@ import {
 @Component({
   apollo: {
     surveys: {
-      query: ALL_SURVEYS_QUERY
+      query: ALL_SURVEYS_QUERY,
+      fetchPolicy: "network-only"
     }
   }
 })
@@ -87,7 +89,7 @@ export default class LetterInfoForm extends Vue {
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
 
-  surveys: Survey[] = [];
+  surveys: AllSurveys_surveys[] = [];
   //booleanAssociations: BooleanAssociationType[] = [];
   title: string = this.initialTitle;
   description: string = this.initialDescription;
@@ -111,7 +113,9 @@ export default class LetterInfoForm extends Vue {
       (v && v.length <= 120) || "Description must be fewer than 120 characters"
   ];
   surveySelectionRules: any = [
-    (v: any) => (v && v.value !== -Infinity) || "Survey is required"
+    (v: any) =>
+      (v && v.value !== -Infinity) ||
+      "Survey is required.  Note that only one letter may be associated with each imported survey, so if no surveys show up in the above list, it may mean that all surveys already have a letter."
   ];
 
   submit() {
@@ -190,11 +194,14 @@ export default class LetterInfoForm extends Vue {
 
   // using a getter, which is apparently the way to do a computed property when using vue property decorators:
   // https://github.com/kaorun343/vue-property-decorator/issues/85
+  // .filter(...).map(...) might not be the fastest approach (https://stackoverflow.com/questions/34398279/map-and-filter-an-array-at-the-same-time)
   get selections(): SurveySelection[] {
-    return this.surveys.map(survey => ({
-      text: survey.title,
-      value: survey.id
-    }));
+    return this.surveys
+      .filter(survey => survey.letters.length === 0)
+      .map(survey => ({
+        text: survey.title,
+        value: survey.id
+      }));
   }
 
   get surveyTitle() {

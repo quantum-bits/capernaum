@@ -3,7 +3,7 @@
     :value="value"
     @change="$emit('input', $event)"
     :items="selections"
-    :rules="[v => !!v || 'A survey must be selected']"
+    :rules="surveySelectionRules"
     label="Qualtrics Survey"
     required
     persistent-hint
@@ -14,9 +14,11 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { isEmpty } from "lodash";
 import { ALL_QUALTRICS_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { QualtricsSurveys_qualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
 import {
-  QualtricsSurvey,
+  //QualtricsSurvey,
   QualtricsSurveySelection
 } from "@/pages/survey.types";
 
@@ -33,7 +35,8 @@ export default Vue.extend({
   apollo: {
     availableQualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
-      update: data => data.qualtricsSurveys
+      update: data => data.qualtricsSurveys,
+      fetchPolicy: "network-only"
     }
   },
 
@@ -46,16 +49,24 @@ export default Vue.extend({
 
   data() {
     return {
-      availableQualtricsSurveys: [] as Array<QualtricsSurvey>
+      availableQualtricsSurveys: [] as Array<QualtricsSurveys_qualtricsSurveys>,
+      //https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
+      surveySelectionRules: [
+        () =>
+          !isEmpty(this.value) ||
+          "Survey is required.  Note that each survey may only be imported once, so if the above list is empty, it may mean that all surveys have already been imported."
+      ] as any
     };
   },
 
   computed: {
     selections(): QualtricsSurveySelection[] {
-      return this.availableQualtricsSurveys.map(survey => ({
-        text: survey.qualtricsName,
-        value: survey.qualtricsId
-      }));
+      return this.availableQualtricsSurveys
+        .filter(survey => survey.importedAs.length === 0)
+        .map(survey => ({
+          text: survey.qualtricsName,
+          value: survey.qualtricsId
+        }));
     }
   }
 });

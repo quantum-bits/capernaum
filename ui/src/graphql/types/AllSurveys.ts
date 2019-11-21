@@ -6,6 +6,13 @@
 // GraphQL query operation: AllSurveys
 // ====================================================
 
+export interface AllSurveys_surveys_letters {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
 export interface AllSurveys_surveys {
   /**
    * Unique ID for this entity
@@ -27,6 +34,7 @@ export interface AllSurveys_surveys {
    * Date and time at which this survey was modified on Qualtrics
    */
   qualtricsModDate: string;
+  letters: AllSurveys_surveys_letters[];
 }
 
 export interface AllSurveys {

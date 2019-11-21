@@ -9,6 +9,9 @@ export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
       qualtricsModDate
       qualtricsIsActive
       qualtricsCreationDate
+      importedAs {
+        id
+      }
     }
   }
 `;
@@ -24,6 +27,9 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsId
       qualtricsName
       qualtricsModDate
+      letters {
+        id
+      }
     }
   }
 `;
