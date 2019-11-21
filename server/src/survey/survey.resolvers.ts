@@ -28,6 +28,7 @@ import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
+import { Letter } from "../letter/entities";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -121,6 +122,11 @@ export class SurveyResolver {
   })
   deleteSurveyIndex(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.deleteSurveyIndex(id);
+  }
+
+  @ResolveProperty("letters", type => [Letter])
+  resolveLetters(@Parent() survey: Survey) {
+    return this.surveyService.find(Letter, { survey });
   }
 
   @ResolveProperty("surveyItems", type => [SurveyItem], {

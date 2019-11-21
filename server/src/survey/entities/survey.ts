@@ -4,12 +4,17 @@ import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
+import { Letter } from "../../letter/entities";
 
 @Entity()
 @ObjectType({
   description: "All information about a survey imported from Qualtrics"
 })
 export class Survey extends AbstractEntity {
+  @OneToMany(type => Letter, letter => letter.survey)
+  @Field(type => [Letter])
+  letters: Letter[];
+
   @OneToMany(type => SurveyItem, item => item.survey)
   @Field(type => [SurveyItem], {
     description:

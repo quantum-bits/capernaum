@@ -270,6 +270,7 @@ input ScriptureEngagementPracticeUpdateInput {
 type Survey {
   """Unique ID for this entity"""
   id: Int!
+  letters: [Letter!]!
 
   """
   Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
