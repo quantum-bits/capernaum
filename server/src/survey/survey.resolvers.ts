@@ -178,8 +178,10 @@ export class SurveyResponseResolver {
   ) {}
 
   @Query(returns => SurveyResponse)
-  surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.findOne(SurveyResponse, id);
+  async surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
+    const rtn = await this.surveyService.surveyResponse(id);
+    console.log("SURVEY RESPONSE", id, JSON.stringify(rtn, null, 2));
+    return rtn;
   }
 
   @Query(returns => [SurveyResponse])
@@ -306,5 +308,10 @@ export class SurveyItemResolver {
     } else {
       return null;
     }
+  }
+
+  @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
+  resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
+    return this.surveyService.find(SurveyItemResponse, { surveyItem });
   }
 }
