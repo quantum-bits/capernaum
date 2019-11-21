@@ -49,10 +49,15 @@ export class PredictionTableEntryResolver {
   resolveScriptureEngagementPractice(
     @Parent() predictionTableEntry: PredictionTableEntry
   ) {
-    return this.predictionService.findOneOrFail(
-      ScriptureEngagementPractice,
-      predictionTableEntry.practiceId
-    );
+    if (predictionTableEntry.practice) {
+      console.log("Already have practice");
+      return predictionTableEntry.practice;
+    } else {
+      return this.predictionService.findOneOrFail(
+        ScriptureEngagementPractice,
+        predictionTableEntry.practiceId
+      );
+    }
   }
 
   @ResolveProperty("letter", type => Letter)
