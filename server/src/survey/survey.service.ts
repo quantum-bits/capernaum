@@ -89,7 +89,9 @@ export class SurveyService extends BaseService {
     });
   }
 
+  /*
   surveyResponse(responseId: number) {
+    console.log("SURVEY RESPONSE", responseId);
     return this.surveyResponseRepo
       .createQueryBuilder("surveyResponse")
       .innerJoinAndSelect("surveyResponse.survey", "survey")
@@ -103,6 +105,20 @@ export class SurveyService extends BaseService {
         responseId
       })
       .getOne();
+  }
+   */
+
+  surveyResponse(id: number) {
+    return this.surveyResponseRepo.findOne(id);
+  }
+
+  async findItemResponse(surveyItem: SurveyItem, responseId: number) {
+    const rtn = await this.surveyItemResponseRepo.findOne({
+      surveyItemId: surveyItem.id,
+      surveyResponseId: responseId
+    });
+    console.log("RTN", rtn);
+    return rtn;
   }
 
   findSurveyByQualtricsId(qualtricsId: string) {

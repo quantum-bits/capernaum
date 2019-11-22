@@ -30,7 +30,7 @@
       <v-col>
         <div v-if="selectedResponse">
           <div v-if="responseDetails">
-            <h4>Details</h4>
+            <h4>Details ({{ responseDetails.email }})</h4>
             <ol>
               <li
                 v-for="dimension in responseDetails.survey.surveyDimensions"
@@ -42,18 +42,18 @@
                     v-for="surveyIndex in dimension.surveyIndices"
                     :key="surveyIndex.id"
                   >
-                    {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }})
-                    [[{{ meanResponse(surveyIndex.surveyItems) }}]]
-                    <ol>
+                    {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }}) =
+                    {{ meanResponse(surveyIndex.surveyItems) }}
+                    <ul>
                       <li
-                        v-for="item in surveyIndex.surveyItems"
+                        v-for="item in itemsWithResponse(surveyIndex)"
                         :key="item.id"
                       >
                         ({{ item.qualtricsId }} =
-                        {{ item.surveyItemResponses[0].value }})
+                        {{ item.surveyItemResponse.value }})
                         {{ item.qualtricsText }}
                       </li>
-                    </ol>
+                    </ul>
                   </li>
                 </ol>
               </li>
@@ -78,6 +78,7 @@ import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ResponseSummary } from "@/graphql/types/ResponseSummary";
 import mean from "lodash/mean";
 import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems as SurveyItem } from "@/graphql/types/ResponseDetails";
+import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices as SurveyIndex } from "@/graphql/types/ResponseDetails";
 
 interface ImportedSurvey {
   id: number;
@@ -107,9 +108,9 @@ export default Vue.extend({
           id: this.selectedResponse
         };
       },
-
-      update: data => data.surveyResponse,
-
+      update(data) {
+        return data.surveyResponse;
+      },
       skip() {
         return !this.selectedResponse;
       }
@@ -149,8 +150,14 @@ export default Vue.extend({
   methods: {
     meanResponse(surveyItems: SurveyItem[]) {
       return mean(
-        surveyItems.map(item => item.surveyItemResponses[0].value)
+        surveyItems
+          .filter(item => item.surveyItemResponse)
+          .map(item => item.surveyItemResponse.value)
       ).toPrecision(3);
+    },
+
+    itemsWithResponse(index: SurveyIndex) {
+      return index.surveyItems.filter(item => item.surveyItemResponse);
     },
 
     showDetails(item: any) {
@@ -159,7 +166,6 @@ export default Vue.extend({
 
     async fetchFromQualtrics() {
       try {
-        console.log("IMPORT RESPONSES", this.selectedQualtricsId);
         // Import all responses for one survey from the Qualtrics API.
         await this.$apollo.mutate({
           mutation: IMPORT_SURVEY_RESPONSES,
@@ -173,9 +179,7 @@ export default Vue.extend({
         const queryResult = await this.$apollo.query<ResponseSummary>({
           query: RESPONSE_SUMMARY_QUERY
         });
-        console.log("QR", queryResult);
         const responseSummary = queryResult.data;
-        console.log("responseSummary", responseSummary);
         this.responseSummary = responseSummary;
       } catch (err) {
         throw err;

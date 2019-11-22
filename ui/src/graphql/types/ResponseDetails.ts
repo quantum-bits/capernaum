@@ -15,23 +15,15 @@ export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIn
 }
 
 export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_predictionTableEntries {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
   practice: ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_predictionTableEntries_practice;
 }
 
-export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems_surveyItemResponses {
+export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems_surveyItemResponse {
   value: number;
   label: string;
 }
 
 export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
   /**
    * Qualtrics identifier for this question
    */
@@ -40,14 +32,10 @@ export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIn
    * Text of this question from Qualtrics
    */
   qualtricsText: string;
-  surveyItemResponses: ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems_surveyItemResponses[];
+  surveyItemResponse: ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems_surveyItemResponse | null;
 }
 
 export interface ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
   /**
    * Title of this index
    */
@@ -81,7 +69,13 @@ export interface ResponseDetails_surveyResponse_survey {
 }
 
 export interface ResponseDetails_surveyResponse {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  email: string;
   progress: number;
+  qualtricsResponseId: string;
   survey: ResponseDetails_surveyResponse_survey;
 }
 
