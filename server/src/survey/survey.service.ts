@@ -112,13 +112,11 @@ export class SurveyService extends BaseService {
     return this.surveyResponseRepo.findOne(id);
   }
 
-  async findItemResponse(surveyItem: SurveyItem, responseId: number) {
-    const rtn = await this.surveyItemResponseRepo.findOne({
+  findItemResponse(surveyItem: SurveyItem, responseId: number) {
+    return this.surveyItemResponseRepo.findOne({
       surveyItemId: surveyItem.id,
       surveyResponseId: responseId
     });
-    console.log("RTN", rtn);
-    return rtn;
   }
 
   findSurveyByQualtricsId(qualtricsId: string) {

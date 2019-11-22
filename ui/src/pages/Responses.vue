@@ -43,7 +43,7 @@
                     :key="surveyIndex.id"
                   >
                     {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }}) =
-                    {{ meanResponse(surveyIndex.surveyItems) }}
+                    {{ meanResponse(surveyIndex) }}
                     <ul>
                       <li
                         v-for="item in itemsWithResponse(surveyIndex)"
@@ -148,11 +148,10 @@ export default Vue.extend({
   },
 
   methods: {
-    meanResponse(surveyItems: SurveyItem[]) {
+    meanResponse(surveyIndex: SurveyIndex) {
+      const validItems = this.itemsWithResponse(surveyIndex);
       return mean(
-        surveyItems
-          .filter(item => item.surveyItemResponse)
-          .map(item => item.surveyItemResponse.value)
+        validItems.map(item => item.surveyItemResponse!.value)
       ).toPrecision(3);
     },
 
