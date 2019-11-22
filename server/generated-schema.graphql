@@ -408,6 +408,7 @@ type SurveyItem {
 
   """Text of this question from Qualtrics"""
   qualtricsText: String!
+  surveyItemResponse(responseId: Int!): SurveyItemResponse
 }
 
 input SurveyItemCreateInput {

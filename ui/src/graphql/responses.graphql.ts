@@ -20,13 +20,34 @@ export const RESPONSE_SUMMARY_QUERY = gql`
 export const ONE_RESPONSE_DETAIL_QUERY = gql`
   query ResponseDetails($id: Int!) {
     surveyResponse(id: $id) {
-      surveyItemResponses {
-        surveyItem {
-          qualtricsId
-          qualtricsText
+      id
+      email
+      progress
+      qualtricsResponseId
+      survey {
+        id
+        surveyDimensions {
+          id
+          title
+          surveyIndices {
+            title
+            abbreviation
+            predictionTableEntries {
+              practice {
+                id
+                title
+              }
+            }
+            surveyItems {
+              qualtricsId
+              qualtricsText
+              surveyItemResponse(responseId: $id) {
+                value
+                label
+              }
+            }
+          }
         }
-        label
-        value
       }
     }
   }

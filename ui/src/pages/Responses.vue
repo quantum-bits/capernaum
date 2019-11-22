@@ -29,13 +29,35 @@
     <v-row>
       <v-col>
         <div v-if="selectedResponse">
-          <div v-if="responseDetails.length">
-            <h4>Details ({{ responseDetails.length }} responses)</h4>
-            <v-data-table
-              :headers="detailHeaders"
-              :items="responseDetails"
-              class="elevation-1"
-            />
+          <div v-if="responseDetails">
+            <h4>Details ({{ responseDetails.email }})</h4>
+            <ol>
+              <li
+                v-for="dimension in responseDetails.survey.surveyDimensions"
+                :key="dimension.id"
+              >
+                {{ dimension.title }}
+                <ol>
+                  <li
+                    v-for="surveyIndex in dimension.surveyIndices"
+                    :key="surveyIndex.id"
+                  >
+                    {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }}) =
+                    {{ meanResponse(surveyIndex.surveyItems) }}
+                    <ul>
+                      <li
+                        v-for="item in itemsWithResponse(surveyIndex)"
+                        :key="item.id"
+                      >
+                        ({{ item.qualtricsId }} =
+                        {{ item.surveyItemResponse.value }})
+                        {{ item.qualtricsText }}
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </li>
+            </ol>
           </div>
           <p v-else>This person submitted no responses.</p>
         </div>
@@ -48,12 +70,15 @@
 <script lang="ts">
 import Vue from "vue";
 import {
+  IMPORT_SURVEY_RESPONSES,
   ONE_RESPONSE_DETAIL_QUERY,
-  RESPONSE_SUMMARY_QUERY,
-  IMPORT_SURVEY_RESPONSES
+  RESPONSE_SUMMARY_QUERY
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ResponseSummary } from "@/graphql/types/ResponseSummary";
+import mean from "lodash/mean";
+import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems as SurveyItem } from "@/graphql/types/ResponseDetails";
+import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices as SurveyIndex } from "@/graphql/types/ResponseDetails";
 
 interface ImportedSurvey {
   id: number;
@@ -83,7 +108,9 @@ export default Vue.extend({
           id: this.selectedResponse
         };
       },
-      update: data => data.surveyResponse.surveyItemResponses,
+      update(data) {
+        return data.surveyResponse;
+      },
       skip() {
         return !this.selectedResponse;
       }
@@ -107,13 +134,7 @@ export default Vue.extend({
       ],
 
       selectedResponse: null,
-      responseDetails: [],
-      detailHeaders: [
-        { text: "ID", value: "surveyItem.qualtricsId" },
-        { text: "Text", value: "surveyItem.qualtricsText" },
-        { text: "Choice", value: "value" },
-        { text: "Response", value: "label" }
-      ]
+      responseDetails: null
     };
   },
 
@@ -127,13 +148,24 @@ export default Vue.extend({
   },
 
   methods: {
+    meanResponse(surveyItems: SurveyItem[]) {
+      return mean(
+        surveyItems
+          .filter(item => item.surveyItemResponse)
+          .map(item => item.surveyItemResponse.value)
+      ).toPrecision(3);
+    },
+
+    itemsWithResponse(index: SurveyIndex) {
+      return index.surveyItems.filter(item => item.surveyItemResponse);
+    },
+
     showDetails(item: any) {
       this.selectedResponse = item.id;
     },
 
     async fetchFromQualtrics() {
       try {
-        console.log("IMPORT RESPONSES", this.selectedQualtricsId);
         // Import all responses for one survey from the Qualtrics API.
         await this.$apollo.mutate({
           mutation: IMPORT_SURVEY_RESPONSES,
@@ -147,9 +179,7 @@ export default Vue.extend({
         const queryResult = await this.$apollo.query<ResponseSummary>({
           query: RESPONSE_SUMMARY_QUERY
         });
-        console.log("QR", queryResult);
         const responseSummary = queryResult.data;
-        console.log("responseSummary", responseSummary);
         this.responseSummary = responseSummary;
       } catch (err) {
         throw err;

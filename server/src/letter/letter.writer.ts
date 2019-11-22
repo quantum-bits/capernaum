@@ -31,54 +31,13 @@ export default class LetterWriter {
     this.environment = new Environment(loader, configuration);
   }
 
-  private tab(n: number, msge: string) {
-    return "  ".repeat(n) + msge;
-  }
-
-  private dumpSurveyResponse(surveyResponse: SurveyResponse): void {
-    for (let dim of surveyResponse.survey.surveyDimensions) {
-      console.log(`DIM (${dim.id}) ${dim.title}`);
-
-      for (let index of dim.surveyIndices) {
-        console.log(
-          this.tab(
-            1,
-            `IDX (${index.id}), ${index.title} => ${index.meanResponse()}`
-          )
-        );
-
-        for (let pte of index.predictionTableEntries) {
-          console.log(this.tab(2, `PTE (${pte.id}) ${pte.practice.title}`));
-        }
-
-        for (let item of index.surveyItems) {
-          console.log(
-            this.tab(
-              3,
-              `ITEM (${item.id}-${item.qualtricsId}) ${item.qualtricsText}`
-            )
-          );
-
-          for (let response of item.surveyItemResponses) {
-            console.log(
-              this.tab(
-                4,
-                `RESP (${response.id}) ${response.label}, ${response.value}`
-              )
-            );
-          }
-        }
-      }
-    }
-  }
-
   render(
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
     // console.log("LETTER", JSON.stringify(letter, null, 2));
     // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
-    this.dumpSurveyResponse(surveyResponse);
+    surveyResponse.dump();
 
     return new Promise((resolve, reject) => {
       // Validate element types.

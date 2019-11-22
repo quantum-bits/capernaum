@@ -179,7 +179,7 @@ export class SurveyResponseResolver {
 
   @Query(returns => SurveyResponse)
   surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.findOne(SurveyResponse, id);
+    return this.surveyService.surveyResponse(id);
   }
 
   @Query(returns => [SurveyResponse])
@@ -306,5 +306,20 @@ export class SurveyItemResolver {
     } else {
       return null;
     }
+  }
+
+  @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
+  resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
+    return this.surveyService.find(SurveyItemResponse, { surveyItem });
+  }
+
+  @ResolveProperty("surveyItemResponse", type => SurveyItemResponse, {
+    nullable: true
+  })
+  resolveSurveyItemResponse(
+    @Parent() surveyItem: SurveyItem,
+    @Args({ name: "responseId", type: () => Int }) responseId: number
+  ) {
+    return this.surveyService.findItemResponse(surveyItem, responseId);
   }
 }
