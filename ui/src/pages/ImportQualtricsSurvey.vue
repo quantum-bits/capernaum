@@ -78,7 +78,7 @@ export default Vue.extend({
       // FIXME: Replace the `as any` hack.
       if ((this.$refs.form as any).validate()) {
         console.log("title is: ", this.title);
-
+        this.valid = false; //disable the submit button so that the user can't accidentally import the survey twice
         this.$apollo
           .mutate({
             mutation: IMPORT_QUALTRICS_SURVEY,
