@@ -5,9 +5,30 @@
         <h1 class="headline mb-5">Letters</h1>
       </v-flex>
       <v-flex xs3 class="text-xs-right">
-        <v-btn color="primary" dark @click="newLetter">
-          New Letter
-        </v-btn>
+        <span v-if="allSurveysHaveLetters">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <span v-on="on">
+                <v-btn color="primary" disabled>
+                  New Letter
+                </v-btn>
+              </span>
+            </template>
+            <span
+              >All imported surveys already have a letter. To create another
+              letter, please import a survey first.</span
+            >
+          </v-tooltip>
+        </span>
+        <span v-else>
+          <v-btn
+            color="primary"
+            :disabled="allSurveysHaveLetters"
+            @click="newLetter"
+          >
+            New Letter
+          </v-btn>
+        </span>
       </v-flex>
       <v-flex xs12>
         <v-data-table :headers="headers" :items="letters" class="elevation-1">
@@ -87,8 +108,11 @@ import {
   DELETE_LETTER_MUTATION
 } from "@/graphql/letters.graphql";
 
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
+import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 
 @Component({
   apollo: {
@@ -98,6 +122,21 @@ import { Letters, Letters_letters } from "@/graphql/types/Letters";
         console.log("letter data: ", letters.letters);
 
         return letters.letters;
+      },
+      fetchPolicy: "network-only"
+    },
+    surveys: {
+      query: ALL_SURVEYS_QUERY,
+      update(data) {
+        console.log("inside update: ", data);
+        this.allSurveysHaveLetters = true;
+        data.surveys.forEach((survey: Survey) => {
+          if (survey.letters.length === 0) {
+            this.allSurveysHaveLetters = false;
+          }
+        });
+
+        return data.surveys;
       },
       fetchPolicy: "network-only"
     }
@@ -120,6 +159,8 @@ export default class LettersPage extends Vue {
   ];
 
   letterData: Letters_letters[] = [];
+  surveys: Survey[] = [];
+  allSurveysHaveLetters = false;
 
   get letters() {
     return this.letterData.map((letter: Letters_letters) => ({
@@ -150,6 +191,7 @@ export default class LettersPage extends Vue {
       .then(({ data }) => {
         console.log("letter successfully deleted!", data);
         this.refreshLetterData();
+        this.refreshSurveyData();
       })
       .catch(error => {
         console.log(
@@ -180,6 +222,12 @@ export default class LettersPage extends Vue {
 
   refreshLetterData() {
     this.$apollo.queries.letterData.refetch().then(({ data }) => {
+      console.log("item(s) refetched!", data);
+    });
+  }
+
+  refreshSurveyData() {
+    this.$apollo.queries.surveys.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });
   }
