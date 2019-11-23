@@ -55,14 +55,9 @@ export class LetterElement extends AbstractEntity {
   @Field({ nullable: true })
   textDelta?: string;
 
-  // @Column({ type: "int", nullable: true })
-  // @Field(type => Int, { nullable: true })
-  // imageId?: number;
-
   @Column("int", { nullable: true }) imageId?: number;
   @Field(type => Image, { nullable: true })
   @OneToOne(type => Image, { nullable: true })
-  @JoinColumn()
   image?: Image;
 
   @Column("int")

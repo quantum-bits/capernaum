@@ -141,7 +141,6 @@ export class LetterElementResolver {
     nullable: true
   })
   resolveSurveyDimension(@Parent() letterElement: LetterElement) {
-    console.log("LETTER ELT", letterElement);
     if (letterElement.surveyDimensionId) {
       return this.letterService.findOneOrFail(
         SurveyDimension,
