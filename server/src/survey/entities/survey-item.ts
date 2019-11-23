@@ -40,6 +40,13 @@ export class SurveyItem extends AbstractEntity {
   @Column()
   @Field({ description: "Text of this question from Qualtrics" })
   qualtricsText: string;
+
+  public surveyItemResponse(surveyResponseId: number) {
+    return this.surveyItemResponses.find(
+      surveyItemResponse =>
+        surveyItemResponse.surveyResponseId === surveyResponseId
+    );
+  }
 }
 
 @InputType()

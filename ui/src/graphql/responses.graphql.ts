@@ -29,6 +29,7 @@ export const ONE_RESPONSE_DETAIL_QUERY = gql`
         surveyDimensions {
           id
           title
+          useForPredictions
           surveyIndices {
             title
             abbreviation

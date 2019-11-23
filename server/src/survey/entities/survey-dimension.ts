@@ -1,14 +1,9 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { ChartData, ChartEntry } from "../survey.types";
 
 @Entity()
 @ObjectType({
@@ -40,6 +35,19 @@ export class SurveyDimension extends AbstractEntity {
     description: "Sequence number; dimension are displayed in this order."
   })
   sequence: number;
+
+  public chartData(responseId: number): ChartData {
+    const chartEntries = this.surveyIndices.map(surveyIndex => {
+      return {
+        title: surveyIndex.title,
+        value: surveyIndex.meanResponse(responseId)
+      };
+    });
+    return {
+      title: this.title,
+      entries: chartEntries
+    };
+  }
 }
 
 @InputType({

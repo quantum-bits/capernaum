@@ -31,9 +31,17 @@ export class SurveyIndex extends AbstractEntity {
   @Field({ description: "Title of this index" })
   title: string;
 
-  public meanResponse() {
+  public surveyItemResponses(surveyResponseId: number) {
+    return this.surveyItems.map(surveyItem =>
+      surveyItem.surveyItemResponse(surveyResponseId)
+    );
+  }
+
+  public meanResponse(surveyResponseId: number) {
     return mean(
-      this.surveyItems.map(item => item.surveyItemResponses[0].value)
+      this.surveyItemResponses(surveyResponseId).map(
+        surveyItemResponse => surveyItemResponse.value
+      )
     );
   }
 }

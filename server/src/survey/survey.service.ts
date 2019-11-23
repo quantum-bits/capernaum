@@ -89,9 +89,7 @@ export class SurveyService extends BaseService {
     });
   }
 
-  /*
-  surveyResponse(responseId: number) {
-    console.log("SURVEY RESPONSE", responseId);
+  surveyResponseComplete(responseId: number) {
     return this.surveyResponseRepo
       .createQueryBuilder("surveyResponse")
       .innerJoinAndSelect("surveyResponse.survey", "survey")
@@ -106,7 +104,6 @@ export class SurveyService extends BaseService {
       })
       .getOne();
   }
-   */
 
   surveyResponse(id: number) {
     return this.surveyResponseRepo.findOne(id);

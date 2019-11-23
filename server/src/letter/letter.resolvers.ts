@@ -84,7 +84,7 @@ export class LetterResolver {
     @Args("letterWriterInput") letterWriterInput: LetterWriterInput
   ) {
     const letter = await this.letterService.letter(letterWriterInput.letterId);
-    const surveyResponse = await this.surveyService.surveyResponse(
+    const surveyResponse = await this.surveyService.surveyResponseComplete(
       letterWriterInput.surveyResponseId
     );
 
