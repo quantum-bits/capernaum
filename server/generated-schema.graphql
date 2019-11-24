@@ -165,6 +165,8 @@ type Mutation {
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
+  updateImage(updateInput: ImageUpdateInput!): Image!
+  deleteImage(id: Int!): Int!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
   replacePredictionTableEntries(replaceInput: PredictionTableEntryReplaceInput!): [PredictionTableEntry!]!
 
@@ -172,8 +174,6 @@ type Mutation {
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
-  updateImage(updateInput: ImageUpdateInput!): Image!
-  deleteImage(id: Int!): Int!
 }
 
 input PartialPredictionTableEntry {
@@ -258,10 +258,10 @@ type Query {
   surveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
-  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   images: [Image!]!
   image(id: Int!): Image!
+  scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 """Scripture engagement practice"""

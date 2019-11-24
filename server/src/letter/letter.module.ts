@@ -9,7 +9,6 @@ import {
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
 import { SurveyModule } from "../survey/survey.module";
-import { FileService } from "../image/file.service";
 import { ImageModule } from "../image/image.module";
 
 @Module({
@@ -20,7 +19,8 @@ import { ImageModule } from "../image/image.module";
       LetterElementType,
       PredictionTableEntry
     ]),
-    SurveyModule
+    SurveyModule,
+    ImageModule
   ],
   providers: [
     LetterService,

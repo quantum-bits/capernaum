@@ -1,12 +1,10 @@
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { LetterModule } from "./letter/letter.module";
-import { QualtricsModule } from "./qualtrics/qualtrics.module";
-import { SurveyModule } from "./survey/survey.module";
 import typeORMConfig from "./typeorm-config";
+import { LetterModule } from "./letter/letter.module";
+import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
-import { ImageModule } from "./image/image.module";
 
 @Module({
   imports: [
@@ -19,10 +17,8 @@ import { ImageModule } from "./image/image.module";
       autoSchemaFile: "generated-schema.graphql"
     }),
     LetterModule,
-    QualtricsModule,
     SurveyModule,
-    PredictionModule,
-    ImageModule
+    PredictionModule
   ]
 })
 export class AppModule {}

@@ -8,9 +8,12 @@ import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { Image } from "../../image/entities";
 import * as assert from "assert";
 import { formatLaTeX, LineBuffer } from "../letter.writer";
+import { Inject, Injectable } from "@nestjs/common";
+import { FileService } from "../../image/file.service";
 
 @Entity()
 @ObjectType()
+@Injectable()
 export class LetterElement extends AbstractEntity {
   @Field(type => Int)
   @Column("int")
@@ -42,7 +45,10 @@ export class LetterElement extends AbstractEntity {
   @Field(type => SurveyDimension, { nullable: true })
   surveyDimension?: SurveyDimension;
 
+  @Inject(FileService) private readonly fileService: FileService;
+
   renderImage() {
+    console.log("FILE SERVICE", this.fileService);
     assert.strictEqual(this.letterElementType.key, "image");
     console.log("RENDER IMAGE");
     return `IMAGE '${this.image.fileName()}'`;
