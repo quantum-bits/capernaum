@@ -26,8 +26,7 @@ export class LetterService extends BaseService {
       relations: [
         "letterElements",
         "letterElements.letterElementType",
-        "tableEntries",
-        "tableEntries.practice"
+        "letterElements.image"
       ]
     });
   }

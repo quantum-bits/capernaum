@@ -8,6 +8,16 @@ type AbstractEntity {
   id: Int!
 }
 
+type ChartData {
+  title: String!
+  entries: [ChartEntry!]!
+}
+
+type ChartEntry {
+  title: String!
+  value: Int!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
@@ -23,6 +33,7 @@ type Image {
   created: DateTime!
   updated: DateTime!
   url: String!
+  fullPath: String!
   letterElements: [LetterElement!]!
 }
 
@@ -169,6 +180,18 @@ input PartialPredictionTableEntry {
   surveyIndexId: Int!
   practiceId: Int!
   sequence: Int!
+}
+
+type Prediction {
+  practice: ScriptureEngagementPractice!
+  details: [PredictionDetails!]!
+  predict: Boolean!
+}
+
+type PredictionDetails {
+  title: String!
+  abbreviation: String!
+  meanResponse: Float!
 }
 
 """One entry in a prediction table"""

@@ -4,45 +4,10 @@ import { AbstractEntity } from "../../shared/abstract-entity";
 import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
-import * as assert from "assert";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { Image } from "../../image/entities";
-
-function formatLaTeX(command: string, content: string) {
-  return `\\${command}{${content}}`;
-}
-
-class LineBuffer {
-  constructor(private allLines = [], private currentLine = "") {}
-
-  flushCurrentLine() {
-    this.allLines.push(this.currentLine);
-    this.currentLine = "";
-  }
-
-  appendToCurrentLine(moreChars: string) {
-    this.currentLine += moreChars;
-  }
-
-  wrapCurrentLine(wrapper: string) {
-    this.currentLine = formatLaTeX(wrapper, this.currentLine);
-  }
-
-  unpackMultipleLines(packed: string) {
-    for (let char of packed) {
-      if (char === "\n") {
-        this.flushCurrentLine();
-      } else {
-        this.currentLine += char;
-      }
-    }
-  }
-
-  concatenateLines() {
-    this.flushCurrentLine();
-    return this.allLines.join("\n\n");
-  }
-}
+import * as assert from "assert";
+import { formatLaTeX, LineBuffer } from "../letter.writer";
 
 @Entity()
 @ObjectType()
@@ -58,6 +23,7 @@ export class LetterElement extends AbstractEntity {
   @Column("int", { nullable: true }) imageId?: number;
   @Field(type => Image, { nullable: true })
   @OneToOne(type => Image, { nullable: true })
+  @JoinColumn()
   image?: Image;
 
   @Column("int")
@@ -76,8 +42,15 @@ export class LetterElement extends AbstractEntity {
   @Field(type => SurveyDimension, { nullable: true })
   surveyDimension?: SurveyDimension;
 
-  asLaTeX() {
+  renderImage() {
+    assert.strictEqual(this.letterElementType.key, "image");
+    console.log("RENDER IMAGE");
+    return `IMAGE '${this.image.fileName()}'`;
+  }
+
+  renderBoilerplate() {
     assert.strictEqual(this.letterElementType.key, "boilerplate");
+    console.log("RENDER BOILERPLATE");
 
     const quillDelta = JSON.parse(this.textDelta);
     const lineBuffer = new LineBuffer();

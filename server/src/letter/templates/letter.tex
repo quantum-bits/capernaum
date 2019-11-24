@@ -13,7 +13,7 @@
 
 {% for elt in letter.letterElements %}
   {% if elt.letterElementType.key == "boilerplate" %}
-    <$ elt.asLaTeX() $>
+    <$ elt.renderBoilerplate() $>
   {% elif elt.letterElementType.key == "boolean-calculation-results" %}
     {% include "se-results.tex" %}
   {% elif elt.letterElementType.key == "footer" %}
@@ -22,8 +22,10 @@
     {% include "header.tex" %}
   {% elif elt.letterElementType.key == "chart" %}
     {% include "chart.tex" %}
+  {% elif elt.letterElementType.key == "image" %}
+    IMAGE <$ elt.renderImage() $> END IMAGE
   {% else %}
-    <$ elt $>
+    Don't know how to render <$ elt.letterElementType.key $>.
   {% endif %}
 {% endfor %}
 

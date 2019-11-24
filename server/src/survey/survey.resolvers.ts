@@ -26,7 +26,7 @@ import {
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
-import { WhichItems } from "./survey.types";
+import { ChartData, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
 

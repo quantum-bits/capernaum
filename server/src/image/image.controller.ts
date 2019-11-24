@@ -27,27 +27,18 @@ export class ImageController {
   @Header("Content-Type", "text/plain")
   @UseInterceptors(FileInterceptor("filepondUpload"))
   async process(@UploadedFile() file): Promise<number> {
-    const fileDetails = await this.fileService.saveFile(
-      file.mimetype,
-      file.buffer
-    );
-
-    const result = await this.imageService.createImage(
+    const imageDetails = await this.imageService.createImage(
       file.originalname,
-      file.mimetype,
-      fileDetails.uuid
+      file.mimetype
     );
-
-    return result.id;
+    await this.fileService.saveFile(imageDetails.fileName(), file.buffer);
+    return imageDetails.id;
   }
 
   @Get(":id")
   async getImage(@Res() res, @Param("id") id: number) {
     const imageDetails = await this.imageService.findOne(Image, id);
-    const imagePath = this.fileService.fullPath(
-      imageDetails.uuid,
-      imageDetails.mimeType
-    );
+    const imagePath = this.fileService.fullPath(imageDetails.fileName());
     const options = {
       headers: {
         "Content-Type": imageDetails.mimeType
@@ -63,11 +54,7 @@ export class ImageController {
         const id = parseInt(body.toString());
         const imageDetails = await this.imageService.findOne(Image, id);
 
-        await this.fileService.deleteFile(
-          imageDetails.uuid,
-          imageDetails.mimeType
-        );
-
+        await this.fileService.deleteFile(imageDetails.fileName());
         await this.imageService.delete(Image, id);
       })
       .catch(err => {

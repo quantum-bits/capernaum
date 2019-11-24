@@ -4,6 +4,7 @@ import { exec } from "child_process";
 import { writeFile } from "fs";
 import { format, join } from "path";
 import { SurveyResponse } from "../survey/entities";
+import * as assert from "assert";
 
 const WORKING_DIR = "/Users/tom/Scratch";
 
@@ -15,6 +16,42 @@ const VALID_ELEMENT_TYPES = [
   "chart",
   "image"
 ];
+
+export function formatLaTeX(command: string, content: string) {
+  return `\\${command}{${content}}`;
+}
+
+export class LineBuffer {
+  constructor(private allLines = [], private currentLine = "") {}
+
+  flushCurrentLine() {
+    this.allLines.push(this.currentLine);
+    this.currentLine = "";
+  }
+
+  appendToCurrentLine(moreChars: string) {
+    this.currentLine += moreChars;
+  }
+
+  wrapCurrentLine(wrapper: string) {
+    this.currentLine = formatLaTeX(wrapper, this.currentLine);
+  }
+
+  unpackMultipleLines(packed: string) {
+    for (let char of packed) {
+      if (char === "\n") {
+        this.flushCurrentLine();
+      } else {
+        this.currentLine += char;
+      }
+    }
+  }
+
+  concatenateLines() {
+    this.flushCurrentLine();
+    return this.allLines.join("\n\n");
+  }
+}
 
 export default class LetterWriter {
   private environment: Environment;
@@ -35,7 +72,7 @@ export default class LetterWriter {
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    // console.log("LETTER", JSON.stringify(letter, null, 2));
+    console.log("LETTER", JSON.stringify(letter, null, 2));
     // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
     surveyResponse.dump();
 

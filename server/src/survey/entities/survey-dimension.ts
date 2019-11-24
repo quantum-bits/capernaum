@@ -43,6 +43,7 @@ export class SurveyDimension extends AbstractEntity {
         value: surveyIndex.meanResponse(responseId)
       };
     });
+
     return {
       title: this.title,
       entries: chartEntries

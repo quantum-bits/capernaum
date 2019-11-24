@@ -39,13 +39,18 @@ export class ImageResolver {
   @Mutation(returns => Int)
   async deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
     const imageDetails = await this.imageService.findOne(Image, id);
-    await this.fileService.deleteFile(imageDetails.uuid, imageDetails.mimeType);
+    await this.fileService.deleteFile(imageDetails.fileName());
     return this.imageService.delete(Image, id);
   }
 
   @ResolveProperty(returns => String)
-  url(@Parent() image) {
+  url(@Parent() image: Image) {
     return `http://localhost:3000/images/${image.id}`;
+  }
+
+  @ResolveProperty(returns => String)
+  fullPath(@Parent() image: Image) {
+    return this.fileService.fullPath(image.fileName());
   }
 
   @ResolveProperty("letterElements", type => [LetterElement])

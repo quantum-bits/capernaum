@@ -1,12 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { join, normalize } from "path";
 import { access, close, open, unlink, write } from "fs";
-import { v4 } from "uuid";
 
 interface FileDetails {
+  fileName: string;
   fullPath: string;
-  uuid: string;
-  mimeType: string;
   fileSize: number;
 }
 
@@ -26,21 +24,12 @@ export class FileService {
     });
   }
 
-  private static extensionFromMimeType(mimeType: string) {
-    return mimeType.replace(/\//g, ".");
+  fullPath(fileName: string) {
+    return join(this.fileBaseDir, fileName);
   }
 
-  private static fileName(uuid: string, mimeType: string) {
-    return `${uuid}.${FileService.extensionFromMimeType(mimeType)}`;
-  }
-
-  fullPath(uuid: string, mimeType: string) {
-    return join(this.fileBaseDir, FileService.fileName(uuid, mimeType));
-  }
-
-  async saveFile(mimeType: string, buffer: Buffer): Promise<FileDetails> {
-    const uuid = v4();
-    const fullPath = this.fullPath(uuid, mimeType);
+  async saveFile(fileName: string, buffer: Buffer): Promise<FileDetails> {
+    const fullPath = this.fullPath(fileName);
 
     return new Promise((resolve, reject) => {
       let fileSize = NaN;
@@ -63,9 +52,8 @@ export class FileService {
           }
 
           resolve({
+            fileName,
             fullPath,
-            uuid,
-            mimeType,
             fileSize
           });
         });
@@ -73,8 +61,8 @@ export class FileService {
     });
   }
 
-  deleteFile(uuid: string, mimeType: string) {
-    const fullPath = this.fullPath(uuid, mimeType);
+  deleteFile(fileName: string) {
+    const fullPath = this.fullPath(fileName);
 
     return new Promise((resolve, reject) => {
       unlink(fullPath, err => {

@@ -1,32 +1,51 @@
-// Used to filter which survey items are retrieved for a survey.
-
 import { ScriptureEngagementPractice } from "../prediction/entities";
-import { SurveyIndex } from "./entities";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 
+// Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
   All,
   WithIndex,
   WithoutIndex
 }
 
-export interface ChartEntry {
+@ObjectType()
+export class ChartEntry {
+  @Field()
   title: string;
+
+  @Field(type => Int)
   value: number;
 }
 
-export interface ChartData {
+@ObjectType()
+export class ChartData {
+  @Field()
   title: string;
+
+  @Field(type => [ChartEntry])
   entries: ChartEntry[];
 }
 
-export interface PredictionDetails {
+@ObjectType()
+export class PredictionDetails {
+  @Field()
   title: string;
+
+  @Field()
   abbreviation: string;
+
+  @Field(type => Float)
   meanResponse: number;
 }
 
-export interface Prediction {
+@ObjectType()
+export class Prediction {
+  @Field(type => ScriptureEngagementPractice)
   practice: ScriptureEngagementPractice;
+
+  @Field(type => [PredictionDetails])
   details: PredictionDetails[];
+
+  @Field()
   predict: boolean;
 }

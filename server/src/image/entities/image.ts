@@ -28,6 +28,14 @@ export class Image extends AbstractEntity {
   @Field()
   @UpdateDateColumn()
   updated: Date;
+
+  private static extensionFromMimeType(mimeType: string) {
+    return mimeType.replace(/\//g, ".");
+  }
+
+  fileName() {
+    return `${this.uuid}.${Image.extensionFromMimeType(this.mimeType)}`;
+  }
 }
 
 @InputType()
