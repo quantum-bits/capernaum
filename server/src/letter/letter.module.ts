@@ -10,6 +10,8 @@ import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
 import { SurveyModule } from "../survey/survey.module";
 import { ImageModule } from "../image/image.module";
+import LetterWriter from "./letter.writer";
+import { FileModule } from "../file/file.module";
 
 @Module({
   imports: [
@@ -20,13 +22,15 @@ import { ImageModule } from "../image/image.module";
       PredictionTableEntry
     ]),
     SurveyModule,
-    ImageModule
+    ImageModule,
+    FileModule
   ],
   providers: [
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    LetterElementResolver
+    LetterElementResolver,
+    LetterWriter
   ]
 })
 export class LetterModule {}

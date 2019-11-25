@@ -11,7 +11,7 @@ import {
   UseInterceptors
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { FileService } from "./file.service";
+import { FileService } from "../file/file.service";
 import { ImageService } from "./image.service";
 import { Image } from "./entities";
 import getRawBody from "raw-body";

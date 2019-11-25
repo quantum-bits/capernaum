@@ -1,9 +1,11 @@
 import { ConfigureOptions, Environment, FileSystemLoader } from "nunjucks";
-import { Letter, LetterWriterOutput } from "./entities";
+import { Letter, LetterElement, LetterWriterOutput } from "./entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
 import { format, join } from "path";
 import { SurveyResponse } from "../survey/entities";
+import { FileService } from "../file/file.service";
+import { Injectable } from "@nestjs/common";
 import * as assert from "assert";
 
 const WORKING_DIR = "/Users/tom/Scratch";
@@ -17,8 +19,20 @@ const VALID_ELEMENT_TYPES = [
   "image"
 ];
 
-export function formatLaTeX(command: string, content: string) {
-  return `\\${command}{${content}}`;
+export function formatLaTeX(
+  command: string,
+  content: string,
+  options?: string
+) {
+  const rtn = [];
+  rtn.push(`\\${command}`);
+  if (options) {
+    rtn.push(`[${options}]`);
+  }
+  rtn.push(`{${content}}`);
+  const foo = rtn.join("");
+  console.log("FOO", foo);
+  return foo;
 }
 
 export class LineBuffer {
@@ -53,10 +67,11 @@ export class LineBuffer {
   }
 }
 
+@Injectable()
 export default class LetterWriter {
   private environment: Environment;
 
-  constructor() {
+  constructor(private readonly fileService: FileService) {
     const loader = new FileSystemLoader("./src/letter/templates");
     const configuration: ConfigureOptions = {
       autoescape: false,
@@ -68,11 +83,73 @@ export default class LetterWriter {
     this.environment = new Environment(loader, configuration);
   }
 
-  render(
+  renderImage(letterElement: LetterElement) {
+    console.log("RENDER IMAGE", letterElement);
+    const fullPath = this.fileService.fullPath(letterElement.image.fileName());
+    console.log("FULL PATH", fullPath);
+    return formatLaTeX("includegraphics", fullPath, "width=\\textwidth");
+  }
+
+  renderBoilerplate(letterElement: LetterElement) {
+    console.log("RENDER BOILERPLATE", letterElement);
+    const quillDelta = JSON.parse(letterElement.textDelta);
+    const lineBuffer = new LineBuffer();
+
+    for (let op of quillDelta.ops) {
+      assert.ok(op.hasOwnProperty("insert"));
+      // console.log(JSON.stringify(op, null, 2));
+
+      if (op.insert === "\n") {
+        // Insert op that is just a newline.
+        assert.ok(op.hasOwnProperty("attributes"));
+        let wrapper = "";
+        if (op.attributes.hasOwnProperty("header")) {
+          if (op.attributes.header === 1) {
+            wrapper = "section";
+          } else if (op.attributes.header === 2) {
+            wrapper = "subsection";
+          } else {
+            throw Error(`Bogus attributes ${op.attributes}`);
+          }
+        }
+        if (op.attributes.hasOwnProperty("list")) {
+          wrapper = "item";
+        }
+        lineBuffer.wrapCurrentLine(wrapper);
+        lineBuffer.flushCurrentLine();
+      } else {
+        // Insert op that is not just a newline.
+        if (op.hasOwnProperty("attributes")) {
+          // More than a newline and has attributes.
+          for (let attribute of Object.keys(op.attributes)) {
+            switch (attribute) {
+              case "bold":
+                lineBuffer.appendToCurrentLine(
+                  formatLaTeX("textbf", op.insert)
+                );
+                break;
+              case "italic":
+                lineBuffer.appendToCurrentLine(formatLaTeX("emph", op.insert));
+                break;
+              default:
+                throw Error(`Unknown attribute ${attribute}`);
+            }
+          }
+        } else {
+          // More than a newline and don't have attributes.
+          lineBuffer.unpackMultipleLines(op.insert);
+        }
+      }
+    }
+
+    return lineBuffer.concatenateLines();
+  }
+
+  renderLetter(
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    console.log("LETTER", JSON.stringify(letter, null, 2));
+    // console.log("LETTER", JSON.stringify(letter, null, 2));
     // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
     surveyResponse.dump();
 
@@ -94,6 +171,7 @@ export default class LetterWriter {
       const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
 
       const result = this.environment.render("letter.tex", {
+        writer: this,
         letter,
         templateDir
       });

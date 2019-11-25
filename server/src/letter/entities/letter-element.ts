@@ -6,14 +6,9 @@ import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { Image } from "../../image/entities";
-import * as assert from "assert";
-import { formatLaTeX, LineBuffer } from "../letter.writer";
-import { Inject, Injectable } from "@nestjs/common";
-import { FileService } from "../../image/file.service";
 
 @Entity()
 @ObjectType()
-@Injectable()
 export class LetterElement extends AbstractEntity {
   @Field(type => Int)
   @Column("int")
@@ -44,72 +39,6 @@ export class LetterElement extends AbstractEntity {
   @ManyToOne(type => SurveyDimension, { nullable: true })
   @Field(type => SurveyDimension, { nullable: true })
   surveyDimension?: SurveyDimension;
-
-  @Inject(FileService) private readonly fileService: FileService;
-
-  renderImage() {
-    console.log("FILE SERVICE", this.fileService);
-    assert.strictEqual(this.letterElementType.key, "image");
-    console.log("RENDER IMAGE");
-    return `IMAGE '${this.image.fileName()}'`;
-  }
-
-  renderBoilerplate() {
-    assert.strictEqual(this.letterElementType.key, "boilerplate");
-    console.log("RENDER BOILERPLATE");
-
-    const quillDelta = JSON.parse(this.textDelta);
-    const lineBuffer = new LineBuffer();
-
-    for (let op of quillDelta.ops) {
-      assert.ok(op.hasOwnProperty("insert"));
-      // console.log(JSON.stringify(op, null, 2));
-
-      if (op.insert === "\n") {
-        // Insert op that is just a newline.
-        assert.ok(op.hasOwnProperty("attributes"));
-        let wrapper = "";
-        if (op.attributes.hasOwnProperty("header")) {
-          if (op.attributes.header === 1) {
-            wrapper = "section";
-          } else if (op.attributes.header === 2) {
-            wrapper = "subsection";
-          } else {
-            throw Error(`Bogus attributes ${op.attributes}`);
-          }
-        }
-        if (op.attributes.hasOwnProperty("list")) {
-          wrapper = "item";
-        }
-        lineBuffer.wrapCurrentLine(wrapper);
-        lineBuffer.flushCurrentLine();
-      } else {
-        // Insert op that is not just a newline.
-        if (op.hasOwnProperty("attributes")) {
-          // More than a newline and has attributes.
-          for (let attribute of Object.keys(op.attributes)) {
-            switch (attribute) {
-              case "bold":
-                lineBuffer.appendToCurrentLine(
-                  formatLaTeX("textbf", op.insert)
-                );
-                break;
-              case "italic":
-                lineBuffer.appendToCurrentLine(formatLaTeX("emph", op.insert));
-                break;
-              default:
-                throw Error(`Unknown attribute ${attribute}`);
-            }
-          }
-        } else {
-          // More than a newline and don't have attributes.
-          lineBuffer.unpackMultipleLines(op.insert);
-        }
-      }
-    }
-
-    return lineBuffer.concatenateLines();
-  }
 }
 
 @InputType()

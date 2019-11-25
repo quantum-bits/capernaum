@@ -32,7 +32,8 @@ import { Image } from "../image/entities";
 export class LetterResolver {
   constructor(
     private readonly letterService: LetterService,
-    private readonly surveyService: SurveyService
+    private readonly surveyService: SurveyService,
+    private readonly letterWriter: LetterWriter
   ) {}
 
   @Mutation(returns => Letter)
@@ -88,8 +89,7 @@ export class LetterResolver {
       letterWriterInput.surveyResponseId
     );
 
-    const letterWriter = new LetterWriter();
-    const result = await letterWriter.render(letter, surveyResponse);
+    const result = await this.letterWriter.renderLetter(letter, surveyResponse);
     return result;
   }
 

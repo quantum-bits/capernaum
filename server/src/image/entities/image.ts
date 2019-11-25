@@ -34,7 +34,7 @@ export class Image extends AbstractEntity {
   }
 
   fileName() {
-    return `${this.uuid}.${Image.extensionFromMimeType(this.mimeType)}`;
+    return `${this.uuid}-${Image.extensionFromMimeType(this.mimeType)}`;
   }
 }
 

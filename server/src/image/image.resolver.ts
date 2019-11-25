@@ -9,7 +9,7 @@ import {
 import { ImageService } from "./image.service";
 import { Int } from "type-graphql";
 import { Image, ImageUpdateInput } from "./entities";
-import { FileService } from "./file.service";
+import { FileService } from "../file/file.service";
 import { LetterElement } from "../letter/entities";
 
 @Resolver(of => Image)
