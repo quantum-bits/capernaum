@@ -29,6 +29,7 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsModDate
       letters {
         id
+        title
       }
     }
   }
@@ -206,6 +207,15 @@ export const DELETE_INDEX = gql`
     deleteSurveyIndex(id: $id) {
       deletedIndexId
       deletedItemIds
+    }
+  }
+`;
+
+export const WRITE_LETTER = gql`
+  mutation WriteLetter($input: LetterWriterInput!) {
+    writeLetter(letterWriterInput: $input) {
+      ok
+      pdfFilePath
     }
   }
 `;

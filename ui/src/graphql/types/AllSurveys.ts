@@ -11,6 +11,7 @@ export interface AllSurveys_surveys_letters {
    * Unique ID for this entity
    */
   id: number;
+  title: string;
 }
 
 export interface AllSurveys_surveys {

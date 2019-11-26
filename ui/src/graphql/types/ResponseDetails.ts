@@ -57,6 +57,10 @@ export interface ResponseDetails_surveyResponse_survey_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
+  /**
+   * Use this dimension in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyIndices: ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices[];
 }
 

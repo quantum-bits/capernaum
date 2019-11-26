@@ -22,7 +22,22 @@
           :items="responseSummary.surveyResponses"
           class="elevation-1"
           @click:row="showDetails"
-        />
+        >
+          <template v-slot:item.letter="{ item }">
+            {{ letterTitle(item) }}
+          </template>
+          <template v-slot:item.date="{ item }">
+            {{ item.endDate | sensibleDate }}
+          </template>
+          <template v-slot:item.action="{ item }">
+            <v-icon class="mr-2" @click="generatePDF(item)">
+              mdi-pdf-box
+            </v-icon>
+            <v-icon @click="sendEmail(item)">
+              mdi-email
+            </v-icon>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
 
@@ -75,10 +90,15 @@ import {
   RESPONSE_SUMMARY_QUERY
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { ResponseSummary } from "@/graphql/types/ResponseSummary";
+import {
+  ResponseSummary,
+  ResponseSummary_surveyResponses
+} from "@/graphql/types/ResponseSummary";
 import mean from "lodash/mean";
 import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems as SurveyItem } from "@/graphql/types/ResponseDetails";
 import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices as SurveyIndex } from "@/graphql/types/ResponseDetails";
+import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
+import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 
 interface ImportedSurvey {
   id: number;
@@ -124,13 +144,12 @@ export default Vue.extend({
 
       responseSummary: {} as ResponseSummary,
       masterHeaders: [
+        { text: "Date", value: "date" },
         { text: "Survey", value: "survey.qualtricsName" },
+        { text: "Letter", value: "letter" },
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
-        { text: "Start", value: "startDate" },
-        { text: "End", value: "endDate" },
-        { text: "Duration", value: "duration" },
-        { text: "Finished", value: "finished" }
+        { text: "Action", value: "action" }
       ],
 
       selectedResponse: null,
@@ -148,11 +167,33 @@ export default Vue.extend({
   },
 
   methods: {
+    generatePDF(surveyResponse: ResponseSummary_surveyResponses) {
+      this.$apollo.mutate({
+        mutation: WRITE_LETTER_MUTATION,
+        variables: {
+          letterWriterInput: {
+            letterId: surveyResponse.survey.letters[0].id,
+            surveyResponseId: surveyResponse.id
+          }
+        }
+      });
+    },
+
     meanResponse(surveyIndex: SurveyIndex) {
       const validItems = this.itemsWithResponse(surveyIndex);
       return mean(
         validItems.map(item => item.surveyItemResponse!.value)
       ).toPrecision(3);
+    },
+
+    letterTitle(item: ResponseSummary_surveyResponses) {
+      if (!item.survey.letters) {
+        return "N/A";
+      } else if (item.survey.letters.length !== 1) {
+        return `${item.survey.letters.length} letters?`;
+      } else {
+        return item.survey.letters[0].title;
+      }
     },
 
     itemsWithResponse(index: SurveyIndex) {

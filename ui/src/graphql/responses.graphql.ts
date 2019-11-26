@@ -8,6 +8,11 @@ export const RESPONSE_SUMMARY_QUERY = gql`
       email
       survey {
         qualtricsName
+        letters {
+          id
+          title
+          description
+        }
       }
       startDate
       endDate

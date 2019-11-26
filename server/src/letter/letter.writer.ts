@@ -67,7 +67,7 @@ export default class LetterWriter {
   constructor(private readonly fileService: FileService) {}
 
   renderImage(letterElement: LetterElement) {
-    console.log("RENDER IMAGE", letterElement);
+    // console.log("RENDER IMAGE", letterElement);
     const fullPath = this.fileService.fullPath(letterElement.image.fileName());
     return formatEnvironment(
       "flushleft",
@@ -76,7 +76,7 @@ export default class LetterWriter {
   }
 
   renderBoilerplate(letterElement: LetterElement) {
-    console.log("RENDER BOILERPLATE", letterElement);
+    // console.log("RENDER BOILERPLATE", letterElement);
     const quillDelta = JSON.parse(letterElement.textDelta);
     const lineBuffer = new LineBuffer();
 
@@ -131,7 +131,7 @@ export default class LetterWriter {
   }
 
   renderChart(chartData: ChartData) {
-    console.log("RENDER CHART", chartData);
+    // console.log("RENDER CHART", chartData);
 
     const chart = `
       \\begin{tikzpicture}
@@ -222,12 +222,23 @@ export default class LetterWriter {
     `;
   }
 
+  renderResponseDetails(surveyResponse: SurveyResponse) {
+    return formatEnvironment(
+      "flushright",
+      [
+        "\\scriptsize",
+        formatLaTeX("item", `Survey ID: ${surveyResponse.id}`),
+        formatLaTeX("item", `Email: ${surveyResponse.email}`)
+      ].join("\n")
+    );
+  }
+
   renderLetter(
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    console.log("LETTER", JSON.stringify(letter, null, 2));
-    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+    // console.log("LETTER", JSON.stringify(letter, null, 2));
+    // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
     surveyResponse.dump();
 
     return new Promise((resolve, reject) => {
@@ -265,6 +276,8 @@ export default class LetterWriter {
         }
       }
 
+      renderedElements.push(this.renderResponseDetails(surveyResponse));
+
       // Set up paths.
       const pathObject = {
         dir: WORKING_DIR,
@@ -272,6 +285,7 @@ export default class LetterWriter {
       };
       const texFilePath = format({ ...pathObject, ext: ".tex" });
       const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
+      console.log(`TeX File ${texFilePath}, PDF File ${pdfFilePath}`);
 
       // Create the document.
       const result = this.renderDocument(renderedElements);
@@ -284,7 +298,7 @@ export default class LetterWriter {
 
         // Create the PDF.
         exec(
-          `pdflatex ${texFilePath}`,
+          `lualatex ${texFilePath}`,
           { cwd: WORKING_DIR },
           (err, stdout, stderr) => {
             if (err) {

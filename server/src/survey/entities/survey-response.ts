@@ -118,10 +118,12 @@ export class SurveyResponse extends AbstractEntity {
   }
 
   public dump() {
+    console.log("RESPONSE", this.id);
+
     for (let dim of this.survey.surveyDimensions) {
       console.log(
-        `DIM (${dim.id}) ${dim.title} ${
-          dim.useForPredictions ? "PREDICT" : "DON'T PREDICT"
+        `DIM (${dim.id}) ${dim.title} - ${
+          dim.useForPredictions ? "USE TO PREDICT" : "DON'T USE TO PREDICT"
         }`
       );
       console.log("CHART", dim.chartData());
