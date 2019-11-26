@@ -6,15 +6,11 @@ import { SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Injectable } from "@nestjs/common";
 import * as assert from "assert";
-import { ChartData } from "../survey/survey.types";
+import { ChartData, Prediction } from "../survey/survey.types";
 
 const WORKING_DIR = "/Users/tom/Scratch";
 
-export function formatLaTeX(
-  command: string,
-  content: string,
-  options?: string
-) {
+function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
   rtn.push(`\\${command}`);
   if (options) {
@@ -22,6 +18,16 @@ export function formatLaTeX(
   }
   rtn.push(`{${content}}`);
   return rtn.join("");
+}
+
+function formatEnvironment(name: string, content: string) {
+  return [formatLaTeX("begin", name), content, formatLaTeX("end", name)].join(
+    "\n"
+  );
+}
+
+function formatHref(url: string, text: string) {
+  return `\\href{${url}}{${text}}`;
 }
 
 export class LineBuffer {
@@ -52,7 +58,7 @@ export class LineBuffer {
 
   concatenateLines() {
     this.flushCurrentLine();
-    return this.allLines.join("\n\n");
+    return "\n\n" + this.allLines.join("\n\n");
   }
 }
 
@@ -63,8 +69,10 @@ export default class LetterWriter {
   renderImage(letterElement: LetterElement) {
     console.log("RENDER IMAGE", letterElement);
     const fullPath = this.fileService.fullPath(letterElement.image.fileName());
-    console.log("FULL PATH", fullPath);
-    return formatLaTeX("includegraphics", fullPath, "width=\\textwidth");
+    return formatEnvironment(
+      "flushleft",
+      formatLaTeX("includegraphics", fullPath, "width=\\textwidth")
+    );
   }
 
   renderBoilerplate(letterElement: LetterElement) {
@@ -82,9 +90,9 @@ export default class LetterWriter {
         let wrapper = "";
         if (op.attributes.hasOwnProperty("header")) {
           if (op.attributes.header === 1) {
-            wrapper = "section";
+            wrapper = "section*";
           } else if (op.attributes.header === 2) {
-            wrapper = "subsection";
+            wrapper = "subsection*";
           } else {
             throw Error(`Bogus attributes ${op.attributes}`);
           }
@@ -125,14 +133,14 @@ export default class LetterWriter {
   renderChart(chartData: ChartData) {
     console.log("RENDER CHART", chartData);
 
-    return `
+    const chart = `
       \\begin{tikzpicture}
         \\begin{axis}[
           title=${chartData.title},
           xbar, xmin=0, xmax=7,
-          width=12cm,
-          height=7.5cm,
-          enlarge y limits=0.25,
+          width=0.75\\textwidth,
+          height=${chartData.entries.length + 1}cm,
+          enlarge y limits={abs=0.5cm},
           symbolic y coords={${chartData.allTitles()}},
           ytick=data,
           nodes near coords,
@@ -143,10 +151,24 @@ export default class LetterWriter {
           };
         \\end{axis}
       \\end{tikzpicture}`;
+
+    return formatEnvironment("center", chart);
   }
 
-  renderPredictions(letterElement: LetterElement) {
-    return "SEP PREDICTION TABLE";
+  renderPredictions(predictions: Prediction[]) {
+    return predictions
+      .filter(prediction => prediction.predict)
+      .map(prediction => {
+        const practice = prediction.practice;
+        return [
+          formatLaTeX(
+            "subsection*",
+            formatHref(practice.moreInfoUrl, practice.title)
+          ),
+          practice.description
+        ].join("\n\n");
+      })
+      .join("\n\n");
   }
 
   renderFooter() {
@@ -181,12 +203,13 @@ export default class LetterWriter {
   renderDocument(renderedElements: string[]) {
     return `
     \\documentclass{article}
+    
+    \\usepackage{fontspec}
+    \\setmainfont[Ligatures=TeX]{Helvetica}
 
-    \\usepackage[margin=0.75in]{geometry}
+    \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
     \\usepackage{graphicx}
-    \\usepackage{multicol}
     \\usepackage[colorlinks]{hyperref}
-    \\usepackage{framed}
     
     \\usepackage{pgfplots}
     \\pgfplotsset{compat=1.16}
@@ -217,7 +240,8 @@ export default class LetterWriter {
             renderedElements.push(this.renderBoilerplate(letterElement));
             break;
           case "boolean-calculation-results":
-            renderedElements.push(this.renderPredictions(letterElement));
+            const predictions = surveyResponse.predictScriptureEngagement();
+            renderedElements.push(this.renderPredictions(predictions));
             break;
           case "chart":
             const dimension = surveyResponse.findDimensionById(
