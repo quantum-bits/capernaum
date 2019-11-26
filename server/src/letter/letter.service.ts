@@ -21,22 +21,13 @@ export class LetterService extends BaseService {
     super(entityManager);
   }
 
-  letter2(id: number) {
-    return this.letterRepo.findOne(id, {
-      relations: [
-        "letterElements",
-        "letterElements.letterElementType",
-        "letterElements.image"
-      ]
-    });
-  }
-
   letter(id: number) {
     return this.letterRepo
       .createQueryBuilder("letter")
       .innerJoinAndSelect("letter.letterElements", "letterElements")
       .innerJoinAndSelect("letterElements.letterElementType", "elementTypes")
       .leftJoinAndSelect("letterElements.image", "images")
+      .leftJoinAndSelect("letterElements.surveyDimension", "dimension")
       .where("letter.id = :id", { id })
       .orderBy("letterElements.sequence")
       .getOne();

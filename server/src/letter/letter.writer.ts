@@ -1,23 +1,14 @@
-import { ConfigureOptions, Environment, FileSystemLoader } from "nunjucks";
 import { Letter, LetterElement, LetterWriterOutput } from "./entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
-import { format, join } from "path";
+import { format } from "path";
 import { SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Injectable } from "@nestjs/common";
 import * as assert from "assert";
+import { ChartData } from "../survey/survey.types";
 
 const WORKING_DIR = "/Users/tom/Scratch";
-
-const VALID_ELEMENT_TYPES = [
-  "boilerplate",
-  "boolean-calculation-results",
-  "footer",
-  "header",
-  "chart",
-  "image"
-];
 
 export function formatLaTeX(
   command: string,
@@ -67,19 +58,7 @@ export class LineBuffer {
 
 @Injectable()
 export default class LetterWriter {
-  private environment: Environment;
-
-  constructor(private readonly fileService: FileService) {
-    const loader = new FileSystemLoader("./src/letter/templates");
-    const configuration: ConfigureOptions = {
-      autoescape: false,
-      tags: {
-        variableStart: "<$",
-        variableEnd: "$>"
-      }
-    };
-    this.environment = new Environment(loader, configuration);
-  }
+  constructor(private readonly fileService: FileService) {}
 
   renderImage(letterElement: LetterElement) {
     console.log("RENDER IMAGE", letterElement);
@@ -143,24 +122,126 @@ export default class LetterWriter {
     return lineBuffer.concatenateLines();
   }
 
+  renderChart(chartData: ChartData) {
+    console.log("RENDER CHART", chartData);
+
+    return `
+      \\begin{tikzpicture}
+        \\begin{axis}[
+          title=${chartData.title},
+          xbar, xmin=0, xmax=7,
+          width=12cm,
+          height=7.5cm,
+          enlarge y limits=0.25,
+          symbolic y coords={${chartData.allTitles()}},
+          ytick=data,
+          nodes near coords,
+          nodes near coords align={horizontal},
+          ]
+          \\addplot coordinates {
+            ${chartData.allCoordinates()}
+          };
+        \\end{axis}
+      \\end{tikzpicture}`;
+  }
+
+  renderPredictions(letterElement: LetterElement) {
+    return "SEP PREDICTION TABLE";
+  }
+
+  renderFooter() {
+    return `
+      \\vfill
+      \\begin{center}
+        \\vspace{0.25in}
+        \\href{http://tucse.taylor.edu/}{\\includegraphics{<$ templateDir $>/c4se-logo}}
+      
+        \\vspace{0.25in}
+        \\href{http://tucse.taylor.edu/}{Taylor University Center for Scripture Engagement}
+      
+        \\vspace{0.25in}
+        \\href{https://www.biblegateway.com/resources/scripture-engagement/}{Bible Engagement at Bible Gateway }
+      \\end{center}
+      `;
+  }
+
+  renderHeader() {
+    return `
+    \\begin{multicols}{2}
+    \\begin{flushleft}
+      \\Huge
+      Your personal results\\\\for the Christian Life Survey
+    \\end{flushleft}
+    \\columnbreak
+    \\includegraphics{<$ templateDir $>/c4se-logo}
+    \\end{multicols}
+    `;
+  }
+
+  renderDocument(renderedElements: string[]) {
+    return `
+    \\documentclass{article}
+
+    \\usepackage[margin=0.75in]{geometry}
+    \\usepackage{graphicx}
+    \\usepackage{multicol}
+    \\usepackage[colorlinks]{hyperref}
+    \\usepackage{framed}
+    
+    \\usepackage{pgfplots}
+    \\pgfplotsset{compat=1.16}
+    
+    \\begin{document}
+    
+    ${renderedElements.join("\n\n")}
+    
+    \\end{document}
+    `;
+  }
+
   renderLetter(
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    // console.log("LETTER", JSON.stringify(letter, null, 2));
-    // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
+    console.log("LETTER", JSON.stringify(letter, null, 2));
+    console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
     surveyResponse.dump();
 
     return new Promise((resolve, reject) => {
-      // Validate element types.
+      // Render letter elements.
+      const renderedElements = [];
+
       for (const letterElement of letter.letterElements) {
-        const key = letterElement.letterElementType.key;
-        if (!VALID_ELEMENT_TYPES.includes(key)) {
-          reject(`Invalid element type '${key}'`);
+        switch (letterElement.letterElementType.key) {
+          case "boilerplate":
+            renderedElements.push(this.renderBoilerplate(letterElement));
+            break;
+          case "boolean-calculation-results":
+            renderedElements.push(this.renderPredictions(letterElement));
+            break;
+          case "chart":
+            const dimension = surveyResponse.findDimensionById(
+              letterElement.surveyDimension.id
+            );
+            renderedElements.push(this.renderChart(dimension.chartData()));
+            break;
+          case "footer":
+            renderedElements.push(this.renderFooter());
+            break;
+          case "header":
+            renderedElements.push(this.renderHeader());
+            break;
+          case "image":
+            renderedElements.push(this.renderImage(letterElement));
+            break;
+          default:
+            throw Error(
+              `Unknown element type '${letterElement.letterElementType.key}'`
+            );
         }
       }
 
-      const templateDir = join(process.cwd(), "src/letter/templates");
+      // Set up paths.
       const pathObject = {
         dir: WORKING_DIR,
         name: `${letter.id}-${surveyResponse.id}`
@@ -168,16 +249,16 @@ export default class LetterWriter {
       const texFilePath = format({ ...pathObject, ext: ".tex" });
       const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
 
-      const result = this.environment.render("letter.tex", {
-        writer: this,
-        letter,
-        templateDir
-      });
+      // Create the document.
+      const result = this.renderDocument(renderedElements);
 
+      // Write the LaTeX source file.
       writeFile(texFilePath, result, "utf8", err => {
         if (err) {
           reject(err);
         }
+
+        // Create the PDF.
         exec(
           `pdflatex ${texFilePath}`,
           { cwd: WORKING_DIR },

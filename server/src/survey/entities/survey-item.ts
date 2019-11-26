@@ -41,11 +41,11 @@ export class SurveyItem extends AbstractEntity {
   @Field({ description: "Text of this question from Qualtrics" })
   qualtricsText: string;
 
-  public surveyItemResponse(surveyResponseId: number) {
-    return this.surveyItemResponses.find(
-      surveyItemResponse =>
-        surveyItemResponse.surveyResponseId === surveyResponseId
-    );
+  public surveyItemResponse() {
+    if (this.surveyItemResponses.length != 1) {
+      throw Error(`Too many responses to survey item '${this.id}'`);
+    }
+    return this.surveyItemResponses[0];
   }
 }
 

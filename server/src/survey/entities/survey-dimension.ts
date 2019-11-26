@@ -36,18 +36,16 @@ export class SurveyDimension extends AbstractEntity {
   })
   sequence: number;
 
-  public chartData(responseId: number): ChartData {
+  public chartData(): ChartData {
+    console.log("DIMENSION", this);
     const chartEntries = this.surveyIndices.map(surveyIndex => {
       return {
         title: surveyIndex.title,
-        value: surveyIndex.meanResponse(responseId)
+        value: surveyIndex.meanResponse()
       };
     });
 
-    return {
-      title: this.title,
-      entries: chartEntries
-    };
+    return new ChartData(this.title, chartEntries);
   }
 }
 

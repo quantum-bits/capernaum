@@ -24,6 +24,21 @@ export class ChartData {
 
   @Field(type => [ChartEntry])
   entries: ChartEntry[];
+
+  constructor(title: string, entries: ChartEntry[]) {
+    this.title = title;
+    this.entries = entries;
+  }
+
+  allTitles() {
+    return this.entries.map(entry => entry.title).join(",");
+  }
+
+  allCoordinates() {
+    return this.entries
+      .map(entry => `(${entry.value},${entry.title})`)
+      .join("\n");
+  }
 }
 
 @ObjectType()

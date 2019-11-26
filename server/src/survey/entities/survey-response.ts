@@ -29,7 +29,7 @@ class ScriptureEngagementPracticePrediction {
       results.push({
         title: surveyIndex.title,
         abbreviation: surveyIndex.abbreviation,
-        meanResponse: surveyIndex.meanResponse(this.responseId)
+        meanResponse: surveyIndex.meanResponse()
       });
     }
 
@@ -69,6 +69,12 @@ export class SurveyResponse extends AbstractEntity {
   @Column() @Field() ipAddress: string;
   @Column() @Field() latitude: string;
   @Column() @Field() longitude: string;
+
+  public findDimensionById(dimensionId: number) {
+    return this.survey.surveyDimensions.find(
+      dimension => dimension.id === dimensionId
+    );
+  }
 
   public predictScriptureEngagement() {
     const predictionMap: Map<
@@ -118,7 +124,7 @@ export class SurveyResponse extends AbstractEntity {
           dim.useForPredictions ? "PREDICT" : "DON'T PREDICT"
         }`
       );
-      console.log("CHART CHART", dim.chartData(this.id));
+      console.log("CHART", dim.chartData());
 
       for (let index of dim.surveyIndices) {
         console.log(
@@ -126,7 +132,7 @@ export class SurveyResponse extends AbstractEntity {
             1,
             `IDX (${index.id}-${index.abbreviation}), ${
               index.title
-            } => ${index.meanResponse(this.id)}`
+            } => ${index.meanResponse()}`
           )
         );
 
