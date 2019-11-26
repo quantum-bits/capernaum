@@ -30,9 +30,7 @@ export function formatLaTeX(
     rtn.push(`[${options}]`);
   }
   rtn.push(`{${content}}`);
-  const foo = rtn.join("");
-  console.log("FOO", foo);
-  return foo;
+  return rtn.join("");
 }
 
 export class LineBuffer {

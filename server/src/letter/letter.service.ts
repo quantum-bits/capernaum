@@ -21,7 +21,7 @@ export class LetterService extends BaseService {
     super(entityManager);
   }
 
-  letter(id: number) {
+  letter2(id: number) {
     return this.letterRepo.findOne(id, {
       relations: [
         "letterElements",
@@ -29,6 +29,17 @@ export class LetterService extends BaseService {
         "letterElements.image"
       ]
     });
+  }
+
+  letter(id: number) {
+    return this.letterRepo
+      .createQueryBuilder("letter")
+      .innerJoinAndSelect("letter.letterElements", "letterElements")
+      .innerJoinAndSelect("letterElements.letterElementType", "elementTypes")
+      .leftJoinAndSelect("letterElements.image", "images")
+      .where("letter.id = :id", { id })
+      .orderBy("letterElements.sequence")
+      .getOne();
   }
 
   letterElementTypes() {
