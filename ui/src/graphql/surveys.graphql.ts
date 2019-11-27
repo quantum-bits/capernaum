@@ -210,12 +210,3 @@ export const DELETE_INDEX = gql`
     }
   }
 `;
-
-export const WRITE_LETTER = gql`
-  mutation WriteLetter($input: LetterWriterInput!) {
-    writeLetter(letterWriterInput: $input) {
-      ok
-      pdfFilePath
-    }
-  }
-`;

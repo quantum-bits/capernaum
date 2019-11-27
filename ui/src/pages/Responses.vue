@@ -33,9 +33,6 @@
             <v-icon class="mr-2" @click="generatePDF(item)">
               mdi-pdf-box
             </v-icon>
-            <v-icon @click="sendEmail(item)">
-              mdi-email
-            </v-icon>
           </template>
         </v-data-table>
       </v-col>

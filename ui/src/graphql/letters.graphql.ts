@@ -218,7 +218,48 @@ export const WRITE_LETTER_MUTATION = gql`
   mutation WriteLetter($letterWriterInput: LetterWriterInput!) {
     writeLetter(letterWriterInput: $letterWriterInput) {
       ok
-      pdfFilePath
+      pdfFileName
+      responseSummary {
+        id
+        date
+        qualtricsResponseId
+        surveySummary {
+          id
+          title
+          qualtricsId
+          qualtricsName
+        }
+        dimensionSummaries {
+          id
+          title
+          indexSummaries {
+            id
+            title
+            abbreviation
+            meanResponse
+            itemSummaries {
+              id
+              qualtricsId
+              qualtricsText
+              responseId
+              responseLabel
+              responseValue
+            }
+          }
+        }
+        predictionSummaries {
+          practiceSummary {
+            id
+            title
+          }
+          predictionDetails {
+            title
+            abbreviation
+            meanResponse
+          }
+          predict
+        }
+      }
     }
   }
 `;

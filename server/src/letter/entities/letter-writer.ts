@@ -1,4 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
+import { ResponseSummary } from "../../survey/entities/survey-response-summary";
 
 @InputType()
 export class LetterWriterInput {
@@ -9,5 +10,6 @@ export class LetterWriterInput {
 @ObjectType()
 export class LetterWriterOutput {
   @Field() ok: boolean;
-  @Field() pdfFilePath: string;
+  @Field() pdfFileName: string;
+  @Field(type => ResponseSummary) responseSummary: ResponseSummary;
 }

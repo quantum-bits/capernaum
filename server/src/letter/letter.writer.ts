@@ -7,6 +7,7 @@ import { FileService } from "../file/file.service";
 import { Injectable } from "@nestjs/common";
 import * as assert from "assert";
 import { ChartData, Prediction } from "../survey/survey.types";
+import { createHash } from "crypto";
 
 const WORKING_DIR = "/Users/tom/Scratch";
 
@@ -28,6 +29,13 @@ function formatEnvironment(name: string, content: string) {
 
 function formatHref(url: string, text: string) {
   return `\\href{${url}}{${text}}`;
+}
+
+// Generate a hash digest for the file.
+function generateFileName(letterId, responseId) {
+  return createHash("sha1")
+    .update(`${letterId}-${responseId}`)
+    .digest("hex");
 }
 
 export class LineBuffer {
@@ -66,7 +74,7 @@ export class LineBuffer {
 export default class LetterWriter {
   constructor(private readonly fileService: FileService) {}
 
-  renderImage(letterElement: LetterElement) {
+  private renderImage(letterElement: LetterElement) {
     // console.log("RENDER IMAGE", letterElement);
     const fullPath = this.fileService.fullPath(letterElement.image.fileName());
     return formatEnvironment(
@@ -75,7 +83,7 @@ export default class LetterWriter {
     );
   }
 
-  renderBoilerplate(letterElement: LetterElement) {
+  private renderBoilerplate(letterElement: LetterElement) {
     // console.log("RENDER BOILERPLATE", letterElement);
     const quillDelta = JSON.parse(letterElement.textDelta);
     const lineBuffer = new LineBuffer();
@@ -130,7 +138,7 @@ export default class LetterWriter {
     return lineBuffer.concatenateLines();
   }
 
-  renderChart(chartData: ChartData) {
+  private renderChart(chartData: ChartData) {
     // console.log("RENDER CHART", chartData);
 
     const chart = `
@@ -155,7 +163,7 @@ export default class LetterWriter {
     return formatEnvironment("center", chart);
   }
 
-  renderPredictions(predictions: Prediction[]) {
+  private renderPredictions(predictions: Prediction[]) {
     return predictions
       .filter(prediction => prediction.predict)
       .map(prediction => {
@@ -171,7 +179,7 @@ export default class LetterWriter {
       .join("\n\n");
   }
 
-  renderFooter() {
+  private renderFooter() {
     return `
       \\vfill
       \\begin{center}
@@ -187,7 +195,7 @@ export default class LetterWriter {
       `;
   }
 
-  renderHeader() {
+  private renderHeader() {
     return `
     \\begin{multicols}{2}
     \\begin{flushleft}
@@ -200,7 +208,7 @@ export default class LetterWriter {
     `;
   }
 
-  renderDocument(renderedElements: string[]) {
+  private renderDocument(renderedElements: string[]) {
     return `
     \\documentclass{article}
     
@@ -222,7 +230,7 @@ export default class LetterWriter {
     `;
   }
 
-  renderResponseDetails(surveyResponse: SurveyResponse) {
+  private renderResponseDetails(surveyResponse: SurveyResponse) {
     return formatEnvironment(
       "flushright",
       [
@@ -279,9 +287,10 @@ export default class LetterWriter {
       renderedElements.push(this.renderResponseDetails(surveyResponse));
 
       // Set up paths.
+      const pdfFileName = generateFileName(letter.id, surveyResponse.id);
       const pathObject = {
         dir: WORKING_DIR,
-        name: `${letter.id}-${surveyResponse.id}`
+        name: pdfFileName
       };
       const texFilePath = format({ ...pathObject, ext: ".tex" });
       const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
@@ -310,7 +319,11 @@ export default class LetterWriter {
         );
       });
 
-      resolve({ ok: true, pdfFilePath });
+      resolve({
+        ok: true,
+        pdfFileName,
+        responseSummary: surveyResponse.summarize()
+      });
     });
   }
 }

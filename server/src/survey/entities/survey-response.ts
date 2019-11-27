@@ -6,6 +6,7 @@ import { SurveyItemResponse } from "./survey-item-response";
 import { SurveyIndex } from "./survey-index";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
+import { ResponseSummary } from "./survey-response-summary";
 
 class ScriptureEngagementPracticePrediction {
   private surveyIndexMap: Map<number, SurveyIndex> = new Map();
@@ -69,6 +70,54 @@ export class SurveyResponse extends AbstractEntity {
   @Column() @Field() ipAddress: string;
   @Column() @Field() latitude: string;
   @Column() @Field() longitude: string;
+
+  public summarize(): ResponseSummary {
+    return {
+      id: this.id,
+      qualtricsResponseId: this.qualtricsResponseId,
+      email: this.email,
+      date: this.endDate,
+      surveySummary: {
+        id: this.survey.id,
+        title: this.survey.title,
+        qualtricsId: this.survey.qualtricsId,
+        qualtricsName: this.survey.qualtricsName
+      },
+      dimensionSummaries: this.survey.surveyDimensions.map(dimension => ({
+        id: dimension.id,
+        title: dimension.title,
+        indexSummaries: dimension.surveyIndices.map(index => ({
+          id: index.id,
+          title: index.title,
+          abbreviation: index.abbreviation,
+          meanResponse: index.meanResponse(),
+          itemSummaries: index.surveyItems.map(item => {
+            const itemResponse = item.surveyItemResponse();
+            return {
+              id: item.id,
+              qualtricsId: item.qualtricsId,
+              qualtricsText: item.qualtricsText,
+              responseId: itemResponse.id,
+              responseLabel: itemResponse.label,
+              responseValue: itemResponse.value
+            };
+          })
+        }))
+      })),
+      predictionSummaries: this.predictScriptureEngagement().map(prediction => {
+        const practice = prediction.practice;
+        return {
+          practiceSummary: {
+            id: practice.id,
+            title: practice.title,
+            description: practice.description
+          },
+          predictionDetails: prediction.details,
+          predict: prediction.predict
+        };
+      })
+    };
+  }
 
   public findDimensionById(dimensionId: number) {
     return this.survey.surveyDimensions.find(

@@ -23,6 +23,12 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
+type DimensionSummary {
+  id: Int!
+  title: String!
+  indexSummaries: [IndexSummary!]!
+}
+
 type Image {
   """Unique ID for this entity"""
   id: Int!
@@ -40,6 +46,23 @@ type Image {
 input ImageUpdateInput {
   id: Int!
   title: String!
+}
+
+type IndexSummary {
+  id: Int!
+  title: String!
+  abbreviation: String!
+  meanResponse: Float!
+  itemSummaries: [ItemSummary!]!
+}
+
+type ItemSummary {
+  id: Int!
+  qualtricsId: String!
+  qualtricsText: String!
+  responseId: Int!
+  responseLabel: String!
+  responseValue: Float!
 }
 
 type Letter {
@@ -117,7 +140,8 @@ input LetterWriterInput {
 
 type LetterWriterOutput {
   ok: Boolean!
-  pdfFilePath: String!
+  pdfFileName: String!
+  responseSummary: ResponseSummary!
 }
 
 type Mutation {
@@ -182,6 +206,12 @@ input PartialPredictionTableEntry {
   sequence: Int!
 }
 
+type PracticeSummary {
+  id: Int!
+  title: String!
+  description: String!
+}
+
 type Prediction {
   practice: ScriptureEngagementPractice!
   details: [PredictionDetails!]!
@@ -192,6 +222,12 @@ type PredictionDetails {
   title: String!
   abbreviation: String!
   meanResponse: Float!
+}
+
+type PredictionSummary {
+  practiceSummary: PracticeSummary!
+  predictionDetails: [PredictionDetails!]!
+  predict: Boolean!
 }
 
 """One entry in a prediction table"""
@@ -262,6 +298,16 @@ type Query {
   image(id: Int!): Image!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+}
+
+type ResponseSummary {
+  id: Int!
+  qualtricsResponseId: String!
+  email: String!
+  date: String!
+  surveySummary: SurveySummary!
+  dimensionSummaries: [DimensionSummary!]!
+  predictionSummaries: [PredictionSummary!]!
 }
 
 """Scripture engagement practice"""
@@ -469,6 +515,13 @@ type SurveyResponse {
   ipAddress: String!
   latitude: String!
   longitude: String!
+}
+
+type SurveySummary {
+  id: Int!
+  title: String!
+  qualtricsId: String!
+  qualtricsName: String!
 }
 
 input SurveyUpdateInput {
