@@ -222,6 +222,7 @@ export const WRITE_LETTER_MUTATION = gql`
       responseSummary {
         id
         date
+        email
         qualtricsResponseId
         surveySummary {
           id

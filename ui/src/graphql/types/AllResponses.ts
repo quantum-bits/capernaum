@@ -3,10 +3,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: ResponseSummary
+// GraphQL query operation: AllResponses
 // ====================================================
 
-export interface ResponseSummary_surveyResponses_survey_letters {
+export interface AllResponses_surveyResponses_survey_letters {
   /**
    * Unique ID for this entity
    */
@@ -15,28 +15,28 @@ export interface ResponseSummary_surveyResponses_survey_letters {
   description: string;
 }
 
-export interface ResponseSummary_surveyResponses_survey {
+export interface AllResponses_surveyResponses_survey {
   /**
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
-  letters: ResponseSummary_surveyResponses_survey_letters[];
+  letters: AllResponses_surveyResponses_survey_letters[];
 }
 
-export interface ResponseSummary_surveyResponses {
+export interface AllResponses_surveyResponses {
   /**
    * Unique ID for this entity
    */
   id: number;
   qualtricsResponseId: string;
   email: string;
-  survey: ResponseSummary_surveyResponses_survey;
+  survey: AllResponses_surveyResponses_survey;
   startDate: string;
   endDate: string;
   duration: number;
   finished: number;
 }
 
-export interface ResponseSummary {
-  surveyResponses: ResponseSummary_surveyResponses[];
+export interface AllResponses {
+  surveyResponses: AllResponses_surveyResponses[];
 }

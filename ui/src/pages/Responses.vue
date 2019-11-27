@@ -19,9 +19,8 @@
         <h4>All Responses</h4>
         <v-data-table
           :headers="masterHeaders"
-          :items="responseSummary.surveyResponses"
+          :items="allResponses.surveyResponses"
           class="elevation-1"
-          @click:row="showDetails"
         >
           <template v-slot:item.letter="{ item }">
             {{ letterTitle(item) }}
@@ -38,42 +37,84 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="haveResponseSummary">
       <v-col>
-        <div v-if="selectedResponse">
-          <div v-if="responseDetails">
-            <h4>Details ({{ responseDetails.email }})</h4>
+        <ol>
+          <li>
+            Survey ({{ responseSummary.responseSummary.surveySummary.id }} -
+            {{ responseSummary.responseSummary.surveySummary.qualtricsId }})
+            <ul>
+              <li>
+                Title {{ responseSummary.responseSummary.surveySummary.title }}
+              </li>
+              <li>
+                Q Name
+                {{
+                  responseSummary.responseSummary.surveySummary.qualtricsName
+                }}
+              </li>
+            </ul>
+          </li>
+          <li>
+            Response ({{ responseSummary.responseSummary.id }} -
+            {{ responseSummary.responseSummary.qualtricsResponseId }})
+            <ul>
+              <li>Status {{ responseSummary.ok ? "OK" : "FAILED" }}</li>
+              <li>Date {{ responseSummary.responseSummary.date }}</li>
+              <li>Email {{ responseSummary.responseSummary.email }}</li>
+              <li>PDF File {{ responseSummary.pdfFileName }}</li>
+            </ul>
+          </li>
+          <li>
+            Dimensions
             <ol>
               <li
-                v-for="dimension in responseDetails.survey.surveyDimensions"
-                :key="dimension.id"
+                v-for="dim in responseSummary.responseSummary
+                  .dimensionSummaries"
+                :key="dim.id"
               >
-                {{ dimension.title }}
+                (ID {{ dim.id }}) {{ dim.title }}
                 <ol>
-                  <li
-                    v-for="surveyIndex in dimension.surveyIndices"
-                    :key="surveyIndex.id"
-                  >
-                    {{ surveyIndex.title }} ({{ surveyIndex.abbreviation }}) =
-                    {{ meanResponse(surveyIndex) }}
-                    <ul>
-                      <li
-                        v-for="item in itemsWithResponse(surveyIndex)"
-                        :key="item.id"
-                      >
-                        ({{ item.qualtricsId }} =
-                        {{ item.surveyItemResponse.value }})
-                        {{ item.qualtricsText }}
+                  <li v-for="index in dim.indexSummaries" :key="index.id">
+                    ({{ index.id }} - {{ index.abbreviation }})
+                    {{ index.title }} = {{ index.meanResponse }}
+                    <ol>
+                      <li v-for="item in index.itemSummaries" :key="item.id">
+                        ({{ item.id }} {{ item.qualtricsId }})
+                        {{ item.qualtricsText }} ({{ item.responseId }}) =
+                        {{ item.responseValue }} - {{ item.responseLabel }}
                       </li>
-                    </ul>
+                    </ol>
                   </li>
                 </ol>
               </li>
             </ol>
-          </div>
-          <p v-else>This person submitted no responses.</p>
-        </div>
-        <p v-else>Click a response for details.</p>
+          </li>
+          <li>
+            Predictions
+            <ol>
+              <li
+                v-for="prediction in responseSummary.responseSummary
+                  .predictionSummaries"
+                :key="prediction.practiceSummary.id"
+              >
+                ({{ prediction.practiceSummary.id }})
+                {{ prediction.practiceSummary.title }}
+                {{ prediction.predict ? "PREDICT" : "DON'T PREDICT" }}
+                <ol>
+                  <li
+                    v-for="details in prediction.predictionDetails"
+                    :key="details.abbreviation"
+                  >
+                    {{ details.title }}
+                    ({{ details.abbreviation }})
+                    {{ details.meanResponse }}
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+        </ol>
       </v-col>
     </v-row>
   </v-container>
@@ -82,20 +123,20 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  IMPORT_SURVEY_RESPONSES,
-  ONE_RESPONSE_DETAIL_QUERY,
-  RESPONSE_SUMMARY_QUERY
+  ALL_RESPONSES_QUERY,
+  IMPORT_SURVEY_RESPONSES
 } from "@/graphql/responses.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import {
-  ResponseSummary,
-  ResponseSummary_surveyResponses
-} from "@/graphql/types/ResponseSummary";
-import mean from "lodash/mean";
-import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices_surveyItems as SurveyItem } from "@/graphql/types/ResponseDetails";
-import { ResponseDetails_surveyResponse_survey_surveyDimensions_surveyIndices as SurveyIndex } from "@/graphql/types/ResponseDetails";
-import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
+import {
+  AllResponses,
+  AllResponses_surveyResponses
+} from "@/graphql/types/AllResponses";
+import {
+  WriteLetter,
+  WriteLetter_writeLetter
+} from "@/graphql/types/WriteLetter";
+import isEmpty from "lodash/isEmpty";
 
 interface ImportedSurvey {
   id: number;
@@ -113,24 +154,9 @@ export default Vue.extend({
       query: ALL_SURVEYS_QUERY
     },
 
-    responseSummary: {
-      query: RESPONSE_SUMMARY_QUERY,
+    allResponses: {
+      query: ALL_RESPONSES_QUERY,
       update: data => data
-    },
-
-    responseDetails: {
-      query: ONE_RESPONSE_DETAIL_QUERY,
-      variables() {
-        return {
-          id: this.selectedResponse
-        };
-      },
-      update(data) {
-        return data.surveyResponse;
-      },
-      skip() {
-        return !this.selectedResponse;
-      }
     }
   },
 
@@ -139,7 +165,7 @@ export default Vue.extend({
       surveys: [] as ImportedSurvey[],
       selectedQualtricsId: "",
 
-      responseSummary: {} as ResponseSummary,
+      allResponses: {} as AllResponses,
       masterHeaders: [
         { text: "Date", value: "date" },
         { text: "Survey", value: "survey.qualtricsName" },
@@ -149,8 +175,7 @@ export default Vue.extend({
         { text: "Action", value: "action" }
       ],
 
-      selectedResponse: null,
-      responseDetails: null
+      responseSummary: {} as WriteLetter_writeLetter
     };
   },
 
@@ -160,30 +185,29 @@ export default Vue.extend({
         text: survey.qualtricsName,
         value: survey.qualtricsId
       }));
+    },
+
+    haveResponseSummary(): boolean {
+      return !isEmpty(this.responseSummary);
     }
   },
 
   methods: {
-    generatePDF(surveyResponse: ResponseSummary_surveyResponses) {
-      this.$apollo.mutate({
-        mutation: WRITE_LETTER_MUTATION,
-        variables: {
-          letterWriterInput: {
-            letterId: surveyResponse.survey.letters[0].id,
-            surveyResponseId: surveyResponse.id
+    generatePDF(surveyResponse: AllResponses_surveyResponses) {
+      this.$apollo
+        .mutate<WriteLetter>({
+          mutation: WRITE_LETTER_MUTATION,
+          variables: {
+            letterWriterInput: {
+              letterId: surveyResponse.survey.letters[0].id,
+              surveyResponseId: surveyResponse.id
+            }
           }
-        }
-      });
+        })
+        .then(response => (this.responseSummary = response.data!.writeLetter));
     },
 
-    meanResponse(surveyIndex: SurveyIndex) {
-      const validItems = this.itemsWithResponse(surveyIndex);
-      return mean(
-        validItems.map(item => item.surveyItemResponse!.value)
-      ).toPrecision(3);
-    },
-
-    letterTitle(item: ResponseSummary_surveyResponses) {
+    letterTitle(item: AllResponses_surveyResponses) {
       if (!item.survey.letters) {
         return "N/A";
       } else if (item.survey.letters.length !== 1) {
@@ -191,14 +215,6 @@ export default Vue.extend({
       } else {
         return item.survey.letters[0].title;
       }
-    },
-
-    itemsWithResponse(index: SurveyIndex) {
-      return index.surveyItems.filter(item => item.surveyItemResponse);
-    },
-
-    showDetails(item: any) {
-      this.selectedResponse = item.id;
     },
 
     async fetchFromQualtrics() {
@@ -209,15 +225,14 @@ export default Vue.extend({
           variables: {
             qId: this.selectedQualtricsId
           },
-          refetchQueries: ["ResponseSummary"]
+          refetchQueries: ["AllResponses"]
         });
 
         // Read them in to refresh the table.
-        const queryResult = await this.$apollo.query<ResponseSummary>({
-          query: RESPONSE_SUMMARY_QUERY
+        const queryResult = await this.$apollo.query<AllResponses>({
+          query: ALL_RESPONSES_QUERY
         });
-        const responseSummary = queryResult.data;
-        this.responseSummary = responseSummary;
+        this.allResponses = queryResult.data;
       } catch (err) {
         throw err;
       }

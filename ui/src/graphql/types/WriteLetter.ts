@@ -58,6 +58,7 @@ export interface WriteLetter_writeLetter_responseSummary_predictionSummaries {
 export interface WriteLetter_writeLetter_responseSummary {
   id: number;
   date: string;
+  email: string;
   qualtricsResponseId: string;
   surveySummary: WriteLetter_writeLetter_responseSummary_surveySummary;
   dimensionSummaries: WriteLetter_writeLetter_responseSummary_dimensionSummaries[];

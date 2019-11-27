@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
-export const RESPONSE_SUMMARY_QUERY = gql`
-  query ResponseSummary {
+export const ALL_RESPONSES_QUERY = gql`
+  query AllResponses {
     surveyResponses {
       id
       qualtricsResponseId
@@ -18,43 +18,6 @@ export const RESPONSE_SUMMARY_QUERY = gql`
       endDate
       duration
       finished
-    }
-  }
-`;
-
-export const ONE_RESPONSE_DETAIL_QUERY = gql`
-  query ResponseDetails($id: Int!) {
-    surveyResponse(id: $id) {
-      id
-      email
-      progress
-      qualtricsResponseId
-      survey {
-        id
-        surveyDimensions {
-          id
-          title
-          useForPredictions
-          surveyIndices {
-            title
-            abbreviation
-            predictionTableEntries {
-              practice {
-                id
-                title
-              }
-            }
-            surveyItems {
-              qualtricsId
-              qualtricsText
-              surveyItemResponse(responseId: $id) {
-                value
-                label
-              }
-            }
-          }
-        }
-      }
     }
   }
 `;
