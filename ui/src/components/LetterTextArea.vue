@@ -184,6 +184,7 @@ export default class LetterTextArea extends Vue {
   // prior to editing.
   cancelEdits() {
     this.editModeOn = false;
+    this.$emit("edit-mode-off");
     this.restoreTextDelta();
     this.updateHtmlFromTextDelta();
   }
@@ -208,6 +209,7 @@ export default class LetterTextArea extends Vue {
         })
         .then(({ data }) => {
           console.log("done!", data);
+          this.$emit("edit-mode-off");
           //this.$emit("refresh-page");
           //this.refreshPage();
           //this.$emit("letter-created", data.createLetter.id);
@@ -230,6 +232,7 @@ export default class LetterTextArea extends Vue {
         })
         .then(({ data }) => {
           console.log("done!", data);
+          this.$emit("edit-mode-off");
         })
         .catch(error => {
           console.log("there appears to have been an error: ", error);
@@ -241,6 +244,7 @@ export default class LetterTextArea extends Vue {
   // Update the editor to contain the content.
   openEditor() {
     this.editModeOn = true;
+    this.$emit("edit-mode-on");
     this.saveTextDelta();
     this.quillEditor.setContents(this.textDelta);
   }

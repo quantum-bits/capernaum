@@ -174,6 +174,8 @@
             :description="'Email message to respondent'"
             :parentIsFrozen="surveyLetterIsFrozen"
             :isEmailText="'true'"
+            v-on:edit-mode-on="setEmailEditModeOn()"
+            v-on:edit-mode-off="setEmailEditModeOff()"
           ></LetterTextArea>
         </v-flex>
       </v-layout>
@@ -207,7 +209,6 @@
             :imageId="imageId(element)"
             :order="element.sequence"
             :initialTextDelta="element.textDelta"
-            :initialEditModeOn="element.editModeOn"
             :largestSequenceNumber="largestSequenceNumber"
             :smallestSequenceNumber="smallestSequenceNumber"
             :letterElementKey="element.letterElementType.key"
@@ -217,6 +218,8 @@
             v-on:move-down="moveDown(index)"
             v-on:delete-element="deleteElement(element.id)"
             v-on:refresh-page="refreshPage()"
+            v-on:edit-mode-on="setEditModeOn(element)"
+            v-on:edit-mode-off="setEditModeOff(element)"
           ></component>
         </div>
       </v-flex>
@@ -309,6 +312,21 @@ interface LetterElement extends OneLetter_letter_letterElements {
     AssociationTable,
     SpinnerBtn
   },
+  beforeRouteLeave(to: Route, from: Route, next: Function) {
+    console.log("inside before route leave!");
+    if (!this.allEditsSaved()) {
+      const answer = window.confirm(
+        "Do you really want to leave? You have unsaved changes in Boilerplate elements and/or the email message!"
+      );
+      if (answer) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
+  },
   apollo: {
     theLetter: {
       query: ONE_LETTER_QUERY,
@@ -357,6 +375,8 @@ export default class Compose extends Vue {
   selectedImage: null | any = null;
   chartTypeElementId = -Infinity; //used when creating a chart type of letter element
   imageTypeElementId = -Infinity; //used when creating an image type of letter element
+  confirmDialog = null;
+  emailEditModeOn = false;
 
   name = "";
   letterExists = false;
@@ -482,6 +502,19 @@ export default class Compose extends Vue {
       }
     });
     return smallestSN;
+  }
+
+  allEditsSaved() {
+    console.log("email edit mode on:", this.emailEditModeOn);
+    let editsSaved = !this.emailEditModeOn;
+    this.theLetter.letterElements.forEach( letterElement => {
+      //console.log('element:', letterElement);
+      if (letterElement.editModeOn) {
+        editsSaved = false;
+      }
+    });
+    console.log("edits saved?", editsSaved);
+    return editsSaved;
   }
 
   showTable() {
@@ -772,6 +805,24 @@ export default class Compose extends Vue {
     }
   }
 
+  setEditModeOn(element: LetterElement) {
+    element.editModeOn = true;
+    console.log("edit mode on!", this.theLetter.letterElements);
+  }
+
+  setEditModeOff(element: LetterElement) {
+    element.editModeOn = false;
+    console.log("edit mode off!");
+  }
+
+  setEmailEditModeOn() {
+    this.emailEditModeOn = true;
+  }
+
+  setEmailEditModeOff() {
+    this.emailEditModeOn = false;
+  }
+
   letterElementDescription(element: OneLetter_letter_letterElements) {
     if (
       element.letterElementType.key === LetterElementEnum.CHART &&
@@ -843,8 +894,11 @@ export default class Compose extends Vue {
       });
   }
 
+  // not sure if the following is actually doing anything; may need to move it up into
+  // the @Component decorator....
   // https://github.com/vuejs/vue-class-component/issues/270
   beforeRouteUpdate(to: Route, from: Route, next: Function) {
+    console.log("before route update!");
     this.name = to.params.name;
     next();
   }

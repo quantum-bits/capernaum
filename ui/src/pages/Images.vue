@@ -115,6 +115,8 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { Route } from "vue-router";
+
 import {
   ALL_IMAGES_QUERY,
   DELETE_IMAGE_MUTATION,
