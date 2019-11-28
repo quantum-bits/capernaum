@@ -300,8 +300,8 @@ interface LetterElement extends OneLetter_letter_letterElements {
 }
 
 // https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
-interface Letter extends Omit<OneLetter_letter, 'letterElements'> {
-  letterElements: LetterElement[]
+interface Letter extends Omit<OneLetter_letter, "letterElements"> {
+  letterElements: LetterElement[];
 }
 
 /**
@@ -316,22 +316,6 @@ interface Letter extends Omit<OneLetter_letter, 'letterElements'> {
     LetterElementMenu,
     AssociationTable,
     SpinnerBtn
-  },
-  // https://github.com/kaorun343/vue-property-decorator/issues/38
-  beforeRouteLeave(to: Route, from: Route, next: Function) {
-    console.log("inside before route leave!");
-    if (!this.allEditsSaved) {
-      const answer = window.confirm(
-        "Do you really want to leave? You have unsaved changes in Boilerplate elements and/or the email message!"
-      );
-      if (answer) {
-        next();
-      } else {
-        next(false);
-      }
-    } else {
-      next();
-    }
   },
   apollo: {
     theLetter: {
@@ -513,7 +497,7 @@ export default class Compose extends Vue {
   get allEditsSaved() {
     console.log("email edit mode on:", this.emailEditModeOn);
     let editsSaved = !this.emailEditModeOn;
-    this.theLetter.letterElements.forEach( (letterElement: LetterElement) => {
+    this.theLetter.letterElements.forEach((letterElement: LetterElement) => {
       //console.log('element:', letterElement);
       if (letterElement.editModeOn) {
         editsSaved = false;
@@ -522,19 +506,6 @@ export default class Compose extends Vue {
     console.log("edits saved?", editsSaved);
     return editsSaved;
   }
-
-  // allEditsSaved() {
-  //   console.log("email edit mode on:", this.emailEditModeOn);
-  //   let editsSaved = !this.emailEditModeOn;
-  //   this.theLetter.letterElements.forEach( (letterElement: LetterElement) => {
-  //     //console.log('element:', letterElement);
-  //     if (letterElement.editModeOn) {
-  //       editsSaved = false;
-  //     }
-  //   });
-  //   console.log("edits saved?", editsSaved);
-  //   return editsSaved;
-  // }
 
   showTable() {
     this.tableIsHidden = false;
@@ -913,13 +884,29 @@ export default class Compose extends Vue {
       });
   }
 
-  // not sure if the following is actually doing anything; may need to move it up into
-  // the @Component decorator....
   // https://github.com/vuejs/vue-class-component/issues/270
   beforeRouteUpdate(to: Route, from: Route, next: Function) {
     console.log("before route update!");
     this.name = to.params.name;
     next();
+  }
+
+  // https://github.com/kaorun343/vue-property-decorator/issues/38
+  // https://github.com/vuejs/vue-class-component/blob/master/README.md#adding-custom-hooks
+  beforeRouteLeave(to: Route, from: Route, next: Function) {
+    console.log("inside before route leave!");
+    if (!this.allEditsSaved) {
+      const answer = window.confirm(
+        "Do you really want to leave? You have unsaved changes in Boilerplate elements and/or the email message!"
+      );
+      if (answer) {
+        next();
+      } else {
+        next(false);
+      }
+    } else {
+      next();
+    }
   }
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
