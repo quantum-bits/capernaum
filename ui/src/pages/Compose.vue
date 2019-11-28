@@ -299,6 +299,11 @@ interface LetterElement extends OneLetter_letter_letterElements {
   key: string;
 }
 
+// https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
+interface Letter extends Omit<OneLetter_letter, 'letterElements'> {
+  letterElements: LetterElement[]
+}
+
 /**
  * loading in components with tabs: https://jsfiddle.net/jjloneman/e5a6L27u/26/
  */
@@ -315,7 +320,7 @@ interface LetterElement extends OneLetter_letter_letterElements {
   // https://github.com/kaorun343/vue-property-decorator/issues/38
   beforeRouteLeave(to: Route, from: Route, next: Function) {
     console.log("inside before route leave!");
-    if (!this.allEditsSaved()) {
+    if (!this.allEditsSaved) {
       const answer = window.confirm(
         "Do you really want to leave? You have unsaved changes in Boilerplate elements and/or the email message!"
       );
@@ -383,7 +388,7 @@ export default class Compose extends Vue {
   letterExists = false;
   generatingPDF = false;
 
-  theLetter: OneLetter_letter = {
+  theLetter: Letter = {
     id: -1,
     title: "",
     description: "",
@@ -505,10 +510,10 @@ export default class Compose extends Vue {
     return smallestSN;
   }
 
-  allEditsSaved() {
+  get allEditsSaved() {
     console.log("email edit mode on:", this.emailEditModeOn);
     let editsSaved = !this.emailEditModeOn;
-    this.theLetter.letterElements.forEach( letterElement => {
+    this.theLetter.letterElements.forEach( (letterElement: LetterElement) => {
       //console.log('element:', letterElement);
       if (letterElement.editModeOn) {
         editsSaved = false;
@@ -517,6 +522,19 @@ export default class Compose extends Vue {
     console.log("edits saved?", editsSaved);
     return editsSaved;
   }
+
+  // allEditsSaved() {
+  //   console.log("email edit mode on:", this.emailEditModeOn);
+  //   let editsSaved = !this.emailEditModeOn;
+  //   this.theLetter.letterElements.forEach( (letterElement: LetterElement) => {
+  //     //console.log('element:', letterElement);
+  //     if (letterElement.editModeOn) {
+  //       editsSaved = false;
+  //     }
+  //   });
+  //   console.log("edits saved?", editsSaved);
+  //   return editsSaved;
+  // }
 
   showTable() {
     this.tableIsHidden = false;
