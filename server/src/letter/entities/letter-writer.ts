@@ -10,6 +10,6 @@ export class LetterWriterInput {
 @ObjectType()
 export class LetterWriterOutput {
   @Field() ok: boolean;
-  @Field() pdfFileName: string;
+  @Field() pdfUrl: string;
   @Field(type => ResponseSummary) responseSummary: ResponseSummary;
 }

@@ -1,8 +1,20 @@
 import { Module } from "@nestjs/common";
 import { FileService } from "./file.service";
 
+export const IMAGE_FILE_SERVICE = "IMAGE_FILE_SERVICE";
+export const PDF_FILE_SERVICE = "PDF_FILE_SERVICE";
+
 @Module({
-  providers: [FileService],
-  exports: [FileService]
+  providers: [
+    {
+      provide: IMAGE_FILE_SERVICE,
+      useFactory: () => new FileService(process.env.CAP_UPLOAD_DIR)
+    },
+    {
+      provide: PDF_FILE_SERVICE,
+      useFactory: () => new FileService(process.env.CAP_PDF_DIR)
+    }
+  ],
+  exports: [IMAGE_FILE_SERVICE, PDF_FILE_SERVICE]
 })
 export class FileModule {}

@@ -218,7 +218,7 @@ export const WRITE_LETTER_MUTATION = gql`
   mutation WriteLetter($letterWriterInput: LetterWriterInput!) {
     writeLetter(letterWriterInput: $letterWriterInput) {
       ok
-      pdfFileName
+      pdfUrl
       responseSummary {
         id
         date

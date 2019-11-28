@@ -1,4 +1,3 @@
-import { Injectable } from "@nestjs/common";
 import { join, normalize } from "path";
 import { access, close, open, unlink, write } from "fs";
 
@@ -8,24 +7,26 @@ interface FileDetails {
   fileSize: number;
 }
 
-@Injectable()
 export class FileService {
-  private readonly fileBaseDir: string;
+  private readonly basePath: string;
 
-  constructor() {
-    const workingDir = process.cwd();
-    const uploadBaseDir = process.env.UPLOAD_BASE_DIR;
-    this.fileBaseDir = normalize(join(workingDir, uploadBaseDir));
+  constructor(subDir: string) {
+    const dataFilesDirPath = process.env.CAP_DATA_FILES;
+    this.basePath = normalize(join(dataFilesDirPath, subDir));
 
-    access(this.fileBaseDir, err => {
+    access(this.basePath, err => {
       if (err) {
-        throw Error(`No base upload directory at '${this.fileBaseDir}'`);
+        throw Error(`Can't find a base directory at '${this.basePath}'`);
       }
     });
   }
 
+  baseDirPath() {
+    return this.basePath;
+  }
+
   fullPath(fileName: string) {
-    return join(this.fileBaseDir, fileName);
+    return join(this.basePath, fileName);
   }
 
   async saveFile(fileName: string, buffer: Buffer): Promise<FileDetails> {

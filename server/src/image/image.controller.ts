@@ -3,6 +3,7 @@ import {
   Delete,
   Get,
   Header,
+  Inject,
   Param,
   Post,
   Req,
@@ -15,11 +16,12 @@ import { FileService } from "../file/file.service";
 import { ImageService } from "./image.service";
 import { Image } from "./entities";
 import getRawBody from "raw-body";
+import { IMAGE_FILE_SERVICE } from "../file/file.module";
 
 @Controller("images")
 export class ImageController {
   constructor(
-    private readonly fileService: FileService,
+    @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
     private readonly imageService: ImageService
   ) {}
 
@@ -31,14 +33,14 @@ export class ImageController {
       file.originalname,
       file.mimetype
     );
-    await this.fileService.saveFile(imageDetails.fileName(), file.buffer);
+    await this.imageFileService.saveFile(imageDetails.fileName(), file.buffer);
     return imageDetails.id;
   }
 
   @Get(":id")
   async getImage(@Res() res, @Param("id") id: number) {
     const imageDetails = await this.imageService.findOne(Image, id);
-    const imagePath = this.fileService.fullPath(imageDetails.fileName());
+    const imagePath = this.imageFileService.fullPath(imageDetails.fileName());
     const options = {
       headers: {
         "Content-Type": imageDetails.mimeType
@@ -54,7 +56,7 @@ export class ImageController {
         const id = parseInt(body.toString());
         const imageDetails = await this.imageService.findOne(Image, id);
 
-        await this.fileService.deleteFile(imageDetails.fileName());
+        await this.imageFileService.deleteFile(imageDetails.fileName());
         await this.imageService.delete(Image, id);
       })
       .catch(err => {

@@ -62,7 +62,9 @@
               <li>Status {{ responseSummary.ok ? "OK" : "FAILED" }}</li>
               <li>Date {{ responseSummary.responseSummary.date }}</li>
               <li>Email {{ responseSummary.responseSummary.email }}</li>
-              <li>PDF File {{ responseSummary.pdfFileName }}</li>
+              <li>
+                <a :href="responseSummary.pdfUrl" target="_blank">PDF File </a>
+              </li>
             </ul>
           </li>
           <li>

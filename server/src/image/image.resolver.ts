@@ -11,12 +11,14 @@ import { Int } from "type-graphql";
 import { Image, ImageUpdateInput } from "./entities";
 import { FileService } from "../file/file.service";
 import { LetterElement } from "../letter/entities";
+import { IMAGE_FILE_SERVICE } from "../file/file.module";
+import { Inject } from "@nestjs/common";
 
 @Resolver(of => Image)
 export class ImageResolver {
   constructor(
     private readonly imageService: ImageService,
-    private readonly fileService: FileService
+    @Inject(IMAGE_FILE_SERVICE) private readonly fileService: FileService
   ) {}
 
   // No createImage as that is handled by the upload controller.

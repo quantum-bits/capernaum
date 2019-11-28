@@ -6,4 +6,4 @@ foo.*
 foo/
 node_modules/
 private/
-uploaded-files/
+data-files/

@@ -4,12 +4,12 @@ import { writeFile } from "fs";
 import { format } from "path";
 import { SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import * as assert from "assert";
 import { ChartData, Prediction } from "../survey/survey.types";
 import { createHash } from "crypto";
-
-const WORKING_DIR = "/Users/tom/Scratch";
+import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
+import { DateTime } from "luxon";
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
@@ -72,11 +72,17 @@ export class LineBuffer {
 
 @Injectable()
 export default class LetterWriter {
-  constructor(private readonly fileService: FileService) {}
+  constructor(
+    @Inject(IMAGE_FILE_SERVICE)
+    private readonly imageFileService: FileService,
+    @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService
+  ) {}
 
   private renderImage(letterElement: LetterElement) {
     // console.log("RENDER IMAGE", letterElement);
-    const fullPath = this.fileService.fullPath(letterElement.image.fileName());
+    const fullPath = this.imageFileService.fullPath(
+      letterElement.image.fileName()
+    );
     return formatEnvironment(
       "flushleft",
       formatLaTeX("includegraphics", fullPath, "width=\\textwidth")
@@ -231,14 +237,18 @@ export default class LetterWriter {
   }
 
   private renderResponseDetails(surveyResponse: SurveyResponse) {
-    return formatEnvironment(
-      "flushright",
-      [
-        "\\scriptsize",
-        formatLaTeX("item", `Survey ID: ${surveyResponse.id}`),
-        formatLaTeX("item", `Email: ${surveyResponse.email}`)
-      ].join("\n")
-    );
+    return [
+      "\\vfill",
+      formatEnvironment(
+        "flushright",
+        [
+          "\\scriptsize",
+          `Survey ID: ${surveyResponse.id}`,
+          `Email: ${surveyResponse.email}`,
+          `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`
+        ].join("\n\n")
+      )
+    ].join("\n");
   }
 
   renderLetter(
@@ -289,12 +299,11 @@ export default class LetterWriter {
       // Set up paths.
       const pdfFileName = generateFileName(letter.id, surveyResponse.id);
       const pathObject = {
-        dir: WORKING_DIR,
+        dir: this.pdfFileService.baseDirPath(),
         name: pdfFileName
       };
       const texFilePath = format({ ...pathObject, ext: ".tex" });
-      const pdfFilePath = format({ ...pathObject, ext: ".pdf" });
-      console.log(`TeX File ${texFilePath}, PDF File ${pdfFilePath}`);
+      const pdfUrl = `http://localhost:3000/files/${pdfFileName}.pdf`;
 
       // Create the document.
       const result = this.renderDocument(renderedElements);
@@ -308,7 +317,7 @@ export default class LetterWriter {
         // Create the PDF.
         exec(
           `lualatex ${texFilePath}`,
-          { cwd: WORKING_DIR },
+          { cwd: this.pdfFileService.baseDirPath() },
           (err, stdout, stderr) => {
             if (err) {
               reject(err);
@@ -321,7 +330,7 @@ export default class LetterWriter {
 
       resolve({
         ok: true,
-        pdfFileName,
+        pdfUrl,
         responseSummary: surveyResponse.summarize()
       });
     });

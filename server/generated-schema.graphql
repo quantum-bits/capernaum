@@ -140,7 +140,7 @@ input LetterWriterInput {
 
 type LetterWriterOutput {
   ok: Boolean!
-  pdfFileName: String!
+  pdfUrl: String!
   responseSummary: ResponseSummary!
 }
 
