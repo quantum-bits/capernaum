@@ -21,15 +21,14 @@
                 required
                 persistent-hint
               ></v-text-field>
-              <v-text-field
+              <v-textarea
                 v-model="scriptureEngagementPracticeDescription"
                 label="Description"
                 :rules="descriptionRules"
-                :counter="500"
                 outlined
                 required
                 persistent-hint
-              ></v-text-field>
+              ></v-textarea>
               <v-text-field
                 v-model="moreInfoUrl"
                 label="Scripture Engagement Website URL"
@@ -78,28 +77,52 @@
               <td class="text-xs-right">{{ item.description }}</td>
               <td class="text-xs-right">
                 <!-- https://stackoverflow.com/questions/40899532/how-to-pass-a-value-from-vue-data-to-href -->
-                <v-btn text :href="item.moreInfoUrl" target="_blank"
-                  >More Info
-                </v-btn>
-              </td>
-              <td class="text-xs-right">
-                <v-btn text v-on:click="editSEPractice(item)">
-                  Edit
-                </v-btn>
-                <v-tooltip v-if="!item.canDelete" top>
+                <v-tooltip top>
                   <template v-slot:activator="{ on }">
-                    <span v-on="on">
-                      <v-btn text disabled> Delete</v-btn>
-                    </span>
+                    <a
+                      class="no-underline"
+                      :href="item.moreInfoUrl"
+                      target="_blank"
+                      v-on="on"
+                    >
+                      <v-icon>
+                        {{ "mdi-link-variant" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span>Check the linked page for this SE Practice.</span>
+                </v-tooltip>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="editSEPractice(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-pencil" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span>Edit this SE Practice.</span>
+                </v-tooltip>
+                <v-tooltip v-if="item.canDelete" top>
+                  <template v-slot:activator="{ on }">
+                    <a @click="deleteSEPractice(item)" v-on="on">
+                      <v-icon>
+                        {{ "mdi-close-circle" }}
+                      </v-icon>
+                    </a>
+                  </template>
+                  <span>Delete this SE Practice.</span>
+                </v-tooltip>
+                <v-tooltip v-else top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="grey--text text--lighten-1">
+                      {{ "mdi-close-circle" }}
+                    </v-icon>
                   </template>
                   <span
                     >This SE Practice cannot be deleted because it has boolean
-                    associations.</span
+                    associations</span
                   >
                 </v-tooltip>
-                <v-btn v-else text v-on:click="deleteSEPractice(item)">
-                  Delete
-                </v-btn>
               </td>
             </tr>
           </template>
@@ -147,8 +170,7 @@ export default Vue.extend({
           sortable: false,
           value: "description"
         },
-        { text: "More Information", sortable: false },
-        { text: "Action", sortable: false }
+        { text: "Actions", sortable: false }
       ],
       scriptureEngagementPracticeData: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
       createUpdateSEPracticeDialog: false as boolean,
@@ -165,12 +187,7 @@ export default Vue.extend({
           (v && v.length <= 50) ||
           "Title of letter must be fewer than 50 characters"
       ],
-      descriptionRules: [
-        (v: any) => !!v || "Description is required",
-        (v: any) =>
-          (v && v.length <= 500) ||
-          "Description must be fewer than 500 characters"
-      ],
+      descriptionRules: [(v: any) => !!v || "Description is required"],
       urlRules: [(v: any) => !!v || "A URL is required"]
     };
   },
@@ -354,3 +371,9 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style scoped>
+.no-underline {
+  text-decoration: none;
+}
+</style>

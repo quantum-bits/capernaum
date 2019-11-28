@@ -312,6 +312,7 @@ interface LetterElement extends OneLetter_letter_letterElements {
     AssociationTable,
     SpinnerBtn
   },
+  // https://github.com/kaorun343/vue-property-decorator/issues/38
   beforeRouteLeave(to: Route, from: Route, next: Function) {
     console.log("inside before route leave!");
     if (!this.allEditsSaved()) {
