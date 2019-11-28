@@ -5,6 +5,8 @@ import typeORMConfig from "./typeorm-config";
 import { LetterModule } from "./letter/letter.module";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,7 +20,9 @@ import { PredictionModule } from "./prediction/prediction.module";
     }),
     LetterModule,
     SurveyModule,
-    PredictionModule
+    PredictionModule,
+    UsersModule,
+    AuthModule
   ]
 })
 export class AppModule {}

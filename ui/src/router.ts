@@ -72,6 +72,11 @@ export default new Router({
       path: "/images",
       name: "images",
       component: () => import("./pages/Images.vue")
+    },
+    {
+      path: "/login",
+      name: "login",
+      component: () => import("./pages/Login.vue")
     }
   ]
 });
