@@ -24,8 +24,8 @@ export class LetterService extends BaseService {
   letter(id: number) {
     return this.letterRepo
       .createQueryBuilder("letter")
-      .innerJoinAndSelect("letter.letterElements", "letterElements")
-      .innerJoinAndSelect("letterElements.letterElementType", "elementTypes")
+      .leftJoinAndSelect("letter.letterElements", "letterElements")
+      .leftJoinAndSelect("letterElements.letterElementType", "elementTypes")
       .leftJoinAndSelect("letterElements.image", "images")
       .leftJoinAndSelect("letterElements.surveyDimension", "dimension")
       .where("letter.id = :id", { id })
