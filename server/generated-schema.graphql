@@ -144,6 +144,11 @@ type LetterWriterOutput {
   responseSummary: ResponseSummary!
 }
 
+input LoginCredentials {
+  email: String!
+  plainTextPassword: String!
+}
+
 type Mutation {
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
@@ -199,7 +204,8 @@ type Mutation {
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
   createUser(createInput: UserCreateInput!): User!
-  createUserRole(name: String!): UserRole!
+  createUserRole(createInput: UserRoleCreateInput!): UserRole!
+  login(loginCredentials: LoginCredentials!): User!
 }
 
 input PartialPredictionTableEntry {
@@ -543,7 +549,6 @@ type User {
   email: String!
   firstName: String!
   lastName: String!
-  hashedPassword: String!
   roles: [UserRole!]!
 }
 
@@ -559,6 +564,12 @@ type UserRole {
   """Unique ID for this entity"""
   id: Int!
   name: String!
+  description: String!
+}
+
+input UserRoleCreateInput {
+  name: String!
+  description: String!
 }
 
 """

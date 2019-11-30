@@ -9,7 +9,7 @@ export class User extends AbstractEntity {
   @Field() @Column({ unique: true }) email: string;
   @Field() @Column() firstName: string;
   @Field() @Column() lastName: string;
-  @Field() @Column() hashedPassword: string;
+  @Column() hashedPassword: string; // Don't expose this via GraphQL.
 
   @Field(returns => [UserRole])
   @ManyToMany(type => UserRole)

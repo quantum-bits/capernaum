@@ -1,7 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
 import { EntityManager, Repository } from "typeorm";
-import { User, UserCreateInput, UserRole } from "./entities";
+import {
+  User,
+  UserCreateInput,
+  UserRole,
+  UserRoleCreateInput
+} from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { hashPassword } from "../auth/auth.service";
 
@@ -17,26 +22,31 @@ export class UserService extends BaseService {
   }
 
   async createUser(createInput: UserCreateInput) {
-    const hashedPassword = await hashPassword(createInput.plainTextPassword);
-
+    // Resolve role IDs to roles objects.
     const roles: UserRole[] = [];
     for (const id of createInput.userRoleIds) {
       roles.push(await this.userRoleRepo.findOneOrFail(id));
     }
 
+    // Create and save the user. Because this is the only modification to the database,
+    // don't bother with a transaction.
     return this.userRepo.save(
       this.userRepo.create({
         email: createInput.email,
         firstName: createInput.firstName,
         lastName: createInput.lastName,
-        hashedPassword,
+        hashedPassword: await hashPassword(createInput.plainTextPassword),
         roles
       })
     );
   }
 
-  createUserRole(name: string) {
-    return this.userRoleRepo.save(this.userRoleRepo.create({ name }));
+  createUserRole(createInput: UserRoleCreateInput) {
+    return this.userRoleRepo.save(this.userRoleRepo.create(createInput));
+  }
+
+  oneUser(id: number) {
+    return this.userRepo.findOne(id, { relations: ["roles"] });
   }
 
   allUsers() {
@@ -44,6 +54,6 @@ export class UserService extends BaseService {
   }
 
   findUserByEmail(email: string) {
-    return this.userRepo.findOne({ email });
+    return this.userRepo.findOne({ email }, { relations: ["roles"] });
   }
 }

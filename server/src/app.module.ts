@@ -6,7 +6,6 @@ import { LetterModule } from "./letter/letter.module";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
 import { AuthModule } from "./auth/auth.module";
-import { AppController } from "./app.controller";
 
 @Module({
   imports: [
@@ -16,13 +15,13 @@ import { AppController } from "./app.controller";
       logging: true
     }),
     GraphQLModule.forRoot({
-      autoSchemaFile: "generated-schema.graphql"
+      autoSchemaFile: "generated-schema.graphql",
+      context: ({ req }) => ({ req })
     }),
     LetterModule,
     SurveyModule,
     PredictionModule,
     AuthModule
-  ],
-  controllers: [AppController]
+  ]
 })
 export class AppModule {}

@@ -33,11 +33,23 @@
         </v-card>
       </v-col>
     </v-row>
+    <v-row>
+      {{ allUsers }}
+    </v-row>
   </v-container>
 </template>
 
 <script>
+import { ALL_USERS_QUERY } from "../graphql/users.graphql";
+
 export default {
+  apollo: {
+    allUsers: {
+      query: ALL_USERS_QUERY,
+      update: data => data.users
+    }
+  },
+
   data() {
     return {
       email: "",
