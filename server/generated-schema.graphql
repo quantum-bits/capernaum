@@ -199,7 +199,7 @@ type Mutation {
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
   createUser(createInput: UserCreateInput!): User!
-  createUserRole(createInput: UserRoleCreateInput!): UserRole!
+  createUserRole(name: String!): UserRole!
 }
 
 input PartialPredictionTableEntry {
@@ -302,6 +302,7 @@ type Query {
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   user(id: Int!): User!
   users: [User!]!
+  userRoles: [UserRole!]!
 }
 
 type ResponseSummary {
@@ -551,18 +552,12 @@ input UserCreateInput {
   firstName: String!
   lastName: String!
   plainTextPassword: String!
-  roles: [UserRoleCreateInput!]!
+  userRoleIds: [Int!]!
 }
 
 type UserRole {
   """Unique ID for this entity"""
   id: Int!
-  name: String!
-  description: String!
-  users: [User!]!
-}
-
-input UserRoleCreateInput {
   name: String!
 }
 

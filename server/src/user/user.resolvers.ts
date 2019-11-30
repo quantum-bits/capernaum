@@ -1,10 +1,5 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import {
-  User,
-  UserCreateInput,
-  UserRole,
-  UserRoleCreateInput
-} from "./entities";
+import { User, UserCreateInput, UserRole } from "./entities";
 import { UserService } from "./user.service";
 import { Int } from "type-graphql";
 
@@ -24,7 +19,7 @@ export class UserResolver {
 
   @Query(returns => [User])
   users() {
-    return this.userService.find(User);
+    return this.userService.allUsers();
   }
 }
 
@@ -33,7 +28,12 @@ export class UserRoleResolver {
   constructor(private readonly userService: UserService) {}
 
   @Mutation(returns => UserRole)
-  createUserRole(@Args("createInput") createInput: UserRoleCreateInput) {
-    return this.userService.createUserRole(createInput);
+  createUserRole(@Args("name") name: string) {
+    return this.userService.createUserRole(name);
+  }
+
+  @Query(returns => [UserRole])
+  userRoles() {
+    return this.userService.find(UserRole);
   }
 }

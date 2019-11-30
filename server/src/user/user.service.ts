@@ -1,12 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
 import { EntityManager, Repository } from "typeorm";
-import {
-  User,
-  UserCreateInput,
-  UserRole,
-  UserRoleCreateInput
-} from "./entities";
+import { User, UserCreateInput, UserRole } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { hashPassword } from "../auth/auth.service";
 
@@ -23,18 +18,29 @@ export class UserService extends BaseService {
 
   async createUser(createInput: UserCreateInput) {
     const hashedPassword = await hashPassword(createInput.plainTextPassword);
+
+    const roles: UserRole[] = [];
+    for (const id of createInput.userRoleIds) {
+      roles.push(await this.userRoleRepo.findOneOrFail(id));
+    }
+
     return this.userRepo.save(
       this.userRepo.create({
         email: createInput.email,
         firstName: createInput.firstName,
         lastName: createInput.lastName,
-        hashedPassword
+        hashedPassword,
+        roles
       })
     );
   }
 
-  createUserRole(createInput: UserRoleCreateInput) {
-    return this.userRoleRepo.save(this.userRoleRepo.create(createInput));
+  createUserRole(name: string) {
+    return this.userRoleRepo.save(this.userRoleRepo.create({ name }));
+  }
+
+  allUsers() {
+    return this.userRepo.find({ relations: ["roles"] });
   }
 
   findUserByEmail(email: string) {
