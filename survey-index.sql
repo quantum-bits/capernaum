@@ -1,0 +1,15 @@
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (3, 4, 'FOG', 'Focus on God');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (4, 4, 'FOO', 'Focus on Others');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (5, 4, 'FOB', 'Focus on the Bible');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (6, 5, 'CON', 'Connectedness');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (7, 5, 'APP', 'Appetites');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (8, 5, 'REF', 'Reflective');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (9, 5, 'EVAN', 'Evangelism');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (10, 5, 'SERV', 'Service');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (11, 5, 'STEW', 'Stewardship');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (12, 6, 'EX GOD', 'Experience God');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (13, 6, 'APP', 'Application');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (14, 6, 'IDENT', 'Identity');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (15, 6, 'AFF', 'Affective');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (16, 6, 'OUT', 'Outward Focus');
+INSERT INTO public.survey_index (id, "surveyDimensionId", abbreviation, title) VALUES (17, 6, 'STUD', 'Study');
