@@ -30,7 +30,7 @@
         </v-card-text>
         <v-card-actions v-if="!parentIsFrozen">
           <v-btn text color="orange" @click="deleteElement">Delete</v-btn>
-          <v-btn v-if="order > 0" text color="orange" @click="moveUp">
+          <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
             <v-icon>mdi-arrow-up</v-icon>
           </v-btn>
           <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
