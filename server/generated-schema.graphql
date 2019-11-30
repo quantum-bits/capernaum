@@ -198,6 +198,8 @@ type Mutation {
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
+  createUser(createInput: UserCreateInput!): User!
+  createUserRole(createInput: UserRoleCreateInput!): UserRole!
 }
 
 input PartialPredictionTableEntry {
@@ -298,6 +300,8 @@ type Query {
   image(id: Int!): Image!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+  user(id: Int!): User!
+  users: [User!]!
 }
 
 type ResponseSummary {
@@ -530,6 +534,36 @@ input SurveyUpdateInput {
   qualtricsId: String
   qualtricsName: String
   qualtricsModDate: String
+}
+
+type User {
+  """Unique ID for this entity"""
+  id: Int!
+  email: String!
+  firstName: String!
+  lastName: String!
+  hashedPassword: String!
+  roles: [UserRole!]!
+}
+
+input UserCreateInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  plainTextPassword: String!
+  roles: [UserRoleCreateInput!]!
+}
+
+type UserRole {
+  """Unique ID for this entity"""
+  id: Int!
+  name: String!
+  description: String!
+  users: [User!]!
+}
+
+input UserRoleCreateInput {
+  name: String!
 }
 
 """

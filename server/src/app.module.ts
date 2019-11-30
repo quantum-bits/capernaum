@@ -8,6 +8,7 @@ import { PredictionModule } from "./prediction/prediction.module";
 import { UserModule } from "./user/user.module";
 import { AuthModule } from "./auth/auth.module";
 import { AppController } from "./app.controller";
+import { UserService } from "./user/user.service";
 
 @Module({
   imports: [
@@ -22,7 +23,6 @@ import { AppController } from "./app.controller";
     LetterModule,
     SurveyModule,
     PredictionModule,
-    UserModule,
     AuthModule
   ],
   controllers: [AppController]

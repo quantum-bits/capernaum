@@ -1,47 +1,43 @@
 import { Injectable } from "@nestjs/common";
-import { AuthService } from "../auth/auth.service";
-
-export interface User {
-  id: number;
-  email: string;
-  hashedPassword: string;
-  roles: string[];
-}
-
-export const ROLE_SYS_ADMIN = "sys-admin";
-export const ROLE_SURVEY_ADMIN = "survey-admin";
-
-const TEST_HASHED_PASSWORD =
-  "$2b$10$.8jKztznXlJ6j83P8ahAOu4ZK5onQZ2zODhJr6v2kldZRJw8Djfmi";
+import { BaseService } from "../shared/base.service";
+import { EntityManager, Repository } from "typeorm";
+import {
+  User,
+  UserCreateInput,
+  UserRole,
+  UserRoleCreateInput
+} from "./entities";
+import { InjectRepository } from "@nestjs/typeorm";
+import { hashPassword } from "../auth/auth.service";
 
 @Injectable()
-export class UserService {
-  private readonly users: User[];
-
-  constructor() {
-    this.users = [
-      {
-        id: 1,
-        email: "tnurkkala@cse.taylor.edu",
-        hashedPassword: TEST_HASHED_PASSWORD,
-        roles: [ROLE_SYS_ADMIN]
-      },
-      {
-        id: 2,
-        email: "knkiers@taylor.edu",
-        hashedPassword: TEST_HASHED_PASSWORD,
-        roles: [ROLE_SYS_ADMIN]
-      },
-      {
-        id: 3,
-        email: "stbird@taylor.edu",
-        hashedPassword: TEST_HASHED_PASSWORD,
-        roles: [ROLE_SURVEY_ADMIN]
-      }
-    ];
+export class UserService extends BaseService {
+  constructor(
+    protected readonly entityManager: EntityManager,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(UserRole)
+    private readonly userRoleRepo: Repository<UserRole>
+  ) {
+    super(entityManager);
   }
 
-  async findOne(email: string): Promise<User | undefined> {
-    return this.users.find(user => user.email === email);
+  async createUser(createInput: UserCreateInput) {
+    const hashedPassword = await hashPassword(createInput.plainTextPassword);
+    return this.userRepo.save(
+      this.userRepo.create({
+        email: createInput.email,
+        firstName: createInput.firstName,
+        lastName: createInput.lastName,
+        hashedPassword
+      })
+    );
+  }
+
+  createUserRole(createInput: UserRoleCreateInput) {
+    return this.userRoleRepo.save(this.userRoleRepo.create(createInput));
+  }
+
+  findUserByEmail(email: string) {
+    return this.userRepo.findOne({ email });
   }
 }
