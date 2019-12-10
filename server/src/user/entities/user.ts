@@ -25,3 +25,13 @@ export class UserCreateInput {
   @Field() plainTextPassword: string;
   @Field(type => [Int]) userRoleIds: number[];
 }
+
+// JWT payload.
+@ObjectType()
+export class UserPayload {
+  @Field() id: number;
+  @Field() firstName: string;
+  @Field() lastName: string;
+  @Field() email: string;
+  @Field(type => [UserRole]) roles: UserRole[];
+}

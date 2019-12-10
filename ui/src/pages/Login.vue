@@ -33,23 +33,13 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row>
-      {{ allUsers }}
-    </v-row>
   </v-container>
 </template>
 
 <script>
-import { ALL_USERS_QUERY } from "../graphql/users.graphql";
+import { LOGIN_MUTATION } from "../graphql/users.graphql";
 
 export default {
-  apollo: {
-    allUsers: {
-      query: ALL_USERS_QUERY,
-      update: data => data.users
-    }
-  },
-
   data() {
     return {
       email: "",
@@ -59,8 +49,23 @@ export default {
 
   methods: {
     logIn() {
-      console.log(`Email: ${this.email}`);
-      console.log(`Password: ${this.password}`);
+      this.$apollo
+        .mutate({
+          mutation: LOGIN_MUTATION,
+          variables: {
+            credentials: {
+              email: this.email,
+              plainTextPassword: this.password
+            }
+          }
+        })
+        .then(response => {
+          this.$store.commit("logIn", response.data.login);
+          this.$router.push({ name: "home" });
+        })
+        .catch(err => {
+          this.$store.commit("logOut");
+        });
     }
   }
 };

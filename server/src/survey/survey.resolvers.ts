@@ -26,7 +26,7 @@ import {
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
-import { ChartData, WhichItems } from "./survey.types";
+import { WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
@@ -185,7 +185,6 @@ export class SurveyResponseResolver {
   }
 
   @Query(returns => [SurveyResponse])
-  @UseGuards(GqlAuthGuard)
   surveyResponses() {
     return this.surveyService.find(SurveyResponse);
   }

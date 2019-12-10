@@ -11,6 +11,7 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { UseGuards } from "@nestjs/common";
 
 @Resolver(of => User)
+@UseGuards(GqlAuthGuard)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 

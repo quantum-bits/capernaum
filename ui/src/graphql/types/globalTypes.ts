@@ -60,6 +60,11 @@ export interface LetterWriterInput {
   surveyResponseId: number;
 }
 
+export interface LoginCredentials {
+  email: string;
+  plainTextPassword: string;
+}
+
 export interface PartialPredictionTableEntry {
   surveyIndexId: number;
   practiceId: number;

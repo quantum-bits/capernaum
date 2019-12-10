@@ -14,11 +14,6 @@ export default new Router({
       component: Home
     },
     {
-      path: "/about",
-      name: "about",
-      component: () => import("./pages/About.vue")
-    },
-    {
       path: "/letters",
       name: "letters",
       component: () => import("./pages/Letters.vue")
@@ -47,16 +42,6 @@ export default new Router({
       path: "/association-table/:letterId",
       name: "association-table",
       component: () => import("./pages/BooleanAssociations.vue")
-    },
-    {
-      path: "/about-more",
-      name: "about-more",
-      component: () => import("./pages/About.vue")
-    },
-    {
-      path: "/about-even-more",
-      name: "about-even-more",
-      component: () => import("./pages/About.vue")
     },
     {
       path: "/responses",

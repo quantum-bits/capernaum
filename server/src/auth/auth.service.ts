@@ -2,7 +2,8 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../user/user.service";
 import { validatePassword } from "./crypto";
-import { AccessTokenPayload, LoginCredentials } from "./entities";
+import { LoginCredentials } from "./entities";
+import { UserPayload } from "../user/entities";
 
 @Injectable()
 export class AuthService {
@@ -21,16 +22,17 @@ export class AuthService {
       );
 
       if (validPassword) {
-        const payload: AccessTokenPayload = {
-          sub: user.id,
+        const userPayload: UserPayload = {
+          id: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           roles: user.roles
         };
-        const token = this.jwtService.sign(payload);
+        const token = this.jwtService.sign(userPayload);
 
         return {
+          user: userPayload,
           accessToken: token
         };
       }

@@ -1,21 +1,34 @@
 <template>
   <v-app>
-    <ToolBar />
-
+    <nav-drawer v-model="drawerVisible" />
+    <app-bar @toggleDrawer="toggleNavDrawer" />
     <v-content>
-      <router-view></router-view>
+      <router-view />
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
-import ToolBar from "./ToolBar.vue";
+import Vue from "vue";
+import AppBar from "./AppBar.vue";
+import NavDrawer from "./NavDrawer.vue";
 
-@Component({
+export default Vue.extend({
   components: {
-    ToolBar
+    AppBar,
+    NavDrawer
+  },
+
+  data() {
+    return {
+      drawerVisible: false
+    };
+  },
+
+  methods: {
+    toggleNavDrawer(): void {
+      this.drawerVisible = !this.drawerVisible;
+    }
   }
-})
-export default class DefaultLayout extends Vue {}
+});
 </script>

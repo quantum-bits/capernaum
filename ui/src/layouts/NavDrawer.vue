@@ -1,20 +1,14 @@
 <template>
-  <v-navigation-drawer app v-model="drawerVisible">
+  <v-navigation-drawer
+    app
+    clipped
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
+  >
     <!-- Heading -->
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="title">
-          Admin
-        </v-list-item-title>
-        <v-list-item-subtitle>
-          Capernaum
-        </v-list-item-subtitle>
-      </v-list-item-content>
-    </v-list-item>
+    <v-list v-for="item in navItems" :key="item.route" dense>
+      <v-subheader v-if="item.heading">{{ item.heading }}</v-subheader>
 
-    <v-divider></v-divider>
-
-    <v-list v-for="item in navItems" :key="item.route" dense nav>
       <!-- No children -->
       <v-list-item v-if="!item.children" :to="{ name: item.route }">
         <v-list-item-icon>
@@ -57,19 +51,16 @@ interface NavChild {
 }
 
 interface NavItem extends NavChild {
+  heading?: string;
   divider?: boolean;
   children?: NavChild[];
 }
 
 export default Vue.extend({
-  props: {
-    initialVisibility: {
-      type: Boolean,
-      default: null
-    }
-  },
+  props: ["value"],
+
   data: function() {
-    let navItems: NavItem[] = [
+    const navItems: NavItem[] = [
       {
         title: "Home",
         route: "home",
@@ -77,26 +68,22 @@ export default Vue.extend({
         divider: true
       },
       {
-        title: "About",
-        route: "about",
-        icon: "mdi-school",
-        children: [
-          {
-            title: "This project",
-            route: "about-more",
-            icon: "mdi-autorenew"
-          },
-          {
-            title: "The Center for Scripture Engagement",
-            route: "about-even-more",
-            icon: "mdi-view-dashboard"
-          }
-        ]
+        heading: "PRACTICES",
+        title: "Scripture Engagement Practices",
+        route: "scripture-engagement-practices",
+        icon: "mdi-book-open",
+        divider: true
       },
       {
-        title: "Responses",
-        route: "responses",
-        icon: "mdi-message-outline"
+        heading: "SURVEYS",
+        title: "Survey Dimensions",
+        route: "survey-dimensions",
+        icon: "mdi-file-tree"
+      },
+      {
+        title: "Uploaded Images",
+        route: "images",
+        icon: "mdi-image"
       },
       {
         title: "Letters",
@@ -105,40 +92,20 @@ export default Vue.extend({
         divider: true
       },
       {
-        title: "Survey Dimensions",
-        route: "survey-dimensions",
-        icon: "mdi-file-tree",
-        divider: true
-      },
-      {
+        heading: "RESPONSES",
         title: "Imported Surveys",
         route: "imported-surveys",
-        icon: "mdi-download",
-        divider: true
+        icon: "mdi-download"
       },
       {
-        title: "Uploaded Images",
-        route: "images",
-        icon: "mdi-image",
-        divider: true
-      },
-      {
-        title: "Scripture Engagement Practices",
-        route: "scripture-engagement-practices",
-        icon: "mdi-book-open",
-        divider: true
+        title: "Responses",
+        route: "responses",
+        icon: "mdi-message-outline"
       }
     ];
     return {
-      drawerVisible: this.initialVisibility,
       navItems
     };
-  },
-
-  methods: {
-    toggle: function() {
-      this.drawerVisible = !this.drawerVisible;
-    }
   }
 });
 </script>

@@ -29,3 +29,22 @@ export const ALL_USERS_QUERY = gql`
     }
   }
 `;
+
+export const LOGIN_MUTATION = gql`
+  mutation Login($credentials: LoginCredentials!) {
+    login(loginCredentials: $credentials) {
+      accessToken
+      user {
+        id
+        email
+        firstName
+        lastName
+        roles {
+          id
+          name
+          description
+        }
+      }
+    }
+  }
+`;

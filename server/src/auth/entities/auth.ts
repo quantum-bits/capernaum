@@ -1,5 +1,5 @@
 import { Field, InputType, ObjectType } from "type-graphql";
-import { UserRole } from "../../user/entities";
+import { UserPayload } from "../../user/entities";
 
 @InputType()
 export class LoginCredentials {
@@ -8,14 +8,7 @@ export class LoginCredentials {
 }
 
 @ObjectType()
-export class AccessToken {
+export class LoginResponse {
   @Field() accessToken: string;
-}
-
-export interface AccessTokenPayload {
-  sub: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  roles: UserRole[];
+  @Field(type => UserPayload) user: UserPayload;
 }

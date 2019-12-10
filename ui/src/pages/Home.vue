@@ -1,6 +1,10 @@
 <template>
   <v-container>
-    <h1 class="headline">The home page</h1>
+    <v-row>
+      <v-col>
+        <h1 class="headline">The home page</h1>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

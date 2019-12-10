@@ -8,10 +8,6 @@ type AbstractEntity {
   id: Int!
 }
 
-type AccessToken {
-  accessToken: String!
-}
-
 type ChartData {
   title: String!
   entries: [ChartEntry!]!
@@ -153,6 +149,11 @@ input LoginCredentials {
   plainTextPassword: String!
 }
 
+type LoginResponse {
+  accessToken: String!
+  user: UserPayload!
+}
+
 type Mutation {
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
@@ -209,7 +210,7 @@ type Mutation {
   deleteScriptureEngagementPractice(id: Int!): Int!
   createUser(createInput: UserCreateInput!): User!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
-  login(loginCredentials: LoginCredentials!): AccessToken!
+  login(loginCredentials: LoginCredentials!): LoginResponse!
 }
 
 input PartialPredictionTableEntry {
@@ -562,6 +563,14 @@ input UserCreateInput {
   lastName: String!
   plainTextPassword: String!
   userRoleIds: [Int!]!
+}
+
+type UserPayload {
+  id: Float!
+  firstName: String!
+  lastName: String!
+  email: String!
+  roles: [UserRole!]!
 }
 
 type UserRole {

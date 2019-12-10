@@ -3,13 +3,12 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import Vue from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
-@Component({
+export default Vue.extend({
   components: {
     DefaultLayout
   }
-})
-export default class App extends Vue {}
+});
 </script>
