@@ -8,6 +8,10 @@ type AbstractEntity {
   id: Int!
 }
 
+type AccessToken {
+  accessToken: String!
+}
+
 type ChartData {
   title: String!
   entries: [ChartEntry!]!
@@ -205,7 +209,7 @@ type Mutation {
   deleteScriptureEngagementPractice(id: Int!): Int!
   createUser(createInput: UserCreateInput!): User!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
-  login(loginCredentials: LoginCredentials!): User!
+  login(loginCredentials: LoginCredentials!): AccessToken!
 }
 
 input PartialPredictionTableEntry {

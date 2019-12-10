@@ -7,7 +7,8 @@ import {
 } from "./entities";
 import { UserService } from "./user.service";
 import { Int } from "type-graphql";
-import { AuthService } from "../auth/auth.service";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { UseGuards } from "@nestjs/common";
 
 @Resolver(of => User)
 export class UserResolver {

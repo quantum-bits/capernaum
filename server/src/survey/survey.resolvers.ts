@@ -29,6 +29,8 @@ import { Int } from "type-graphql";
 import { ChartData, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
+import { UseGuards } from "@nestjs/common";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => Survey)
 export class SurveyResolver {
@@ -183,6 +185,7 @@ export class SurveyResponseResolver {
   }
 
   @Query(returns => [SurveyResponse])
+  @UseGuards(GqlAuthGuard)
   surveyResponses() {
     return this.surveyService.find(SurveyResponse);
   }

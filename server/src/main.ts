@@ -1,8 +1,5 @@
-// Import configuration from environment.
 import { config } from "dotenv";
 config();
-
-// console.log("ENV", process.env);
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
@@ -12,4 +9,5 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(3000);
 }
+
 bootstrap();

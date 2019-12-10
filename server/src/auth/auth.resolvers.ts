@@ -1,21 +1,13 @@
 import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { AuthService } from "../auth/auth.service";
-import { User } from "../user/entities";
-import { LoginCredentials } from "./entities";
-import { UserService } from "../user/user.service";
+import { AccessToken, LoginCredentials } from "./entities";
 
 @Resolver()
 export class AuthResolver {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Mutation(returns => User)
+  @Mutation(returns => AccessToken)
   login(@Args("loginCredentials") loginCredentials: LoginCredentials) {
-    console.log("CRED", loginCredentials);
-
-    const user = this.userService.findUserByEmail(loginCredentials.email);
-    return user;
+    return this.authService.login(loginCredentials);
   }
 }

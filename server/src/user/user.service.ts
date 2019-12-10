@@ -8,7 +8,7 @@ import {
   UserRoleCreateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { hashPassword } from "../auth/auth.service";
+import { hashPassword } from "../auth/crypto";
 
 @Injectable()
 export class UserService extends BaseService {

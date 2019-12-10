@@ -1,21 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { compare, hash } from "bcrypt";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../user/user.service";
-import { User } from "../user/entities";
-
-const SALT_ROUNDS = 10;
-
-export function hashPassword(plainTextPassword: string) {
-  return hash(plainTextPassword, SALT_ROUNDS);
-}
-
-function validatePassword(
-  plainTextPassword: string,
-  encryptedPassword: string
-) {
-  return compare(plainTextPassword, encryptedPassword);
-}
+import { validatePassword } from "./crypto";
+import { AccessTokenPayload, LoginCredentials } from "./entities";
 
 @Injectable()
 export class AuthService {
@@ -24,25 +11,31 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async validateUser(email: string, plainTextPassword: string) {
-    console.log("PWD", await hashPassword(plainTextPassword));
-    const user = await this.userService.findUserByEmail(email);
-    console.log("USER", user);
+  async login(loginCredentials: LoginCredentials) {
+    const user = await this.userService.findUserByEmail(loginCredentials.email);
+
     if (user) {
-      if (await validatePassword(plainTextPassword, user.hashedPassword)) {
-        // Return everything but the password.
-        const { hashedPassword, ...result } = user;
-        return result;
+      const validPassword = await validatePassword(
+        loginCredentials.plainTextPassword,
+        user.hashedPassword
+      );
+
+      if (validPassword) {
+        const payload: AccessTokenPayload = {
+          sub: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          roles: user.roles
+        };
+        const token = this.jwtService.sign(payload);
+
+        return {
+          accessToken: token
+        };
       }
     }
 
-    return null;
-  }
-
-  async login(user: User) {
-    const payload = { email: user.email, sub: user.id };
-    return {
-      accessToken: this.jwtService.sign(payload)
-    };
+    throw new UnauthorizedException();
   }
 }
