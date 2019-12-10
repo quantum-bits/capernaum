@@ -62,12 +62,6 @@ export default Vue.extend({
   data: function() {
     const navItems: NavItem[] = [
       {
-        title: "Home",
-        route: "home",
-        icon: "mdi-home",
-        divider: true
-      },
-      {
         heading: "PRACTICES",
         title: "Scripture Engagement Practices",
         route: "scripture-engagement-practices",
