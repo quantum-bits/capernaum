@@ -33,6 +33,11 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-snackbar v-model="snackbar.show">
+      {{ snackbar.text }}
+      <v-btn text @click="snackbar.show = false">Close</v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -43,11 +48,21 @@ export default {
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
+
+      snackbar: {
+        show: false,
+        text: ""
+      }
     };
   },
 
   methods: {
+    showSnackbar(text) {
+      this.snackbar.text = text;
+      this.snackbar.show = true;
+    },
+
     logIn() {
       this.$apollo
         .mutate({
@@ -61,10 +76,11 @@ export default {
         })
         .then(response => {
           this.$store.commit("logIn", response.data.login);
-          this.$router.push({ name: "home" });
+          this.$router.push({ name: "letters" });
         })
-        .catch(err => {
+        .catch(() => {
           this.$store.commit("logOut");
+          this.showSnackbar("Invalid credentials; please try again.");
         });
     }
   }

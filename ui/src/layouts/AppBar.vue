@@ -9,10 +9,6 @@
 
     <v-spacer />
 
-    <v-btn v-if="!isLoggedIn" text v-bind:to="{ name: 'login' }">
-      Log In
-    </v-btn>
-
     <v-menu v-if="isLoggedIn" offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on">
@@ -49,6 +45,7 @@ export default {
     },
     logOut() {
       this.$store.commit("logOut");
+      this.$router.push({ name: "login" });
     }
   },
 

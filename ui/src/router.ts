@@ -1,12 +1,17 @@
 import Vue from "vue";
-import Router from "vue-router";
+import VueRouter from "vue-router";
+import vuexStore from "./store";
 
-Vue.use(Router);
+Vue.use(VueRouter);
 
-export default new Router({
+const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
+    {
+      path: "/",
+      redirect: { name: "letters" }
+    },
     {
       path: "/login",
       name: "login",
@@ -59,3 +64,18 @@ export default new Router({
     }
   ]
 });
+
+router.beforeEach((to, from, next) => {
+  if (vuexStore.getters.isLoggedIn) {
+    // Already logged in.
+    next();
+  } else if (to.name === "login") {
+    // Avoid infinite loop
+    next();
+  } else {
+    // Force login.
+    next({ name: "login" });
+  }
+});
+
+export default router;

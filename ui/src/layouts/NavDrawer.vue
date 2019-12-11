@@ -9,32 +9,13 @@
     <v-list v-for="item in navItems" :key="item.route" dense>
       <v-subheader v-if="item.heading">{{ item.heading }}</v-subheader>
 
-      <!-- No children -->
-      <v-list-item v-if="!item.children" :to="{ name: item.route }">
+      <v-list-item :to="{ name: item.route }" :disabled="!isLoggedIn">
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
 
         <v-list-item-title>{{ item.title }}</v-list-item-title>
       </v-list-item>
-
-      <!-- With children -->
-      <v-list-group v-else :prepend-icon="item.icon" no-action>
-        <template v-slot:activator>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </template>
-
-        <v-list-item
-          v-for="child in item.children"
-          :key="child.route"
-          :to="{ name: child.route }"
-        >
-          <v-list-item-icon>
-            <v-icon>{{ child.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title>{{ child.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list-group>
 
       <v-divider v-if="item.divider"></v-divider>
     </v-list>
@@ -44,20 +25,22 @@
 <script lang="ts">
 import Vue from "vue";
 
-interface NavChild {
+interface NavItem {
+  heading?: string;
   title: string;
   route: string;
   icon: string;
-}
-
-interface NavItem extends NavChild {
-  heading?: string;
   divider?: boolean;
-  children?: NavChild[];
 }
 
 export default Vue.extend({
   props: ["value"],
+
+  computed: {
+    isLoggedIn(): boolean {
+      return this.$store.getters.isLoggedIn;
+    }
+  },
 
   data: function() {
     const navItems: NavItem[] = [
