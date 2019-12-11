@@ -1,0 +1,2 @@
+[webservers]
+parallels ansible_host=10.211.55.50
