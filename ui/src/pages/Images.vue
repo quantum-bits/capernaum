@@ -23,7 +23,7 @@
                   <file-pond
                     name="filepondUpload"
                     :server="{
-                      url: '/images',
+                      url: '/images/',
                       process: 'process'
                     }"
                     @processfile="fileProcessed"
