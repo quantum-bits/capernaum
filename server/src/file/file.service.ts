@@ -11,7 +11,7 @@ export class FileService {
   private readonly basePath: string;
 
   constructor(subDir: string) {
-    const dataFilesDirPath = process.env.CAP_DATA_FILES;
+    const dataFilesDirPath = process.env.CAP_STATIC_DIR;
     this.basePath = normalize(join(dataFilesDirPath, subDir));
 
     access(this.basePath, err => {

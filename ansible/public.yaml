@@ -5,15 +5,15 @@ pg_username: "capernaum"
 cap_repo: "https://github.com/quantum-bits/capernaum.git"
 
 cap_base_dir: "/home/capernaum"
-cap_src_dir: "{{ cap_base_dir }}/src"
-cap_ui_dir: "{{ cap_src_dir }}/ui"
-cap_server_dir: "{{ cap_src_dir }}/server"
+cap_app_dir: "{{ cap_base_dir }}/app"
+cap_ui_dir: "{{ cap_app_dir }}/ui"
+cap_server_dir: "{{ cap_app_dir }}/server"
 
 cap_username: "capernaum"
 
-cap_data_files: "{{ cap_base_dir }}/data-files"
-cap_upload_dir: "uploaded-files"
-cap_pdf_dir: "generated-pdfs"
+cap_static_dir: "{{ cap_base_dir }}/static"
+cap_upload_dir: "images"
+cap_pdf_dir: "pdfs"
 
 sep_prediction_threshold: 4.5
 
