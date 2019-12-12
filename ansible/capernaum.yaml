@@ -91,12 +91,12 @@
     - name: copy nginx config file
       copy:
         src: files/nginx.conf
-        dest: /etc/nginx/sites-available/capernaum
+        dest: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
 
     - name: enable nginx configuration
       file:
-        src: /etc/nginx/sites-available/capernaum
-        dest: /etc/nginx/sites-enabled/capernaum
+        src: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
+        dest: "{{ nginx_enabled_dir }}/{{ nginx_conf_file }}"
         state: link
 
     - name: restart nginx

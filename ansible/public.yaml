@@ -1,18 +1,23 @@
-pg_host: 'localhost'
-pg_database: 'capernaum'
-pg_username: 'capernaum'
+pg_host: "localhost"
+pg_database: "capernaum"
+pg_username: "capernaum"
 
-cap_repo: 'https://github.com/quantum-bits/capernaum.git'
+cap_repo: "https://github.com/quantum-bits/capernaum.git"
 
-cap_base_dir: '/home/capernaum'
-cap_src_dir: '{{ cap_base_dir }}/src'
-cap_ui_dir: '{{ cap_src_dir }}/ui'
-cap_server_dir: '{{ cap_src_dir }}/server'
+cap_base_dir: "/home/capernaum"
+cap_src_dir: "{{ cap_base_dir }}/src"
+cap_ui_dir: "{{ cap_src_dir }}/ui"
+cap_server_dir: "{{ cap_src_dir }}/server"
 
-cap_username: 'capernaum'
+cap_username: "capernaum"
 
-cap_data_files: '{{ cap_base_dir }}/data-files'
-cap_upload_dir: 'uploaded-files'
-cap_pdf_dir: 'generated-pdfs'
+cap_data_files: "{{ cap_base_dir }}/data-files"
+cap_upload_dir: "uploaded-files"
+cap_pdf_dir: "generated-pdfs"
 
 sep_prediction_threshold: 4.5
+
+nginx_base_dir: "/etc/nginx"
+nginx_available_dir: "{{ nginx_base_dir}}/sites-available"
+nginx_enabled_dir: "{{ nginx_base_dir}}/sites-enabled"
+nginx_conf_file: "capernaum.conf"

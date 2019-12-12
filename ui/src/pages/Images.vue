@@ -23,7 +23,7 @@
                   <file-pond
                     name="filepondUpload"
                     :server="{
-                      url: 'http://localhost:3000/images/',
+                      url: '/images',
                       process: 'process'
                     }"
                     @processfile="fileProcessed"
@@ -214,7 +214,8 @@ export default Vue.extend({
       this.fileUploaded = true;
       this.fileNotUploadedMessage = "";
       if (!this.valid) {
-        // if the form is currently not valid (possibly because of an attempted submission with no file uploaded), recheck it....
+        // if the form is currently not valid (possibly because of an attempted submission
+        // with no file uploaded), recheck it....
         if ((this.$refs.form as any).validate()) {
           this.valid = true;
         }
