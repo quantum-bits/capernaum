@@ -1,10 +1,15 @@
-cap_base_dir: '/home/capernaum'
-ui_base_dir: '{{ cap_base_dir }}/src/ui'
-server_base_dir: '{{ cap_base_dir }}/src/server'
-
 pg_host: 'localhost'
 pg_database: 'capernaum'
 pg_username: 'capernaum'
+
+cap_repo: 'https://github.com/quantum-bits/capernaum.git'
+
+cap_base_dir: '/home/capernaum'
+cap_src_dir: '{{ cap_base_dir }}/src'
+cap_ui_dir: '{{ cap_src_dir }}/ui'
+cap_server_dir: '{{ cap_src_dir }}/server'
+
+cap_username: 'capernaum'
 
 cap_data_files: '{{ cap_base_dir }}/data-files'
 cap_upload_dir: 'uploaded-files'

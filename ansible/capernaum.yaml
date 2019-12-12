@@ -6,97 +6,100 @@
     - secrets.yaml
   become: yes
   tasks:
-#    - name: configure modern apt repository for node
-#      apt_repository:
-#        repo: deb https://deb.nodesource.com/node_12.x bionic main
-#        state: present
-#
-#    - name: install apt packages
-#      apt:
-#        pkg: "{{ item }}"
-#        update_cache: yes
-#      loop:
-#        - nodejs
-#        - git
-#        - nginx
-#        - postgresql
-#        - python3-psycopg2
-#        - htop
-#        - tree
-#        - emacs
-#        - multitail
-#
-#    - name: create database user
-#      become_user: postgres
-#      postgresql_user:
-#        name: capernaum
-#        shell: /bin/bash
-#        password: password
-#
-#    - name: create database
-#      become_user: postgres
-#      postgresql_db:
-#        name: capernaum
-#        owner: capernaum
-#
-#    - name: create capernaum user
-#      user:
-#        name: capernaum
-#        password: "{{ 'password' | password_hash('sha512') }}"
-#
-#    - name: clone application from GitHub
-#      become_user: capernaum
-#      git:
-#        repo: https://github.com/quantum-bits/capernaum.git
-#        dest: /home/capernaum/src
+    - name: configure modern apt repository for node
+      apt_repository:
+        repo: deb https://deb.nodesource.com/node_12.x bionic main
+        state: present
+
+    - name: install apt packages
+      apt:
+        pkg: "{{ item }}"
+        update_cache: yes
+      loop:
+        - nodejs
+        - git
+        - nginx
+        - postgresql
+        - python3-psycopg2
+        - htop
+        - tree
+        - emacs
+        - multitail
+
+    - name: create database user
+      become_user: postgres
+      postgresql_user:
+        name: "{{ pg_username }}"
+        password: "{{ pg_password }}"
+
+    - name: create database
+      become_user: postgres
+      postgresql_db:
+        name: "{{ pg_database }}"
+        owner: "{{ pg_username }}"
+
+    - name: create capernaum user
+      user:
+        name: "{{ cap_username }}"
+        password: "{{ cap_password | password_hash('sha512') }}"
+        shell: /bin/bash
+
+    - name: clone application from GitHub
+      become_user: "{{ cap_username }}"
+      git:
+        repo: "{{ cap_repo }}"
+        dest: "{{ cap_src_dir }}"
 
     - name: create and copy .env file
-      become_user: capernaum
+      become_user: "{{ cap_username }}"
       template:
         src: templates/dot-env.j2
-        dest: "{{ server_base_dir }}/.env"
+        dest: "{{ cap_server_dir }}/.env"
         mode: 0400
 
     - name: create image upload directory
-      become_user: capernaum
+      become_user: "{{ cap_username }}"
       file:
         path: "{{ cap_data_files }}/{{ cap_upload_dir }}"
         state: directory
         mode: 0755
 
     - name: create generated PDF directory
-      become_user: capernaum
+      become_user: "{{ cap_username }}"
       file:
         path: "{{ cap_data_files }}/{{ cap_pdf_dir }}"
         state: directory
         mode: 0755
 
+    - name: install node modules for user interface
+      become_user: "{{ cap_username }}"
+      yarn:
+        path: "{{ cap_ui_dir }}"
 
-#    - name: install node modules for user interface
-#      become_user: capernaum
-#      yarn:
-#        path: /home/capernaum/src/ui
-#
-#    - name: install node modules for server
-#      become_user: capernaum
-#      yarn:
-#        path: /home/capernaum/src/server
+    - name: install node modules for server
+      become_user: "{{ cap_username }}"
+      yarn:
+        path: "{{ cap_server_dir }}"
 
-#    - name: build production ui
-#      become_user: capernaum
-#      command:
-#        chdir: /home/capernaum/src/ui
-#        cmd: yarn build
-#        creates: /home/capernaum/src/ui/dist/index.html
+    - name: build production ui
+      become_user: "{{ cap_username }}"
+      command:
+        chdir: "{{ cap_ui_dir }}"
+        cmd: yarn build
+        creates: "{{ cap_ui_dir }}/dist/index.html"
 
-#    - name: copy nginx config file
-#      copy: src=files/nginx.conf dest=/etc/nginx/sites-available/capernaum
-#
-#    - name: enable nginx configuration
-#      file: >
-#        dest=/etc/nginx/sites-enabled/capernaum
-#        src=/etc/nginx/sites-available/capernaum
-#        state=link
-#
-#    - name: restart nginx
-#      service: name=nginx state=restarted
+    - name: copy nginx config file
+      copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/sites-available/capernaum
+
+    - name: enable nginx configuration
+      file:
+        src: /etc/nginx/sites-available/capernaum
+        dest: /etc/nginx/sites-enabled/capernaum
+        state: link
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
