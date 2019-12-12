@@ -21,6 +21,12 @@
         - git
         - nginx
         - postgresql
+        - texlive
+        - texlive-latex-extra
+        - texlive-fonts-extra
+        - texlive-fonts-extra-doc
+        - texlive-fonts-recommended
+        - texlive-fonts-recommended-doc
         - python3-psycopg2
         - htop
         - tree
@@ -102,7 +108,7 @@
 
     - name: copy nginx config file
       copy:
-        src: files/nginx.conf
+        src: files/capernaum.nginx.conf
         dest: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
       tags: nginx
 

@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import vuexStore from "./store";
+import NotFound from "../src/pages/NotFound.vue";
 
 Vue.use(VueRouter);
 
@@ -60,6 +61,11 @@ const router = new VueRouter({
       path: "/images",
       name: "images",
       component: () => import("./pages/Images.vue")
+    },
+    {
+      // See https://router.vuejs.org/guide/essentials/history-mode.html#caveat
+      path: "*",
+      component: NotFound
     }
   ]
 });
