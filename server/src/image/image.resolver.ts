@@ -47,7 +47,7 @@ export class ImageResolver {
 
   @ResolveProperty(returns => String)
   url(@Parent() image: Image) {
-    return `http://localhost:3000/images/${image.id}`;
+    return `/images/${image.id}`;
   }
 
   @ResolveProperty(returns => String)

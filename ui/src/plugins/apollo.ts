@@ -5,9 +5,11 @@ import Vue from "vue";
 import VueApollo from "vue-apollo";
 
 // HTTP connection to the API
+
+console.log(`WE'RE IN ${JSON.stringify(process.env, null, 2)} MODE`);
+
 const httpLink = createHttpLink({
-  // You should use an absolute URL here
-  uri: "http://localhost:3000/graphql"
+  uri: "/graphql"
 });
 
 // Create the apollo client

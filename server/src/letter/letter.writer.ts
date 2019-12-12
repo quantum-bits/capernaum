@@ -303,7 +303,7 @@ export default class LetterWriter {
         name: pdfFileName
       };
       const texFilePath = format({ ...pathObject, ext: ".tex" });
-      const pdfUrl = `http://localhost:3000/files/${pdfFileName}.pdf`;
+      const pdfUrl = `/files/${pdfFileName}.pdf`;
 
       // Create the document.
       const result = this.renderDocument(renderedElements);
