@@ -6,13 +6,14 @@ import { LetterModule } from "./letter/letter.module";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
 import { AuthModule } from "./auth/auth.module";
+import { inDevelopmentMode } from "./shared/helpers";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
-      logging: true
+      logging: inDevelopmentMode()
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",

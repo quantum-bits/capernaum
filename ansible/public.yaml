@@ -1,0 +1,13 @@
+cap_base_dir: '/home/capernaum'
+ui_base_dir: '{{ cap_base_dir }}/src/ui'
+server_base_dir: '{{ cap_base_dir }}/src/server'
+
+pg_host: 'localhost'
+pg_database: 'capernaum'
+pg_username: 'capernaum'
+
+cap_data_files: '{{ cap_base_dir }}/data-files'
+cap_upload_dir: 'uploaded-files'
+cap_pdf_dir: 'generated-pdfs'
+
+sep_prediction_threshold: 4.5
