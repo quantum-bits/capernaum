@@ -26,14 +26,14 @@ export class QualtricsService {
   apiToken: string = "";
 
   constructor() {
-    if (process.env.CAP_BASE_URL) {
-      this.baseUrl = process.env.CAP_BASE_URL;
+    if (process.env.QUALTRICS_BASE_URL) {
+      this.baseUrl = process.env.QUALTRICS_BASE_URL;
     } else {
       throw new Error("No base URL configured in environment");
     }
 
-    if (process.env.CAP_API_TOKEN) {
-      this.apiToken = process.env.CAP_API_TOKEN;
+    if (process.env.QUALTRICS_API_TOKEN) {
+      this.apiToken = process.env.QUALTRICS_API_TOKEN;
     } else {
       throw new Error("No API token configured in environment");
     }

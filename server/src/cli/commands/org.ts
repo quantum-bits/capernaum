@@ -8,8 +8,8 @@ export default class OrgCommand extends Command {
   async run() {
     const api = new QualtricsService();
 
-    if (process.env.CAP_ORG_ID) {
-      api.getOrganization(process.env.CAP_ORG_ID).then(organization => {
+    if (process.env.QUALTRICS_ORG_ID) {
+      api.getOrganization(process.env.QUALTRICS_ORG_ID).then(organization => {
         const data = [
           ["Id", organization.id],
           ["Name", organization.name],

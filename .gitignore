@@ -7,3 +7,4 @@ foo/
 node_modules/
 private/
 data-files/
+secrets.yaml
