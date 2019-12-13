@@ -1,6 +1,16 @@
-[webservers]
-ubuntu-server ansible_host=10.211.55.52
-ubuntu-desktop ansible_host=10.211.55.53
+all:
+  hosts:
+    ubuntu-server:
+      ansible_host: 10.211.55.52
+    ubuntu-desktop:
+      ansible_user: tom
+      ansible_host: 10.211.55.53
+    galilee-tunnel:
+      ansible_connection: local
+      ansible_port: 2222
 
-johnny john.cse.taylor.edu
-ping-test ansible_ssh_extra_args="-F /dev/null -J tnurkkala@john.cse.taylor.edu"
+# Had started out trying to tunnel through John, but ran afoul of
+# fail2ban and sshguard issues on John.
+#    john.cse.taylor.edu:
+#    galilee.cse.taylor.edu:
+#      ansible_ssh_extra_args: -J tnurkkala@john.cse.taylor.edu

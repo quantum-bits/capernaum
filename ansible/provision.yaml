@@ -1,10 +1,12 @@
 ---
 - name: provision Capernaum
-  hosts: webservers
+  hosts: all
   vars_files:
     - public.yaml
-    - secrets.yaml
+    - private.yaml
   become: yes
+  environment:
+    PATH: "{{ ansible_env.PATH }}:~/.yarn/bin"
   tasks:
     - name: add key for yarn PPA
       apt_key:
@@ -121,6 +123,19 @@
         cmd: yarn build
         creates: "{{ cap_ui_dir }}/dist/index.html"
       tags: build
+
+    - name: build production server
+      become_user: "{{ cap_username }}"
+      command:
+        chdir: "{{ cap_server_dir }}"
+        cmd: yarn build
+        creates: "{{ cap_server_dir }}/dist/main.js"
+      tags: build
+
+    - name: install pm2   # run as root, installs in /usr/local/bin
+      yarn:
+        name: pm2
+        global: yes
 
     - name: disable nginx default configuration
       file:
