@@ -81,7 +81,7 @@
         dest: "{{ cap_app_dir }}"
       tags: [cap, git]
 
-    - name: create and copy .env file
+    - name: create .env file
       become_user: "{{ cap_username }}"
       template:
         src: templates/dot-env
@@ -137,6 +137,14 @@
       yarn:
         name: pm2
         global: yes
+      tags: pm2
+
+    - name: create pm2 directory
+      become_user: "{{ cap_username }}"
+      file:
+        path: "{{ cap_pm2_dir }}"
+        state: directory
+        mode: 0755
       tags: pm2
 
     - name: configure pm2
