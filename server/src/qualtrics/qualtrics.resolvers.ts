@@ -2,8 +2,11 @@ import { Args, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
 import { QualtricsSurveyListItem } from "./qualtrics.entities";
 import { SurveyService } from "../survey/survey.service";
+import { UseGuards } from "@nestjs/common";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver()
+@UseGuards(GqlAuthGuard)
 export class QualtricsResolver {
   constructor(
     private readonly qualtricsService: QualtricsService,

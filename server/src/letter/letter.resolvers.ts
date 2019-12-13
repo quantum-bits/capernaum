@@ -27,8 +27,11 @@ import {
 import LetterWriter from "./letter.writer";
 import { SurveyService } from "../survey/survey.service";
 import { Image } from "../image/entities";
+import { UseGuards } from "@nestjs/common";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => Letter)
+@UseGuards(GqlAuthGuard)
 export class LetterResolver {
   constructor(
     private readonly letterService: LetterService,
@@ -117,6 +120,7 @@ export class LetterResolver {
 }
 
 @Resolver(of => LetterElement)
+@UseGuards(GqlAuthGuard)
 export class LetterElementResolver {
   constructor(private readonly letterService: LetterService) {}
 
@@ -153,6 +157,7 @@ export class LetterElementResolver {
 }
 
 @Resolver(of => LetterElementType)
+@UseGuards(GqlAuthGuard)
 export class LetterElementTypeResolver {
   constructor(private readonly letterService: LetterService) {}
 

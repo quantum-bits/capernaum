@@ -18,8 +18,11 @@ import { PredictionService } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "type-graphql";
 import { Letter, LetterUpdateInput } from "../letter/entities";
+import { UseGuards } from "@nestjs/common";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => PredictionTableEntry)
+@UseGuards(GqlAuthGuard)
 export class PredictionTableEntryResolver {
   constructor(private readonly predictionService: PredictionService) {}
 
@@ -65,6 +68,7 @@ export class PredictionTableEntryResolver {
 }
 
 @Resolver(of => ScriptureEngagementPractice)
+@UseGuards(GqlAuthGuard)
 export class ScriptureEngagementPracticeResolver {
   constructor(private readonly predictionService: PredictionService) {}
 
