@@ -8,6 +8,7 @@ cap_base_dir: "/home/capernaum"
 cap_app_dir: "{{ cap_base_dir }}/app"
 cap_ui_dir: "{{ cap_app_dir }}/ui"
 cap_server_dir: "{{ cap_app_dir }}/server"
+cap_pm2_dir: "{{ cap_app_dir }}/pm2"
 
 cap_username: "capernaum"
 
