@@ -1,0 +1,6 @@
+[webservers]
+ubuntu-server ansible_host=10.211.55.52
+ubuntu-desktop ansible_host=10.211.55.53
+
+johnny john.cse.taylor.edu
+ping-test ansible_ssh_extra_args="-F /dev/null -J tnurkkala@john.cse.taylor.edu"

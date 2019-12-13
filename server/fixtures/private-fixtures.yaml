@@ -1,0 +1,20 @@
+fixtures:
+  - table: user_role
+    rows:
+      sys-admin:
+        name: sys-admin
+        description: System Administrator
+      survey-admin:
+        name: survey-admin
+        description: Survey Administrator
+  - table: user
+    rows:
+      tom:
+        firstName: Tom
+        lastName: Nurkkala
+        hashedPassword: foobar
+  - table: user_roles_user_role
+    rows:
+      tom:
+        userId: ^user.tom
+        userRoleId: ^user_role.sys-admin
