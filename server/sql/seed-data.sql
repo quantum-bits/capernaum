@@ -19,6 +19,10 @@ INSERT INTO public."user" (id, email, "firstName", "lastName", "hashedPassword")
 VALUES (3, 'stbird@taylor.edu', 'Steve', 'Bird',
         '$2b$10$3P393Jj5xcDX1uW4K5RnRO9PSjCnHp7E0eoL/85LlCJJ0rAz/Kmmm');
 
+INSERT INTO public."user" (id, email, "firstName", "lastName", "hashedPassword")
+VALUES (4, 'william_slauson@taylor.edu', 'William', 'Slauson',
+        '$2b$10$3P393Jj5xcDX1uW4K5RnRO9PSjCnHp7E0eoL/85LlCJJ0rAz/Kmmm');
+
 ALTER SEQUENCE user_id_seq RESTART WITH 101;
 
 -- User Roles
@@ -30,6 +34,8 @@ INSERT INTO public.user_roles_user_role ("userId", "userRoleId")
 VALUES (2, 1);
 INSERT INTO public.user_roles_user_role ("userId", "userRoleId")
 VALUES (3, 2);
+INSERT INTO public.user_roles_user_role ("userId", "userRoleId")
+VALUES (4, 1);
 
 -- Letter Element Type
 INSERT INTO public.letter_element_type (id, key, description)
