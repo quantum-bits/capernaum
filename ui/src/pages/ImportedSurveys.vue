@@ -104,6 +104,7 @@ export default Vue.extend({
       },
       fetchPolicy: "network-only"
     },
+
     availableQualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
       update: data => data.qualtricsSurveys,

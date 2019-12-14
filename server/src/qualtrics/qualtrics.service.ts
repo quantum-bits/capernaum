@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   extractZipContent,
   isValidDate,
@@ -24,6 +24,7 @@ const apiDebug = debug("api");
 export class QualtricsService {
   baseUrl: string = "";
   apiToken: string = "";
+  customAxios: AxiosInstance;
 
   constructor() {
     if (process.env.QUALTRICS_BASE_URL) {
@@ -37,6 +38,20 @@ export class QualtricsService {
     } else {
       throw new Error("No API token configured in environment");
     }
+
+    // Customize our Axios instance.
+    // Always want to send the API token.
+    const requestConfig: AxiosRequestConfig = {
+      headers: { "x-api-token": this.apiToken }
+    };
+    // Configure proxy if required.
+    if (process.env.PROXY_HOST && process.env.PROXY_PORT) {
+      requestConfig.proxy = {
+        host: process.env.PROXY_HOST,
+        port: parseInt(process.env.PROXY_PORT)
+      };
+    }
+    this.customAxios = axios.create(requestConfig);
   }
 
   private makeUrl(...segments: string[]) {
@@ -50,10 +65,7 @@ export class QualtricsService {
    * @param moreConfig - additional parameters for the Axios config object
    */
   private axiosGet<T>(url: URL, moreConfig: object = {}) {
-    return axios.get<T>(url.href, {
-      headers: { "x-api-token": this.apiToken },
-      ...moreConfig
-    });
+    return this.customAxios.get<T>(url.href, moreConfig);
   }
 
   /**
@@ -76,14 +88,9 @@ export class QualtricsService {
    * @param data
    */
   private async qualtricsPost<T>(url: URL, data: object) {
-    const axiosResponse = await axios.post<QualtricsResponse<T>>(
+    const axiosResponse = await this.customAxios.post<QualtricsResponse<T>>(
       url.href,
-      data,
-      {
-        headers: {
-          "x-api-token": this.apiToken
-        }
-      }
+      data
     );
     return axiosResponse.data.result;
   }

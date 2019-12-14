@@ -20,3 +20,8 @@ CAP_PDF_DIR={{ cap_pdf_dir }}
 SEP_PREDICTION_THRESHOLD={{ sep_prediction_threshold }}
 
 JWT_SECRET={{ jwt_secret }}
+
+{% if proxy.enable %}
+PROXY_HOST={{ proxy.host }}
+PROXY_PORT={{ proxy.port }}
+{% endif %}

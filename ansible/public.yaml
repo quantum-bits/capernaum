@@ -24,4 +24,10 @@ nginx_enabled_dir: "{{ nginx_base_dir}}/sites-enabled"
 nginx_conf_file: "capernaum.conf"
 
 server_name: "galilee.cse.taylor.edu"
+
 enable_lets_encrypt: true
+
+proxy:
+  enable: true
+  host: localhost
+  port: 3128
