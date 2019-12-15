@@ -87,7 +87,7 @@
         src: templates/dot-env
         dest: "{{ cap_server_dir }}/.env"
         mode: 0400
-      tags: cap
+      tags: cap, env
 
     - name: create image upload directory
       become_user: "{{ cap_username }}"

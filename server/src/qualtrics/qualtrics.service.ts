@@ -1,4 +1,3 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   extractZipContent,
   isValidDate,
@@ -17,14 +16,16 @@ import {
 import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
+import got, { Got, GotOptions } from "got";
+import tunnel from "tunnel";
 
-const apiDebug = debug("api");
+const qualtricsDebug = debug("qualtrics");
 
 @Injectable()
 export class QualtricsService {
   baseUrl: string = "";
   apiToken: string = "";
-  customAxios: AxiosInstance;
+  httpClient: Got;
 
   constructor() {
     if (process.env.QUALTRICS_BASE_URL) {
@@ -39,19 +40,23 @@ export class QualtricsService {
       throw new Error("No API token configured in environment");
     }
 
-    // Customize our Axios instance.
+    // Customize HTTP client.
     // Always want to send the API token.
-    const requestConfig: AxiosRequestConfig = {
-      headers: { "x-api-token": this.apiToken }
+    const gotOptions: GotOptions = {
+      headers: { "x-api-token": this.apiToken },
+      responseType: "json"
     };
     // Configure proxy if required.
     if (process.env.PROXY_HOST && process.env.PROXY_PORT) {
-      requestConfig.proxy = {
-        host: process.env.PROXY_HOST,
-        port: parseInt(process.env.PROXY_PORT)
-      };
+      gotOptions.agent = tunnel.httpsOverHttp({
+        proxy: {
+          host: process.env.PROXY_HOST,
+          port: parseInt(process.env.PROXY_PORT)
+        }
+      });
     }
-    this.customAxios = axios.create(requestConfig);
+    qualtricsDebug("gotOptions %O", gotOptions);
+    this.httpClient = got.extend(gotOptions);
   }
 
   private makeUrl(...segments: string[]) {
@@ -64,8 +69,8 @@ export class QualtricsService {
    * @param url
    * @param moreConfig - additional parameters for the Axios config object
    */
-  private axiosGet<T>(url: URL, moreConfig: object = {}) {
-    return this.customAxios.get<T>(url.href, moreConfig);
+  private gotGet<T>(url: URL, moreConfig: object = {}) {
+    return this.httpClient.get<T>(url.href, moreConfig);
   }
 
   /**
@@ -74,12 +79,9 @@ export class QualtricsService {
    * @param moreConfig
    */
   private async qualtricsGet<T>(url: URL, moreConfig: object = {}) {
-    const axiosResponse = await this.axiosGet<QualtricsResponse<T>>(
-      url,
-      moreConfig
-    );
-    apiDebug("Axios response data %O", axiosResponse.data);
-    return axiosResponse.data.result;
+    const response = await this.gotGet<QualtricsResponse<T>>(url, moreConfig);
+    qualtricsDebug("Response data %O", response.body);
+    return response.body.result;
   }
 
   /**
@@ -88,11 +90,11 @@ export class QualtricsService {
    * @param data
    */
   private async qualtricsPost<T>(url: URL, data: object) {
-    const axiosResponse = await this.customAxios.post<QualtricsResponse<T>>(
+    const axiosResponse = await this.httpClient.post<QualtricsResponse<T>>(
       url.href,
       data
     );
-    return axiosResponse.data.result;
+    return axiosResponse.body.result;
   }
 
   /** Get an organization's details. */
@@ -143,7 +145,7 @@ export class QualtricsService {
       }
     }
 
-    apiDebug("postData %O", postData);
+    qualtricsDebug("postData %O", postData);
 
     return this.qualtricsPost<CreateResponseExportResponse>(
       this.makeUrl("surveys", surveyId, "export-responses"),
@@ -158,14 +160,14 @@ export class QualtricsService {
   }
 
   async getResponseExportFile(surveyId: string, fileId: string) {
-    return this.axiosGet<string>(
+    return this.gotGet<string>(
       this.makeUrl("surveys", surveyId, "export-responses", fileId, "file"),
       {
         responseType: "arraybuffer"
       }
     )
       .then(response => {
-        const b = Buffer.from(response.data, "binary");
+        const b = Buffer.from(response.body, "binary");
         return extractZipContent(b);
       })
       .catch(err => {
@@ -181,18 +183,18 @@ export class QualtricsService {
       startDate,
       endDate
     );
-    apiDebug("createResult %O", createResult);
+    qualtricsDebug("createResult %O", createResult);
 
     // Await completion of the export.
     let exportResult: ResponseExportProgress;
     let awaitingResponse = true;
-    apiDebug("Await response");
+    qualtricsDebug("Await response");
     while (awaitingResponse) {
       exportResult = await this.getResponseExportProgress(
         surveyId,
         createResult.progressId
       );
-      apiDebug("exportResult %O", exportResult);
+      qualtricsDebug("exportResult %O", exportResult);
 
       if (exportResult.status === "complete") {
         awaitingResponse = false;
@@ -200,7 +202,7 @@ export class QualtricsService {
         await sleep(2000);
       }
     }
-    apiDebug("Result available %O", exportResult);
+    qualtricsDebug("Result available %O", exportResult);
 
     // Fetch the export data itself. Returns a Promise of ZipEntry objects.
     return this.getResponseExportFile(surveyId, exportResult.fileId);

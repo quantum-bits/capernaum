@@ -16,3 +16,7 @@ all:
       ansible_user: tnurkkala
       ansible_host: localhost
       ansible_port: 2222
+      proxy:
+        enable: true
+        host: "10.120.160.77"
+        port: 3128
