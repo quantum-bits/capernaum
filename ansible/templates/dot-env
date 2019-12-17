@@ -21,7 +21,7 @@ SEP_PREDICTION_THRESHOLD={{ sep_prediction_threshold }}
 
 JWT_SECRET={{ jwt_secret }}
 
-{% if proxy.enable %}
+{% if proxy is defined and proxy.host and proxy.port %}
 PROXY_HOST={{ proxy.host }}
 PROXY_PORT={{ proxy.port }}
 {% endif %}

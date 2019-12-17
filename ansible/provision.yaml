@@ -128,7 +128,7 @@
         creates: "{{ cap_server_dir }}/dist/main.js"
       tags: build
 
-    - name: install pm2   # run as root, installs in /usr/local/bin
+    - name: install pm2 # run as root, installs in /usr/local/bin
       yarn:
         name: pm2
         global: yes
@@ -163,7 +163,7 @@
 
     - name: copy nginx config file
       template:
-        src: templates/capernaum.conf
+        src: "templates/{{ nginx_config }}"
         dest: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
         mode: 0444
       tags: nginx
