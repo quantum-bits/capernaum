@@ -203,6 +203,12 @@ export class QualtricsService {
     );
   }
 
+  getSubscription(subscriptionId: string) {
+    return this.qualtricsGet(
+      this.makeUrl("eventsubscriptions", subscriptionId)
+    );
+  }
+
   /** Raw methods to export responses from Qualtrics. */
   async createResponseExport(
     surveyId: string,

@@ -179,12 +179,31 @@ program
 
 program
   .command("delete-subscription <subscriptionId>")
-  .description("list all event subscriptions")
+  .description("delete an event subscription")
   .action((subscriptionId: string) => {
     qualtricsService
       .deleteSubscription(subscriptionId)
       .then(response => console.log(response))
       .catch(err => console.log(err));
   });
+
+program
+  .command("get-subscription <subscriptionId>")
+  .description("get one event subscription")
+  .action((subscriptionId: string) => {
+    qualtricsService
+      .getSubscription(subscriptionId)
+      .then(response => console.log(response))
+      .catch(err => console.log(err));
+  });
+
+// Error on unknown commands; see the commander documentation
+program.on("command:*", function() {
+  console.error(
+    "Invalid command: %s\nSee --help for a list of available commands.",
+    program.args.join(" ")
+  );
+  process.exit(1);
+});
 
 program.parse(process.argv);
