@@ -41,12 +41,7 @@
         - nginx
         - postgresql
         - python3-psycopg2
-#        - texlive
-#        - texlive-latex-extra
-#        - texlive-fonts-extra
-#        - texlive-fonts-extra-doc
-#        - texlive-fonts-recommended
-#        - texlive-fonts-recommended-doc
+        - texlive-pictures
         - htop
         - tree
         - silversearcher-ag

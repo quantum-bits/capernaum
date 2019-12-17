@@ -218,15 +218,12 @@ export default class LetterWriter {
     return `
     \\documentclass{article}
     
-    \\usepackage{fontspec}
-    \\setmainfont[Ligatures=TeX]{Helvetica}
-
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
     \\usepackage{graphicx}
     \\usepackage[colorlinks]{hyperref}
     
     \\usepackage{pgfplots}
-    \\pgfplotsset{compat=1.16}
+    \\pgfplotsset{compat=1.15}
     
     \\begin{document}
     
