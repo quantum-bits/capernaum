@@ -9,3 +9,10 @@ pg_password: ""
 # Capernaum
 cap_password: ""
 jwt_secret: ""
+
+# Mail
+mail_host: ""
+mail_port: 123
+mail_user: ""
+mail_pass: ""
+
