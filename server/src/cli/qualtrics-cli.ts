@@ -1,6 +1,7 @@
+import { join } from "path";
 import { config } from "dotenv";
 config({
-  path: "../../.env"
+  path: join(__dirname, "../../.env")
 });
 
 import commander from "commander";

@@ -17,7 +17,7 @@ import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
 import got, { Got, GotOptions } from "got";
-import tunnel from "tunnel";
+import ProxyAgent from "https-proxy-agent";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -47,14 +47,13 @@ export class QualtricsService {
 
     // Configure proxy if required.
     if (process.env.PROXY_HOST && process.env.PROXY_PORT) {
-      commonOptions.agent = tunnel.httpsOverHttp({
-        proxy: {
-          host: process.env.PROXY_HOST,
-          port: parseInt(process.env.PROXY_PORT)
-        }
+      commonOptions.agent = new ProxyAgent({
+        host: process.env.PROXY_HOST,
+        port: parseInt(process.env.PROXY_PORT)
       });
     }
 
+    qualtricsDebug("common options %O", commonOptions);
     this.client = got.extend(commonOptions);
   }
 
@@ -68,11 +67,11 @@ export class QualtricsService {
    * @param url
    */
   private async qualtricsGet<T>(url: URL) {
-    qualtricsDebug("URL %s", url);
+    qualtricsDebug("qualtricsGet - URL %s", url);
     const response = await this.client.get<QualtricsResponse<T>>(url.href, {
       responseType: "json"
     });
-    qualtricsDebug("Response data %O", response.body);
+    qualtricsDebug("qualtricsGet - response %O", response.body);
     return response.body.result;
   }
 
@@ -82,7 +81,7 @@ export class QualtricsService {
    * @param data
    */
   private qualtricsPost<T>(url: URL, data: object) {
-    qualtricsDebug("URL %s\nData %O", url, data);
+    qualtricsDebug("qualtricsPost - URL %s\nData %O", url, data);
     return this.client
       .post<QualtricsResponse<T>>(url.href, {
         responseType: "json",
@@ -112,6 +111,7 @@ export class QualtricsService {
     if (offset) {
       url.searchParams.set("offset", offset);
     }
+    qualtricsDebug("listSurveys - %O", url);
     return this.qualtricsGet<QualtricsSurveyList>(url);
   }
 
@@ -161,7 +161,12 @@ export class QualtricsService {
       fileId,
       "file"
     );
-    qualtricsDebug("URL: %s\nSURVEY %s\nFILE %s\n", url.href, surveyId, fileId);
+    qualtricsDebug(
+      "getResponseExportFile URL %s\nSURVEY %s\nFILE %s\n",
+      url.href,
+      surveyId,
+      fileId
+    );
     return this.client
       .get(url.href, { responseType: "buffer" })
       .then(response => extractZipContent(response.body))
@@ -191,7 +196,6 @@ export class QualtricsService {
         surveyId,
         createResult.progressId
       );
-      qualtricsDebug("exportResult %O", exportResult);
 
       if (exportResult.status === "complete") {
         awaitingResponse = false;
@@ -199,7 +203,7 @@ export class QualtricsService {
         await sleep(2000);
       }
     }
-    qualtricsDebug("Result available %O", exportResult);
+    qualtricsDebug("getResponses result %O", exportResult);
 
     // Fetch the export data itself. Returns a Promise of ZipEntry objects.
     return this.getResponseExportFile(surveyId, exportResult.fileId);
