@@ -157,4 +157,34 @@ program
       .catch(err => console.error(err));
   });
 
+program
+  .command("create-subscription <eventName> [surveyId]")
+  .description("create event subscription")
+  .action((eventName: string, surveyId?: string) => {
+    qualtricsService
+      .createSubscription("https://galilee.cse.taylor.edu", eventName, surveyId)
+      .then(response => console.log("RESPONSE", response))
+      .catch(err => console.log("ERROR", err));
+  });
+
+program
+  .command("list-subscriptions")
+  .description("list all event subscriptions")
+  .action(() => {
+    qualtricsService
+      .listSubscriptions()
+      .then(response => console.log(response))
+      .catch(err => console.log(err));
+  });
+
+program
+  .command("delete-subscription <subscriptionId>")
+  .description("list all event subscriptions")
+  .action((subscriptionId: string) => {
+    qualtricsService
+      .deleteSubscription(subscriptionId)
+      .then(response => console.log(response))
+      .catch(err => console.log(err));
+  });
+
 program.parse(process.argv);

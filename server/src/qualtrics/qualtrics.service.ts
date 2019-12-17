@@ -21,11 +21,67 @@ import ProxyAgent from "https-proxy-agent";
 
 const qualtricsDebug = debug("qualtrics");
 
+interface WebhookEvent {
+  name: string;
+  details: string;
+  takesSurveyId: boolean;
+}
+
+class WebhookEventFactory {
+  private webhookEvents: WebhookEvent[] = [
+    {
+      name: "activate-survey",
+      details: "controlpanel.activateSurvey",
+      takesSurveyId: false
+    },
+    {
+      name: "deactivate-survey",
+      details: "controlpanel.deactivateSurvey",
+      takesSurveyId: false
+    },
+    {
+      name: "started-session",
+      details: "surveyengine.startedRecipientSession",
+      takesSurveyId: true
+    },
+    {
+      name: "partial-response",
+      details: "surveyengine.partialResponse",
+      takesSurveyId: true
+    },
+    {
+      name: "completed-response",
+      details: "surveyengine.completedResponse",
+      takesSurveyId: true
+    }
+  ];
+
+  private validNames() {
+    return this.webhookEvents.map(event => event.name).join(", ");
+  }
+
+  makeEvent(name: string, surveyId?: string) {
+    for (let event of this.webhookEvents) {
+      if (event.name === name) {
+        if (event.takesSurveyId) {
+          return `${event.details}.${surveyId}`;
+        } else {
+          return event.details;
+        }
+      }
+    }
+    throw Error(
+      `Invalid event name '${name}'; valid names are: ${this.validNames()}`
+    );
+  }
+}
+
 @Injectable()
 export class QualtricsService {
   baseUrl: string = "";
   apiToken: string = "";
   client: Got;
+  eventFactory: WebhookEventFactory = new WebhookEventFactory();
 
   constructor() {
     if (process.env.QUALTRICS_BASE_URL) {
@@ -75,6 +131,15 @@ export class QualtricsService {
     return response.body.result;
   }
 
+  private async qualtricsDelete<T>(url: URL) {
+    qualtricsDebug("qualtricsDelete - URL %s", url);
+    const response = await this.client.delete<QualtricsResponse<T>>(url.href, {
+      responseType: "json"
+    });
+    qualtricsDebug("qualtricsDelete - response %O", response.body);
+    return response.body.result;
+  }
+
   /**
    * Post data to Qualtrics.
    * @param url
@@ -113,6 +178,29 @@ export class QualtricsService {
     }
     qualtricsDebug("listSurveys - %O", url);
     return this.qualtricsGet<QualtricsSurveyList>(url);
+  }
+
+  listSubscriptions() {
+    return this.qualtricsGet(this.makeUrl("eventsubscriptions"));
+  }
+
+  /** Create an event subscription */
+  createSubscription(
+    publicationUrl: string,
+    eventName: string,
+    surveyId?: string
+  ) {
+    const url = this.makeUrl("eventsubscriptions");
+    return this.qualtricsPost(url, {
+      publicationUrl: publicationUrl,
+      topics: this.eventFactory.makeEvent(eventName, surveyId)
+    });
+  }
+
+  deleteSubscription(subscriptionId: string) {
+    return this.qualtricsDelete(
+      this.makeUrl("eventsubscriptions", subscriptionId)
+    );
   }
 
   /** Raw methods to export responses from Qualtrics. */
