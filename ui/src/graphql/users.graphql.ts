@@ -48,3 +48,20 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+export const USER_MUTATION = gql`
+  mutation UpdateUser($updateInput: UserUpdateInput!) {
+    updateUser(updateInput: $updateInput) {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+`;
+
+export const PASSWORD_MUTATION = gql`
+  mutation ChangePassword($passwordInput: ChangePasswordInput!) {
+    changePassword(passwordInput: $passwordInput)
+  }
+`;

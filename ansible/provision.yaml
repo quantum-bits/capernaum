@@ -117,7 +117,7 @@
       command:
         chdir: "{{ cap_ui_dir }}"
         cmd: yarn build
-        creates: "{{ cap_ui_dir }}/dist/index.html"
+      # creates: "{{ cap_ui_dir }}/dist/index.html"
       tags: build
 
     - name: build production server
@@ -125,7 +125,7 @@
       command:
         chdir: "{{ cap_server_dir }}"
         cmd: yarn build
-        creates: "{{ cap_server_dir }}/dist/main.js"
+      # creates: "{{ cap_server_dir }}/dist/main.js"
       tags: build
 
     - name: install pm2 # run as root, installs in /usr/local/bin

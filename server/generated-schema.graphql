@@ -8,6 +8,12 @@ type AbstractEntity {
   id: Int!
 }
 
+input ChangePasswordInput {
+  userId: Int!
+  currentPassword: String!
+  newPassword: String!
+}
+
 type ChartData {
   title: String!
   entries: [ChartEntry!]!
@@ -210,6 +216,7 @@ type Mutation {
   deleteScriptureEngagementPractice(id: Int!): Int!
   createUser(createInput: UserCreateInput!): User!
   updateUser(updateInput: UserUpdateInput!): User!
+  changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
 }
@@ -591,7 +598,6 @@ input UserUpdateInput {
   email: String
   firstName: String
   lastName: String
-  password: String
   userRoleIds: [Int!]
 }
 

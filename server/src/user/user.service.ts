@@ -5,8 +5,7 @@ import {
   User,
   UserCreateInput,
   UserRole,
-  UserRoleCreateInput,
-  UserUpdateInput
+  UserRoleCreateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 

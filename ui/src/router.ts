@@ -23,6 +23,11 @@ const router = new VueRouter({
       component: () => import("./pages/Account.vue")
     },
     {
+      path: "/password",
+      name: "password",
+      component: () => import("./pages/Password.vue")
+    },
+    {
       path: "/letters",
       name: "letters",
       component: () => import("./pages/Letters.vue")

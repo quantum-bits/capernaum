@@ -15,6 +15,12 @@ export enum WhichItems {
   WithoutIndex = "WithoutIndex",
 }
 
+export interface ChangePasswordInput {
+  userId: number;
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface ImageUpdateInput {
   id: number;
   title: string;
@@ -94,6 +100,14 @@ export interface ScriptureEngagementPracticeUpdateInput {
   description?: string | null;
   moreInfoUrl?: string | null;
   sequence?: number | null;
+}
+
+export interface UserUpdateInput {
+  id: number;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  userRoleIds?: number[] | null;
 }
 
 //==============================================================

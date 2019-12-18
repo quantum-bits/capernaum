@@ -64,8 +64,14 @@ export class UserUpdateInput {
   @Field({ nullable: true }) email?: string;
   @Field({ nullable: true }) firstName?: string;
   @Field({ nullable: true }) lastName?: string;
-  @Field({ nullable: true }) password?: string;
   @Field(type => [Int], { nullable: true }) userRoleIds?: number[];
+}
+
+@InputType()
+export class ChangePasswordInput {
+  @Field(type => Int) userId: number;
+  @Field() currentPassword: string;
+  @Field() newPassword: string;
 }
 
 // JWT payload.
