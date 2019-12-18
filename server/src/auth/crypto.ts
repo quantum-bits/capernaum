@@ -6,9 +6,6 @@ export function hashPassword(password: string) {
   return hash(password, SALT_ROUNDS);
 }
 
-export function validatePassword(
-  password: string,
-  encryptedPassword: string
-) {
+export function validatePassword(password: string, encryptedPassword: string) {
   return compare(password, encryptedPassword);
 }
