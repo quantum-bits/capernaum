@@ -186,9 +186,6 @@
         <h2 class="title font-weight-regular mb-3 mt-5">Content of Letter:</h2>
       </v-flex>
       <v-flex xs10 offset-xs1 class="text-xs-right">
-        <v-btn class="mr-2" color="primary" dark @click="viewPDF">
-          Generate PDF
-        </v-btn>
         <LetterElementMenu
           v-if="!surveyLetterIsFrozen"
           @click="addElement($event)"
@@ -225,14 +222,6 @@
       </v-flex>
 
       <v-flex xs10 offset-xs1 class="text-xs-right">
-        <SpinnerBtn
-          v-if="surveyLetterElements.length > 0"
-          :loading="generatingPDF"
-          @click="viewPDF"
-        >
-          Generate PDF
-        </SpinnerBtn>
-
         <LetterElementMenu
           v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
           @click="addElement($event)"
@@ -860,28 +849,6 @@ export default class Compose extends Vue {
     // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
     // https://router.vuejs.org/guide/essentials/navigation.html
     //this.$router.go(0);
-  }
-
-  viewPDF() {
-    console.log("GENERATING");
-    this.generatingPDF = true;
-    this.$apollo
-      .mutate({
-        mutation: WRITE_LETTER_MUTATION,
-        variables: {
-          letterWriterInput: {
-            letterId: this.theLetter.id,
-            surveyResponseId: 12
-          }
-        }
-      })
-      .then(({ data }) => {
-        this.generatingPDF = false;
-        console.log("DONE GENERATING");
-      })
-      .catch(error => {
-        console.log("there appears to have been an error: ", error);
-      });
   }
 
   // https://github.com/vuejs/vue-class-component/issues/270

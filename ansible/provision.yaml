@@ -74,7 +74,8 @@
       git:
         repo: "{{ cap_repo }}"
         dest: "{{ cap_app_dir }}"
-      tags: [cap, git]
+        version: master
+      tags: cap, git
 
     - name: create .env file
       become_user: "{{ cap_username }}"
