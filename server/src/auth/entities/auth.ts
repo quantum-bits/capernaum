@@ -4,7 +4,7 @@ import { UserPayload } from "../../user/entities";
 @InputType()
 export class LoginCredentials {
   @Field() email: string;
-  @Field() plainTextPassword: string;
+  @Field() password: string;
 }
 
 @ObjectType()

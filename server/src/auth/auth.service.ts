@@ -17,8 +17,8 @@ export class AuthService {
 
     if (user) {
       const validPassword = await validatePassword(
-        loginCredentials.plainTextPassword,
-        user.hashedPassword
+        loginCredentials.password,
+        user.password
       );
 
       if (validPassword) {

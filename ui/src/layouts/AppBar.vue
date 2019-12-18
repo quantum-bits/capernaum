@@ -19,6 +19,9 @@
       </template>
 
       <v-list>
+        <v-list-item :to="{ name: 'account' }">
+          <v-list-item-title>Account</v-list-item-title>
+        </v-list-item>
         <v-list-item @click="logOut">
           <v-list-item-title>Log Out</v-list-item-title>
         </v-list-item>

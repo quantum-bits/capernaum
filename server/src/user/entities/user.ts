@@ -1,7 +1,16 @@
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
+import {
+  AfterLoad,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany
+} from "typeorm";
 import { UserRole } from "./user-role";
+import { hashPassword } from "../../auth/crypto";
 
 @Entity()
 @ObjectType()
@@ -9,7 +18,30 @@ export class User extends AbstractEntity {
   @Field() @Column({ unique: true }) email: string;
   @Field() @Column() firstName: string;
   @Field() @Column() lastName: string;
-  @Column() hashedPassword: string; // Don't expose this via GraphQL.
+
+  @Column() password: string; // Don't expose this via GraphQL.
+  private tempPassword: string;
+
+  @AfterLoad()
+  private loadTempPassword() {
+    this.tempPassword = this.password;
+    console.log("AFTER LOAD", this.tempPassword);
+  }
+
+  @BeforeInsert()
+  private async encryptOnAdd() {
+    this.password = await hashPassword(this.password);
+    console.log("BEFORE INSERT", this);
+  }
+
+  @BeforeUpdate()
+  private async encryptonUpdate() {
+    console.log("BEFORE UPDATE", this.tempPassword, this.password);
+    if (this.tempPassword !== this.password) {
+      this.password = await hashPassword(this.password);
+      this.loadTempPassword();
+    }
+  }
 
   @Field(returns => [UserRole])
   @ManyToMany(type => UserRole)
@@ -22,8 +54,18 @@ export class UserCreateInput {
   @Field() email: string;
   @Field() firstName: string;
   @Field() lastName: string;
-  @Field() plainTextPassword: string;
+  @Field() password: string;
   @Field(type => [Int]) userRoleIds: number[];
+}
+
+@InputType()
+export class UserUpdateInput {
+  @Field(type => Int) id: number;
+  @Field({ nullable: true }) email?: string;
+  @Field({ nullable: true }) firstName?: string;
+  @Field({ nullable: true }) lastName?: string;
+  @Field({ nullable: true }) password?: string;
+  @Field(type => [Int], { nullable: true }) userRoleIds?: number[];
 }
 
 // JWT payload.

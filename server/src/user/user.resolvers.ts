@@ -3,7 +3,8 @@ import {
   User,
   UserCreateInput,
   UserRole,
-  UserRoleCreateInput
+  UserRoleCreateInput,
+  UserUpdateInput
 } from "./entities";
 import { UserService } from "./user.service";
 import { Int } from "type-graphql";
@@ -11,7 +12,7 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { UseGuards } from "@nestjs/common";
 
 @Resolver(of => User)
-@UseGuards(GqlAuthGuard)
+// @UseGuards(GqlAuthGuard)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
@@ -28,6 +29,11 @@ export class UserResolver {
   @Query(returns => [User])
   users() {
     return this.userService.allUsers();
+  }
+
+  @Mutation(returns => User)
+  updateUser(@Args("updateInput") updateInput: UserUpdateInput) {
+    return this.userService.update(User, updateInput);
   }
 }
 

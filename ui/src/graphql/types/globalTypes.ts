@@ -62,7 +62,7 @@ export interface LetterWriterInput {
 
 export interface LoginCredentials {
   email: string;
-  plainTextPassword: string;
+  password: string;
 }
 
 export interface PartialPredictionTableEntry {

@@ -5,10 +5,10 @@ import {
   User,
   UserCreateInput,
   UserRole,
-  UserRoleCreateInput
+  UserRoleCreateInput,
+  UserUpdateInput
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { hashPassword } from "../auth/crypto";
 
 @Injectable()
 export class UserService extends BaseService {
@@ -30,15 +30,7 @@ export class UserService extends BaseService {
 
     // Create and save the user. Because this is the only modification to the database,
     // don't bother with a transaction.
-    return this.userRepo.save(
-      this.userRepo.create({
-        email: createInput.email,
-        firstName: createInput.firstName,
-        lastName: createInput.lastName,
-        hashedPassword: await hashPassword(createInput.plainTextPassword),
-        roles
-      })
-    );
+    return this.userRepo.save(this.userRepo.create(createInput));
   }
 
   createUserRole(createInput: UserRoleCreateInput) {

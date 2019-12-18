@@ -18,6 +18,11 @@ const router = new VueRouter({
       component: () => import("./pages/Login.vue")
     },
     {
+      path: "/account",
+      name: "account",
+      component: () => import("./pages/Account.vue")
+    },
+    {
       path: "/letters",
       name: "letters",
       component: () => import("./pages/Letters.vue")
