@@ -77,8 +77,16 @@ export default Vue.extend({
       {
         title: "Responses",
         route: "responses",
-        icon: "mdi-message-outline"
+        icon: "mdi-message-outline",
+        divider: true
       }
+      // ,
+      // {
+      //   heading: "ADMINISTRATION",
+      //   title: "Accounts",
+      //   route: "accounts",
+      //   icon: "mdi-account-multiple"
+      // }
     ];
     return {
       navItems

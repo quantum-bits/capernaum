@@ -80,7 +80,7 @@ export default Vue.extend({
             }
           }
         })
-        .then(response => this.showSnackbar(response.data.changePassword))
+        .then(() => this.$router.push({ name: "letters" }))
         .catch(err => this.showSnackbar(`Error: ${err}`));
     }
   }
