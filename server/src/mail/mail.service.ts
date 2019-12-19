@@ -1,8 +1,9 @@
 import debug from "debug";
 import { Injectable } from "@nestjs/common";
 import nodemailer, { Transporter } from "nodemailer";
-import Mail, { Attachment } from "nodemailer/lib/mailer";
+import Mail from "nodemailer/lib/mailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { SendMailInput } from "./entities";
 
 const mailDebug = debug("mail");
 
@@ -36,22 +37,26 @@ export class MailService {
     this.transporter = nodemailer.createTransport(options);
   }
 
-  sendMail(
-    from: string,
-    to: string,
-    subject: string,
-    text: string,
-    attachment?: Attachment
-  ) {
+  sendMail(mailInput: SendMailInput) {
     const options: Mail.Options = {
-      from,
-      to,
-      subject,
-      text
+      from: mailInput.from,
+      to: mailInput.to,
+      subject: mailInput.subject,
+      text: mailInput.textContent
     };
-    if (attachment) {
-      options.attachments = [attachment];
+
+    if (mailInput.htmlContent) {
+      options.html = mailInput.htmlContent;
     }
+
+    if (mailInput.attachmentPath) {
+      options.attachments = [
+        {
+          path: mailInput.attachmentPath
+        }
+      ];
+    }
+
     mailDebug("sendMail options %O", options);
     return this.transporter.sendMail(options);
   }

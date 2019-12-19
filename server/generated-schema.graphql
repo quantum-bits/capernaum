@@ -161,7 +161,7 @@ type LoginResponse {
 }
 
 type Mutation {
-  sendLetter(letterInput: SendLetterInput!): String!
+  sendLetter(mailInput: SendMailInput!): String!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
@@ -361,10 +361,13 @@ input ScriptureEngagementPracticeUpdateInput {
   sequence: Int
 }
 
-input SendLetterInput {
+input SendMailInput {
+  from: String
   to: String!
   subject: String!
-  text: String!
+  textContent: String!
+  htmlContent: String
+  attachmentPath: String
 }
 
 """All information about a survey imported from Qualtrics"""

@@ -1,8 +1,11 @@
 import { Field, InputType } from "type-graphql";
 
 @InputType()
-export class SendLetterInput {
+export class SendMailInput {
+  @Field({ nullable: true }) from?: string;
   @Field() to: string;
   @Field() subject: string;
-  @Field() text: string;
+  @Field() textContent: string;
+  @Field({ nullable: true }) htmlContent?: string;
+  @Field({ nullable: true }) attachmentPath?: string;
 }
