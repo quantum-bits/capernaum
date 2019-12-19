@@ -1,12 +1,14 @@
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import typeORMConfig from "./typeorm-config";
 import { LetterModule } from "./letter/letter.module";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
 import { AuthModule } from "./auth/auth.module";
 import { inDevelopmentMode } from "./shared/helpers";
+import { MailModule } from "./mail/mail.module";
+
+import typeORMConfig from "./typeorm-config";
 
 @Module({
   imports: [
@@ -22,7 +24,8 @@ import { inDevelopmentMode } from "./shared/helpers";
     LetterModule,
     SurveyModule,
     PredictionModule,
-    AuthModule
+    AuthModule,
+    MailModule
   ]
 })
 export class AppModule {}

@@ -17,11 +17,11 @@ all:
       ansible_user: tnurkkala
       ansible_host: localhost
       ansible_port: 2222
+      server_name: "galilee.cse.taylor.edu"
+      nginx_config: nginx-production.conf
       proxy:
         host: "10.120.160.77"
         port: 3128
-      server_name: "galilee.cse.taylor.edu"
-      nginx_config: nginx-production.conf
       mail:
         host: smtp.cse.taylor.edu
         from: "Tom Nurkkala <tnurkkala@cse.taylor.edu>"

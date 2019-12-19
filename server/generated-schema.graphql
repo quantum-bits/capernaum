@@ -161,6 +161,7 @@ type LoginResponse {
 }
 
 type Mutation {
+  sendLetter(letterInput: SendLetterInput!): String!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
@@ -358,6 +359,12 @@ input ScriptureEngagementPracticeUpdateInput {
   description: String
   moreInfoUrl: String
   sequence: Int
+}
+
+input SendLetterInput {
+  to: String!
+  subject: String!
+  text: String!
 }
 
 """All information about a survey imported from Qualtrics"""
