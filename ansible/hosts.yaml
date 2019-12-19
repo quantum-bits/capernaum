@@ -5,6 +5,11 @@ all:
       ansible_host: 10.211.55.53
       server_name: ubuntu
       nginx_config: nginx-simple.conf
+      mail:
+        host: smtp.ethereal.mail
+        port: 587
+        user: fred
+        pass: ziffle
 
     # Use this with forwarded port, as in
     #   ssh -L2222:galilee.cse.taylor.edu:22 john.cse.taylor.edu
@@ -17,3 +22,6 @@ all:
         port: 3128
       server_name: "galilee.cse.taylor.edu"
       nginx_config: nginx-production.conf
+      mail:
+        host: smtp.cse.taylor.edu
+        from: "Tom Nurkkala <tnurkkala@cse.taylor.edu>"

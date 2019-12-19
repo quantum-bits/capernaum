@@ -11,22 +11,28 @@ export class MailService {
   private transporter: Transporter;
 
   constructor() {
-    const port = parseInt(process.env.MAIL_PORT);
-    const isSecure = port == 465;
-
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
-      port: port,
-      secure: isSecure,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
-      },
       logger: true,
       debug: true
     };
-    mailDebug("transport options %O", options);
 
+    if (process.env.MAIL_PORT) {
+      const port = parseInt(process.env.MAIL_PORT);
+      const isSecure = port == 465;
+
+      options.port = port;
+      options.secure = isSecure;
+    }
+
+    if (process.env.MAIL_USER && process.env.MAIL_PASS) {
+      options.auth = {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+      };
+    }
+
+    mailDebug("transport options %O", options);
     this.transporter = nodemailer.createTransport(options);
   }
 
@@ -46,7 +52,7 @@ export class MailService {
     if (attachment) {
       options.attachments = [attachment];
     }
-    mailDebug("semdMail options %O", options);
+    mailDebug("sendMail options %O", options);
     return this.transporter.sendMail(options);
   }
 }

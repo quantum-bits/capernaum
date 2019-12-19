@@ -26,7 +26,10 @@ PROXY_HOST={{ proxy.host }}
 PROXY_PORT={{ proxy.port }}
 {% endif %}
 
-MAIL_HOST={{ mail_host }}
-MAIL_PORT={{ mail_port }}
-MAIL_USER={{ mail_user }}
-MAIL_PASS={{ mail_pass }}
+{% if mail is defined %}
+MAIL_HOST={{ mail.host }}
+MAIL_FROM={{ mail.from }}
+MAIL_PORT={{ mail.port }}
+MAIL_USER={{ mail.user }}
+MAIL_PASS={{ mail.pass }}
+{% endif %}
