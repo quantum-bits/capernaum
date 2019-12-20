@@ -9,17 +9,32 @@ import { mean } from "lodash";
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
 export class SurveyIndex extends AbstractEntity {
-  @ManyToOne(type => SurveyDimension, dimension => dimension.surveyIndices)
+  @ManyToOne(
+    type => SurveyDimension,
+    dimension => dimension.surveyIndices
+  )
   @Field(type => SurveyDimension)
   surveyDimension: SurveyDimension;
   @Column("integer")
   surveyDimensionId: number;
 
-  @OneToMany(type => SurveyItem, item => item.surveyIndex)
+  @Column({ default: true })
+  @Field({
+    description: "Use this index in prediction tables?"
+  })
+  useForPredictions: boolean;
+
+  @OneToMany(
+    type => SurveyItem,
+    item => item.surveyIndex
+  )
   @Field(type => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany(type => PredictionTableEntry, ptEntry => ptEntry.surveyIndex)
+  @OneToMany(
+    type => PredictionTableEntry,
+    ptEntry => ptEntry.surveyIndex
+  )
   @Field(type => [PredictionTableEntry])
   predictionTableEntries: PredictionTableEntry[];
 

@@ -456,6 +456,9 @@ type SurveyIndex {
   """Unique ID for this entity"""
   id: Int!
   surveyDimension: SurveyDimension!
+
+  """Use this index in prediction tables?"""
+  useForPredictions: Boolean!
   surveyItems: [SurveyItem!]!
   predictionTableEntries: [PredictionTableEntry!]!
 

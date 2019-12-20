@@ -52,7 +52,7 @@ import axios, { AxiosResponse } from "axios";
 import gql from "graphql-tag";
 
 //import { BooleanAssociationBriefType } from "@/types/association-table.types";
-import { Survey, SurveyItem, SurveySelection } from "@/pages/survey.types";
+import { SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 import {
