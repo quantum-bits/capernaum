@@ -34,20 +34,20 @@ export interface SurveyItemView {
 
 export interface SurveyIndexView {
   id: number;
-  parentId: number;
-  parentName: string;
   name: string;
   abbrev: string;
   type: string;
   useForPredictions: boolean;
-  canDelete: boolean;
+  dimensionId: number;
+  dimensionName: string;
   children: SurveyItemView[];
+  canDelete: boolean;
 }
 
 export interface SurveyDimensionView {
   id: number;
   name: string;
   type: string;
-  canDelete: boolean;
   children: SurveyIndexView[];
+  canDelete: boolean;
 }
