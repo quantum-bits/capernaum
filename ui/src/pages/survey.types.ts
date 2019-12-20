@@ -29,7 +29,6 @@ export interface QualtricsSurveySelection {
 export interface SurveyItemView {
   id: number;
   name: string;
-  type?: string;
 }
 
 export interface SurveyIndexView {

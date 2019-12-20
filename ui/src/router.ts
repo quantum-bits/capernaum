@@ -35,7 +35,7 @@ const router = new VueRouter({
     {
       path: "/survey-dimensions",
       name: "survey-dimensions",
-      component: () => import("./pages/SurveyDimensions.vue")
+      component: () => import("./pages/SurveyDimensions/SurveyDimensions.vue")
     },
     {
       path: "/import-qualtrics-survey",

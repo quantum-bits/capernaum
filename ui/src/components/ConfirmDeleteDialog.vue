@@ -54,14 +54,9 @@ export default Vue.extend({
         return this.value;
       },
       set(newValue: boolean): void {
-        console.log("in setter!");
         this.$emit("input", newValue);
       }
     }
-  },
-
-  mounted() {
-    console.log("mounted....");
   }
 });
 </script>

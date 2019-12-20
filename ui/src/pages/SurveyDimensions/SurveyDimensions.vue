@@ -17,14 +17,18 @@
         />
       </v-col>
 
-      <v-btn color="primary" @click="addSurveyDimension()">
+      <v-btn
+        color="primary"
+        :disabled="!isSurveySelected"
+        @click="showDimensionDialog"
+      >
         Add Survey Dimension
       </v-btn>
     </v-row>
 
     <!-- Tree -->
     <v-row v-if="surveySelect">
-      <v-col cols="10" offset="1" v-if="surveyData">
+      <v-col cols="10" offset="1" v-if="isSurveyDataValid">
         <v-treeview dense rounded hoverable :items="surveyDimensions">
           <template v-slot:label="{ item }">
             <div v-html="item.name"></div>
@@ -37,12 +41,18 @@
           <template v-slot:append="{ item }">
             <span v-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION">
               <dimension-tree-branch
-                :dimension="item"
+                :survey="surveyData"
+                :surveyDimension="item"
                 @refetch="refetchSurveyData"
+                ref="dimensionTreeBranch"
               />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
-              <index-tree-branch :index="item" @refetch="refetchSurveyData" />
+              <index-tree-branch
+                :survey="surveyData"
+                :surveyIndex="item"
+                @refetch="refetchSurveyData"
+              />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
               Item
@@ -55,11 +65,11 @@
       </v-col>
     </v-row>
 
-    <ConfirmDeleteDialog
-      v-model="deleteDialog.visible"
-      v-on:delete-is-confirmed="deleteIsConfirmed()"
-      :customText="deleteDialog.dialogText"
-      :customTitle="deleteDialog.dialogTitle"
+    <dimension-dialog
+      title="Add a New Survey Dimension"
+      hint="e.g., 'Focal Dimension'"
+      :visible="dimensionDialog.visible"
+      @dimension-ready="addDimension"
     />
   </v-container>
 </template>
@@ -67,12 +77,9 @@
 <script lang="ts">
 import Vue from "vue";
 
-import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
-
 import {
+  ADD_DIMENSION_MUTATION,
   ALL_SURVEYS_QUERY,
-  DELETE_DIMENSION,
-  DELETE_INDEX,
   ONE_SURVEY_QUERY
 } from "@/graphql/surveys.graphql";
 
@@ -81,15 +88,17 @@ import {
   SurveyDimensionEnum,
   SurveyDimensionView,
   SurveySelection
-} from "./survey.types";
+} from "../survey.types";
 
 import {
   OneSurvey_survey as Survey,
   OneSurvey_survey_surveyDimensions as SurveyDimension,
   OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex
 } from "@/graphql/types/OneSurvey";
-import DimensionTreeBranch from "@/components/DimensionTreeBranch.vue";
-import IndexTreeBranch from "@/components/IndexTreeBranch.vue";
+import DimensionTreeBranch from "./DimensionTreeBranch.vue";
+import IndexTreeBranch from "./IndexTreeBranch.vue";
+import isEmpty from "lodash/isEmpty";
+import DimensionDialog from "@/pages/SurveyDimensions/DimensionDialog.vue";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
@@ -97,29 +106,21 @@ export default Vue.extend({
 
   components: {
     DimensionTreeBranch,
+    DimensionDialog,
     IndexTreeBranch
   },
 
   data() {
     return {
-      deleteDialog: {
-        id: NaN, // id of the dimension or index to be deleted
-        visible: false,
-        type: "", // will be set to the type of element that will be deleted (e.g., surveyDimensionEnum.SURVEY_INDEX)
-        dialogTitle: "", // custom title sent to the confirm delete dialog
-        dialogText: "" // custom text sent to the confirm delete dialog
-      },
-
       surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
-      surveyData: (null as any) as Survey,
 
       surveys: [] as Survey[],
+      surveyData: {} as Survey,
+      surveySelect: {} as SurveySelection,
 
-      //FIXME: make surveySelect of the appropriate type
-      surveySelect: (null as any) as SurveySelection,
-
-      nameRules: [(v: any) => !!v || "Title is required"],
-      abbrevRules: [(v: any) => !!v || "Abbreviation is required"]
+      dimensionDialog: {
+        visible: false
+      }
     };
   },
 
@@ -140,41 +141,33 @@ export default Vue.extend({
       });
     },
 
-    deleteIsConfirmed() {
-      console.log("delete is confirmed!");
-      if (this.deleteDialog.type === SurveyDimensionEnum.SURVEY_DIMENSION) {
-        console.log("deleting dimension....");
-        this.$apollo
-          .mutate({
-            mutation: DELETE_DIMENSION,
-            variables: {
-              id: this.deleteDialog.id
-            }
-          })
-          .then(({ data }) => {
-            console.log("item(s) deleted!", data);
-            this.refetchSurveyData();
-          })
-          .catch(error => {
-            console.log("there appears to have been an error: ", error);
-          });
-      } else if (this.deleteDialog.type === SurveyDimensionEnum.SURVEY_INDEX) {
-        console.log("deleting index....");
-        this.$apollo
-          .mutate({
-            mutation: DELETE_INDEX,
-            variables: {
-              id: this.deleteDialog.id
-            }
-          })
-          .then(({ data }) => {
-            console.log("item(s) deleted!", data);
-            this.refetchSurveyData();
-          })
-          .catch(error => {
-            console.log("there appears to have been an error: ", error);
-          });
-      }
+    showDimensionDialog() {
+      this.dimensionDialog.visible = true;
+    },
+
+    hideDimensionDialog() {
+      this.dimensionDialog.visible = false;
+    },
+
+    addDimension(dimensionDetails: any) {
+      console.log("DIM DETAILS", dimensionDetails);
+      this.$apollo
+        .mutate({
+          mutation: ADD_DIMENSION_MUTATION,
+          variables: {
+            surveyId: this.surveyData.id,
+            title: dimensionDetails.dimensionName,
+            // FIXME: sequence should not be hard-coded
+            sequence: 10
+          }
+        })
+        .then(() => {
+          this.hideDimensionDialog();
+          this.refetchSurveyData();
+        })
+        .catch(error => {
+          console.log("there appears to have been an error: ", error);
+        });
     }
   },
 
@@ -203,7 +196,7 @@ export default Vue.extend({
         return data.survey;
       },
       skip() {
-        return this.surveySelect === null;
+        return !this.isSurveySelected;
       },
       fetchPolicy: "network-only"
     }
@@ -215,6 +208,14 @@ export default Vue.extend({
         text: survey.title,
         value: survey.id
       }));
+    },
+
+    isSurveySelected(): boolean {
+      return !isEmpty(this.surveySelect);
+    },
+
+    isSurveyDataValid(): boolean {
+      return !isEmpty(this.surveyData);
     },
 
     surveyDimensions(): SurveyDimensionView[] {

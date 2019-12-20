@@ -10,6 +10,7 @@
         Items for this index used in Boolean Association Table.
       </span>
     </v-tooltip>
+
     <v-tooltip top>
       <template v-slot:activator="{ on }">
         <a @click="editIndex" v-on="on">
@@ -22,6 +23,7 @@
         Edit this survey index and/or update the associations to survey items.
       </span>
     </v-tooltip>
+
     <v-tooltip v-if="surveyIndex.canDelete" top>
       <template v-slot:activator="{ on }">
         <a @click="deleteIndex" v-on="on">
@@ -44,17 +46,17 @@
         This survey index has boolean associations and cannot be deleted.
       </span>
     </v-tooltip>
-    <v-dialog
-      v-if="surveyData"
-      persistent
-      v-model="surveyIndexDialog.visible"
-      max-width="800"
-    >
+
+    <v-dialog persistent v-model="surveyIndexDialog.visible" max-width="800">
       <v-card>
         <v-card-title class="headline">
           {{ surveyIndexDialog.dialogTitle }}
         </v-card-title>
-        <v-form ref="indexForm" v-model="valid" lazy-validation>
+        <v-form
+          ref="indexForm"
+          v-model="surveyIndexDialog.valid"
+          lazy-validation
+        >
           <v-card-text>
             <v-text-field
               v-model="surveyIndexDialog.text"
@@ -127,7 +129,7 @@
             </v-btn>
 
             <v-btn
-              :disabled="!valid"
+              :disabled="!surveyIndexDialog.valid"
               color="success"
               text
               @click="submitIndex()"
@@ -138,27 +140,43 @@
         </v-form>
       </v-card>
     </v-dialog>
+
+    <ConfirmDeleteDialog
+      v-model="deleteDialog.visible"
+      :customText="deleteDialog.dialogText"
+      :customTitle="deleteDialog.dialogTitle"
+      @delete-is-confirmed="deleteIsConfirmed"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  SurveyDimensionEnum,
-  SurveyIndexView,
-  SurveyItemView
-} from "../pages/survey.types";
+import { SurveyIndexView, SurveyItemView } from "../survey.types";
+
 import {
   ADD_INDEX_MUTATION,
+  DELETE_INDEX,
   UPDATE_INDEX_MUTATION
-} from "../graphql/surveys.graphql";
+} from "../../graphql/surveys.graphql";
+import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog.vue";
 
 export default Vue.extend({
-  name: "DimensionTreeBranch",
+  name: "IndexTreeBranch",
 
+  components: {
+    ConfirmDeleteDialog
+  },
+
+  // https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
   props: {
+    survey: {
+      type: Object as () => Survey,
+      required: true
+    },
     surveyIndex: {
-      type: Object,
+      type: Object as () => SurveyIndexView,
       required: true
     }
   },
@@ -172,6 +190,7 @@ export default Vue.extend({
         text: "",
         abbrev: "",
         useForPredictions: true,
+        valid: false,
 
         dialogTitle: "",
         dialogHint: "",
@@ -181,7 +200,14 @@ export default Vue.extend({
         editOn: false
       },
 
+      deleteDialog: {
+        visible: false,
+        dialogTitle: "",
+        dialogText: ""
+      },
+
       serverError: false,
+      canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
 
       rules: {
         required: [(v: any) => !!v || "Required field"]
@@ -213,6 +239,7 @@ export default Vue.extend({
         text: "",
         abbrev: "",
         useForPredictions: true,
+        valid: false,
 
         dialogTitle: `Add a New Survey Index for '${this.surveyIndex.dimensionName}'`,
         dialogHint: "e.g., 'A Focus on Others'",
@@ -221,6 +248,7 @@ export default Vue.extend({
         visible: true,
         editOn: false
       };
+      this.canTurnOffPredictions = true;
     },
 
     editIndex() {
@@ -233,6 +261,7 @@ export default Vue.extend({
         text: this.surveyIndex.name,
         abbrev: this.surveyIndex.abbrev,
         useForPredictions: this.surveyIndex.useForPredictions,
+        valid: false,
 
         dialogTitle: `Edit Survey Index for '${this.surveyIndex.dimensionName}'`,
         dialogHint: "e.g., 'A Focus on Others'",
@@ -241,16 +270,32 @@ export default Vue.extend({
         visible: true,
         editOn: true
       };
+      this.canTurnOffPredictions = this.surveyIndex.canDelete;
     },
 
     deleteIndex() {
-      this.deleteDialog.dialogTitle =
-        "Really delete the index " + "'" + this.surveyIndex.name + "'?";
-      this.deleteDialog.dialogText = "This action is not reversible.";
-      this.showConfirmDeleteDialog = true;
-      this.deleteDialog.type = SurveyDimensionEnum.SURVEY_INDEX;
-      this.deleteDialog.id = this.surveyIndex.id;
-      // can use the parentId to make sure things are done correctly
+      this.deleteDialog = {
+        dialogTitle: `Really delete the index '${this.surveyIndex.name}'?`,
+        dialogText: "This action is not reversible.",
+        visible: true
+      };
+    },
+
+    deleteIsConfirmed() {
+      this.$apollo
+        .mutate({
+          mutation: DELETE_INDEX,
+          variables: {
+            id: this.surveyIndex.id
+          }
+        })
+        .then(({ data }) => {
+          console.log("item(s) deleted!", data);
+          this.refetchSurveyData();
+        })
+        .catch(error => {
+          console.log("there appears to have been an error: ", error);
+        });
     },
 
     cancelIndexDialog() {
@@ -276,7 +321,7 @@ export default Vue.extend({
               itemIds: this.selectedSurveyItems.map(surveyItem => surveyItem.id)
             }
           })
-          .then(({ data }) => {
+          .then(() => {
             this.cancelIndexDialog();
             this.refetchSurveyData();
           })
@@ -290,14 +335,14 @@ export default Vue.extend({
           .mutate({
             mutation: ADD_INDEX_MUTATION,
             variables: {
-              dimensionId: this.surveyDimensionDialog.id,
+              dimensionId: this.surveyIndex.dimensionId,
               abbreviation: this.surveyIndexDialog.abbrev,
               title: this.surveyIndexDialog.text,
               useForPredictions: this.surveyIndexDialog.useForPredictions,
               itemIds: this.selectedSurveyItems.map(surveyItem => surveyItem.id)
             }
           })
-          .then(({ data }) => {
+          .then(() => {
             this.cancelIndexDialog();
             this.refetchSurveyData();
           })
@@ -322,7 +367,7 @@ export default Vue.extend({
         });
       }
 
-      this.surveyData.surveyItems.forEach(item => {
+      this.survey.surveyItems.forEach(item => {
         returnArray.push({
           id: item.id,
           name: item.qualtricsText
