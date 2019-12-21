@@ -66,9 +66,9 @@
     </v-row>
 
     <dimension-dialog
-      title="Add a New Survey Dimension"
-      hint="e.g., 'Focal Dimension'"
-      :visible="dimensionDialog.visible"
+      dialog-title="Add a New Survey Dimension"
+      dialog-hint="e.g., 'Focal Dimension'"
+      :value="dimensionDialog.visible"
       @dimension-ready="addDimension"
     />
   </v-container>

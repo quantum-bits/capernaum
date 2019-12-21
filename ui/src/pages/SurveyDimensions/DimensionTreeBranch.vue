@@ -47,16 +47,17 @@
     </v-tooltip>
 
     <dimension-dialog
-      title="Edit Survey Dimension"
-      hint="e.g., 'Focal Dimension'"
-      :visible="dimensionDialog.visible"
+      v-model="dimensionDialog.visible"
+      dialog-title="Edit Survey Dimension"
+      dialog-hint="e.g., 'Focal Dimension'"
+      :initial-title="surveyDimension.name"
       @dimension-ready="updateDimension"
     />
 
     <confirm-delete-dialog
       v-model="deleteDialog.visible"
-      :customText="deleteDialog.dialogText"
-      :customTitle="deleteDialog.dialogTitle"
+      :custom-text="deleteDialog.dialogText"
+      :custom-title="deleteDialog.dialogTitle"
       @delete-is-confirmed="deleteIsConfirmed"
     />
   </div>
@@ -129,10 +130,12 @@ export default Vue.extend({
         .mutate({
           mutation: UPDATE_DIMENSION_MUTATION,
           variables: {
-            id: this.surveyDimension.id,
-            title: dimensionDetails.dimensionName,
-            // FIXME: sequence should not be hard-coded
-            sequence: 10
+            updateInput: {
+              id: this.surveyDimension.id,
+              title: dimensionDetails.dimensionTitle,
+              // FIXME: sequence should not be hard-coded
+              sequence: 10
+            }
           }
         })
         .then(() => {

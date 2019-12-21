@@ -79,20 +79,8 @@ export const ADD_DIMENSION_MUTATION = gql`
 `;
 
 export const UPDATE_DIMENSION_MUTATION = gql`
-  mutation ChangeDimension(
-    $id: Int!
-    $title: String!
-    $sequence: Int!
-    $useForPredictions: Boolean!
-  ) {
-    updateSurveyDimension(
-      updateInput: {
-        id: $id
-        title: $title
-        sequence: $sequence
-        useForPredictions: $useForPredictions
-      }
-    ) {
+  mutation UpdateDimension($updateInput: SurveyDimensionUpdateInput!) {
+    updateSurveyDimension(updateInput: $updateInput) {
       title
       sequence
       useForPredictions
