@@ -2,6 +2,8 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { SurveyIndexCreateInput } from "./globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: AddIndex
 // ====================================================
@@ -37,8 +39,5 @@ export interface AddIndex {
 }
 
 export interface AddIndexVariables {
-  dimensionId: number;
-  itemIds: number[];
-  title: string;
-  abbreviation: string;
+  createInput: SurveyIndexCreateInput;
 }

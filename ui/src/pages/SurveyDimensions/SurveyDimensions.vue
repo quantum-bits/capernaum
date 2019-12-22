@@ -68,7 +68,7 @@
     <dimension-dialog
       dialog-title="Add a New Survey Dimension"
       dialog-hint="e.g., 'Focal Dimension'"
-      :value="dimensionDialog.visible"
+      :visible="dimensionDialog.visible"
       @dimension-ready="addDimension"
     />
   </v-container>
@@ -155,10 +155,12 @@ export default Vue.extend({
         .mutate({
           mutation: ADD_DIMENSION_MUTATION,
           variables: {
-            surveyId: this.surveyData.id,
-            title: dimensionDetails.dimensionName,
-            // FIXME: sequence should not be hard-coded
-            sequence: 10
+            createInput: {
+              surveyId: this.surveyData.id,
+              title: dimensionDetails.dimensionTitle,
+              // FIXME: sequence should not be hard-coded
+              sequence: 10
+            }
           }
         })
         .then(() => {
@@ -230,7 +232,7 @@ export default Vue.extend({
           dimensionName: dim.title,
           name: index.title,
           abbrev: index.abbreviation,
-          useForPredictions: dim.useForPredictions,
+          useForPredictions: index.useForPredictions,
           type: "survey-index",
           canDelete: this.canDeleteSurveyIndex(index),
           children: index.surveyItems.map(item => ({

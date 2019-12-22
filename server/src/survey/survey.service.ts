@@ -55,8 +55,7 @@ export class SurveyService extends BaseService {
       this.surveyDimensionRepo.create({
         survey,
         title: createInput.title,
-        sequence: createInput.sequence,
-        useForPredictions: createInput.useForPredictions
+        sequence: createInput.sequence
       })
     );
   }
@@ -75,7 +74,8 @@ export class SurveyService extends BaseService {
         surveyIndexRepo.create({
           surveyDimension: dimension,
           title: createInput.title,
-          abbreviation: createInput.abbreviation
+          abbreviation: createInput.abbreviation,
+          useForPredictions: createInput.useForPredictions
         })
       );
 

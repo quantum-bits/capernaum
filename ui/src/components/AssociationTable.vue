@@ -148,8 +148,8 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
           "sequence"
         );
         surveyDimensions.forEach(dimension => {
-          if (dimension.useForPredictions) {
-            dimension.surveyIndices.forEach(index => {
+          dimension.surveyIndices.forEach(index => {
+            if (index.useForPredictions) {
               //this.tableColumns.push(index);
               this.headers.push({
                 text: index.abbreviation,
@@ -157,8 +157,8 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
                 sortable: true,
                 value: "columnId-" + index.id // unique id for this index
               });
-            });
-          }
+            }
+          });
         });
 
         let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[] = orderBy(

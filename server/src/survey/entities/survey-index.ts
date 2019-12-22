@@ -71,6 +71,12 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
   })
   itemIds: number[];
 
+  @Column({ default: true })
+  @Field({
+    description: "Use this index in prediction tables?"
+  })
+  useForPredictions: boolean;
+
   @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })
   abbreviation: string;
 
@@ -84,6 +90,7 @@ export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
   @Field(type => [Int], { nullable: true }) itemIds?: number[];
   @Field({ nullable: true }) abbreviation?: string;
   @Field({ nullable: true }) title?: string;
+  @Field({ nullable: true }) useForPredictions?: boolean;
 }
 
 @ObjectType()

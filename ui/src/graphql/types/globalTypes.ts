@@ -102,6 +102,31 @@ export interface ScriptureEngagementPracticeUpdateInput {
   sequence?: number | null;
 }
 
+/**
+ * Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.
+ */
+export interface SurveyDimensionCreateInput {
+  surveyId: number;
+  title: string;
+  useForPredictions: boolean;
+  sequence: number;
+}
+
+export interface SurveyDimensionUpdateInput {
+  id: number;
+  title?: string | null;
+  useForPredictions?: boolean | null;
+  sequence?: number | null;
+}
+
+export interface SurveyIndexCreateInput {
+  dimensionId: number;
+  itemIds: number[];
+  useForPredictions: boolean;
+  abbreviation: string;
+  title: string;
+}
+
 export interface UserUpdateInput {
   id: number;
   email?: string | null;

@@ -2,6 +2,8 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { SurveyDimensionCreateInput } from "./globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: AddDimension
 // ====================================================
@@ -26,6 +28,10 @@ export interface AddDimension_createSurveyDimension_surveyIndices {
    * Abbreviation for this index (e.g., 'FOG')
    */
   abbreviation: string;
+  /**
+   * Use this index in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyItems: AddDimension_createSurveyDimension_surveyIndices_surveyItems[];
 }
 
@@ -42,10 +48,6 @@ export interface AddDimension_createSurveyDimension {
    * Sequence number; dimension are displayed in this order.
    */
   sequence: number;
-  /**
-   * Use this dimension in prediction tables?
-   */
-  useForPredictions: boolean;
   surveyIndices: AddDimension_createSurveyDimension_surveyIndices[];
 }
 
@@ -57,8 +59,5 @@ export interface AddDimension {
 }
 
 export interface AddDimensionVariables {
-  surveyId: number;
-  title: string;
-  sequence: number;
-  useForPredictions: boolean;
+  createInput: SurveyDimensionCreateInput;
 }

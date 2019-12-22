@@ -62,6 +62,10 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices {
    * Abbreviation for this index (e.g., 'FOG')
    */
   abbreviation: string;
+  /**
+   * Use this index in prediction tables?
+   */
+  useForPredictions: boolean;
   predictionTableEntries: OneSurvey_survey_surveyDimensions_surveyIndices_predictionTableEntries[];
   surveyItems: OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems[];
 }
@@ -79,10 +83,6 @@ export interface OneSurvey_survey_surveyDimensions {
    * Sequence number; dimension are displayed in this order.
    */
   sequence: number;
-  /**
-   * Use this dimension in prediction tables?
-   */
-  useForPredictions: boolean;
   surveyIndices: OneSurvey_survey_surveyDimensions_surveyIndices[];
 }
 

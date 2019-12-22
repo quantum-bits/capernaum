@@ -71,7 +71,6 @@ export const ONE_LETTER_QUERY = gql`
         surveyDimension {
           id
           title
-          useForPredictions
           sequence
         }
         image {
@@ -92,11 +91,11 @@ export const ONE_LETTER_QUERY = gql`
           id
           sequence
           title
-          useForPredictions
           surveyIndices {
             id
             abbreviation
             title
+            useForPredictions
             surveyItems {
               id
               qualtricsId
@@ -148,7 +147,6 @@ export const ALL_LETTERS_QUERY = gql`
         surveyDimension {
           id
           title
-          useForPredictions
           sequence
         }
       }
@@ -164,10 +162,10 @@ export const ALL_LETTERS_QUERY = gql`
           }
           sequence
           title
-          useForPredictions
           surveyIndices {
             abbreviation
             title
+            useForPredictions
             surveyItems {
               id
               qualtricsId

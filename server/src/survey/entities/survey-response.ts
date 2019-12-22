@@ -46,7 +46,10 @@ class ScriptureEngagementPracticePrediction {
 @ObjectType({ description: "One user's response to a survey" })
 export class SurveyResponse extends AbstractEntity {
   @Column("int") surveyId;
-  @ManyToOne(type => Survey, survey => survey.surveyItems)
+  @ManyToOne(
+    type => Survey,
+    survey => survey.surveyItems
+  )
   @Field(type => Survey)
   survey: Survey;
 
@@ -132,8 +135,8 @@ export class SurveyResponse extends AbstractEntity {
     > = new Map();
 
     for (const dimension of this.survey.surveyDimensions) {
-      if (dimension.useForPredictions) {
-        for (const surveyIndex of dimension.surveyIndices) {
+      for (const surveyIndex of dimension.surveyIndices) {
+        if (surveyIndex.useForPredictions) {
           for (const predictionTableEntry of surveyIndex.predictionTableEntries) {
             if (!predictionMap.has(predictionTableEntry.practiceId)) {
               predictionMap.set(
@@ -170,20 +173,20 @@ export class SurveyResponse extends AbstractEntity {
     console.log("RESPONSE", this.id);
 
     for (let dim of this.survey.surveyDimensions) {
-      console.log(
-        `DIM (${dim.id}) ${dim.title} - ${
-          dim.useForPredictions ? "USE TO PREDICT" : "DON'T USE TO PREDICT"
-        }`
-      );
+      console.log(`DIM (${dim.id}) ${dim.title}`);
       console.log("CHART", dim.chartData());
 
       for (let index of dim.surveyIndices) {
         console.log(
           this.tab(
             1,
-            `IDX (${index.id}-${index.abbreviation}), ${
-              index.title
-            } => ${index.meanResponse()}`
+            `IDX (${index.id}-${index.abbreviation}) ${index.title} 
+                          ${
+                            index.useForPredictions
+                              ? "USE TO PREDICT"
+                              : "DON'T USE TO PREDICT"
+                          }
+             => ${index.meanResponse()}`
           )
         );
 

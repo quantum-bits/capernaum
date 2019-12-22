@@ -1,11 +1,11 @@
 <template>
-  <v-dialog persistent v-model="value" max-width="800">
+  <v-dialog persistent v-model="visible" max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="dimensionForm" v-model="valid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="dimensionTitle"
+            v-model="dimension.title"
             label="Survey Dimension"
             :hint="dialogHint"
             :rules="rules.required"
@@ -39,14 +39,21 @@ export default Vue.extend({
   props: {
     dialogTitle: { type: String, required: true },
     dialogHint: { type: String, required: true },
-    value: { type: Boolean, required: true, default: false },
+    visible: { type: Boolean, required: true, default: false },
 
-    initialTitle: { type: String }
+    dimensionTitle: { type: String }
+  },
+
+  model: {
+    prop: "visible",
+    event: "submit"
   },
 
   data() {
     return {
-      dimensionTitle: this.initialTitle,
+      dimension: {
+        title: this.dimensionTitle
+      },
 
       valid: false,
 
@@ -58,27 +65,30 @@ export default Vue.extend({
 
   methods: {
     onCancel() {
-      this.$emit("input", false);
+      this.$emit("submmit", false);
     },
 
     onSubmit() {
       this.$emit("dimension-ready", {
-        dimensionTitle: this.dimensionTitle
+        dimensionTitle: this.dimension.title
       });
-      this.$emit("input", false);
+      this.$emit("submit", false);
+    }
+  },
+
+  watch: {
+    visible: {
+      handler: function(newValue, oldValue) {
+        if (newValue) {
+          this.dimension.title = this.dimensionTitle;
+          if (this.$refs.dimensionForm && newValue) {
+            // FIXME: Replace the `as any` hack.
+            (this.$refs.dimensionForm as any).resetValidation();
+          }
+        }
+      },
+      immediate: true
     }
   }
-
-  // watch: {
-  //   value: {
-  //     handler: function(newValue) {
-  //       if (newValue) {
-  //         // FIXME: Replace the `as any` hack.
-  //         (this.$refs.dimensionForm as any).resetValidation();
-  //       }
-  //     },
-  //     immediate: true
-  //   }
-  // }
 });
 </script>

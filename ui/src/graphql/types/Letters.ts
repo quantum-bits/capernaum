@@ -74,10 +74,6 @@ export interface Letters_letters_letterElements_surveyDimension {
    */
   title: string;
   /**
-   * Use this dimension in prediction tables?
-   */
-  useForPredictions: boolean;
-  /**
    * Sequence number; dimension are displayed in this order.
    */
   sequence: number;
@@ -125,6 +121,10 @@ export interface Letters_letters_survey_surveyDimensions_surveyIndices {
    * Title of this index
    */
   title: string;
+  /**
+   * Use this index in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyItems: Letters_letters_survey_surveyDimensions_surveyIndices_surveyItems[];
 }
 
@@ -142,10 +142,6 @@ export interface Letters_letters_survey_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Use this dimension in prediction tables?
-   */
-  useForPredictions: boolean;
   surveyIndices: Letters_letters_survey_surveyDimensions_surveyIndices[];
 }
 
