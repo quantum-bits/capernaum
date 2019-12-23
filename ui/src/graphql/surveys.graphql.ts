@@ -96,20 +96,8 @@ export const ADD_INDEX_MUTATION = gql`
 `;
 
 export const UPDATE_INDEX_MUTATION = gql`
-  mutation UpdateIndex(
-    $id: Int!
-    $itemIds: [Int!]!
-    $title: String!
-    $abbreviation: String!
-  ) {
-    updateSurveyIndex(
-      updateInput: {
-        id: $id
-        title: $title
-        abbreviation: $abbreviation
-        itemIds: $itemIds
-      }
-    ) {
+  mutation UpdateIndex($updateInput: SurveyIndexUpdateInput!) {
+    updateSurveyIndex(updateInput: $updateInput) {
       id
       title
       abbreviation

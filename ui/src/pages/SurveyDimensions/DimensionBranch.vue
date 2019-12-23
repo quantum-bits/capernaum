@@ -1,64 +1,73 @@
 <template>
   <div>
     <v-tooltip top>
+      <span>Add a new survey index for this survey dimension.</span>
       <template v-slot:activator="{ on }">
-        <a @click="addSurveyIndex(surveyDimension)" v-on="on">
+        <a @click="visible.indexDialog = true" v-on="on">
           <v-icon class="mx-2">
             {{ "mdi-plus-circle" }}
           </v-icon>
         </a>
       </template>
-      <span>Add a new survey index for this survey dimension.</span>
     </v-tooltip>
 
     <v-tooltip top>
+      <span>Edit this survey dimension.</span>
       <template v-slot:activator="{ on }">
-        <a @click="showDimensionDialog" v-on="on">
+        <a @click="visible.dimensionDialog = true" v-on="on">
           <v-icon class="mx-2">
             {{ "mdi-pencil" }}
           </v-icon>
         </a>
       </template>
-      <span>Edit this survey dimension.</span>
     </v-tooltip>
 
     <v-tooltip v-if="surveyDimension.canDelete" top>
+      <span>
+        Delete this survey dimension and all associated survey indexes.
+      </span>
       <template v-slot:activator="{ on }">
-        <a @click="deleteDimension(surveyDimension)" v-on="on">
+        <a @click="visible.deleteDialog = true" v-on="on">
           <v-icon class="mx-2">
             {{ "mdi-close-circle" }}
           </v-icon>
         </a>
       </template>
-      <span>
-        Delete this survey dimension and all associated survey indexes.
-      </span>
     </v-tooltip>
     <v-tooltip v-else top>
+      <span>
+        One or more survey indexes associated with this survey dimension have
+        boolean associations, so it cannot be deleted.
+      </span>
       <template v-slot:activator="{ on }">
         <v-icon v-on="on" class="mx-2 grey--text text--lighten-1">
           {{ "mdi-close-circle" }}
         </v-icon>
       </template>
-      <span>
-        One or more survey indexes associated with this survey dimension have
-        boolean associations, so it cannot be deleted.
-      </span>
     </v-tooltip>
 
     <dimension-dialog
-      v-model="dimensionDialog.visible"
-      dialog-title="Edit Survey Dimension"
-      dialog-hint="e.g., 'Focal Dimension'"
-      :dimension-title="surveyDimension.name"
-      @dimension-ready="updateDimension"
+      v-model="visible.dimensionDialog"
+      dialog-title="Edit an existing survey dimension"
+      title-hint="e.g., 'Focal Dimension'"
+      :initial-values="{ title: surveyDimension.name }"
+      @ready="updateDimension"
     />
 
-    <confirm-delete-dialog
-      v-model="deleteDialog.visible"
-      :custom-text="deleteDialog.dialogText"
-      :custom-title="deleteDialog.dialogTitle"
-      @delete-is-confirmed="deleteIsConfirmed"
+    <index-dialog
+      v-model="visible.indexDialog"
+      :dialog-title="`Add a new survey index for '${surveyDimension.name}'`"
+      title-hint="e.g., 'A focus on others"
+      abbreviation-hint="e.g., 'FOO'"
+      @ready="createIndex"
+    />
+
+    <confirm-dialog
+      v-model="visible.deleteDialog"
+      :dialog-title="`Really delete the dimension '${surveyDimension.name}'?`"
+      dialog-text="Doing so will also delete any associated indexes."
+      button-label="Delete"
+      @confirmed="deleteDimension"
     />
   </div>
 </template>
@@ -67,19 +76,27 @@
 import Vue from "vue";
 import { SurveyDimensionView } from "@/pages/survey.types";
 import {
+  ADD_INDEX_MUTATION,
   DELETE_DIMENSION,
   UPDATE_DIMENSION_MUTATION
 } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog.vue";
-import DimensionDialog from "@/pages/SurveyDimensions/DimensionDialog.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import DimensionDialog from "./DimensionDialog.vue";
+import IndexDialog from "./IndexDialog.vue";
+import { SurveyIndexCreateInput } from "@/graphql/types/globalTypes";
+import {
+  DimensionDialogResponse,
+  IndexDialogResponse
+} from "@/pages/SurveyDimensions/dialog.types";
 
 export default Vue.extend({
-  name: "DimensionTreeBranch",
+  name: "DimensionBranch",
 
   components: {
-    ConfirmDeleteDialog,
-    DimensionDialog
+    ConfirmDialog,
+    DimensionDialog,
+    IndexDialog
   },
 
   props: {
@@ -95,14 +112,10 @@ export default Vue.extend({
 
   data() {
     return {
-      dimensionDialog: {
-        visible: false
-      },
-
-      deleteDialog: {
-        visible: false,
-        dialogTitle: "",
-        dialogText: ""
+      visible: {
+        dimensionDialog: false,
+        indexDialog: false,
+        deleteDialog: false
       },
 
       rules: {
@@ -116,30 +129,21 @@ export default Vue.extend({
       this.$emit("refetch");
     },
 
-    showDimensionDialog() {
-      this.dimensionDialog.visible = true;
-    },
-
-    hideDimensionDialog() {
-      this.dimensionDialog.visible = false;
-    },
-
-    updateDimension(dimensionDetails: any) {
-      console.log("DIM DETAILS", dimensionDetails);
+    updateDimension(dialogResponse: DimensionDialogResponse) {
       this.$apollo
         .mutate({
           mutation: UPDATE_DIMENSION_MUTATION,
           variables: {
             updateInput: {
               id: this.surveyDimension.id,
-              title: dimensionDetails.dimensionTitle,
+              title: dialogResponse.title,
               // FIXME: sequence should not be hard-coded
               sequence: 10
             }
           }
         })
         .then(() => {
-          this.hideDimensionDialog();
+          this.visible.dimensionDialog = false;
           this.refetchSurveyData();
         })
         .catch(error => {
@@ -147,15 +151,25 @@ export default Vue.extend({
         });
     },
 
-    deleteDimension(dimension: SurveyDimensionView) {
-      this.deleteDialog = {
-        dialogTitle: `Really delete the dimension '${dimension.name}'?`,
-        dialogText: "Doing so will also delete any associated indexes.",
-        visible: true
-      };
+    createIndex(dialogResponse: IndexDialogResponse) {
+      // Add a new index.
+      this.$apollo
+        .mutate({
+          mutation: ADD_INDEX_MUTATION,
+          variables: {
+            createInput: dialogResponse
+          }
+        })
+        .then(() => {
+          this.visible.indexDialog = false;
+          this.refetchSurveyData();
+        })
+        .catch(error => {
+          console.log("there appears to have been an error: ", error);
+        });
     },
 
-    deleteIsConfirmed() {
+    deleteDimension() {
       this.$apollo
         .mutate({
           mutation: DELETE_DIMENSION,

@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <!-- Heading -->
     <v-row align="baseline" class="justify-space-around">
       <h1 class="headline">Survey Dimensions</h1>
 
@@ -20,16 +19,15 @@
       <v-btn
         color="primary"
         :disabled="!isSurveySelected"
-        @click="showDimensionDialog"
+        @click="dimensionDialog.visible = true"
       >
         Add Survey Dimension
       </v-btn>
     </v-row>
 
-    <!-- Tree -->
     <v-row v-if="surveySelect">
       <v-col cols="10" offset="1" v-if="isSurveyDataValid">
-        <v-treeview dense rounded hoverable :items="surveyDimensions">
+        <v-treeview dense rounded hoverable :items="surveyContent">
           <template v-slot:label="{ item }">
             <div v-html="item.name"></div>
           </template>
@@ -40,17 +38,16 @@
           </template>
           <template v-slot:append="{ item }">
             <span v-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION">
-              <dimension-tree-branch
+              <dimension-branch
                 :survey="surveyData"
-                :surveyDimension="item"
+                :survey-dimension="item"
                 @refetch="refetchSurveyData"
-                ref="dimensionTreeBranch"
               />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
-              <index-tree-branch
+              <index-branch
                 :survey="surveyData"
-                :surveyIndex="item"
+                :survey-index="item"
                 @refetch="refetchSurveyData"
               />
             </span>
@@ -66,10 +63,10 @@
     </v-row>
 
     <dimension-dialog
+      v-model="dimensionDialog.visible"
       dialog-title="Add a New Survey Dimension"
-      dialog-hint="e.g., 'Focal Dimension'"
-      :visible="dimensionDialog.visible"
-      @dimension-ready="addDimension"
+      title-hint="e.g., 'Focal Dimension'"
+      @ready="createDimension"
     />
   </v-container>
 </template>
@@ -95,19 +92,20 @@ import {
   OneSurvey_survey_surveyDimensions as SurveyDimension,
   OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex
 } from "@/graphql/types/OneSurvey";
-import DimensionTreeBranch from "./DimensionTreeBranch.vue";
-import IndexTreeBranch from "./IndexTreeBranch.vue";
+import DimensionBranch from "./DimensionBranch.vue";
 import isEmpty from "lodash/isEmpty";
-import DimensionDialog from "@/pages/SurveyDimensions/DimensionDialog.vue";
+import DimensionDialog from "./DimensionDialog.vue";
+import IndexBranch from "./IndexBranch.vue";
+import { DimensionDialogResponse } from "@/pages/SurveyDimensions/dialog.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
   name: "SurveyDimensions",
 
   components: {
-    DimensionTreeBranch,
+    DimensionBranch,
     DimensionDialog,
-    IndexTreeBranch
+    IndexBranch
   },
 
   data() {
@@ -122,6 +120,30 @@ export default Vue.extend({
         visible: false
       }
     };
+  },
+
+  apollo: {
+    surveys: {
+      query: ALL_SURVEYS_QUERY
+    },
+
+    // the following query runs automatically when this.surveySelect updates
+    // (i.e., when something is chosen from the drop-down)
+    surveyData: {
+      query: ONE_SURVEY_QUERY,
+      variables() {
+        return {
+          surveyId: this.surveySelect.value
+        };
+      },
+      update(data) {
+        return data.survey;
+      },
+      skip() {
+        return !this.isSurveySelected;
+      },
+      fetchPolicy: "network-only"
+    }
   },
 
   methods: {
@@ -141,66 +163,27 @@ export default Vue.extend({
       });
     },
 
-    showDimensionDialog() {
-      this.dimensionDialog.visible = true;
-    },
-
-    hideDimensionDialog() {
-      this.dimensionDialog.visible = false;
-    },
-
-    addDimension(dimensionDetails: any) {
-      console.log("DIM DETAILS", dimensionDetails);
+    createDimension(dialogResponse: DimensionDialogResponse) {
+      console.log("DIM DETAILS", dialogResponse);
       this.$apollo
         .mutate({
           mutation: ADD_DIMENSION_MUTATION,
           variables: {
             createInput: {
               surveyId: this.surveyData.id,
-              title: dimensionDetails.dimensionTitle,
+              title: dialogResponse.title,
               // FIXME: sequence should not be hard-coded
               sequence: 10
             }
           }
         })
         .then(() => {
-          this.hideDimensionDialog();
+          this.dimensionDialog.visible = false;
           this.refetchSurveyData();
         })
         .catch(error => {
           console.log("there appears to have been an error: ", error);
         });
-    }
-  },
-
-  apollo: {
-    surveys: {
-      query: ALL_SURVEYS_QUERY
-    },
-
-    // the following query runs automatically when this.surveySelect updates
-    // (i.e., when something is chosen from the drop-down)
-    surveyData: {
-      query: ONE_SURVEY_QUERY,
-      variables() {
-        console.log("survey select: ", this.surveySelect);
-        console.log(
-          "qualtricsId (to use fetch survey dimension data): ",
-          this.surveySelect.value
-        );
-        return {
-          surveyId: this.surveySelect.value,
-          which: WhichItems.WITHOUT_INDEX
-        };
-      },
-      update(data) {
-        console.log("data: ", data);
-        return data.survey;
-      },
-      skip() {
-        return !this.isSurveySelected;
-      },
-      fetchPolicy: "network-only"
     }
   },
 
@@ -220,25 +203,30 @@ export default Vue.extend({
       return !isEmpty(this.surveyData);
     },
 
-    surveyDimensions(): SurveyDimensionView[] {
+    surveyContent(): SurveyDimensionView[] {
+      // Dimensions
       return this.surveyData.surveyDimensions.map(dim => ({
         id: dim.id,
         name: dim.title,
-        type: "survey-dimension",
+        type: SurveyDimensionEnum.SURVEY_DIMENSION,
         canDelete: this.canDeleteSurveyDimension(dim),
+
+        // Indices
         children: dim.surveyIndices.map(index => ({
           id: index.id,
           dimensionId: dim.id,
           dimensionName: dim.title,
           name: index.title,
-          abbrev: index.abbreviation,
+          abbreviation: index.abbreviation,
           useForPredictions: index.useForPredictions,
-          type: "survey-index",
+          type: SurveyDimensionEnum.SURVEY_INDEX,
           canDelete: this.canDeleteSurveyIndex(index),
+
+          // Items
           children: index.surveyItems.map(item => ({
             id: item.id,
             name: item.qualtricsText,
-            type: "survey-item"
+            type: SurveyDimensionEnum.SURVEY_ITEM
           }))
         }))
       }));

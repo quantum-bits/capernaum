@@ -67,7 +67,7 @@ export class SurveyService extends BaseService {
       const surveyItemRepo = manager.getRepository(SurveyItem);
 
       const dimension = await surveyDimensionRepo.findOneOrFail(
-        createInput.dimensionId
+        createInput.surveyDimensionId
       );
 
       const newIndex = await surveyIndexRepo.save(

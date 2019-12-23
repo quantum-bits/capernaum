@@ -8,13 +8,20 @@ import { SurveyItemResponse } from "./survey-item-response";
 @Entity()
 @ObjectType({ description: "One item (question) from a survey" })
 export class SurveyItem extends AbstractEntity {
-  @ManyToOne(type => Survey, survey => survey.surveyItems)
+  @ManyToOne(
+    type => Survey,
+    survey => survey.surveyItems
+  )
   @Field(type => Survey)
   survey: Survey;
 
-  @ManyToOne(type => SurveyIndex, surveyIndex => surveyIndex.surveyItems, {
-    nullable: true
-  })
+  @ManyToOne(
+    type => SurveyIndex,
+    surveyIndex => surveyIndex.surveyItems,
+    {
+      nullable: true
+    }
+  )
   @Field(type => SurveyIndex, { nullable: true })
   surveyIndex: SurveyIndex;
   @Column("integer", { nullable: true })

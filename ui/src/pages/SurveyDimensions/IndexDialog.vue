@@ -1,24 +1,22 @@
 <template>
   <v-dialog persistent v-model="visible" max-width="800">
     <v-card>
-      <v-card-title class="headline">
-        {{ dialogTitle }}
-      </v-card-title>
-      <v-form ref="indexForm" v-model="valid" lazy-validation>
+      <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
+      <v-form ref="indexForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="index.title"
+            v-model="currentState.title"
             label="Survey Index"
-            :hint="dialogHint"
+            :hint="titleHint"
             :rules="rules.required"
             outlined
             persistent-hint
           />
 
           <v-text-field
-            v-model="index.abbreviation"
+            v-model="currentState.abbreviation"
             label="Survey Index Abbreviation"
-            :hint="index.abbrevHint"
+            :hint="abbreviationHint"
             :rules="rules.required"
             outlined
             persistent-hint
@@ -26,19 +24,19 @@
 
           <span v-if="canTurnOffPredictions">
             <v-switch
-              v-model="index.useForPredictions"
+              v-model="currentState.useForPredictions"
               label="Use For Predictions in Boolean Association Table"
-            ></v-switch>
+            />
           </span>
           <span v-else>
             <v-tooltip left max-width="300">
               <template v-slot:activator="{ on }">
                 <span v-on="on">
                   <v-switch
-                    v-model="index.useForPredictions"
+                    v-model="currentState.useForPredictions"
                     disabled
                     label="Use for predictions in Boolean association table"
-                  ></v-switch>
+                  />
                 </span>
               </template>
               <span>
@@ -48,34 +46,26 @@
             </v-tooltip>
           </span>
 
-          <template>
-            <v-container fluid>
-              <v-row align="center">
-                <v-col cols="12" sm="12">
-                  <v-select
-                    v-model="selectedSurveyItems"
-                    :items="surveyItems"
-                    :item-text="'name'"
-                    :item-value="'id'"
-                    label="Choose Survey Items"
-                    return-object
-                    multiple
-                    chips
-                  ></v-select>
-                </v-col>
-              </v-row>
-            </v-container>
-          </template>
+          <v-select
+            v-model="currentState.selectedItems"
+            :items="currentState.availableItems"
+            item-value="id"
+            item-text="name"
+            label="Choose Survey Items"
+            return-object
+            multiple
+            chips
+          />
         </v-card-text>
 
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
 
-          <v-btn color="success" text @click="cancelIndexDialog()">
+          <v-btn color="success" text @click="onCancel">
             Cancel
           </v-btn>
 
-          <v-btn :disabled="!valid" color="success" text @click="submitIndex()">
+          <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
             Submit
           </v-btn>
         </v-card-actions>
@@ -86,35 +76,34 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SurveyItemView } from "../survey.types";
+import {
+  IndexDialogInitialState,
+  IndexDialogResponse
+} from "@/pages/SurveyDimensions/dialog.types";
+import { SurveyIndexView, SurveyItemView } from "@/pages/survey.types";
 
 export default Vue.extend({
   name: "IndexDialog",
 
-  props: {
-    dialogTitle: { type: String, required: true },
-    dialogHint: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
-
-    indexTitle: String,
-    indexAbbreviation: String,
-    useForPredictions: Boolean
-  },
-
   model: {
     prop: "visible",
-    event: "submit"
+    event: "action"
+  },
+
+  props: {
+    dialogTitle: { type: String, required: true },
+    titleHint: { type: String, required: true },
+    abbreviationHint: { type: String, required: true },
+    visible: { type: Boolean, required: true, default: false },
+
+    initialState: { type: Object as () => IndexDialogInitialState }
   },
 
   data() {
     return {
-      index: {
-        title: this.indexTitle,
-        abbreviation: this.indexAbbreviation,
-        useForPrediction: this.useForPredictions
-      },
+      currentState: {} as IndexDialogInitialState,
+      formValid: false,
 
-      selectedSurveyItems: [] as SurveyItemView[],
       canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
 
       rules: {
@@ -125,30 +114,32 @@ export default Vue.extend({
 
   methods: {
     onCancel() {
-      this.$emit("submit", false);
+      this.$emit("action", false);
     },
 
     onSubmit() {
-      this.$emit("index-ready", {
-        indexTitle: this.index.title,
-        indexAbbreviation: this.index.abbreviation,
-        useForPrediction: this.index.useForPrediction
-      });
-      this.$emit("submit", false);
+      const response: IndexDialogResponse = {
+        title: this.currentState.title,
+        abbreviation: this.currentState.abbreviation,
+        useForPredictions: this.currentState.useForPredictions,
+        itemIds: this.currentState.children.map(surveyItem => surveyItem.id)
+      };
+      this.$emit("ready", response);
+      this.$emit("action", false);
     }
   },
 
-  computed: {
+  watch: {
     visible: {
       handler: function(newValue) {
         if (newValue) {
+          this.currentState = { ...this.initialState };
           if (this.$refs.indexForm && newValue) {
             // FIXME: Replace the `as any` hack.
             (this.$refs.indexForm as any).resetValidation();
           }
         }
-      },
-      immediate: true
+      }
     }
   }
 });

@@ -466,19 +466,19 @@ type SurveyIndex {
 
 input SurveyIndexCreateInput {
   """ID of the dimension to contain this index"""
-  dimensionId: Int!
+  surveyDimensionId: Int!
 
   """List of IDs of the items to include in this index."""
   itemIds: [Int!]!
-
-  """Use this index in prediction tables?"""
-  useForPredictions: Boolean!
 
   """Abbreviation for this index (e.g., 'FOG')"""
   abbreviation: String!
 
   """Title of this index within the dimension"""
   title: String!
+
+  """Use this index in prediction tables?"""
+  useForPredictions: Boolean!
 }
 
 type SurveyIndexDeleteOutput {

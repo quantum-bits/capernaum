@@ -29,13 +29,14 @@ export interface QualtricsSurveySelection {
 export interface SurveyItemView {
   id: number;
   name: string;
+  type?: string;
 }
 
 export interface SurveyIndexView {
   id: number;
   name: string;
-  abbrev: string;
   type: string;
+  abbreviation: string;
   useForPredictions: boolean;
   dimensionId: number;
   dimensionName: string;

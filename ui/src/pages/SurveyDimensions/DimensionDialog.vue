@@ -2,12 +2,12 @@
   <v-dialog persistent v-model="visible" max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
-      <v-form ref="dimensionForm" v-model="valid" lazy-validation>
+      <v-form ref="dimensionForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="dimension.title"
+            v-model="currentValues.title"
             label="Survey Dimension"
-            :hint="dialogHint"
+            :hint="titleHint"
             :rules="rules.required"
             outlined
             persistent-hint
@@ -17,11 +17,11 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="onCancel">
+          <v-btn color="success" text @click="$emit('action', false)">
             Cancel
           </v-btn>
 
-          <v-btn :disabled="!valid" color="success" text @click="onSubmit">
+          <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
             Submit
           </v-btn>
         </v-card-actions>
@@ -32,30 +32,32 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { DimensionDialogResponse } from "@/pages/SurveyDimensions/dialog.types";
+import { SurveyDimensionView } from "@/pages/survey.types";
 
 export default Vue.extend({
   name: "DimensionDialog",
 
-  props: {
-    dialogTitle: { type: String, required: true },
-    dialogHint: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
-
-    dimensionTitle: { type: String }
-  },
-
   model: {
     prop: "visible",
-    event: "submit"
+    event: "action"
+  },
+
+  props: {
+    dialogTitle: { type: String, required: true },
+    titleHint: { type: String, required: true },
+    visible: { type: Boolean, required: true, default: false },
+
+    initialValues: {
+      type: Object as () => SurveyDimensionView,
+      required: false
+    }
   },
 
   data() {
     return {
-      dimension: {
-        title: this.dimensionTitle
-      },
-
-      valid: false,
+      currentState: {} as SurveyDimensionView,
+      formValid: false,
 
       rules: {
         required: [(v: any) => !!v || "Required field"]
@@ -64,15 +66,12 @@ export default Vue.extend({
   },
 
   methods: {
-    onCancel() {
-      this.$emit("submmit", false);
-    },
-
     onSubmit() {
-      this.$emit("dimension-ready", {
-        dimensionTitle: this.dimension.title
-      });
-      this.$emit("submit", false);
+      const response: DimensionDialogResponse = {
+        title: this.currentValues.name
+      };
+      this.$emit("ready", response);
+      this.$emit("action", false);
     }
   },
 
@@ -80,7 +79,7 @@ export default Vue.extend({
     visible: {
       handler: function(newValue, oldValue) {
         if (newValue) {
-          this.dimension.title = this.dimensionTitle;
+          this.currentValues = { ...this.initialValues };
           if (this.$refs.dimensionForm && newValue) {
             // FIXME: Replace the `as any` hack.
             (this.$refs.dimensionForm as any).resetValidation();

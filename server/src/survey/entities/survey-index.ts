@@ -64,24 +64,24 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
   @Field(type => Int, {
     description: "ID of the dimension to contain this index"
   })
-  dimensionId: number;
+  surveyDimensionId: number;
 
   @Field(type => [Int], {
     description: "List of IDs of the items to include in this index."
   })
   itemIds: number[];
 
-  @Column({ default: true })
-  @Field({
-    description: "Use this index in prediction tables?"
-  })
-  useForPredictions: boolean;
-
   @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })
   abbreviation: string;
 
   @Field({ description: "Title of this index within the dimension" })
   title: string;
+
+  @Column({ default: true })
+  @Field({
+    description: "Use this index in prediction tables?"
+  })
+  useForPredictions: boolean;
 }
 
 @InputType()

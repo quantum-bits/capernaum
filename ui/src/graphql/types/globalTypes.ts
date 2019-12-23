@@ -108,14 +108,12 @@ export interface ScriptureEngagementPracticeUpdateInput {
 export interface SurveyDimensionCreateInput {
   surveyId: number;
   title: string;
-  useForPredictions: boolean;
   sequence: number;
 }
 
 export interface SurveyDimensionUpdateInput {
   id: number;
   title?: string | null;
-  useForPredictions?: boolean | null;
   sequence?: number | null;
 }
 
