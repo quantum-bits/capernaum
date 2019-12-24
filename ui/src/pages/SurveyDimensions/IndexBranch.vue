@@ -16,7 +16,7 @@
         Edit this survey index and/or update the associations to survey items.
       </span>
       <template v-slot:activator="{ on }">
-        <a @click="editIndex" v-on="on">
+        <a @click="visible.indexDialog = true" v-on="on">
           <v-icon class="mx-2">
             {{ "mdi-pencil" }}
           </v-icon>
@@ -29,7 +29,7 @@
         Delete this survey index and the associations to survey items.
       </span>
       <template v-slot:activator="{ on }">
-        <a @click="deleteIndex" v-on="on">
+        <a @click="visible.deleteDialog = true" v-on="on">
           <v-icon class="mx-2">
             {{ "mdi-close-circle" }}
           </v-icon>
@@ -49,16 +49,14 @@
 
     <index-dialog
       v-model="visible.indexDialog"
-      :dialog-title="
-        `Add a New Survey Index for '${surveyIndex.dimensionName}'`
-      "
+      :dialog-title="`Add a survey index for '${surveyIndex.dimensionName}'`"
       title-hint="e.g., 'A Focus on Others'"
       abbreviation-hint="e.g., 'FOO'"
-      :initial-values="{
+      :available-items="availableItems"
+      :initial-state="{
         title: surveyIndex.name,
         abbreviation: surveyIndex.abbreviation,
         useForPredictions: surveyIndex.useForPredictions,
-        availableItems,
         selectedItems
       }"
       @ready="updateIndex"
@@ -69,14 +67,14 @@
       :dialog-title="`Really delete the index '${surveyIndex.name}'?`"
       dialog-text="This action is not reversible."
       button-label="Delete"
-      @confirmed="deleteIsConfirmed"
+      @confirmed="deleteIndex"
     />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { SurveyIndexView, SurveyItemView } from "../survey.types";
+import { SurveyIndexView } from "../survey.types";
 
 import { DELETE_INDEX, UPDATE_INDEX_MUTATION } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
@@ -85,12 +83,14 @@ import {
   IndexDialogResponse,
   SurveyItemSelection
 } from "@/pages/SurveyDimensions/dialog.types";
+import IndexDialog from "@/pages/SurveyDimensions/IndexDialog.vue";
 
 export default Vue.extend({
   name: "IndexBranch",
 
   components: {
-    ConfirmDialog
+    ConfirmDialog,
+    IndexDialog
   },
 
   // https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
@@ -128,6 +128,7 @@ export default Vue.extend({
     },
 
     updateIndex(dialogResponse: IndexDialogResponse) {
+      console.log("UPDATE INDEX", dialogResponse);
       this.$apollo
         .mutate({
           mutation: UPDATE_INDEX_MUTATION,
@@ -166,23 +167,19 @@ export default Vue.extend({
 
   computed: {
     availableItems(): SurveyItemSelection[] {
-      const availableItems = this.surveyIndex.children.map(item => ({
-        id: item.id,
-        name: item.name
-      }));
-
-      const selectedItems = this.survey.surveyItems.map(item => ({
+      return this.survey.surveyItems.map(item => ({
         id: item.id,
         name: item.qualtricsText
       }));
-
-      const rtn = availableItems.concat(selectedItems);
-      console.log("availableItems", rtn);
-      return rtn;
     },
 
-    selectedItems(): number[] {
-      return this.surveyIndex.children(item => item.id);
+    selectedItems(): SurveyItemSelection[] {
+      const rtn = this.surveyIndex.children.map(item => ({
+        id: item.id,
+        name: item.name
+      }));
+      console.log("SELECTED ITEMS", rtn);
+      return rtn;
     }
   }
 });

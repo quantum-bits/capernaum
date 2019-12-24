@@ -5,7 +5,7 @@
 
       <v-col cols="4">
         <v-select
-          v-model="surveySelect"
+          v-model="surveySelection"
           :items="selections"
           :rules="[v => !!v || 'Survey is required']"
           label="Survey"
@@ -25,7 +25,7 @@
       </v-btn>
     </v-row>
 
-    <v-row v-if="surveySelect">
+    <v-row v-if="surveySelection">
       <v-col cols="10" offset="1" v-if="isSurveyDataValid">
         <v-treeview dense rounded hoverable :items="surveyContent">
           <template v-slot:label="{ item }">
@@ -39,21 +39,19 @@
           <template v-slot:append="{ item }">
             <span v-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION">
               <dimension-branch
-                :survey="surveyData"
+                :survey="survey"
                 :survey-dimension="item"
                 @refetch="refetchSurveyData"
               />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
               <index-branch
-                :survey="surveyData"
+                :survey="survey"
                 :survey-index="item"
                 @refetch="refetchSurveyData"
               />
             </span>
-            <span v-else-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
-              Item
-            </span>
+            <span v-else-if="item.type === surveyDimensionEnum.SURVEY_ITEM" />
             <span v-else>
               Something went horribly wrong.
             </span>
@@ -112,9 +110,9 @@ export default Vue.extend({
     return {
       surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
 
-      surveys: [] as Survey[],
-      surveyData: {} as Survey,
-      surveySelect: {} as SurveySelection,
+      allSurveys: [] as Survey[], // All surveys, listed in drop-down.
+      surveySelection: {} as SurveySelection, // Selection from allSurveys
+      survey: {} as Survey,
 
       dimensionDialog: {
         visible: false
@@ -123,17 +121,19 @@ export default Vue.extend({
   },
 
   apollo: {
-    surveys: {
-      query: ALL_SURVEYS_QUERY
+    allSurveys: {
+      query: ALL_SURVEYS_QUERY,
+      update: data => data.surveys
     },
 
-    // the following query runs automatically when this.surveySelect updates
+    // the following query runs automatically when this.surveySelection updates
     // (i.e., when something is chosen from the drop-down)
-    surveyData: {
+    survey: {
       query: ONE_SURVEY_QUERY,
       variables() {
         return {
-          surveyId: this.surveySelect.value
+          surveyId: this.surveySelection.value,
+          which: WhichItems.WITHOUT_INDEX
         };
       },
       update(data) {
@@ -158,19 +158,18 @@ export default Vue.extend({
     },
 
     refetchSurveyData() {
-      this.$apollo.queries.surveyData.refetch().then(({ data }) => {
+      this.$apollo.queries.survey.refetch().then(({ data }) => {
         console.log("survey data refetched! ", data);
       });
     },
 
     createDimension(dialogResponse: DimensionDialogResponse) {
-      console.log("DIM DETAILS", dialogResponse);
       this.$apollo
         .mutate({
           mutation: ADD_DIMENSION_MUTATION,
           variables: {
             createInput: {
-              surveyId: this.surveyData.id,
+              surveyId: this.survey.id,
               title: dialogResponse.title,
               // FIXME: sequence should not be hard-coded
               sequence: 10
@@ -189,23 +188,23 @@ export default Vue.extend({
 
   computed: {
     selections(): SurveySelection[] {
-      return this.surveys.map(survey => ({
+      return this.allSurveys.map(survey => ({
         text: survey.title,
         value: survey.id
       }));
     },
 
     isSurveySelected(): boolean {
-      return !isEmpty(this.surveySelect);
+      return !isEmpty(this.surveySelection);
     },
 
     isSurveyDataValid(): boolean {
-      return !isEmpty(this.surveyData);
+      return !isEmpty(this.survey);
     },
 
     surveyContent(): SurveyDimensionView[] {
       // Dimensions
-      return this.surveyData.surveyDimensions.map(dim => ({
+      return this.survey.surveyDimensions.map(dim => ({
         id: dim.id,
         name: dim.title,
         type: SurveyDimensionEnum.SURVEY_DIMENSION,

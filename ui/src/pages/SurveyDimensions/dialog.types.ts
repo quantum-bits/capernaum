@@ -3,6 +3,10 @@ import {
   SurveyIndexCreateInput
 } from "../../graphql/types/globalTypes";
 
+export interface DimensionDialogState {
+  title: string;
+}
+
 export type DimensionDialogResponse = Pick<SurveyDimensionCreateInput, "title">;
 
 export interface SurveyItemSelection {
@@ -10,12 +14,11 @@ export interface SurveyItemSelection {
   name: string;
 }
 
-export interface IndexDialogInitialState {
+export interface IndexDialogState {
   title: string;
   abbreviation: string;
   useForPredictions: boolean;
-  availableItems: SurveyItemSelection[];
-  selectedItems: number[];
+  selectedItems: SurveyItemSelection[];
 }
 
 export type IndexDialogResponse = Omit<SurveyIndexCreateInput, "dimensionId">;

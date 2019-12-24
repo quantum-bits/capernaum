@@ -50,7 +50,7 @@
       v-model="visible.dimensionDialog"
       dialog-title="Edit an existing survey dimension"
       title-hint="e.g., 'Focal Dimension'"
-      :initial-values="{ title: surveyDimension.name }"
+      :initial-state="{ title: surveyDimension.name }"
       @ready="updateDimension"
     />
 
@@ -59,6 +59,7 @@
       :dialog-title="`Add a new survey index for '${surveyDimension.name}'`"
       title-hint="e.g., 'A focus on others"
       abbreviation-hint="e.g., 'FOO'"
+      :available-items="availableItems"
       @ready="createIndex"
     />
 
@@ -87,7 +88,8 @@ import IndexDialog from "./IndexDialog.vue";
 import { SurveyIndexCreateInput } from "@/graphql/types/globalTypes";
 import {
   DimensionDialogResponse,
-  IndexDialogResponse
+  IndexDialogResponse,
+  SurveyItemSelection
 } from "@/pages/SurveyDimensions/dialog.types";
 
 export default Vue.extend({
@@ -152,12 +154,14 @@ export default Vue.extend({
     },
 
     createIndex(dialogResponse: IndexDialogResponse) {
-      // Add a new index.
       this.$apollo
         .mutate({
           mutation: ADD_INDEX_MUTATION,
           variables: {
-            createInput: dialogResponse
+            createInput: {
+              surveyDimensionId: this.surveyDimension.id,
+              ...dialogResponse
+            }
           }
         })
         .then(() => {
@@ -183,6 +187,17 @@ export default Vue.extend({
         .catch(error => {
           console.log("there appears to have been an error: ", error);
         });
+    }
+  },
+
+  computed: {
+    availableItems(): SurveyItemSelection[] {
+      const rtn = this.survey.surveyItems.map(item => ({
+        id: item.id,
+        name: item.qualtricsText
+      }));
+      console.log("AVAILABLE", rtn);
+      return rtn;
     }
   }
 });

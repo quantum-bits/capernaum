@@ -48,7 +48,7 @@
 
           <v-select
             v-model="currentState.selectedItems"
-            :items="currentState.availableItems"
+            :items="availableItems"
             item-value="id"
             item-text="name"
             label="Choose Survey Items"
@@ -77,10 +77,10 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  IndexDialogInitialState,
-  IndexDialogResponse
+  IndexDialogState,
+  IndexDialogResponse,
+  SurveyItemSelection
 } from "@/pages/SurveyDimensions/dialog.types";
-import { SurveyIndexView, SurveyItemView } from "@/pages/survey.types";
 
 export default Vue.extend({
   name: "IndexDialog",
@@ -95,13 +95,17 @@ export default Vue.extend({
     titleHint: { type: String, required: true },
     abbreviationHint: { type: String, required: true },
     visible: { type: Boolean, required: true, default: false },
+    availableItems: {
+      type: Array as () => SurveyItemSelection[],
+      required: true
+    },
 
-    initialState: { type: Object as () => IndexDialogInitialState }
+    initialState: { type: Object as () => IndexDialogState }
   },
 
   data() {
     return {
-      currentState: {} as IndexDialogInitialState,
+      currentState: {} as IndexDialogState,
       formValid: false,
 
       canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
@@ -122,7 +126,7 @@ export default Vue.extend({
         title: this.currentState.title,
         abbreviation: this.currentState.abbreviation,
         useForPredictions: this.currentState.useForPredictions,
-        itemIds: this.currentState.children.map(surveyItem => surveyItem.id)
+        itemIds: this.currentState.selectedItems.map(item => item.id)
       };
       this.$emit("ready", response);
       this.$emit("action", false);
@@ -133,13 +137,21 @@ export default Vue.extend({
     visible: {
       handler: function(newValue) {
         if (newValue) {
-          this.currentState = { ...this.initialState };
+          this.currentState = {
+            title: "",
+            abbreviation: "",
+            useForPredictions: false,
+            selectedItems: [] as SurveyItemSelection[], // NOT REACTIVE??
+            ...this.initialState
+          };
+          console.log("CURRENT STATE", this.currentState);
           if (this.$refs.indexForm && newValue) {
             // FIXME: Replace the `as any` hack.
             (this.$refs.indexForm as any).resetValidation();
           }
         }
-      }
+      },
+      immediate: true
     }
   }
 });

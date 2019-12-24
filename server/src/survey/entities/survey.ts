@@ -11,18 +11,27 @@ import { Letter } from "../../letter/entities";
   description: "All information about a survey imported from Qualtrics"
 })
 export class Survey extends AbstractEntity {
-  @OneToMany(type => Letter, letter => letter.survey)
+  @OneToMany(
+    type => Letter,
+    letter => letter.survey
+  )
   @Field(type => [Letter])
   letters: Letter[];
 
-  @OneToMany(type => SurveyItem, item => item.survey)
+  @OneToMany(
+    type => SurveyItem,
+    item => item.survey
+  )
   @Field(type => [SurveyItem], {
     description:
       "All the Qualtrics items for this survey; for groupings, see survey dimension and index."
   })
   surveyItems: SurveyItem[];
 
-  @OneToMany(type => SurveyDimension, dimension => dimension.survey)
+  @OneToMany(
+    type => SurveyDimension,
+    dimension => dimension.survey
+  )
   @Field(type => [SurveyDimension], {
     description:
       "Dimensions for this survey; groups indices, which group items."
