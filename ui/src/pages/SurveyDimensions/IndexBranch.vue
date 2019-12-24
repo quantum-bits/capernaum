@@ -55,6 +55,7 @@
       :title="surveyIndex.name"
       :abbreviation="surveyIndex.abbreviation"
       :useForPredictions="surveyIndex.useForPredictions"
+      :can-turn-off-predictions="canTurnOffPredictions"
       :selectedItems="selectedItems"
       :available-items="availableItems"
       @ready="updateIndex"
@@ -109,10 +110,6 @@ export default Vue.extend({
         indexDialog: false,
         deleteDialog: false
       },
-
-      // Control whether the "turn off predictions slider"
-      // is disabled or not in the edit dimensions dialog
-      canTurnOffPredictions: true,
 
       rules: {
         required: [(v: any) => !!v || "Required field"]
@@ -177,6 +174,13 @@ export default Vue.extend({
         id: item.id,
         name: item.name
       }));
+    },
+
+    canTurnOffPredictions() {
+      return (
+        this.surveyIndex.useForPredictions &&
+        this.surveyIndex.dimensionCanDelete
+      );
     }
   }
 });

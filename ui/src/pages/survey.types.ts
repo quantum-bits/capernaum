@@ -40,6 +40,7 @@ export interface SurveyIndexView {
   useForPredictions: boolean;
   dimensionId: number;
   dimensionName: string;
+  dimensionCanDelete: boolean;
   children: SurveyItemView[];
   canDelete: boolean;
 }

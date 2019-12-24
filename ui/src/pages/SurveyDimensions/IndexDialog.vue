@@ -93,11 +93,13 @@ export default Vue.extend({
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
     abbreviationHint: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
+    visible: { type: Boolean, required: true },
     availableItems: {
       type: Array as () => SurveyItemSelection[],
       required: true
     },
+    // Can we turn off "use for predictions" slider?
+    canTurnOffPredictions: { type: Boolean, required: true },
 
     title: String,
     abbreviation: String,
@@ -115,8 +117,6 @@ export default Vue.extend({
       },
 
       formValid: false,
-
-      canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
 
       rules: {
         required: [(v: any) => !!v || "Required field"]

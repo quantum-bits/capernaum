@@ -60,6 +60,7 @@
       title-hint="e.g., 'A focus on others"
       abbreviation-hint="e.g., 'FOO'"
       :available-items="availableItems"
+      :can-turn-off-predictions="true"
       @ready="createIndex"
     />
 

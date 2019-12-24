@@ -224,6 +224,7 @@ export default Vue.extend({
               id: index.id,
               dimensionId: dim.id,
               dimensionName: dim.title,
+              dimensionCanDelete: this.canDeleteSurveyDimension(dim),
               name: index.title,
               abbreviation: index.abbreviation,
               useForPredictions: index.useForPredictions,
