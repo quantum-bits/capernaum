@@ -192,12 +192,10 @@ export default Vue.extend({
 
   computed: {
     availableItems(): SurveyItemSelection[] {
-      const rtn = this.survey.surveyItems.map(item => ({
+      return this.survey.surveyItems.map(item => ({
         id: item.id,
         name: item.qualtricsText
       }));
-      console.log("AVAILABLE", rtn);
-      return rtn;
     }
   }
 });

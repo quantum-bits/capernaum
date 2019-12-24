@@ -126,7 +126,6 @@ export default Vue.extend({
     },
 
     updateIndex(dialogResponse: IndexDialogResponse) {
-      console.log("UPDATE INDEX", dialogResponse);
       this.$apollo
         .mutate({
           mutation: UPDATE_INDEX_MUTATION,

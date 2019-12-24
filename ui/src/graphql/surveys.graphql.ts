@@ -101,6 +101,7 @@ export const UPDATE_INDEX_MUTATION = gql`
       id
       title
       abbreviation
+      useForPredictions
       surveyItems {
         id
         qualtricsId

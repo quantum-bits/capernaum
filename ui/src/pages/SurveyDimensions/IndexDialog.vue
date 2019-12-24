@@ -148,10 +148,7 @@ export default Vue.extend({
           this.dialogState.title = this.title;
           this.dialogState.abbreviation = this.abbreviation;
           this.dialogState.useForPredictions = this.useForPredictions;
-          this.selectedItems.forEach(item =>
-            this.dialogState.selectedItems.push(item)
-          );
-          console.log("DIALOG STATE", this.dialogState);
+          this.dialogState.selectedItems = this.selectedItems;
 
           if (this.$refs.indexForm) {
             // FIXME: Replace the `as any` hack.

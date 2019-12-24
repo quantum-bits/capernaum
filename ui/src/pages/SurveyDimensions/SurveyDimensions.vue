@@ -29,7 +29,10 @@
       <v-col cols="10" offset="1" v-if="isSurveyDataValid">
         <v-treeview dense rounded hoverable :items="surveyContent">
           <template v-slot:label="{ item }">
-            <div v-html="item.name"></div>
+            <span v-html="item.name"></span>
+            <span v-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
+              ({{ item.abbreviation }})
+            </span>
           </template>
           <template v-slot:prepend="{ item }">
             <v-icon v-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
@@ -158,9 +161,9 @@ export default Vue.extend({
     },
 
     refetchSurveyData() {
-      this.$apollo.queries.survey.refetch().then(({ data }) => {
-        console.log("survey data refetched! ", data);
-      });
+      this.$apollo.queries.survey
+        .refetch()
+        .catch(err => console.error("Something went wrong", err));
     },
 
     createDimension(dialogResponse: DimensionDialogResponse) {
@@ -203,32 +206,40 @@ export default Vue.extend({
     },
 
     surveyContent(): SurveyDimensionView[] {
+      function compareStrings(a: string, b: string): number {
+        return a < b ? -1 : a > b ? 1 : 0;
+      }
+
       // Dimensions
-      return this.survey.surveyDimensions.map(dim => ({
-        id: dim.id,
-        name: dim.title,
-        type: SurveyDimensionEnum.SURVEY_DIMENSION,
-        canDelete: this.canDeleteSurveyDimension(dim),
+      return this.survey.surveyDimensions
+        .map(dim => ({
+          id: dim.id,
+          name: dim.title,
+          type: SurveyDimensionEnum.SURVEY_DIMENSION,
+          canDelete: this.canDeleteSurveyDimension(dim),
 
-        // Indices
-        children: dim.surveyIndices.map(index => ({
-          id: index.id,
-          dimensionId: dim.id,
-          dimensionName: dim.title,
-          name: index.title,
-          abbreviation: index.abbreviation,
-          useForPredictions: index.useForPredictions,
-          type: SurveyDimensionEnum.SURVEY_INDEX,
-          canDelete: this.canDeleteSurveyIndex(index),
+          // Indices
+          children: dim.surveyIndices
+            .map(index => ({
+              id: index.id,
+              dimensionId: dim.id,
+              dimensionName: dim.title,
+              name: index.title,
+              abbreviation: index.abbreviation,
+              useForPredictions: index.useForPredictions,
+              type: SurveyDimensionEnum.SURVEY_INDEX,
+              canDelete: this.canDeleteSurveyIndex(index),
 
-          // Items
-          children: index.surveyItems.map(item => ({
-            id: item.id,
-            name: item.qualtricsText,
-            type: SurveyDimensionEnum.SURVEY_ITEM
-          }))
+              // Items
+              children: index.surveyItems.map(item => ({
+                id: item.id,
+                name: item.qualtricsText,
+                type: SurveyDimensionEnum.SURVEY_ITEM
+              }))
+            }))
+            .sort((a, b) => compareStrings(a.name, b.name))
         }))
-      }));
+        .sort((a, b) => compareStrings(a.name, b.name));
     }
   }
 });

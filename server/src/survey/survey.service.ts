@@ -154,7 +154,10 @@ export class SurveyService extends BaseService {
 
       // Assign scalar updates, if any. Only those props listed will be updated,
       // and then only if present in updateInput.
-      assign(index, pick(updateInput, ["title", "abbreviation"]));
+      assign(
+        index,
+        pick(updateInput, ["title", "abbreviation", "useForPredictions"])
+      );
 
       // Fetch survey items specified by the update.
       const updateItems = await surveyItemRepo.findByIds(updateInput.itemIds);
