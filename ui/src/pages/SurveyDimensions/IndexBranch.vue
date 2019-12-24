@@ -49,16 +49,14 @@
 
     <index-dialog
       v-model="visible.indexDialog"
-      :dialog-title="`Add a survey index for '${surveyIndex.dimensionName}'`"
+      :dialog-title="`Edit index for '${surveyIndex.dimensionName}'`"
       title-hint="e.g., 'A Focus on Others'"
       abbreviation-hint="e.g., 'FOO'"
+      :title="surveyIndex.name"
+      :abbreviation="surveyIndex.abbreviation"
+      :useForPredictions="surveyIndex.useForPredictions"
+      :selectedItems="selectedItems"
       :available-items="availableItems"
-      :initial-state="{
-        title: surveyIndex.name,
-        abbreviation: surveyIndex.abbreviation,
-        useForPredictions: surveyIndex.useForPredictions,
-        selectedItems
-      }"
       @ready="updateIndex"
     />
 
@@ -167,19 +165,19 @@ export default Vue.extend({
 
   computed: {
     availableItems(): SurveyItemSelection[] {
-      return this.survey.surveyItems.map(item => ({
-        id: item.id,
-        name: item.qualtricsText
-      }));
+      return this.survey.surveyItems
+        .map(item => ({
+          id: item.id,
+          name: item.qualtricsText
+        }))
+        .concat(this.selectedItems);
     },
 
     selectedItems(): SurveyItemSelection[] {
-      const rtn = this.surveyIndex.children.map(item => ({
+      return this.surveyIndex.children.map(item => ({
         id: item.id,
         name: item.name
       }));
-      console.log("SELECTED ITEMS", rtn);
-      return rtn;
     }
   }
 });

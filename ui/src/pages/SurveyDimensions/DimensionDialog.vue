@@ -5,7 +5,7 @@
       <v-form ref="dimensionForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="currentState.title"
+            v-model="dimensionTitle"
             label="Survey Dimension"
             :hint="titleHint"
             :rules="rules.required"
@@ -32,12 +32,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  DimensionDialogState,
-  DimensionDialogResponse,
-  IndexDialogState
-} from "@/pages/SurveyDimensions/dialog.types";
-import { SurveyDimensionView } from "@/pages/survey.types";
+import { DimensionDialogResponse } from "@/pages/SurveyDimensions/dialog.types";
 
 export default Vue.extend({
   name: "DimensionDialog",
@@ -52,12 +47,12 @@ export default Vue.extend({
     titleHint: { type: String, required: true },
     visible: { type: Boolean, required: true, default: false },
 
-    initialState: { type: Object as () => DimensionDialogState }
+    initialTitle: String
   },
 
   data() {
     return {
-      currentState: {} as DimensionDialogState,
+      dimensionTitle: "",
       formValid: false,
 
       rules: {
@@ -69,7 +64,7 @@ export default Vue.extend({
   methods: {
     onSubmit() {
       const response: DimensionDialogResponse = {
-        title: this.currentState.title
+        title: this.dimensionTitle
       };
       this.$emit("ready", response);
       this.$emit("action", false);
@@ -80,8 +75,9 @@ export default Vue.extend({
     visible: {
       handler: function(newValue, oldValue) {
         if (newValue) {
-          this.currentState = { ...this.initialState };
-          if (this.$refs.dimensionForm && newValue) {
+          this.dimensionTitle = this.initialTitle;
+
+          if (this.$refs.dimensionForm) {
             // FIXME: Replace the `as any` hack.
             (this.$refs.dimensionForm as any).resetValidation();
           }

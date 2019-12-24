@@ -50,7 +50,7 @@
       v-model="visible.dimensionDialog"
       dialog-title="Edit an existing survey dimension"
       title-hint="e.g., 'Focal Dimension'"
-      :initial-state="{ title: surveyDimension.name }"
+      :initial-title="surveyDimension.name"
       @ready="updateDimension"
     />
 

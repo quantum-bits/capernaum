@@ -5,7 +5,7 @@
       <v-form ref="indexForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="currentState.title"
+            v-model="dialogState.title"
             label="Survey Index"
             :hint="titleHint"
             :rules="rules.required"
@@ -14,7 +14,7 @@
           />
 
           <v-text-field
-            v-model="currentState.abbreviation"
+            v-model="dialogState.abbreviation"
             label="Survey Index Abbreviation"
             :hint="abbreviationHint"
             :rules="rules.required"
@@ -24,7 +24,7 @@
 
           <span v-if="canTurnOffPredictions">
             <v-switch
-              v-model="currentState.useForPredictions"
+              v-model="dialogState.useForPredictions"
               label="Use For Predictions in Boolean Association Table"
             />
           </span>
@@ -33,7 +33,7 @@
               <template v-slot:activator="{ on }">
                 <span v-on="on">
                   <v-switch
-                    v-model="currentState.useForPredictions"
+                    v-model="dialogState.useForPredictions"
                     disabled
                     label="Use for predictions in Boolean association table"
                   />
@@ -47,7 +47,7 @@
           </span>
 
           <v-select
-            v-model="currentState.selectedItems"
+            v-model="dialogState.selectedItems"
             :items="availableItems"
             item-value="id"
             item-text="name"
@@ -77,7 +77,6 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  IndexDialogState,
   IndexDialogResponse,
   SurveyItemSelection
 } from "@/pages/SurveyDimensions/dialog.types";
@@ -100,12 +99,21 @@ export default Vue.extend({
       required: true
     },
 
-    initialState: { type: Object as () => IndexDialogState }
+    title: String,
+    abbreviation: String,
+    useForPredictions: Boolean,
+    selectedItems: Array as () => SurveyItemSelection[]
   },
 
   data() {
     return {
-      currentState: {} as IndexDialogState,
+      dialogState: {
+        title: "",
+        abbreviation: "",
+        useForPredictions: false,
+        selectedItems: [] as SurveyItemSelection[]
+      },
+
       formValid: false,
 
       canTurnOffPredictions: true, // used to control whether the "turn off predictions slider" is disabled or not in the edit dimensions dialog
@@ -123,10 +131,10 @@ export default Vue.extend({
 
     onSubmit() {
       const response: IndexDialogResponse = {
-        title: this.currentState.title,
-        abbreviation: this.currentState.abbreviation,
-        useForPredictions: this.currentState.useForPredictions,
-        itemIds: this.currentState.selectedItems.map(item => item.id)
+        title: this.dialogState.title,
+        abbreviation: this.dialogState.abbreviation,
+        useForPredictions: this.dialogState.useForPredictions,
+        itemIds: this.dialogState.selectedItems.map(item => item.id)
       };
       this.$emit("ready", response);
       this.$emit("action", false);
@@ -137,15 +145,15 @@ export default Vue.extend({
     visible: {
       handler: function(newValue) {
         if (newValue) {
-          this.currentState = {
-            title: "",
-            abbreviation: "",
-            useForPredictions: false,
-            selectedItems: [] as SurveyItemSelection[], // NOT REACTIVE??
-            ...this.initialState
-          };
-          console.log("CURRENT STATE", this.currentState);
-          if (this.$refs.indexForm && newValue) {
+          this.dialogState.title = this.title;
+          this.dialogState.abbreviation = this.abbreviation;
+          this.dialogState.useForPredictions = this.useForPredictions;
+          this.selectedItems.forEach(item =>
+            this.dialogState.selectedItems.push(item)
+          );
+          console.log("DIALOG STATE", this.dialogState);
+
+          if (this.$refs.indexForm) {
             // FIXME: Replace the `as any` hack.
             (this.$refs.indexForm as any).resetValidation();
           }
