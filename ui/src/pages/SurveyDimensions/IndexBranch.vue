@@ -55,9 +55,9 @@
       :title="surveyIndex.name"
       :abbreviation="surveyIndex.abbreviation"
       :useForPredictions="surveyIndex.useForPredictions"
-      :can-turn-off-predictions="canTurnOffPredictions"
       :selectedItems="selectedItems"
       :available-items="availableItems"
+      :can-turn-off-predictions="surveyIndex.canDelete"
       @ready="updateIndex"
     />
 
@@ -174,13 +174,6 @@ export default Vue.extend({
         id: item.id,
         name: item.name
       }));
-    },
-
-    canTurnOffPredictions() {
-      return (
-        this.surveyIndex.useForPredictions &&
-        this.surveyIndex.dimensionCanDelete
-      );
     }
   }
 });

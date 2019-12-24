@@ -10,4 +10,7 @@ export interface SurveyItemSelection {
   name: string;
 }
 
-export type IndexDialogResponse = Omit<SurveyIndexCreateInput, "dimensionId">;
+export type IndexDialogResponse = Omit<
+  SurveyIndexCreateInput,
+  "surveyDimensionId"
+>;

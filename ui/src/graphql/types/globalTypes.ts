@@ -118,11 +118,19 @@ export interface SurveyDimensionUpdateInput {
 }
 
 export interface SurveyIndexCreateInput {
-  dimensionId: number;
+  surveyDimensionId: number;
   itemIds: number[];
-  useForPredictions: boolean;
   abbreviation: string;
   title: string;
+  useForPredictions: boolean;
+}
+
+export interface SurveyIndexUpdateInput {
+  id: number;
+  itemIds?: number[] | null;
+  abbreviation?: string | null;
+  title?: string | null;
+  useForPredictions?: boolean | null;
 }
 
 export interface UserUpdateInput {

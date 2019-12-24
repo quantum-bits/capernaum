@@ -2,6 +2,8 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { SurveyIndexUpdateInput } from "./globalTypes";
+
 // ====================================================
 // GraphQL mutation operation: UpdateIndex
 // ====================================================
@@ -34,6 +36,10 @@ export interface UpdateIndex_updateSurveyIndex {
    * Abbreviation for this index (e.g., 'FOG')
    */
   abbreviation: string;
+  /**
+   * Use this index in prediction tables?
+   */
+  useForPredictions: boolean;
   surveyItems: UpdateIndex_updateSurveyIndex_surveyItems[];
 }
 
@@ -46,8 +52,5 @@ export interface UpdateIndex {
 }
 
 export interface UpdateIndexVariables {
-  id: number;
-  itemIds: number[];
-  title: string;
-  abbreviation: string;
+  updateInput: SurveyIndexUpdateInput;
 }

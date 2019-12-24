@@ -40,8 +40,8 @@
                 </span>
               </template>
               <span>
-                One or more survey indexes associated with this survey dimension
-                have boolean associations, so this setting cannot be turned off.
+                This survey index has boolean associations, so this setting
+                cannot be turned off.
               </span>
             </v-tooltip>
           </span>
