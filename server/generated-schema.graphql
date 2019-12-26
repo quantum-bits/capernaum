@@ -146,7 +146,12 @@ input LetterWriterInput {
 
 type LetterWriterOutput {
   ok: Boolean!
-  pdfUrl: String!
+
+  """Name of PDF file (e.g., 'abc.pdf')"""
+  pdfFileName: String!
+
+  """Path to PDF file (e.g., '/static/pdfs/abc.pdf')"""
+  pdfFilePath: String!
   responseSummary: ResponseSummary!
 }
 
@@ -161,7 +166,6 @@ type LoginResponse {
 }
 
 type Mutation {
-  sendLetter(mailInput: SendMailInput!): String!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
@@ -220,6 +224,7 @@ type Mutation {
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
+  sendLetter(mailInput: SendMailInput!): String!
 }
 
 input PartialPredictionTableEntry {

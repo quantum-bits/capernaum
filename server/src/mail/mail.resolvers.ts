@@ -1,8 +1,10 @@
-import { Args, Resolver } from "@nestjs/graphql";
+import { Args, Resolver, Query, Mutation } from "@nestjs/graphql";
 import { MailService } from "./mail.service";
-import { Mutation } from "type-graphql";
 import { SendMailInput } from "./entities/mail";
 import debug from "debug";
+import { UseGuards } from "@nestjs/common";
+import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { QualtricsImportInput } from "../survey/entities";
 
 const mailDebug = debug("mail");
 

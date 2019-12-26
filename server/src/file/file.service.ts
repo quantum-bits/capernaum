@@ -8,11 +8,15 @@ interface FileDetails {
 }
 
 export class FileService {
+  // Full path to static directory (e.g., '/home/capernaum/static')
+  private readonly staticDirPath: string;
+
+  // Full path to subdirectory (e.g., '/home/capernaum/static/pdfs')
   private readonly basePath: string;
 
-  constructor(subDir: string) {
-    const dataFilesDirPath = process.env.CAP_STATIC_DIR;
-    this.basePath = normalize(join(dataFilesDirPath, subDir));
+  constructor(private readonly subDir: string) {
+    this.staticDirPath = process.env.CAP_STATIC_DIR;
+    this.basePath = normalize(join(this.staticDirPath, subDir));
 
     access(this.basePath, err => {
       if (err) {
@@ -23,6 +27,10 @@ export class FileService {
 
   baseDirPath() {
     return this.basePath;
+  }
+
+  relativePath(fileName: string) {
+    return join(this.subDir, fileName);
   }
 
   fullPath(fileName: string) {

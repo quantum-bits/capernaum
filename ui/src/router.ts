@@ -60,7 +60,7 @@ const router = new VueRouter({
     {
       path: "/responses",
       name: "responses",
-      component: () => import("./pages/Responses.vue")
+      component: () => import("./pages/Responses/Responses.vue")
     },
     {
       path: "/scripture-engagement-practices",

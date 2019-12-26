@@ -32,7 +32,7 @@ function formatHref(url: string, text: string) {
 }
 
 // Generate a hash digest for the file.
-function generateFileName(letterId, responseId) {
+function generateBaseName(letterId: number, responseId: number) {
   return createHash("sha1")
     .update(`${letterId}-${responseId}`)
     .digest("hex");
@@ -254,7 +254,7 @@ export default class LetterWriter {
   ): Promise<LetterWriterOutput> {
     // console.log("LETTER", JSON.stringify(letter, null, 2));
     // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
-    surveyResponse.dump();
+    // surveyResponse.dump();
 
     return new Promise((resolve, reject) => {
       // Render letter elements.
@@ -294,13 +294,11 @@ export default class LetterWriter {
       renderedElements.push(this.renderResponseDetails(surveyResponse));
 
       // Set up paths.
-      const pdfFileName = generateFileName(letter.id, surveyResponse.id);
-      const pathObject = {
-        dir: this.pdfFileService.baseDirPath(),
-        name: pdfFileName
-      };
-      const texFilePath = format({ ...pathObject, ext: ".tex" });
-      const pdfUrl = `/static/pdfs/${pdfFileName}.pdf`;
+      const baseName = generateBaseName(letter.id, surveyResponse.id);
+      const texFileName = baseName + ".tex";
+      const texFilePath = this.pdfFileService.fullPath(texFileName);
+      const pdfFileName = baseName + ".pdf";
+      const pdfFilePath = this.pdfFileService.fullPath(pdfFileName);
 
       // Create the document.
       const result = this.renderDocument(renderedElements);
@@ -327,7 +325,8 @@ export default class LetterWriter {
 
       resolve({
         ok: true,
-        pdfUrl,
+        pdfFileName,
+        pdfFilePath,
         responseSummary: surveyResponse.summarize()
       });
     });

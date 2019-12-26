@@ -102,6 +102,15 @@ export interface ScriptureEngagementPracticeUpdateInput {
   sequence?: number | null;
 }
 
+export interface SendMailInput {
+  from?: string | null;
+  to: string;
+  subject: string;
+  textContent: string;
+  htmlContent?: string | null;
+  attachmentPath?: string | null;
+}
+
 /**
  * Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.
  */

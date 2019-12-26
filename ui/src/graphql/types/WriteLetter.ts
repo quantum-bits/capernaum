@@ -67,7 +67,7 @@ export interface WriteLetter_writeLetter_responseSummary {
 
 export interface WriteLetter_writeLetter {
   ok: boolean;
-  pdfUrl: string;
+  pdfFilePath: string;
   responseSummary: WriteLetter_writeLetter_responseSummary;
 }
 
