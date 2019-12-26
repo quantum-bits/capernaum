@@ -1,11 +1,5 @@
-pg_host: "localhost"
-pg_database: "capernaum"
-pg_username: "capernaum"
-
 cap_repo: "https://github.com/quantum-bits/capernaum.git"
 
-cap_base_dir: "/home/capernaum"
-cap_app_dir: "{{ cap_base_dir }}/app"
 cap_ui_dir: "{{ cap_app_dir }}/ui"
 cap_server_dir: "{{ cap_app_dir }}/server"
 cap_pm2_dir: "{{ cap_app_dir }}/pm2"

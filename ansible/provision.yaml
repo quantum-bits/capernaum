@@ -1,12 +1,8 @@
 ---
-- name: provision Capernaum
-  hosts: all
-  vars_files:
-    - public.yaml
-    - private.yaml
+- name: ensure ubuntu packages
+  hosts: staging, production
+  tags: packages
   become: yes
-  environment:
-    PATH: "{{ ansible_env.PATH }}:~/.yarn/bin"
   tasks:
     - name: add key for yarn PPA
       apt_key:
@@ -46,138 +42,149 @@
         - tree
         - silversearcher-ag
         - multitail
-      tags: apt
 
+- name: provision database
+  hosts: staging, production
+  tags: database
+  become: yes
+  become_user: postgres
+  vars_files:
+    - private.yaml
+  tasks:
     - name: create database user
-      become_user: postgres
       postgresql_user:
         name: "{{ pg_username }}"
         password: "{{ pg_password }}"
-      tags: db
 
     - name: create database
-      become_user: postgres
       postgresql_db:
         name: "{{ pg_database }}"
         owner: "{{ pg_username }}"
-      tags: db
 
+- name: provision capernaum
+  hosts: all
+  tags: capernaum
+  become: yes
+  become_user: "{{ cap_username }}"
+  vars_files:
+    - public.yaml
+    - private.yaml
+  tasks:
     - name: create capernaum user
+      when: inventory_hostname not in groups.development
+      become_user: root
       user:
         name: "{{ cap_username }}"
         password: "{{ cap_password | password_hash('sha512') }}"
         shell: /bin/bash
-      tags: cap
-
-    - name: clone application from GitHub
-      become_user: "{{ cap_username }}"
-      git:
-        repo: "{{ cap_repo }}"
-        dest: "{{ cap_app_dir }}"
-        version: master
-      tags: cap, git, build
 
     - name: create .env file
-      become_user: "{{ cap_username }}"
       template:
         src: templates/dot-env
         dest: "{{ cap_server_dir }}/.env"
         mode: 0400
-      tags: cap, env
 
     - name: create image upload directory
-      become_user: "{{ cap_username }}"
       file:
         path: "{{ cap_static_dir }}/{{ cap_upload_dir }}"
         state: directory
         mode: 0755
-      tags: cap
 
     - name: create generated PDF directory
-      become_user: "{{ cap_username }}"
       file:
         path: "{{ cap_static_dir }}/{{ cap_pdf_dir }}"
         state: directory
         mode: 0755
-      tags: cap
+
+- name: build everything
+  hosts: production, staging
+  tags: build
+  become: yes
+  vars_files:
+    - public.yaml
+  tasks:
+    - name: clone application from GitHub
+      git:
+        repo: "{{ cap_repo }}"
+        dest: "{{ cap_app_dir }}"
+        version: master
 
     - name: install node modules for user interface
-      become_user: "{{ cap_username }}"
       yarn:
         path: "{{ cap_ui_dir }}"
-      tags: yarn
 
     - name: install node modules for server
-      become_user: "{{ cap_username }}"
       yarn:
         path: "{{ cap_server_dir }}"
-      tags: yarn
 
     - name: build production ui
-      become_user: "{{ cap_username }}"
       command:
         chdir: "{{ cap_ui_dir }}"
         cmd: yarn build
       # creates: "{{ cap_ui_dir }}/dist/index.html"
-      tags: build
 
     - name: build production server
-      become_user: "{{ cap_username }}"
       command:
         chdir: "{{ cap_server_dir }}"
         cmd: yarn build
       # creates: "{{ cap_server_dir }}/dist/main.js"
-      tags: build
 
+- name: provision process manager
+  hosts: production, staging
+  tags: pm2
+  become: yes
+  become_user: "{{ cap_username }}"
+  vars_files:
+    - public.yaml
+    - private.yaml
+  tasks:
     - name: install pm2 # run as root, installs in /usr/local/bin
+      become_user: root
       yarn:
         name: pm2
         global: yes
-      tags: pm2
 
     - name: create pm2 directory
-      become_user: "{{ cap_username }}"
       file:
         path: "{{ cap_pm2_dir }}"
         state: directory
         mode: 0755
-      tags: pm2
 
     - name: configure pm2
-      become_user: "{{ cap_username }}"
       template:
         src: templates/ecosystem.config.js
         dest: "{{ cap_pm2_dir }}/ecosystem.config.js"
         mode: 0444
-      tags: pm2
 
     - name: start capernaum server
-      become_user: "{{ cap_username }}"
       command: pm2 start "{{ cap_pm2_dir }}/ecosystem.config.js"
-      tags: pm2
 
+- name: provision nginx
+  hosts: production, staging
+  tags: nginx
+  become: yes
+  vars_files:
+    - public.yaml
+    - private.yaml
+  tasks:
     - name: disable nginx default configuration
       file:
         path: "{{ nginx_enabled_dir }}/default"
         state: absent
-      tags: nginx
 
     - name: copy nginx config file
       template:
         src: "templates/{{ nginx_config }}"
         dest: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
         mode: 0444
-      tags: nginx
 
     - name: enable nginx configuration
       file:
         src: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
         dest: "{{ nginx_enabled_dir }}/{{ nginx_conf_file }}"
         state: link
-      tags: nginx
 
     - name: restart nginx
       service:
         name: nginx
         state: restarted
-      tags: nginx
