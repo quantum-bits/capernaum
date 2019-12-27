@@ -13,9 +13,11 @@ PG_USERNAME={{ pg_username }}
 PG_PASSWORD={{ pg_password }}
 
 # Capernaum
-CAP_STATIC_DIR={{ cap_static_dir }}
-CAP_UPLOAD_DIR={{ cap_upload_dir }}
-CAP_PDF_DIR={{ cap_pdf_dir }}
+CAP_BASE_ABS_DIR={{ cap_base_abs_dir }}
+CAP_STATIC_REL_DIR={{ cap_static_rel_dir }}
+CAP_UPLOAD_REL_DIR={{ cap_upload_rel_dir }}
+CAP_PDF_REL_DIR={{ cap_pdf_rel_dir }}
+
 SEP_PREDICTION_THRESHOLD={{ sep_prediction_threshold }}
 JWT_SECRET={{ jwt_secret }}
 

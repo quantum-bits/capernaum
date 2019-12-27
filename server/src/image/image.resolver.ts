@@ -54,7 +54,7 @@ export class ImageResolver {
 
   @ResolveProperty(returns => String)
   fullPath(@Parent() image: Image) {
-    return this.fileService.fullPath(image.fileName());
+    return this.fileService.absolutePath(image.fileName());
   }
 
   @ResolveProperty("letterElements", type => [LetterElement])

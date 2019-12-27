@@ -10,7 +10,7 @@ export class PDFController {
 
   @Get(":fileName")
   async getFile(@Res() res, @Param("fileName") fileName: string) {
-    const filePath = this.pdfFileService.fullPath(fileName);
+    const filePath = this.pdfFileService.absolutePath(fileName);
     const options = {
       headers: {
         "Content-Type": "application/pdf"

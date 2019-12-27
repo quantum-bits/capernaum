@@ -82,18 +82,18 @@
       tags: dot-env
       template:
         src: templates/dot-env
-        dest: "{{ cap_server_dir }}/.env"
+        dest: "{{ cap_server_abs_dir }}/.env"
         mode: 0400
 
     - name: create image upload directory
       file:
-        path: "{{ cap_static_dir }}/{{ cap_upload_dir }}"
+        path: "{{ cap_static_abs_dir }}/{{ cap_upload_rel_dir }}"
         state: directory
         mode: 0755
 
     - name: create generated PDF directory
       file:
-        path: "{{ cap_static_dir }}/{{ cap_pdf_dir }}"
+        path: "{{ cap_static_abs_dir }}/{{ cap_pdf_rel_dir }}"
         state: directory
         mode: 0755
 
@@ -108,28 +108,26 @@
     - name: clone application from GitHub
       git:
         repo: "{{ cap_repo }}"
-        dest: "{{ cap_app_dir }}"
+        dest: "{{ cap_app_abs_dir }}"
         version: master
 
     - name: install node modules for user interface
       yarn:
-        path: "{{ cap_ui_dir }}"
+        path: "{{ cap_ui_abs_dir }}"
 
     - name: install node modules for server
       yarn:
-        path: "{{ cap_server_dir }}"
+        path: "{{ cap_server_abs_dir }}"
 
     - name: build production ui
       command:
-        chdir: "{{ cap_ui_dir }}"
+        chdir: "{{ cap_ui_abs_dir }}"
         cmd: yarn build
-      # creates: "{{ cap_ui_dir }}/dist/index.html"
 
     - name: build production server
       command:
-        chdir: "{{ cap_server_dir }}"
+        chdir: "{{ cap_server_abs_dir }}"
         cmd: yarn build
-      # creates: "{{ cap_server_dir }}/dist/main.js"
 
 - name: provision process manager
   hosts: production, staging
@@ -148,18 +146,18 @@
 
     - name: create pm2 directory
       file:
-        path: "{{ cap_pm2_dir }}"
+        path: "{{ cap_pm2_abs_dir }}"
         state: directory
         mode: 0755
 
     - name: configure pm2
       template:
         src: templates/ecosystem.config.js
-        dest: "{{ cap_pm2_dir }}/ecosystem.config.js"
+        dest: "{{ cap_pm2_abs_dir }}/ecosystem.config.js"
         mode: 0444
 
     - name: start capernaum server
-      command: pm2 start "{{ cap_pm2_dir }}/ecosystem.config.js"
+      command: pm2 start "{{ cap_pm2_abs_dir }}/ecosystem.config.js"
 
 - name: provision nginx
   hosts: production, staging
@@ -171,19 +169,19 @@
   tasks:
     - name: disable nginx default configuration
       file:
-        path: "{{ nginx_enabled_dir }}/default"
+        path: "{{ nginx_enabled_abs_dir }}/default"
         state: absent
 
     - name: copy nginx config file
       template:
         src: "templates/{{ nginx_config }}"
-        dest: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
+        dest: "{{ nginx_available_abs_dir }}/{{ nginx_conf_file }}"
         mode: 0444
 
     - name: enable nginx configuration
       file:
-        src: "{{ nginx_available_dir }}/{{ nginx_conf_file }}"
-        dest: "{{ nginx_enabled_dir }}/{{ nginx_conf_file }}"
+        src: "{{ nginx_available_abs_dir }}/{{ nginx_conf_file }}"
+        dest: "{{ nginx_enabled_abs_dir }}/{{ nginx_conf_file }}"
         state: link
 
     - name: restart nginx

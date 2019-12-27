@@ -8,37 +8,40 @@ interface FileDetails {
 }
 
 export class FileService {
-  // Full path to static directory (e.g., '/home/capernaum/static')
-  private readonly staticDirPath: string;
+  // Relative dir (e.g., 'static/pdfs' or 'static/images')
+  private readonly relDir: string;
 
-  // Full path to subdirectory (e.g., '/home/capernaum/static/pdfs')
-  private readonly basePath: string;
+  // Absolute dir (e.g., '/home/capernaum/static/pdfs')
+  private readonly absDir: string;
 
   constructor(private readonly subDir: string) {
-    this.staticDirPath = process.env.CAP_STATIC_DIR;
-    this.basePath = normalize(join(this.staticDirPath, subDir));
+    // Top-level capernaum base path (e.g., '/home/capernaum')
+    const baseAbsDir = normalize(process.env.CAP_BASE_ABS_DIR);
 
-    access(this.basePath, err => {
+    this.relDir = normalize(join(process.env.CAP_STATIC_REL_DIR, subDir));
+    this.absDir = normalize(join(baseAbsDir, this.relDir));
+
+    access(this.absDir, err => {
       if (err) {
-        throw Error(`Can't find a base directory at '${this.basePath}'`);
+        throw Error(`Can't find a base directory at '${this.absDir}'`);
       }
     });
   }
 
-  baseDirPath() {
-    return this.basePath;
+  absoluteDir() {
+    return this.relDir;
   }
 
   relativePath(fileName: string) {
-    return join(this.subDir, fileName);
+    return join(this.relDir, fileName);
   }
 
-  fullPath(fileName: string) {
-    return join(this.basePath, fileName);
+  absolutePath(fileName: string) {
+    return join(this.absDir, fileName);
   }
 
   async saveFile(fileName: string, buffer: Buffer): Promise<FileDetails> {
-    const fullPath = this.fullPath(fileName);
+    const fullPath = this.absolutePath(fileName);
 
     return new Promise((resolve, reject) => {
       let fileSize = NaN;
@@ -71,7 +74,7 @@ export class FileService {
   }
 
   deleteFile(fileName: string) {
-    const fullPath = this.fullPath(fileName);
+    const fullPath = this.absolutePath(fileName);
 
     return new Promise((resolve, reject) => {
       unlink(fullPath, err => {

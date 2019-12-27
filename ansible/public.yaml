@@ -1,18 +1,18 @@
 cap_repo: "https://github.com/quantum-bits/capernaum.git"
 
-cap_ui_dir: "{{ cap_app_dir }}/ui"
-cap_server_dir: "{{ cap_app_dir }}/server"
-cap_pm2_dir: "{{ cap_app_dir }}/pm2"
+cap_ui_abs_dir: "{{ cap_app_abs_dir }}/ui"
+cap_server_abs_dir: "{{ cap_app_abs_dir }}/server"
+cap_pm2_abs_dir: "{{ cap_app_abs_dir }}/pm2"
 
-cap_username: "capernaum"
 
-cap_static_dir: "{{ cap_base_dir }}/static"
-cap_upload_dir: "images"
-cap_pdf_dir: "pdfs"
+cap_static_rel_dir: "static"
+cap_static_abs_dir: "{{ cap_base_abs_dir }}/{{ cap_static_rel_dir }}"
+cap_upload_rel_dir: "images"
+cap_pdf_rel_dir: "pdfs"
 
 sep_prediction_threshold: 4.5
 
-nginx_base_dir: "/etc/nginx"
-nginx_available_dir: "{{ nginx_base_dir}}/sites-available"
-nginx_enabled_dir: "{{ nginx_base_dir}}/sites-enabled"
+nginx_base_abs_dir: "/etc/nginx"
+nginx_available_abs_dir: "{{ nginx_base_abs_dir}}/sites-available"
+nginx_enabled_abs_dir: "{{ nginx_base_abs_dir}}/sites-enabled"
 nginx_conf_file: "capernaum.conf"

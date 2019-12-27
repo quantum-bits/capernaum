@@ -5,8 +5,8 @@ development:
       ansible_connection: local
   vars:
     node_env: development
-    cap_base_dir: "/Users/tom/Taylor/Projects/Capernaum"
-    cap_app_dir: "{{ cap_base_dir }}"
+    cap_base_abs_dir: "/Users/tom/Taylor/Projects/Capernaum"
+    cap_app_abs_dir: "{{ cap_base_abs_dir }}"
 
 staging:
   hosts:
@@ -17,8 +17,8 @@ staging:
   vars:
     node_env: production
     nginx_config: nginx-simple.conf
-    cap_base_dir: "/home/capernaum"
-    cap_app_dir: "{{ cap_base_dir }}/app"
+    cap_base_abs_dir: "/home/capernaum"
+    cap_app_abs_dir: "{{ cap_base_abs_dir }}/app"
 
 production:
   hosts:
@@ -30,5 +30,5 @@ production:
   vars:
     node_env: production
     nginx_config: nginx-production.conf
-    cap_base_dir: "/home/capernaum"
-    cap_app_dir: "{{ cap_base_dir }}/app"
+    cap_base_abs_dir: "/home/capernaum"
+    cap_app_abs_dir: "{{ cap_base_abs_dir }}/app"

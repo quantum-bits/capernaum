@@ -21,7 +21,7 @@
             <li>Date {{ writeLetter.responseSummary.date }}</li>
             <li>Email {{ writeLetter.responseSummary.email }}</li>
             <li>
-              <a :href="writeLetter.pdfFilePath" target="_blank">PDF File </a>
+              <a :href="writeLetter.pdfFilePath" target="_blank">PDF File</a>
             </li>
           </ul>
         </li>

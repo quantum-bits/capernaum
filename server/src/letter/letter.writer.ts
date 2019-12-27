@@ -82,7 +82,7 @@ export default class LetterWriter {
   ) {}
 
   private renderImage(letterElement: LetterElement) {
-    const fullPath = this.imageFileService.fullPath(
+    const fullPath = this.imageFileService.absolutePath(
       letterElement.image.fileName()
     );
     return formatEnvironment(
@@ -333,9 +333,9 @@ export default class LetterWriter {
       // Set up paths.
       const baseName = generateBaseName(letter.id, surveyResponse.id);
       const texFileName = baseName + ".tex";
-      const texFilePath = this.pdfFileService.fullPath(texFileName);
+      const texFilePath = this.pdfFileService.absolutePath(texFileName);
       const pdfFileName = baseName + ".pdf";
-      const pdfFilePath = this.pdfFileService.fullPath(pdfFileName);
+      const pdfFilePath = this.pdfFileService.absolutePath(pdfFileName);
 
       // Create the document.
       const result = this.renderDocument(renderedElements);
@@ -349,7 +349,7 @@ export default class LetterWriter {
         // Create the PDF.
         exec(
           `lualatex ${texFilePath}`,
-          { cwd: this.pdfFileService.baseDirPath() },
+          { cwd: this.pdfFileService.absoluteDir() },
           (err, stdout, stderr) => {
             if (err) {
               reject(err);
@@ -364,7 +364,7 @@ export default class LetterWriter {
         true,
         "Letter created successfully",
         pdfFileName,
-        pdfFilePath,
+        this.pdfFileService.relativePath(pdfFileName),
         surveyResponse.summarize()
       );
 

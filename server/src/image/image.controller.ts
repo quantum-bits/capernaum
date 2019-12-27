@@ -40,7 +40,9 @@ export class ImageController {
   @Get(":id")
   async getImage(@Res() res, @Param("id") id: number) {
     const imageDetails = await this.imageService.findOne(Image, id);
-    const imagePath = this.imageFileService.fullPath(imageDetails.fileName());
+    const imagePath = this.imageFileService.absolutePath(
+      imageDetails.fileName()
+    );
     const options = {
       headers: {
         "Content-Type": imageDetails.mimeType
