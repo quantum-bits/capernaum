@@ -281,7 +281,7 @@ export default class LetterWriter {
             renderedElements.push(this.renderChart(dimension.chartData()));
           } else {
             renderedElements.push(
-              this.renderParagraph(`No data for dimension '${dimension.title}'`)
+              this.renderParagraph("No data for dimension")
             );
           }
           break;

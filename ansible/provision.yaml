@@ -79,6 +79,7 @@
         shell: /bin/bash
 
     - name: create .env file
+      tags: dot-env
       template:
         src: templates/dot-env
         dest: "{{ cap_server_dir }}/.env"
@@ -98,7 +99,7 @@
 
 - name: build everything
   hosts: production, staging
-  tags: build
+  tags: build, update
   become: yes
   become_user: "{{ cap_username }}"
   vars_files:
@@ -132,7 +133,7 @@
 
 - name: provision process manager
   hosts: production, staging
-  tags: pm2
+  tags: pm2, update
   become: yes
   become_user: "{{ cap_username }}"
   vars_files:
@@ -162,7 +163,7 @@
 
 - name: provision nginx
   hosts: production, staging
-  tags: nginx
+  tags: nginx, update
   become: yes
   vars_files:
     - public.yaml
