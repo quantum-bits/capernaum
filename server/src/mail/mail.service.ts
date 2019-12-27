@@ -15,15 +15,16 @@ export class MailService {
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
       logger: true,
-      debug: true
+      debug: mailDebug.enabled
     };
 
     if (process.env.MAIL_PORT) {
       const port = parseInt(process.env.MAIL_PORT);
-      const isSecure = port == 465;
-
       options.port = port;
-      options.secure = isSecure;
+
+      // This doesn't appear to work, at least against a server on port 587.
+      // const isSecure = port !== 25;
+      // options.secure = isSecure;
     }
 
     if (process.env.MAIL_USER && process.env.MAIL_PASS) {
@@ -52,6 +53,7 @@ export class MailService {
     if (mailInput.attachmentPath) {
       options.attachments = [
         {
+          filename: "CLS Results.pdf",
           path: mailInput.attachmentPath
         }
       ];
