@@ -1,6 +1,6 @@
 development:
   hosts:
-    localhost:
+    nurkbook:
       ansible_become: no
       ansible_connection: local
   vars:
@@ -22,19 +22,11 @@ staging:
 
 production:
   hosts:
-    galilee-via-tunnel:
-      # Use this with forwarded port, as in
-      #   ssh -L2222:galilee.cse.taylor.edu:22 john.cse.taylor.edu
+    galilee:
       ansible_user: tnurkkala
       ansible_host: localhost
       ansible_port: 2222
       server_name: "galilee.cse.taylor.edu"
-      proxy:
-        host: "10.120.160.77"
-        port: 3128
-      mail:
-        host: smtp.cse.taylor.edu
-        from: "Tom Nurkkala <tnurkkala@cse.taylor.edu>"
   vars:
     node_env: production
     nginx_config: nginx-production.conf

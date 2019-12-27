@@ -8,3 +8,4 @@ node_modules/
 private/
 /static/
 private.yaml
+/ansible/host_vars/
