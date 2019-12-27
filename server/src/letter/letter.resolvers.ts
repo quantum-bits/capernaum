@@ -31,7 +31,7 @@ import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => Letter)
-@UseGuards(GqlAuthGuard)
+// @UseGuards(GqlAuthGuard)
 export class LetterResolver {
   constructor(
     private readonly letterService: LetterService,

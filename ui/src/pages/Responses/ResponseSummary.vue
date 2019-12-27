@@ -3,29 +3,25 @@
     <v-col>
       <ol>
         <li>
-          Survey ({{ responseSummary.responseSummary.surveySummary.id }} -
-          {{ responseSummary.responseSummary.surveySummary.qualtricsId }})
+          Survey ({{ writeLetter.responseSummary.surveySummary.id }} -
+          {{ writeLetter.responseSummary.surveySummary.qualtricsId }})
           <ul>
-            <li>
-              Title {{ responseSummary.responseSummary.surveySummary.title }}
-            </li>
+            <li>Title {{ writeLetter.responseSummary.surveySummary.title }}</li>
             <li>
               Q Name
-              {{ responseSummary.responseSummary.surveySummary.qualtricsName }}
+              {{ writeLetter.responseSummary.surveySummary.qualtricsName }}
             </li>
           </ul>
         </li>
         <li>
-          Response ({{ responseSummary.responseSummary.id }} -
-          {{ responseSummary.responseSummary.qualtricsResponseId }})
+          Response ({{ writeLetter.responseSummary.id }} -
+          {{ writeLetter.responseSummary.qualtricsResponseId }})
           <ul>
-            <li>Status {{ responseSummary.ok ? "OK" : "FAILED" }}</li>
-            <li>Date {{ responseSummary.responseSummary.date }}</li>
-            <li>Email {{ responseSummary.responseSummary.email }}</li>
+            <li>Status {{ writeLetter.ok ? "OK" : "FAILED" }}</li>
+            <li>Date {{ writeLetter.responseSummary.date }}</li>
+            <li>Email {{ writeLetter.responseSummary.email }}</li>
             <li>
-              <a :href="responseSummary.pdfFilePath" target="_blank"
-                >PDF File
-              </a>
+              <a :href="writeLetter.pdfFilePath" target="_blank">PDF File </a>
             </li>
           </ul>
         </li>
@@ -33,7 +29,7 @@
           Dimensions
           <ol>
             <li
-              v-for="dim in responseSummary.responseSummary.dimensionSummaries"
+              v-for="dim in writeLetter.responseSummary.dimensionSummaries"
               :key="dim.id"
             >
               (ID {{ dim.id }}) {{ dim.title }}
@@ -58,7 +54,7 @@
           Predictions
           <ol>
             <li
-              v-for="prediction in responseSummary.responseSummary
+              v-for="prediction in writeLetter.responseSummary
                 .predictionSummaries"
               :key="prediction.practiceSummary.id"
             >
@@ -85,13 +81,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { WriteLetter_writeLetter } from "@/graphql/types/WriteLetter";
+import { WriteLetter_writeLetter as LetterWriterOutput } from "@/graphql/types/WriteLetter";
 
 export default Vue.extend({
   name: "ResponseSummary",
 
   props: {
-    responseSummary: Object as () => WriteLetter_writeLetter
+    writeLetter: Object as () => LetterWriterOutput
   }
 });
 </script>

@@ -10,9 +10,12 @@ export class LetterWriterInput {
 @ObjectType()
 export class LetterWriterOutput {
   @Field() ok: boolean;
+  @Field({ description: "Message to UI" })
+  message: string;
   @Field({ description: "Name of PDF file (e.g., 'abc.pdf')" })
   pdfFileName: string;
   @Field({ description: "Path to PDF file (e.g., '/static/pdfs/abc.pdf')" })
   pdfFilePath: string;
-  @Field(type => ResponseSummary) responseSummary: ResponseSummary;
+  @Field(type => ResponseSummary, { nullable: true })
+  responseSummary?: ResponseSummary;
 }

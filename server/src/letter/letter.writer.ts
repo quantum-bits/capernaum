@@ -1,7 +1,6 @@
 import { Letter, LetterElement, LetterWriterOutput } from "./entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
-import { format } from "path";
 import { SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Inject, Injectable } from "@nestjs/common";
@@ -10,6 +9,10 @@ import { ChartData, Prediction } from "../survey/survey.types";
 import { createHash } from "crypto";
 import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { DateTime } from "luxon";
+import debug from "debug";
+import { ResponseSummary } from "../survey/entities/survey-response-summary";
+
+const letterDebug = debug("letter");
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
@@ -79,7 +82,6 @@ export default class LetterWriter {
   ) {}
 
   private renderImage(letterElement: LetterElement) {
-    // console.log("RENDER IMAGE", letterElement);
     const fullPath = this.imageFileService.fullPath(
       letterElement.image.fileName()
     );
@@ -89,8 +91,11 @@ export default class LetterWriter {
     );
   }
 
+  private renderParagraph(content: string) {
+    return ["", content, ""].join("\n");
+  }
+
   private renderBoilerplate(letterElement: LetterElement) {
-    // console.log("RENDER BOILERPLATE", letterElement);
     const quillDelta = JSON.parse(letterElement.textDelta);
     const lineBuffer = new LineBuffer();
 
@@ -145,7 +150,7 @@ export default class LetterWriter {
   }
 
   private renderChart(chartData: ChartData) {
-    // console.log("RENDER CHART", chartData);
+    letterDebug("renderChart %O", chartData);
 
     const chart = `
       \\begin{tikzpicture}
@@ -170,6 +175,8 @@ export default class LetterWriter {
   }
 
   private renderPredictions(predictions: Prediction[]) {
+    letterDebug("renderPredictions %O", predictions);
+
     return predictions
       .filter(prediction => prediction.predict)
       .map(prediction => {
@@ -215,7 +222,7 @@ export default class LetterWriter {
   }
 
   private renderDocument(renderedElements: string[]) {
-    return `
+    const document = `
     \\documentclass{article}
     
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
@@ -231,16 +238,21 @@ export default class LetterWriter {
     
     \\end{document}
     `;
+
+    letterDebug("renderDocument %s", document);
+    return document;
   }
 
   private renderResponseDetails(surveyResponse: SurveyResponse) {
+    letterDebug("renderResponseDetails %O", surveyResponse);
+
     return [
       "\\vfill",
       formatEnvironment(
         "flushright",
         [
           "\\scriptsize",
-          `Survey ID: ${surveyResponse.id}`,
+          `Response ID: ${surveyResponse.id}`,
           `Email: ${surveyResponse.email}`,
           `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`
         ].join("\n\n")
@@ -248,51 +260,76 @@ export default class LetterWriter {
     ].join("\n");
   }
 
-  renderLetter(
+  private renderAllElements(letter: Letter, surveyResponse: SurveyResponse) {
+    const renderedElements = [];
+
+    for (const letterElement of letter.letterElements) {
+      letterDebug("renderLetter - element %O", letterElement);
+      switch (letterElement.letterElementType.key) {
+        case "boilerplate":
+          renderedElements.push(this.renderBoilerplate(letterElement));
+          break;
+        case "boolean-calculation-results":
+          const predictions = surveyResponse.predictScriptureEngagement();
+          renderedElements.push(this.renderPredictions(predictions));
+          break;
+        case "chart":
+          const dimension = surveyResponse.findDimensionById(
+            letterElement.surveyDimension.id
+          );
+          if (dimension) {
+            renderedElements.push(this.renderChart(dimension.chartData()));
+          } else {
+            renderedElements.push(
+              this.renderParagraph(`No data for dimension '${dimension.title}'`)
+            );
+          }
+          break;
+        case "footer":
+          renderedElements.push(this.renderFooter());
+          break;
+        case "header":
+          renderedElements.push(this.renderHeader());
+          break;
+        case "image":
+          renderedElements.push(this.renderImage(letterElement));
+          break;
+        default:
+          throw Error(
+            `Unknown element type '${letterElement.letterElementType.key}'`
+          );
+      }
+    }
+
+    renderedElements.push(this.renderResponseDetails(surveyResponse));
+
+    return renderedElements;
+  }
+
+  private constructOutput(
+    ok: boolean,
+    message: string,
+    pdfFileName: string = "",
+    pdfFilePath: string = "",
+    responseSummary: ResponseSummary = null
+  ) {
+    const letterWriterOutput: LetterWriterOutput = {
+      ok,
+      message,
+      pdfFileName,
+      pdfFilePath,
+      responseSummary
+    };
+    letterDebug("constructOutput: %O", letterWriterOutput);
+    return letterWriterOutput;
+  }
+
+  private runLaTeX(
+    renderedElements,
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<LetterWriterOutput> {
-    // console.log("LETTER", JSON.stringify(letter, null, 2));
-    // console.log("RESPONSE", JSON.stringify(surveyResponse, null, 2));
-    // surveyResponse.dump();
-
     return new Promise((resolve, reject) => {
-      // Render letter elements.
-      const renderedElements = [];
-
-      for (const letterElement of letter.letterElements) {
-        switch (letterElement.letterElementType.key) {
-          case "boilerplate":
-            renderedElements.push(this.renderBoilerplate(letterElement));
-            break;
-          case "boolean-calculation-results":
-            const predictions = surveyResponse.predictScriptureEngagement();
-            renderedElements.push(this.renderPredictions(predictions));
-            break;
-          case "chart":
-            const dimension = surveyResponse.findDimensionById(
-              letterElement.surveyDimension.id
-            );
-            renderedElements.push(this.renderChart(dimension.chartData()));
-            break;
-          case "footer":
-            renderedElements.push(this.renderFooter());
-            break;
-          case "header":
-            renderedElements.push(this.renderHeader());
-            break;
-          case "image":
-            renderedElements.push(this.renderImage(letterElement));
-            break;
-          default:
-            throw Error(
-              `Unknown element type '${letterElement.letterElementType.key}'`
-            );
-        }
-      }
-
-      renderedElements.push(this.renderResponseDetails(surveyResponse));
-
       // Set up paths.
       const baseName = generateBaseName(letter.id, surveyResponse.id);
       const texFileName = baseName + ".tex";
@@ -323,12 +360,31 @@ export default class LetterWriter {
         );
       });
 
-      resolve({
-        ok: true,
+      const letterWriterOutput = this.constructOutput(
+        true,
+        "Letter created successfully",
         pdfFileName,
         pdfFilePath,
-        responseSummary: surveyResponse.summarize()
-      });
+        surveyResponse.summarize()
+      );
+
+      resolve(letterWriterOutput);
     });
+  }
+
+  renderLetter(letter: Letter, surveyResponse: SurveyResponse) {
+    letterDebug("renderLetter - letter %O", letter);
+    letterDebug("renderLetter - response %O", surveyResponse);
+
+    if (!letter) {
+      return Promise.resolve(this.constructOutput(false, "No letter found"));
+    } else if (!surveyResponse) {
+      return Promise.resolve(
+        this.constructOutput(false, "No responses for this survey")
+      );
+    } else {
+      const renderedElements = this.renderAllElements(letter, surveyResponse);
+      return this.runLaTeX(renderedElements, letter, surveyResponse);
+    }
   }
 }

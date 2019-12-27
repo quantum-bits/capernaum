@@ -29,20 +29,25 @@
             {{ item.endDate | sensibleDate }}
           </template>
           <template v-slot:item.action="{ item }">
-            <v-icon @click="sendEmail(item)">
-              mdi-email
-            </v-icon>
-            <v-icon class="ml-2" @click="generatePDF(item)">
-              mdi-adobe-acrobat
-            </v-icon>
+            <div v-if="hasOneLetter(item)">
+              <v-icon @click="sendEmail(item)">
+                mdi-email
+              </v-icon>
+              <v-icon class="ml-2" @click="generatePDF(item)">
+                mdi-adobe-acrobat
+              </v-icon>
+            </div>
+            <div v-else>
+              No letter!
+            </div>
           </template>
         </v-data-table>
       </v-col>
     </v-row>
 
     <response-summary
-      v-if="haveResponseSummary"
-      :response-summary="responseSummary"
+      v-if="haveLetterWriterOutput"
+      :write-letter="letterWriterOutput"
     />
 
     <mail-dialog
@@ -51,6 +56,11 @@
       :admin-email="mailDialog.adminEmail"
       :attachment-path="mailDialog.attachmentPath"
     />
+
+    <v-snackbar v-model="snackbar.visible">
+      {{ snackbar.text }}
+      <v-btn text @click="snackbar.visible = false">Close</v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -68,7 +78,7 @@ import {
 } from "@/graphql/types/AllResponses";
 import {
   WriteLetter,
-  WriteLetter_writeLetter
+  WriteLetter_writeLetter as LetterWriterOutput
 } from "@/graphql/types/WriteLetter";
 import isEmpty from "lodash/isEmpty";
 import MailDialog from "./MailDialog.vue";
@@ -116,13 +126,18 @@ export default Vue.extend({
         { text: "Action", value: "action" }
       ],
 
-      responseSummary: {} as WriteLetter_writeLetter,
+      letterWriterOutput: {} as LetterWriterOutput,
 
       mailDialog: {
         visible: false,
         respondentEmail: "",
         adminEmail: "",
         attachmentPath: ""
+      },
+
+      snackbar: {
+        visible: false,
+        text: ""
       }
     };
   },
@@ -135,21 +150,34 @@ export default Vue.extend({
       }));
     },
 
-    haveResponseSummary(): boolean {
-      return !isEmpty(this.responseSummary);
+    haveLetterWriterOutput(): boolean {
+      return !isEmpty(this.letterWriterOutput);
     }
   },
 
   methods: {
+    clearLetterWriterOutput() {
+      this.letterWriterOutput = {} as LetterWriterOutput;
+    },
+
+    showSnackbar(text: string) {
+      this.snackbar.text = text;
+      this.snackbar.visible = true;
+    },
+
     sendEmail(surveyResponse: SurveyResponse) {
+      this.clearLetterWriterOutput();
+
       // Open the mail dialog.
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
-      this.mailDialog.attachmentPath = this.responseSummary.pdfFilePath;
+      this.mailDialog.attachmentPath = this.letterWriterOutput.pdfFilePath;
       this.mailDialog.visible = true;
     },
 
     generatePDF(surveyResponse: SurveyResponse) {
+      this.clearLetterWriterOutput();
+
       this.$apollo
         .mutate<WriteLetter>({
           mutation: WRITE_LETTER_MUTATION,
@@ -160,16 +188,31 @@ export default Vue.extend({
             }
           }
         })
-        .then(response => (this.responseSummary = response.data!.writeLetter));
+        .then(response => {
+          console.log("response", response);
+          if (response.data) {
+            const writeLetter = response.data.writeLetter;
+
+            this.showSnackbar(writeLetter.message);
+            if (writeLetter.responseSummary) {
+              this.letterWriterOutput = writeLetter;
+            }
+          }
+        })
+        .catch(error => {
+          console.error("generatePDF error", error);
+        });
+    },
+
+    hasOneLetter(item: SurveyResponse) {
+      return item.survey.letters && item.survey.letters.length === 1;
     },
 
     letterTitle(item: SurveyResponse) {
-      if (!item.survey.letters) {
-        return "N/A";
-      } else if (item.survey.letters.length !== 1) {
-        return `${item.survey.letters.length} letters?`;
-      } else {
+      if (this.hasOneLetter(item)) {
         return item.survey.letters[0].title;
+      } else {
+        return "No letter!";
       }
     },
 

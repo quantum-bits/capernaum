@@ -67,8 +67,19 @@ export interface WriteLetter_writeLetter_responseSummary {
 
 export interface WriteLetter_writeLetter {
   ok: boolean;
+  /**
+   * Message to UI
+   */
+  message: string;
+  /**
+   * Name of PDF file (e.g., 'abc.pdf')
+   */
+  pdfFileName: string;
+  /**
+   * Path to PDF file (e.g., '/static/pdfs/abc.pdf')
+   */
   pdfFilePath: string;
-  responseSummary: WriteLetter_writeLetter_responseSummary;
+  responseSummary: WriteLetter_writeLetter_responseSummary | null;
 }
 
 export interface WriteLetter {

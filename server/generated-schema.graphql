@@ -147,12 +147,15 @@ input LetterWriterInput {
 type LetterWriterOutput {
   ok: Boolean!
 
+  """Message to UI"""
+  message: String!
+
   """Name of PDF file (e.g., 'abc.pdf')"""
   pdfFileName: String!
 
   """Path to PDF file (e.g., '/static/pdfs/abc.pdf')"""
   pdfFilePath: String!
-  responseSummary: ResponseSummary!
+  responseSummary: ResponseSummary
 }
 
 input LoginCredentials {
