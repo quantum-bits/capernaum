@@ -1,16 +1,22 @@
 <template>
   <v-container>
-    <v-row class="align-baseline">
-      <v-col> <h3>Fetch Responses from Qualtrics</h3></v-col>
-      <v-col>
-        <v-select
-          v-model="selectedQualtricsId"
-          :items="availableSurveys"
-          label="Choose imported survey"
-        />
+    <v-row class="align-baseline justify-space-between">
+      <v-col cols="4">
+        <h3>Fetch Responses from Qualtrics</h3>
       </v-col>
-      <v-col>
-        <v-btn color="primary" @click="fetchFromQualtrics">Fetch</v-btn>
+      <v-col cols="4">
+        <v-row class="align-baseline">
+          <v-select
+            class="mr-2"
+            v-model="selectedQualtricsId"
+            :items="availableSurveys"
+            label="Choose imported survey"
+          />
+          <v-btn color="primary" @click="fetchFromQualtrics">Fetch</v-btn>
+        </v-row>
+      </v-col>
+      <v-col cols="1">
+        <v-progress-circular v-if="spinnerVisible" indeterminate />
       </v-col>
     </v-row>
 
@@ -138,7 +144,9 @@ export default Vue.extend({
       snackbar: {
         visible: false,
         text: ""
-      }
+      },
+
+      spinnerVisible: false
     };
   },
 
@@ -166,7 +174,6 @@ export default Vue.extend({
     },
 
     sendEmail(surveyResponse: SurveyResponse) {
-      // Open the mail dialog.
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
       this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
@@ -175,6 +182,7 @@ export default Vue.extend({
 
     generatePDF(surveyResponse: SurveyResponse) {
       this.clearLetterWriterOutput();
+      this.spinnerVisible = true;
 
       this.$apollo
         .mutate<WriteLetter>({
@@ -199,6 +207,9 @@ export default Vue.extend({
         })
         .catch(error => {
           console.error("generatePDF error", error);
+        })
+        .finally(() => {
+          this.spinnerVisible = false;
         });
     },
 
