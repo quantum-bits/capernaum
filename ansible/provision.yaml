@@ -79,7 +79,7 @@
         shell: /bin/bash
 
     - name: create .env file
-      tags: dot-env
+      tags: dot-env, update
       template:
         src: templates/dot-env
         dest: "{{ cap_server_abs_dir }}/.env"

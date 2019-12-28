@@ -150,7 +150,7 @@ export default class LetterWriter {
   }
 
   private chartHeight(chartData: ChartData) {
-    const height = Math.min(chartData.entries.length + 1, 3);
+    const height = Math.max(chartData.entries.length + 1, 3);
     return `height=${height}cm`;
   }
 
@@ -227,7 +227,7 @@ export default class LetterWriter {
   }
 
   private renderDocument(renderedElements: string[]) {
-    const document = `
+    return `
     \\documentclass{article}
     
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
@@ -243,9 +243,6 @@ export default class LetterWriter {
     
     \\end{document}
     `;
-
-    letterDebug("renderDocument %s", document);
-    return document;
   }
 
   private renderResponseDetails(surveyResponse: SurveyResponse) {
@@ -343,11 +340,13 @@ export default class LetterWriter {
       const pdfFilePath = this.pdfFileService.absolutePath(pdfFileName);
 
       // Create the document.
-      const result = this.renderDocument(renderedElements);
+      const renderedDocument = this.renderDocument(renderedElements);
+      letterDebug("Rendered document %s", renderedDocument);
 
       // Write the LaTeX source file.
-      writeFile(texFilePath, result, "utf8", err => {
+      writeFile(texFilePath, renderedDocument, "utf8", err => {
         if (err) {
+          letterDebug("writeFile failed %O", err);
           reject(err);
         }
 
@@ -357,23 +356,24 @@ export default class LetterWriter {
           { cwd: this.pdfFileService.absoluteDir() },
           (err, stdout, stderr) => {
             if (err) {
+              letterDebug("lualatex exec failed %O", err);
               reject(err);
             }
-            // console.log("STDOUT", stdout);
-            // console.log("STDERR", stderr);
+            letterDebug("STDOUT %s", stdout);
+            letterDebug("STDERR %s", stderr);
+
+            const letterWriterOutput = this.constructOutput(
+              true,
+              "Letter created successfully",
+              pdfFileName,
+              this.pdfFileService.relativePath(pdfFileName),
+              surveyResponse.summarize()
+            );
+
+            resolve(letterWriterOutput);
           }
         );
       });
-
-      const letterWriterOutput = this.constructOutput(
-        true,
-        "Letter created successfully",
-        pdfFileName,
-        this.pdfFileService.relativePath(pdfFileName),
-        surveyResponse.summarize()
-      );
-
-      resolve(letterWriterOutput);
     });
   }
 

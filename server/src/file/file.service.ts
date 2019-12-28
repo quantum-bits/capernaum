@@ -29,7 +29,7 @@ export class FileService {
   }
 
   absoluteDir() {
-    return this.relDir;
+    return this.absDir;
   }
 
   relativePath(fileName: string) {
