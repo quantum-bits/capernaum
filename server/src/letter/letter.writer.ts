@@ -149,6 +149,11 @@ export default class LetterWriter {
     return lineBuffer.concatenateLines();
   }
 
+  private chartHeight(chartData: ChartData) {
+    const height = Math.min(chartData.entries.length + 1, 3);
+    return `height=${height}cm`;
+  }
+
   private renderChart(chartData: ChartData) {
     letterDebug("renderChart %O", chartData);
 
@@ -158,7 +163,7 @@ export default class LetterWriter {
           title=${chartData.title},
           xbar, xmin=0, xmax=7,
           width=0.75\\textwidth,
-          height=${chartData.entries.length + 1}cm,
+          ${this.chartHeight(chartData)},
           enlarge y limits={abs=0.5cm},
           symbolic y coords={${chartData.allTitles()}},
           ytick=data,

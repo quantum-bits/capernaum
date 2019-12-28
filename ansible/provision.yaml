@@ -104,6 +104,7 @@
   become_user: "{{ cap_username }}"
   vars_files:
     - public.yaml
+    - private.yaml
   tasks:
     - name: clone application from GitHub
       git:
