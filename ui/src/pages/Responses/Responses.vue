@@ -166,12 +166,10 @@ export default Vue.extend({
     },
 
     sendEmail(surveyResponse: SurveyResponse) {
-      this.clearLetterWriterOutput();
-
       // Open the mail dialog.
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
-      this.mailDialog.attachmentPath = this.letterWriterOutput.pdfFilePath;
+      this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
       this.mailDialog.visible = true;
     },
 

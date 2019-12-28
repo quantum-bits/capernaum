@@ -14,8 +14,15 @@ export class LetterWriterOutput {
   message: string;
   @Field({ description: "Name of PDF file (e.g., 'abc.pdf')" })
   pdfFileName: string;
-  @Field({ description: "Path to PDF file (e.g., '/static/pdfs/abc.pdf')" })
-  pdfFilePath: string;
+  @Field({
+    description: "Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"
+  })
+  pdfRelativePath: string;
+  @Field({
+    description:
+      "Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')"
+  })
+  pdfAbsolutePath: string;
   @Field(type => ResponseSummary, { nullable: true })
   responseSummary?: ResponseSummary;
 }

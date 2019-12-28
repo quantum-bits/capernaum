@@ -153,8 +153,13 @@ type LetterWriterOutput {
   """Name of PDF file (e.g., 'abc.pdf')"""
   pdfFileName: String!
 
-  """Path to PDF file (e.g., '/static/pdfs/abc.pdf')"""
-  pdfFilePath: String!
+  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
+  pdfRelativePath: String!
+
+  """
+  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
+  """
+  pdfAbsolutePath: String!
   responseSummary: ResponseSummary
 }
 

@@ -312,14 +312,16 @@ export default class LetterWriter {
     ok: boolean,
     message: string,
     pdfFileName: string = "",
-    pdfFilePath: string = "",
+    pdfRelativePath: string = "",
+    pdfAbsolutePath: string = "",
     responseSummary: ResponseSummary = null
   ) {
     const letterWriterOutput: LetterWriterOutput = {
       ok,
       message,
       pdfFileName,
-      pdfFilePath,
+      pdfRelativePath,
+      pdfAbsolutePath,
       responseSummary
     };
     letterDebug("constructOutput: %O", letterWriterOutput);
@@ -337,7 +339,7 @@ export default class LetterWriter {
       const texFileName = baseName + ".tex";
       const texFilePath = this.pdfFileService.absolutePath(texFileName);
       const pdfFileName = baseName + ".pdf";
-      const pdfFilePath = this.pdfFileService.absolutePath(pdfFileName);
+      const pdfAbsolutePath = this.pdfFileService.absolutePath(pdfFileName);
 
       // Create the document.
       const renderedDocument = this.renderDocument(renderedElements);
@@ -367,6 +369,7 @@ export default class LetterWriter {
               "Letter created successfully",
               pdfFileName,
               this.pdfFileService.relativePath(pdfFileName),
+              pdfAbsolutePath,
               surveyResponse.summarize()
             );
 

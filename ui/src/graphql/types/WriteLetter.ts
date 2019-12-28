@@ -76,9 +76,13 @@ export interface WriteLetter_writeLetter {
    */
   pdfFileName: string;
   /**
-   * Path to PDF file (e.g., '/static/pdfs/abc.pdf')
+   * Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
    */
-  pdfFilePath: string;
+  pdfAbsolutePath: string;
+  /**
+   * Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')
+   */
+  pdfRelativePath: string;
   responseSummary: WriteLetter_writeLetter_responseSummary | null;
 }
 

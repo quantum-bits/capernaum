@@ -218,7 +218,8 @@ export const WRITE_LETTER_MUTATION = gql`
       ok
       message
       pdfFileName
-      pdfFilePath
+      pdfAbsolutePath
+      pdfRelativePath
       responseSummary {
         id
         date
