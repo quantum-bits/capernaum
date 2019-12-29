@@ -211,6 +211,9 @@ type Mutation {
   """
   deleteSurveyIndex(id: Int!): SurveyIndexDeleteOutput!
 
+  """Delete a survey response"""
+  deleteSurveyResponse(id: Int!): Int!
+
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
   """

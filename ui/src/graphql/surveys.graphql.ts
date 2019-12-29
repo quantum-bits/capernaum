@@ -163,3 +163,9 @@ export const DELETE_INDEX = gql`
     }
   }
 `;
+
+export const DELETE_SURVEY_RESPONSE = gql`
+  mutation DeleteSurveyResponse($id: Int!) {
+    deleteSurveyResponse(id: $id)
+  }
+`;

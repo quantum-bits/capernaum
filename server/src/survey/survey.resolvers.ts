@@ -127,6 +127,13 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyIndex(id);
   }
 
+  @Mutation(returns => Int, {
+    description: "Delete a survey response"
+  })
+  deleteSurveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyService.deleteSurveyResponse(id);
+  }
+
   @ResolveProperty("letters", type => [Letter])
   resolveLetters(@Parent() survey: Survey) {
     return this.surveyService.find(Letter, { survey });
@@ -203,11 +210,13 @@ export class SurveyResponseResolver {
   ) {
     const survey = await this.surveyService.find(Survey, { qualtricsId });
 
+    // Get from Qualtrics all responses to this survey.
     const zipFileEntries = await this.qualtricsService.getResponses(
       qualtricsId
     );
     const allResponses = JSON.parse(zipFileEntries[0].content).responses;
 
+    // For each response retrieved from Qualtrics, import it into the database.
     const responses: SurveyResponse[] = [];
     for (const oneResponse of allResponses) {
       const response = await this.surveyService.importQualtricsSurveyResponse(

@@ -1,10 +1,10 @@
 <template>
   <v-container>
     <v-row class="align-baseline justify-space-between">
-      <v-col cols="4">
+      <v-col>
         <h3>Fetch Responses from Qualtrics</h3>
       </v-col>
-      <v-col cols="4">
+      <v-col cols="6">
         <v-row class="align-baseline">
           <v-select
             class="mr-2"
@@ -12,7 +12,12 @@
             :items="availableSurveys"
             label="Choose imported survey"
           />
-          <v-btn color="primary" @click="fetchFromQualtrics">Fetch</v-btn>
+          <v-btn
+            color="primary"
+            :disabled="selectedQualtricsId.length === 0"
+            @click="fetchFromQualtrics"
+            >Fetch</v-btn
+          >
         </v-row>
       </v-col>
       <v-col cols="1">
@@ -35,17 +40,19 @@
             {{ item.endDate | sensibleDate }}
           </template>
           <template v-slot:item.action="{ item }">
-            <div v-if="hasOneLetter(item)">
-              <v-icon @click="sendEmail(item)">
-                mdi-email
-              </v-icon>
-              <v-icon class="ml-2" @click="generatePDF(item)">
-                mdi-adobe-acrobat
-              </v-icon>
-            </div>
-            <div v-else>
-              No letter!
-            </div>
+            <v-icon :disabled="!hasOneLetter(item)" @click="sendEmail(item)">
+              mdi-email
+            </v-icon>
+            <v-icon
+              class="ml-2"
+              :disabled="!hasOneLetter(item)"
+              @click="generatePDF(item)"
+            >
+              mdi-adobe-acrobat
+            </v-icon>
+            <v-icon class="ml-2" @click="confirmDelete(item)">
+              mdi-close-circle
+            </v-icon>
           </template>
         </v-data-table>
       </v-col>
@@ -63,6 +70,14 @@
       :attachment-path="mailDialog.attachmentPath"
     />
 
+    <confirm-dialog
+      v-model="deleteDialog.visible"
+      dialog-title="Confirm delete"
+      dialog-text="Delete this survey response? Only deletes from Capernaum, not Qualtrics"
+      button-label="Delete"
+      @confirmed="deleteResponse"
+    />
+
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
       <v-btn text @click="snackbar.visible = false">Close</v-btn>
@@ -76,7 +91,10 @@ import {
   ALL_RESPONSES_QUERY,
   IMPORT_SURVEY_RESPONSES
 } from "@/graphql/responses.graphql";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import {
+  ALL_SURVEYS_QUERY,
+  DELETE_SURVEY_RESPONSE
+} from "@/graphql/surveys.graphql";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import {
   AllResponses,
@@ -89,6 +107,7 @@ import {
 import isEmpty from "lodash/isEmpty";
 import MailDialog from "./MailDialog.vue";
 import ResponseSummary from "./ResponseSummary.vue";
+import ConfirmDialog from "@/components/ConfirmDialog.vue";
 
 interface ImportedSurvey {
   id: number;
@@ -103,6 +122,7 @@ export default Vue.extend({
 
   components: {
     MailDialog,
+    ConfirmDialog,
     ResponseSummary
   },
 
@@ -129,7 +149,7 @@ export default Vue.extend({
         { text: "Letter", value: "letter" },
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
-        { text: "Action", value: "action" }
+        { text: "Action", value: "action", sortable: false }
       ],
 
       letterWriterOutput: {} as LetterWriterOutput,
@@ -144,6 +164,11 @@ export default Vue.extend({
       snackbar: {
         visible: false,
         text: ""
+      },
+
+      deleteDialog: {
+        visible: false,
+        response: {} as SurveyResponse
       },
 
       spinnerVisible: false
@@ -217,6 +242,29 @@ export default Vue.extend({
       return item.survey.letters && item.survey.letters.length === 1;
     },
 
+    confirmDelete(item: SurveyResponse) {
+      this.deleteDialog.response = item;
+      this.deleteDialog.visible = true;
+    },
+
+    deleteResponse() {
+      const surveyResponse = this.deleteDialog.response;
+      this.$apollo
+        .mutate({
+          mutation: DELETE_SURVEY_RESPONSE,
+          variables: {
+            id: surveyResponse.id
+          }
+        })
+        .then(response => {
+          console.log("DELETE", response);
+          const responseIndex = this.allResponses.surveyResponses.findIndex(
+            item => item.id === surveyResponse.id
+          );
+          this.allResponses.surveyResponses.splice(responseIndex, 1);
+        });
+    },
+
     letterTitle(item: SurveyResponse) {
       if (this.hasOneLetter(item)) {
         return item.survey.letters[0].title;
@@ -225,25 +273,31 @@ export default Vue.extend({
       }
     },
 
-    async fetchFromQualtrics() {
-      try {
-        // Import all responses for one survey from the Qualtrics API.
-        await this.$apollo.mutate({
+    fetchFromQualtrics() {
+      // Import all responses for one survey from the Qualtrics API.
+      this.spinnerVisible = true;
+
+      this.$apollo
+        .mutate({
           mutation: IMPORT_SURVEY_RESPONSES,
           variables: {
             qId: this.selectedQualtricsId
           },
           refetchQueries: ["AllResponses"]
+        })
+        .then(() => {
+          // Read everything to refresh the table.
+          return this.$apollo.query<AllResponses>({
+            query: ALL_RESPONSES_QUERY
+          });
+        })
+        .then(queryResult => {
+          this.allResponses = queryResult.data;
+          this.selectedQualtricsId = "";
+        })
+        .finally(() => {
+          this.spinnerVisible = false;
         });
-
-        // Read them in to refresh the table.
-        const queryResult = await this.$apollo.query<AllResponses>({
-          query: ALL_RESPONSES_QUERY
-        });
-        this.allResponses = queryResult.data;
-      } catch (err) {
-        throw err;
-      }
     }
   }
 });

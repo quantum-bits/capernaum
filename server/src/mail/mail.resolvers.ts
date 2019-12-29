@@ -9,7 +9,7 @@ import { QualtricsImportInput } from "../survey/entities";
 const mailDebug = debug("mail");
 
 @Resolver()
-// @UseGuards(GqlAuthGuard)
+@UseGuards(GqlAuthGuard)
 export class MailResolver {
   constructor(private readonly mailService: MailService) {}
 

@@ -24,6 +24,9 @@ import {
 import { assign, difference, pick } from "lodash";
 import { WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
+import debug from "debug";
+
+const surveyDebug = debug("survey");
 
 @Injectable()
 export class SurveyService extends BaseService {
@@ -294,17 +297,64 @@ export class SurveyService extends BaseService {
     return this.surveyRepo.save(newSurvey);
   }
 
+  private async _deleteSurveyResponse(
+    manager: EntityManager,
+    surveyResponseId: number
+  ) {
+    // Delete responses to each question.
+    await manager.delete(SurveyItemResponse, {
+      surveyResponseId
+    });
+
+    return manager.delete(SurveyResponse, {
+      id: surveyResponseId
+    });
+  }
+
+  async deleteSurveyResponse(surveyResponseId: number) {
+    return this.entityManager.transaction(async manager => {
+      const result = await this._deleteSurveyResponse(
+        manager,
+        surveyResponseId
+      );
+      return result.affected;
+    });
+  }
+
+  /**
+   * Import from Qualtrics one respondent's response to a survey.
+   * @param surveyId - database survey ID
+   * @param createInput - details of the response from Qualtrics
+   */
   async importQualtricsSurveyResponse(
     surveyId: number,
     createInput: QualtricsSurveyResponse
   ) {
     return this.entityManager.transaction(async manager => {
+      const surveyResponseRepo = manager.getRepository(SurveyResponse);
+      const surveyItemResponseRepo = manager.getRepository(SurveyItemResponse);
+
+      // Check for an existing import of this response using its Qualtrics ID.
+      const previousImport = await surveyResponseRepo.findOne({
+        qualtricsResponseId: createInput.responseId
+      });
+      if (previousImport) {
+        // We've previously imported this response; toss it and replace it from Qualtrics.
+        surveyDebug(
+          "Delete previously imported response %s",
+          createInput.responseId
+        );
+        this._deleteSurveyResponse(manager, previousImport.id);
+      }
+
+      // Load the survey and its items from the database.
       const survey = await manager.findOneOrFail(Survey, surveyId, {
         relations: ["surveyItems"]
       });
 
-      const newSurveyResponse = await this.surveyResponseRepo.save(
-        this.surveyResponseRepo.create({
+      // Save response metadata to the database.
+      const newSurveyResponse = await surveyResponseRepo.save(
+        surveyResponseRepo.create({
           survey,
           email: createInput.values["QID2_TEXT"] || "??",
           groupCode: createInput.values["QID3_TEXT"] || "??",
@@ -322,15 +372,20 @@ export class SurveyService extends BaseService {
         })
       );
 
+      // Map the qualtrics ID for each question to its database ID.
+      // We will only import responses to these questions.
       const qualtricsIdToId = new Map<string, number>(
         survey.surveyItems.map(item => [item.qualtricsId, item.id])
       );
 
+      // Save response for each question to database. Use the above
+      // map to avoid inserting any response that doesn't exist in the survey.
+      // This may be unnecessarily paranoid.
       for (let [key, value] of Object.entries(createInput.values)) {
         if (key.startsWith("QID") && qualtricsIdToId.has(key)) {
           const label = createInput.labels[key];
-          await this.surveyItemResponseRepo.save(
-            this.surveyItemResponseRepo.create({
+          await surveyItemResponseRepo.save(
+            surveyItemResponseRepo.create({
               surveyResponse: newSurveyResponse,
               surveyItemId: qualtricsIdToId.get(key),
               label: label,
