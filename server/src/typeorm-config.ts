@@ -16,6 +16,7 @@ import {
 } from "./prediction/entities";
 import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
+import { Event } from "./events/entities";
 
 config();
 
@@ -26,6 +27,7 @@ const options: ConnectionOptions = {
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
   entities: [
+    Event,
     Letter,
     LetterElement,
     LetterElementType,

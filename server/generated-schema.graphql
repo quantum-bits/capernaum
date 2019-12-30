@@ -35,6 +35,19 @@ type DimensionSummary {
   indexSummaries: [IndexSummary!]!
 }
 
+type Event {
+  """Unique ID for this entity"""
+  id: Int!
+  date: String!
+  type: String!
+  details: String!
+}
+
+input EventCreateInput {
+  type: String!
+  details: String!
+}
+
 type Image {
   """Unique ID for this entity"""
   id: Int!
@@ -236,6 +249,7 @@ type Mutation {
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
   sendLetter(mailInput: SendMailInput!): String!
+  createEvent(createInput: EventCreateInput!): Event!
 }
 
 input PartialPredictionTableEntry {
@@ -339,6 +353,7 @@ type Query {
   user(id: Int!): User!
   users: [User!]!
   userRoles: [UserRole!]!
+  events: [Event!]!
 }
 
 type ResponseSummary {

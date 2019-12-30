@@ -9,6 +9,7 @@ import { inDevelopmentMode } from "./shared/helpers";
 import { MailModule } from "./mail/mail.module";
 
 import typeORMConfig from "./typeorm-config";
+import { EventModule } from "./events/event.module";
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import typeORMConfig from "./typeorm-config";
     SurveyModule,
     PredictionModule,
     AuthModule,
-    MailModule
+    MailModule,
+    EventModule
   ]
 })
 export class AppModule {}

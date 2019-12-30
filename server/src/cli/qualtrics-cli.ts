@@ -157,12 +157,14 @@ program
       .catch(err => console.error(err));
   });
 
+///// Subscriptions
+
 program
-  .command("create-subscription <eventName> [surveyId]")
+  .command("create-subscription <publicationUrl> <eventName> [surveyId]")
   .description("create event subscription")
-  .action((eventName: string, surveyId?: string) => {
+  .action((publicationUrl: string, eventName: string, surveyId?: string) => {
     qualtricsService
-      .createSubscription("https://galilee.cse.taylor.edu", eventName, surveyId)
+      .createSubscription(publicationUrl, eventName, surveyId)
       .then(response => console.log("RESPONSE", response))
       .catch(err => console.log("ERROR", err));
   });

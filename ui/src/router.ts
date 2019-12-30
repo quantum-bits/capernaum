@@ -18,6 +18,11 @@ const router = new VueRouter({
       component: () => import("./pages/Login.vue")
     },
     {
+      path: "/events",
+      name: "events",
+      component: () => import("./pages/Events.vue")
+    },
+    {
       path: "/accounts",
       name: "accounts",
       component: () => import("./pages/Accounts.vue")
