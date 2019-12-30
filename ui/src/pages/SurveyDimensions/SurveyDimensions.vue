@@ -74,7 +74,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-
 import {
   ADD_DIMENSION_MUTATION,
   ALL_SURVEYS_QUERY,
@@ -109,6 +108,32 @@ export default Vue.extend({
     IndexBranch
   },
 
+  apollo: {
+    allSurveys: {
+      query: ALL_SURVEYS_QUERY,
+      update: data => data.surveys
+    },
+
+    // The following query runs automatically when this.surveySelection updates
+    // (i.e., when something is chosen from the drop-down)
+    survey: {
+      query: ONE_SURVEY_QUERY,
+      variables(): object {
+        return {
+          surveyId: this.surveySelection.value,
+          which: WhichItems.WITHOUT_INDEX
+        };
+      },
+      update(data) {
+        return data.survey;
+      },
+      skip(): boolean {
+        return !this.isSurveySelected;
+      },
+      fetchPolicy: "network-only"
+    }
+  },
+
   data() {
     return {
       surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
@@ -121,32 +146,6 @@ export default Vue.extend({
         visible: false
       }
     };
-  },
-
-  apollo: {
-    allSurveys: {
-      query: ALL_SURVEYS_QUERY,
-      update: data => data.surveys
-    },
-
-    // The following query runs automatically when this.surveySelection updates
-    // (i.e., when something is chosen from the drop-down)
-    survey: {
-      query: ONE_SURVEY_QUERY,
-      variables() {
-        return {
-          surveyId: this.surveySelection.value,
-          which: WhichItems.WITHOUT_INDEX
-        };
-      },
-      update(data) {
-        return data.survey;
-      },
-      skip() {
-        return !this.isSurveySelected;
-      },
-      fetchPolicy: "network-only"
-    }
   },
 
   methods: {

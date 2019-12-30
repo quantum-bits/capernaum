@@ -9,29 +9,12 @@ import { WebSocketLink } from "apollo-link-ws";
 import { split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
 
-// HTTP connection to the API
-const httpLink = new HttpLink({
-  uri: "/graphql"
-});
-
 const wsLink = new WebSocketLink({
-  uri: "/subscriptions",
+  uri: "ws://localhost:3000/graphql",
   options: {
     reconnect: true
   }
 });
-
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return (
-      definition.kind === "OperationDefinition" &&
-      definition.operation === "subscription"
-    );
-  },
-  wsLink,
-  httpLink
-);
 
 const authLink = setContext((_, { headers }) => {
   const context = {
@@ -44,9 +27,24 @@ const authLink = setContext((_, { headers }) => {
   return context;
 });
 
+const httpLink = new HttpLink({
+  uri: "http://localhost:3000/graphql"
+});
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
+    );
+  },
+  wsLink,
+  authLink.concat(httpLink)
+);
+
 // Create the apollo client
 const apolloClient = new ApolloClient({
-  // link: authLink.concat(httpLink),
   link: splitLink,
   cache: new InMemoryCache(),
   connectToDevTools: true

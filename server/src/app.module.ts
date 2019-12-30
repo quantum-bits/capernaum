@@ -5,7 +5,6 @@ import { LetterModule } from "./letter/letter.module";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
 import { AuthModule } from "./auth/auth.module";
-import { inDevelopmentMode } from "./shared/helpers";
 import { MailModule } from "./mail/mail.module";
 
 import typeORMConfig from "./typeorm-config";
@@ -16,7 +15,7 @@ import { EventModule } from "./events/event.module";
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
-      logging: inDevelopmentMode()
+      logging: false // inDevelopmentMode()
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",

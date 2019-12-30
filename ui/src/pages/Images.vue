@@ -195,11 +195,8 @@ export default Vue.extend({
     imageDetails: {
       query: ALL_IMAGES_QUERY,
       update(data: any) {
-        console.log("image data: ", data.images);
-
         return data.images;
       },
-      //update: data => data.images,
       fetchPolicy: "network-only"
     }
   },

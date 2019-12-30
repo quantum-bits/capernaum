@@ -109,8 +109,6 @@ import {
 } from "@/graphql/letters.graphql";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-
-import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 
