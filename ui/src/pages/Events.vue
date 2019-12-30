@@ -15,7 +15,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ALL_EVENTS_QUERY } from "@/graphql/events.graphql";
+import {
+  ALL_EVENTS_QUERY,
+  NEW_EVENTS_SUBSCRIPTION
+} from "@/graphql/events.graphql";
 import { DateTime } from "luxon";
 
 export default Vue.extend({
@@ -24,7 +27,14 @@ export default Vue.extend({
   apollo: {
     allEvents: {
       query: ALL_EVENTS_QUERY,
-      update: data => data.events
+      update: data => data.events,
+      subscribeToMore: {
+        document: NEW_EVENTS_SUBSCRIPTION,
+        updateQuery: (previousQueryResult, { subscriptionData }) => {
+          console.log("PREVIOUS", previousQueryResult);
+          console.log("SUB DATA", subscriptionData);
+        }
+      }
     }
   },
 

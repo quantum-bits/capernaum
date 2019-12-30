@@ -129,7 +129,7 @@ export default Vue.extend({
       update: data => data.surveys
     },
 
-    // the following query runs automatically when this.surveySelection updates
+    // The following query runs automatically when this.surveySelection updates
     // (i.e., when something is chosen from the drop-down)
     survey: {
       query: ONE_SURVEY_QUERY,

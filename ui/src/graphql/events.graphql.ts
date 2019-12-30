@@ -10,3 +10,15 @@ export const ALL_EVENTS_QUERY = gql`
     }
   }
 `;
+
+export const NEW_EVENTS_SUBSCRIPTION = gql`
+  subscription NewEvents {
+    newEvent {
+      date
+      id
+      date
+      type
+      details
+    }
+  }
+`;

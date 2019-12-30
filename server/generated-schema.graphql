@@ -401,6 +401,10 @@ input SendMailInput {
   attachmentPath: String
 }
 
+type Subscription {
+  newEvent: Event!
+}
+
 """All information about a survey imported from Qualtrics"""
 type Survey {
   """Unique ID for this entity"""

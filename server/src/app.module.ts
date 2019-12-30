@@ -20,6 +20,7 @@ import { EventModule } from "./events/event.module";
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",
+      installSubscriptionHandlers: true,
       context: ({ req }) => ({ req })
     }),
     LetterModule,
