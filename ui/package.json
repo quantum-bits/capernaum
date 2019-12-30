@@ -11,9 +11,8 @@
     "gen:types": "rm -f ./src/graphql/types/*.ts && apollo client:codegen --no-addTypename --target=typescript --outputFlat ./src/graphql/types"
   },
   "dependencies": {
-    "apollo": "^2.19.0-alpha.1",
-    "apollo-cache-inmemory": "^1.6.3",
-    "apollo-client": "^2.6.4",
+    "apollo-cache-inmemory": "^1.6.5",
+    "apollo-client": "^2.6.8",
     "apollo-link": "^1.2.13",
     "apollo-link-context": "^1.0.19",
     "apollo-link-http": "^1.5.16",
@@ -58,6 +57,7 @@
     "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
     "@vue/test-utils": "1.0.0-beta.29",
+    "apollo": "^2.21.2",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
