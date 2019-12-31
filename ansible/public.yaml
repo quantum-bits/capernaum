@@ -4,7 +4,6 @@ cap_ui_abs_dir: "{{ cap_app_abs_dir }}/ui"
 cap_server_abs_dir: "{{ cap_app_abs_dir }}/server"
 cap_pm2_abs_dir: "{{ cap_app_abs_dir }}/pm2"
 
-
 cap_static_rel_dir: "static"
 cap_static_abs_dir: "{{ cap_base_abs_dir }}/{{ cap_static_rel_dir }}"
 cap_upload_rel_dir: "images"

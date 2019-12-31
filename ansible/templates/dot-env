@@ -1,34 +1,47 @@
-# Node
+##### Node
+
 NODE_ENV={{ node_env }}
 
-# Qualtrics
+##### Qualtrics
+
 QUALTRICS_BASE_URL={{ qualtrics_base_url }}
 QUALTRICS_API_TOKEN={{ qualtrics_api_token }}
 QUALTRICS_ORG_ID={{ qualtrics_org_id }}
 
-# Postgres
+##### Postgres
+
 PG_HOST={{ pg_host }}
 PG_DATABASE={{ pg_database }}
 PG_USERNAME={{ pg_username }}
 PG_PASSWORD={{ pg_password }}
 
-# Capernaum
+##### Capernaum
+
+# Absolute top-level directory; where `server` and `ui` live.
 CAP_BASE_ABS_DIR={{ cap_base_abs_dir }}
+
+# Relative path from `CAP_BASE_ABS_DIR` to directory containing upload and PDF directories
 CAP_STATIC_REL_DIR={{ cap_static_rel_dir }}
+
+# Relative path to directory for uploaded files
 CAP_UPLOAD_REL_DIR={{ cap_upload_rel_dir }}
+
+# Relative path to directory for generated PDFs
 CAP_PDF_REL_DIR={{ cap_pdf_rel_dir }}
 
 SEP_PREDICTION_THRESHOLD={{ sep_prediction_threshold }}
 JWT_SECRET={{ jwt_secret }}
 
 {% if proxy is defined and proxy.host and proxy.port %}
-# Proxy
+##### Proxy
+
 PROXY_HOST={{ proxy.host }}
 PROXY_PORT={{ proxy.port }}
 {% endif %}
 
 {% if mail is defined %}
-# Email
+##### Email
+
 MAIL_HOST={{ mail.host }}
 MAIL_FROM={{ mail.from }}
 {% if mail.port is defined %}

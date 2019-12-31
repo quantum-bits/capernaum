@@ -52,13 +52,13 @@ export default Vue.extend({
         divider: true
       },
       {
-        heading: "SURVEYS",
-        title: "Survey Dimensions",
+        heading: "RESPONSES",
+        title: "Dimensions",
         route: "survey-dimensions",
         icon: "mdi-file-tree"
       },
       {
-        title: "Uploaded Images",
+        title: "Images",
         route: "images",
         icon: "mdi-image"
       },
@@ -69,19 +69,17 @@ export default Vue.extend({
         divider: true
       },
       {
-        heading: "RESPONSES",
-        title: "Imported Surveys",
-        route: "imported-surveys",
+        heading: "SURVEYS",
+        title: "Surveys",
+        route: "surveys",
         icon: "mdi-download"
       },
       {
         title: "Responses",
         route: "responses",
         icon: "mdi-message-outline",
-        divider: true
       },
       {
-        heading: "EVENTS",
         title: "Events",
         route: "events",
         icon: "mdi-alarm"
