@@ -23,7 +23,6 @@ export const ALL_SURVEYS_QUERY = gql`
   query AllSurveys {
     surveys {
       id
-      title
       qualtricsId
       qualtricsName
       qualtricsModDate
@@ -36,10 +35,10 @@ export const ALL_SURVEYS_QUERY = gql`
 `;
 
 export const IMPORT_QUALTRICS_SURVEY = gql`
-  mutation ImportQualtricsSurvey($qualtricsImportInput: QualtricsImportInput!) {
-    importQualtricsSurvey(importInput: $qualtricsImportInput) {
+  mutation ImportQualtricsSurvey($qualtricsId: String!) {
+    importQualtricsSurvey(qualtricsId: $qualtricsId) {
       id
-      title
+      qualtricsName
       surveyItems {
         qualtricsText
       }
@@ -115,7 +114,7 @@ export const ONE_SURVEY_QUERY = gql`
   query OneSurvey($surveyId: Int!, $which: WhichItems = All) {
     survey(id: $surveyId) {
       id
-      title
+      qualtricsName
       surveyItems(whichItems: $which) {
         id
         sequence
@@ -167,5 +166,11 @@ export const DELETE_INDEX = gql`
 export const DELETE_SURVEY_RESPONSE = gql`
   mutation DeleteSurveyResponse($id: Int!) {
     deleteSurveyResponse(id: $id)
+  }
+`;
+
+export const DELETE_SURVEY = gql`
+  mutation DeleteSurvey($id: Int!) {
+    deleteSurvey(id: $id)
   }
 `;

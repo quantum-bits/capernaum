@@ -164,7 +164,7 @@ export default class LettersPage extends Vue {
     return this.letterData.map((letter: Letters_letters) => ({
       title: letter.title,
       isFrozen: letter.isFrozen,
-      surveyTitle: letter.survey.title,
+      surveyTitle: letter.survey.qualtricsName,
       updated: letter.updated,
       id: letter.id,
       canDelete: this.canDeleteLetter(letter)

@@ -211,6 +211,7 @@ type Mutation {
         (e.g., if you give a value for itemIds, it will replace the current list.
   """
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
+  deleteSurvey(id: Int!): Int!
 
   """
   Delete a dimension. Also deletes indices associated with this dimension.
@@ -230,7 +231,7 @@ type Mutation {
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
   """
-  importQualtricsSurvey(importInput: QualtricsImportInput!): Survey!
+  importQualtricsSurvey(qualtricsId: String!): Survey!
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
@@ -310,14 +311,6 @@ input PredictionTableEntryUpdateInput {
   surveyIndexId: Int
   practiceId: Int
   sequence: Int
-}
-
-input QualtricsImportInput {
-  """Qualtrics unique identifier"""
-  qualtricsId: String!
-
-  """Title for associated Capernaum survey"""
-  title: String!
 }
 
 type QualtricsSurveyListItem {
@@ -417,9 +410,6 @@ type Survey {
   surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
   surveyDimensions: [SurveyDimension!]!
 
-  """Title for this survey in Capernaum"""
-  title: String!
-
   """Unique identifier for this survey on Qualtrics"""
   qualtricsId: String!
 
@@ -434,7 +424,6 @@ type Survey {
 }
 
 input SurveyCreateInput {
-  title: String!
   qualtricsId: String!
   qualtricsName: String!
   qualtricsModDate: String!
@@ -597,7 +586,6 @@ type SurveySummary {
 
 input SurveyUpdateInput {
   id: Int!
-  title: String
   qualtricsId: String
   qualtricsName: String
   qualtricsModDate: String

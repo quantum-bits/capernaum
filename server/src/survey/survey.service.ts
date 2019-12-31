@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import {
-  QualtricsImportInput,
   Survey,
   SurveyCreateInput,
   SurveyDimension,
@@ -190,6 +189,10 @@ export class SurveyService extends BaseService {
     });
   }
 
+  deleteSurvey(id: number) {
+    return this.surveyRepo.delete(id).then(response => response.affected);
+  }
+
   // This is a helper method to avoid nested transactions; do not call directly.
   private async _deleteSurveyIndex(
     manager: EntityManager,
@@ -265,10 +268,8 @@ export class SurveyService extends BaseService {
     );
   }
 
-  async importQualtricsSurvey(
-    qualtricsImportInput: QualtricsImportInput,
-    qualtricsSurvey: QualtricsSurvey
-  ) {
+  async importQualtricsSurvey(qualtricsSurvey: QualtricsSurvey) {
+    // FIXME: This should use a transaction.
     // Create a list of survey items.
     const newSurveyItems: SurveyItem[] = [];
     for (let [questionId, question] of Object.entries(
@@ -292,7 +293,6 @@ export class SurveyService extends BaseService {
 
     // Construct the survey.
     const newSurvey = this.surveyRepo.create({
-      title: qualtricsImportInput.title,
       qualtricsId: qualtricsSurvey.id,
       qualtricsName: qualtricsSurvey.name,
       qualtricsModDate: qualtricsSurvey.lastModifiedDate,

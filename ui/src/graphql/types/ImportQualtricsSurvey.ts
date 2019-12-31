@@ -21,9 +21,9 @@ export interface ImportQualtricsSurvey_importQualtricsSurvey {
    */
   id: number;
   /**
-   * Title for this survey in Capernaum
+   * Name of this survey on Qualtrics
    */
-  title: string;
+  qualtricsName: string;
   /**
    * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
    */

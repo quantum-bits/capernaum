@@ -165,10 +165,6 @@ export interface OneLetter_letter_survey {
    */
   id: number;
   /**
-   * Title for this survey in Capernaum
-   */
-  title: string;
-  /**
    * Unique identifier for this survey on Qualtrics
    */
   qualtricsId: string;

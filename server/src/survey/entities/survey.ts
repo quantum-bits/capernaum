@@ -39,10 +39,6 @@ export class Survey extends AbstractEntity {
   surveyDimensions: SurveyDimension[];
 
   @Column()
-  @Field({ description: "Title for this survey in Capernaum" })
-  title: string;
-
-  @Column()
   @Field({ description: "Unique identifier for this survey on Qualtrics" })
   qualtricsId: string;
 
@@ -64,7 +60,6 @@ export class Survey extends AbstractEntity {
 
 @InputType()
 export class SurveyCreateInput {
-  @Field() title: string;
   @Field() qualtricsId: string;
   @Field() qualtricsName: string;
   @Field() qualtricsModDate: string;
@@ -74,16 +69,7 @@ export class SurveyCreateInput {
 @InputType()
 export class SurveyUpdateInput {
   @Field(type => Int) id: number;
-  @Field({ nullable: true }) title?: string;
   @Field({ nullable: true }) qualtricsId?: string;
   @Field({ nullable: true }) qualtricsName?: string;
   @Field({ nullable: true }) qualtricsModDate?: string;
-}
-
-@InputType()
-export class QualtricsImportInput {
-  @Field({ description: "Qualtrics unique identifier" })
-  qualtricsId: string;
-  @Field({ description: "Title for associated Capernaum survey" })
-  title: string;
 }

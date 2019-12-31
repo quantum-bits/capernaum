@@ -81,7 +81,6 @@ export const ONE_LETTER_QUERY = gql`
       }
       survey {
         id
-        title
         qualtricsId
         qualtricsName
         surveyDimensions {
@@ -152,7 +151,6 @@ export const ALL_LETTERS_QUERY = gql`
       }
       survey {
         id
-        title
         qualtricsId
         qualtricsName
         surveyDimensions {

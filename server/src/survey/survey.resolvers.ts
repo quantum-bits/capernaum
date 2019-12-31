@@ -7,7 +7,6 @@ import {
   Resolver
 } from "@nestjs/graphql";
 import {
-  QualtricsImportInput,
   Survey,
   SurveyCreateInput,
   SurveyDimension,
@@ -33,7 +32,7 @@ import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => Survey)
-// @UseGuards(GqlAuthGuard)
+@UseGuards(GqlAuthGuard)
 export class SurveyResolver {
   constructor(
     private readonly surveyService: SurveyService,
@@ -110,6 +109,11 @@ export class SurveyResolver {
     return this.surveyService.updateSurveyIndex(updateInput);
   }
 
+  @Mutation(returns => Int)
+  deleteSurvey(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyService.deleteSurvey(id);
+  }
+
   @Mutation(returns => SurveyDimensionDeleteOutput, {
     description: `Delete a dimension. Also deletes indices associated with this dimension.
     Each index is removed using the equivalent of deleteSurveyIndex.
@@ -164,19 +168,12 @@ export class SurveyResolver {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
   })
-  async importQualtricsSurvey(
-    @Args("importInput") qualtricsImportInput: QualtricsImportInput
-  ) {
+  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: string) {
     // Fetch the survey with the given ID from the Qualtrics API.
-    const qualtricsSurvey = await this.qualtricsService.getSurvey(
-      qualtricsImportInput.qualtricsId
-    );
+    const qualtricsSurvey = await this.qualtricsService.getSurvey(qualtricsId);
 
     // Import survey into the database.
-    return this.surveyService.importQualtricsSurvey(
-      qualtricsImportInput,
-      qualtricsSurvey
-    );
+    return this.surveyService.importQualtricsSurvey(qualtricsSurvey);
   }
 }
 

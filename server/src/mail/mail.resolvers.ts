@@ -4,7 +4,6 @@ import { SendMailInput } from "./entities/mail";
 import debug from "debug";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
-import { QualtricsImportInput } from "../survey/entities";
 
 const mailDebug = debug("mail");
 

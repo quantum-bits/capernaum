@@ -20,10 +20,6 @@ export interface AllSurveys_surveys {
    */
   id: number;
   /**
-   * Title for this survey in Capernaum
-   */
-  title: string;
-  /**
    * Unique identifier for this survey on Qualtrics
    */
   qualtricsId: string;

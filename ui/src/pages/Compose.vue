@@ -375,7 +375,6 @@ export default class Compose extends Vue {
     }),
     survey: {
       id: -1,
-      title: "",
       qualtricsId: "",
       qualtricsName: "",
       surveyDimensions: []

@@ -199,7 +199,7 @@ export default class LetterInfoForm extends Vue {
     return this.surveys
       .filter(survey => survey.letters.length === 0)
       .map(survey => ({
-        text: survey.title,
+        text: survey.qualtricsName,
         value: survey.id
       }));
   }
@@ -209,7 +209,7 @@ export default class LetterInfoForm extends Vue {
     if (!this.isNew) {
       this.surveys.forEach(survey => {
         if (survey.id === this.surveyId) {
-          surveyTitle = survey.title;
+          surveyTitle = survey.qualtricsName;
         }
       });
     }

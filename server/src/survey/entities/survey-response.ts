@@ -82,7 +82,7 @@ export class SurveyResponse extends AbstractEntity {
       date: this.endDate,
       surveySummary: {
         id: this.survey.id,
-        title: this.survey.title,
+        title: this.survey.qualtricsName,
         qualtricsId: this.survey.qualtricsId,
         qualtricsName: this.survey.qualtricsName
       },

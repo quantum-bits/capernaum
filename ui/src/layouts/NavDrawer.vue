@@ -72,12 +72,12 @@ export default Vue.extend({
         heading: "SURVEYS",
         title: "Surveys",
         route: "surveys",
-        icon: "mdi-download"
+        icon: "mdi-format-list-bulleted-square"
       },
       {
         title: "Responses",
         route: "responses",
-        icon: "mdi-message-outline",
+        icon: "mdi-message-outline"
       },
       {
         title: "Events",
