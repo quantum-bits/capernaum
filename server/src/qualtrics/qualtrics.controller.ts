@@ -2,18 +2,25 @@ import debug from "debug";
 
 import { Body, Controller, Post, Headers } from "@nestjs/common";
 import {
+  QualtricsSurveyResponse,
   RawActivateDeactivateSurvey,
   WebHookActivateDeactivateSurvey,
   WebHookCompletedResponse
 } from "./qualtrics.types";
 import { EventService } from "../events/event.service";
-import { Event, EventCreateInput } from "../events/entities";
+import { EventCreateInput } from "../events/entities";
+import { QualtricsService } from "./qualtrics.service";
+import { SurveyService } from "../survey/survey.service";
 
 const qualtricsDebug = debug("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {
-  constructor(private readonly eventService: EventService) {}
+  constructor(
+    private readonly eventService: EventService,
+    private readonly qualtricsService: QualtricsService,
+    private readonly surveyService: SurveyService
+  ) {}
 
   private parseActivateDeactivate(
     body: RawActivateDeactivateSurvey
@@ -66,13 +73,42 @@ export class QualtricsController {
   }
 
   @Post("completed-response")
-  completedResponse(@Headers() headers, @Body() body) {
+  async completedResponse(@Headers() headers, @Body() body) {
     const reply: WebHookCompletedResponse = body;
     qualtricsDebug("completedResponse %O", reply);
 
+    const qualtricsSurveyId = reply.SurveyID;
+    const qualtricsResponseId = reply.ResponseID;
+
+    // Find the survey
+    const survey = await this.surveyService.findOneSurveyByQualtricsId(
+      qualtricsSurveyId
+    );
+    qualtricsDebug(
+      "qSurveyId %s - qResponseId %s - surveyId %s",
+      qualtricsSurveyId,
+      qualtricsResponseId,
+      survey.id
+    );
+
+    // Grab the response from Qualtrics
+    const qualtricsResponse = await this.qualtricsService.getOneResponse(
+      qualtricsSurveyId,
+      qualtricsResponseId
+    );
+    qualtricsDebug("qualtricsResponse - %O", qualtricsResponse);
+
+    // Store it locally.
+    const capResponse = await this.surveyService.importQualtricsSurveyResponse(
+      survey.id,
+      qualtricsResponse as QualtricsSurveyResponse
+    );
+    qualtricsDebug("response - %O", capResponse);
+
+    // Create event.
     const createInput: EventCreateInput = {
       type: "Completed",
-      details: `Survey '${reply.SurveyID}' completed; response '${reply.ResponseID}'`
+      details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`
     };
     return this.eventService.createEvent(createInput);
   }

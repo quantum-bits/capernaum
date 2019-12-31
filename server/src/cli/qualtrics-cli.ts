@@ -157,6 +157,16 @@ program
       .catch(err => console.error(err));
   });
 
+program
+  .command("get-one-response <survey-id> <response-id>")
+  .description("Get a single response (new-ish API)")
+  .action((surveyId, responseId) => {
+    qualtricsService
+      .getOneResponse(surveyId, responseId)
+      .then(response => console.log(JSON.stringify(response, null, 2)))
+      .catch(err => console.error(err));
+  });
+
 ///// Subscriptions
 
 program

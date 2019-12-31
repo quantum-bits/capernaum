@@ -120,6 +120,10 @@ export class SurveyService extends BaseService {
     });
   }
 
+  findOneSurveyByQualtricsId(qualtricsId: string) {
+    return this.surveyRepo.findOne({ qualtricsId });
+  }
+
   findSurveyByQualtricsId(qualtricsId: string) {
     return this.surveyRepo.find({ qualtricsId });
   }

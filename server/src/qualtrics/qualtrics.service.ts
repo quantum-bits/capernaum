@@ -209,6 +209,13 @@ export class QualtricsService {
     );
   }
 
+  /** New-ish endpoint to export a single response. */
+  getOneResponse(surveyId: string, responseId: string) {
+    const url = this.makeUrl("surveys", surveyId, "responses", responseId);
+    qualtricsDebug("getOneResponse - %s", url);
+    return this.qualtricsGet(url);
+  }
+
   /** Raw methods to export responses from Qualtrics. */
   async createResponseExport(
     surveyId: string,
