@@ -25,6 +25,10 @@ export class QualtricsController {
     };
   }
 
+  private surveyName(reply: WebHookActivateDeactivateSurvey) {
+    return `'${reply.event.common.SurveyName}' (${reply.event.common.SurveyID})`;
+  }
+
   @Post("activate-survey")
   activateSurvey(@Body() body) {
     const reply = this.parseActivateDeactivate(body);
@@ -32,9 +36,9 @@ export class QualtricsController {
 
     const createInput: EventCreateInput = {
       type: "Activated",
-      details: `Survey '${reply.event.common.SurveyID}' activated`
+      details: `Survey ${this.surveyName(reply)} activated`
     };
-    return this.eventService.create(Event, createInput);
+    return this.eventService.createEvent(createInput);
   }
 
   @Post("deactivate-survey")
@@ -44,9 +48,9 @@ export class QualtricsController {
 
     const createInput: EventCreateInput = {
       type: "Deactivated",
-      details: `Survey '${reply.event.common.SurveyID}' deactivated`
+      details: `Survey ${this.surveyName(reply)} deactivated`
     };
-    return this.eventService.create(Event, createInput);
+    return this.eventService.createEvent(createInput);
   }
 
   // Not triggered by default
@@ -65,5 +69,11 @@ export class QualtricsController {
   completedResponse(@Headers() headers, @Body() body) {
     const reply: WebHookCompletedResponse = body;
     qualtricsDebug("completedResponse %O", reply);
+
+    const createInput: EventCreateInput = {
+      type: "Completed",
+      details: `Survey '${reply.SurveyID}' completed; response '${reply.ResponseID}'`
+    };
+    return this.eventService.createEvent(createInput);
   }
 }

@@ -6,8 +6,13 @@ import store from "../store";
 import Vue from "vue";
 import VueApollo from "vue-apollo";
 import { WebSocketLink } from "apollo-link-ws";
-import { split } from "apollo-link";
+import { ApolloLink, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
+
+const loggingLink = new ApolloLink((operation, forward) => {
+  console.log("OPERATION", operation);
+  return forward(operation);
+});
 
 const wsLink = new WebSocketLink({
   uri: "ws://localhost:3000/graphql",
@@ -45,7 +50,7 @@ const splitLink = split(
 
 // Create the apollo client
 const apolloClient = new ApolloClient({
-  link: splitLink,
+  link: loggingLink.concat(splitLink),
   cache: new InMemoryCache(),
   connectToDevTools: true
 });

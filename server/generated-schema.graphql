@@ -234,6 +234,7 @@ type Mutation {
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
+  createEvent(createInput: EventCreateInput!): Event!
   updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
@@ -249,7 +250,6 @@ type Mutation {
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
   sendLetter(mailInput: SendMailInput!): String!
-  createEvent(createInput: EventCreateInput!): Event!
 }
 
 input PartialPredictionTableEntry {
@@ -346,6 +346,7 @@ type Query {
   surveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
+  events: [Event!]!
   images: [Image!]!
   image(id: Int!): Image!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
@@ -353,7 +354,6 @@ type Query {
   user(id: Int!): User!
   users: [User!]!
   userRoles: [UserRole!]!
-  events: [Event!]!
 }
 
 type ResponseSummary {

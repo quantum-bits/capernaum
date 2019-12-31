@@ -20,27 +20,14 @@ import {
   NEW_EVENTS_SUBSCRIPTION
 } from "@/graphql/events.graphql";
 import { DateTime } from "luxon";
+import { AllEvents_events as Event } from "@/graphql/types/AllEvents";
 
 export default Vue.extend({
   name: "Events",
 
-  apollo: {
-    allEvents: {
-      query: ALL_EVENTS_QUERY,
-      update: data => data.events,
-      subscribeToMore: {
-        document: NEW_EVENTS_SUBSCRIPTION,
-        updateQuery: (previousQueryResult, { subscriptionData }) => {
-          console.log("PREVIOUS", previousQueryResult);
-          console.log("SUB DATA", subscriptionData);
-        }
-      }
-    }
-  },
-
   data() {
     return {
-      allEvents: [],
+      allEvents: [] as Event[],
 
       headers: [
         { text: "Date", value: "date" },
@@ -48,6 +35,21 @@ export default Vue.extend({
         { text: "Details", value: "details" }
       ]
     };
+  },
+
+  apollo: {
+    allEvents: {
+      query: ALL_EVENTS_QUERY,
+      update: data => data.events,
+      subscribeToMore: {
+        document: NEW_EVENTS_SUBSCRIPTION,
+        updateQuery: function(previousQueryResult, { subscriptionData }) {
+          console.log("PREVIOUS", previousQueryResult);
+          console.log("SUB DATA", subscriptionData);
+          this.allEvents.push(subscriptionData.data.newEvent);
+        }
+      }
+    }
   },
 
   filters: {
