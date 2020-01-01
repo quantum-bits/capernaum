@@ -17,7 +17,8 @@ export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
 `;
 
 /**
- * this query is for getting all of the surveys that are saved in the local database (as opposed to the ones coming from Qualtrics itself)
+ * Get all surveys in the local database (as opposed to the ones coming from Qualtrics itself)
+ * Fetch additional info so we can tell whether other entities refer to this survey.
  */
 export const ALL_SURVEYS_QUERY = gql`
   query AllSurveys {
@@ -30,6 +31,15 @@ export const ALL_SURVEYS_QUERY = gql`
         id
         title
       }
+      surveyDimensions {
+        id
+      }
+      surveyItems {
+        id
+      }
+      surveyResponses {
+        id
+      }
     }
   }
 `;
@@ -38,7 +48,9 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
   mutation ImportQualtricsSurvey($qualtricsId: String!) {
     importQualtricsSurvey(qualtricsId: $qualtricsId) {
       id
+      qualtricsId
       qualtricsName
+      qualtricsModDate
       surveyItems {
         qualtricsText
       }

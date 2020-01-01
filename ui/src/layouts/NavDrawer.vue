@@ -45,30 +45,6 @@ export default Vue.extend({
   data: function() {
     const navItems: NavItem[] = [
       {
-        heading: "PRACTICES",
-        title: "Scripture Engagement Practices",
-        route: "scripture-engagement-practices",
-        icon: "mdi-book-open",
-        divider: true
-      },
-      {
-        heading: "RESPONSES",
-        title: "Dimensions",
-        route: "survey-dimensions",
-        icon: "mdi-file-tree"
-      },
-      {
-        title: "Images",
-        route: "images",
-        icon: "mdi-image"
-      },
-      {
-        title: "Letters",
-        route: "letters",
-        icon: "mdi-email",
-        divider: true
-      },
-      {
         heading: "SURVEYS",
         title: "Surveys",
         route: "surveys",
@@ -82,7 +58,29 @@ export default Vue.extend({
       {
         title: "Events",
         route: "events",
-        icon: "mdi-alarm"
+        icon: "mdi-alarm",
+        divider: true
+      },
+      {
+        heading: "RESPONSES",
+        title: "Practices",
+        route: "scripture-engagement-practices",
+        icon: "mdi-book-open"
+      },
+      {
+        title: "Dimensions",
+        route: "survey-dimensions",
+        icon: "mdi-file-tree"
+      },
+      {
+        title: "Images",
+        route: "images",
+        icon: "mdi-image"
+      },
+      {
+        title: "Letters",
+        route: "letters",
+        icon: "mdi-email"
       }
     ];
     return {

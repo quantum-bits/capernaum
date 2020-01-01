@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="align-baseline justify-space-between">
       <v-col>
-        <h3>Fetch Responses from Qualtrics</h3>
+        <h1 class="headline">Responses</h1>
       </v-col>
       <v-col cols="6">
         <v-row class="align-baseline">

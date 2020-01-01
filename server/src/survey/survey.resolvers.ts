@@ -164,6 +164,11 @@ export class SurveyResolver {
     return this.surveyService.find(SurveyDimension, { survey });
   }
 
+  @ResolveProperty("surveyResponses", type => [SurveyResponse])
+  resolveSurveyResponses(@Parent() survey: Survey) {
+    return this.surveyService.find(SurveyResponse, { survey });
+  }
+
   @Mutation(returns => Survey, {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey."

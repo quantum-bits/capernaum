@@ -43,11 +43,6 @@ const router = new VueRouter({
       component: () => import("./pages/SurveyDimensions/SurveyDimensions.vue")
     },
     {
-      path: "/import-qualtrics-survey",
-      name: "import-qualtrics-survey",
-      component: () => import("./pages/ImportQualtricsSurvey.vue")
-    },
-    {
       path: "/surveys",
       name: "surveys",
       component: () => import("./pages/Surveys.vue")
@@ -70,7 +65,7 @@ const router = new VueRouter({
     {
       path: "/scripture-engagement-practices",
       name: "scripture-engagement-practices",
-      component: () => import("./pages/ScriptureEngagementPractices.vue")
+      component: () => import("./pages/Practices.vue")
     },
     {
       path: "/images",

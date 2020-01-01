@@ -24,9 +24,21 @@
               mdi-minus
             </v-icon>
           </template>
+
           <template v-slot:item.action="{ item }">
             <v-chip
-              v-if="item.capId"
+              v-if="item.isImported && item.hasReference"
+              @click="showReason(item)"
+              color="info"
+              text-color="white"
+              small
+            >
+              <v-icon small left>mdi-help-circle</v-icon>
+              Can't remove
+            </v-chip>
+
+            <v-chip
+              v-else-if="item.isImported"
               @click="deleteSurvey(item.capId)"
               color="warning"
               text-color="white"
@@ -35,6 +47,7 @@
               <v-icon small left>mdi-delete</v-icon>
               Remove
             </v-chip>
+
             <v-chip
               v-else
               @click="importQualtricsSurvey(item.qualtricsId)"
@@ -53,6 +66,20 @@
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
     </v-snackbar>
+
+    <v-bottom-sheet v-model="bottomSheet.visible" inset>
+      <v-sheet class="text-center" height="200px">
+        <v-btn
+          class="my-6"
+          color="success"
+          @click="bottomSheet.visible = false"
+        >
+          <v-icon left>mdi-close</v-icon>
+          Close
+        </v-btn>
+        <div>{{ bottomSheet.content }}</div>
+      </v-sheet>
+    </v-bottom-sheet>
   </v-container>
 </template>
 
@@ -66,6 +93,13 @@ interface CombinedSurvey {
   qualtricsIsActive: boolean;
 
   capId: number | null;
+  isImported: boolean;
+
+  // Stats on other entities that have this one as a FK.
+  hasReference: boolean;
+  letterCount: number;
+  dimensionCount: number;
+  responseCount: number;
 }
 
 import {
@@ -76,6 +110,7 @@ import {
 } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 import { QualtricsSurveys_qualtricsSurveys as QualtricsSurvey } from "@/graphql/types/QualtricsSurveys";
+import pluralize from "pluralize";
 
 export default Vue.extend({
   name: "Surveys",
@@ -105,6 +140,11 @@ export default Vue.extend({
 
       snackbar: {
         text: "",
+        visible: false
+      },
+
+      bottomSheet: {
+        content: "",
         visible: false
       },
 
@@ -149,6 +189,8 @@ export default Vue.extend({
         if (!combinedSurvey) {
           combinedSurvey = {} as CombinedSurvey;
           combinedSurveyMap.set(key, combinedSurvey);
+          combinedSurvey.hasReference = false;
+          combinedSurvey.isImported = false;
         }
         return combinedSurvey;
       }
@@ -156,6 +198,27 @@ export default Vue.extend({
       for (let capSurvey of this.surveys) {
         const combinedSurvey = getCombinedSurvey(capSurvey.qualtricsId);
         combinedSurvey.capId = capSurvey.id;
+        combinedSurvey.isImported = true;
+
+        // Does this survey have a reference from a letter-related entity?
+        // Note that we do not check for survey items because these are
+        // owned by the survey itself and are not added when creating a letter,
+        // adding survey dimensions, etc.
+        combinedSurvey.letterCount = capSurvey.letters
+          ? capSurvey.letters.length
+          : 0;
+        combinedSurvey.dimensionCount = capSurvey.surveyDimensions
+          ? capSurvey.surveyDimensions.length
+          : 0;
+        combinedSurvey.responseCount = capSurvey.surveyResponses
+          ? capSurvey.surveyResponses.length
+          : 0;
+
+        combinedSurvey.hasReference =
+          combinedSurvey.letterCount +
+            combinedSurvey.dimensionCount +
+            combinedSurvey.responseCount >
+          0;
       }
 
       for (let qualtricsSurvey of this.qualtricsSurveys) {
@@ -180,7 +243,8 @@ export default Vue.extend({
           mutation: IMPORT_QUALTRICS_SURVEY,
           variables: {
             qualtricsId: qualtricsSurveyId
-          }
+          },
+          refetchQueries: ["AllSurveys", "QualtricsSurveys"]
         })
         .then(result => {
           console.log("IMPORT RESULT", result);
@@ -189,13 +253,58 @@ export default Vue.extend({
         .catch(error => this.showSnackbar(error));
     },
 
+    literateJoin(phrases: string[]) {
+      switch (phrases.length) {
+        case 0:
+          throw Error("No phrases");
+        case 1:
+          return phrases[0];
+        case 2:
+          return phrases.join(" and ");
+        default: {
+          const lastPhrase = phrases.pop();
+          return phrases.join(", ") + `, and ${lastPhrase}`;
+        }
+      }
+    },
+
+    showReason(item: CombinedSurvey) {
+      const details = [];
+      if (item.letterCount > 0) {
+        details.push(
+          `${item.letterCount} related ${pluralize("letter", item.letterCount)}`
+        );
+      }
+      if (item.dimensionCount > 0) {
+        details.push(
+          `${item.dimensionCount} survey ${pluralize(
+            "dimension",
+            item.dimensionCount
+          )}`
+        );
+      }
+      if (item.responseCount > 0) {
+        details.push(
+          `${item.responseCount} imported ${pluralize(
+            "response",
+            item.responseCount
+          )}`
+        );
+      }
+      this.bottomSheet.content = `This imported survey has ${this.literateJoin(
+        details
+      )}`;
+      this.bottomSheet.visible = true;
+    },
+
     deleteSurvey(id: number) {
       this.$apollo
         .mutate({
           mutation: DELETE_SURVEY,
           variables: {
             id
-          }
+          },
+          refetchQueries: ["AllSurveys", "QualtricsSurveys"]
         })
         .then(result => {
           console.log("DELETE RESULT", result);

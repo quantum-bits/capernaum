@@ -209,8 +209,6 @@ export default class AssociationTable extends Vue {
   @Prop({ default: null }) letterId!: number; // letter id
   @Prop({ default: false }) allowHideTable!: boolean; // whether or not the table may be hidden
   oneLetter: OneLetter_letter | null = null;
-  //survey: OneSurvey | null = null;
-  //scriptureEngagementPractices: ScriptureEngagementPractices | null = null;
 
   tableColumns: SpiritualFocusOrientation[] = [];
   tableData: TableData[] = [];

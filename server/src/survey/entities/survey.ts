@@ -5,6 +5,7 @@ import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
+import { SurveyResponse } from "./survey-response";
 
 @Entity()
 @ObjectType({
@@ -37,6 +38,13 @@ export class Survey extends AbstractEntity {
       "Dimensions for this survey; groups indices, which group items."
   })
   surveyDimensions: SurveyDimension[];
+
+  @OneToMany(
+    type => SurveyResponse,
+    response => response.survey
+  )
+  @Field(type => [SurveyResponse], { description: "Responses for this survey" })
+  surveyResponses: SurveyResponse[];
 
   @Column()
   @Field({ description: "Unique identifier for this survey on Qualtrics" })

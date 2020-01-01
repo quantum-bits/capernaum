@@ -2,8 +2,6 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { QualtricsImportInput } from "./globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: ImportQualtricsSurvey
 // ====================================================
@@ -21,9 +19,17 @@ export interface ImportQualtricsSurvey_importQualtricsSurvey {
    */
   id: number;
   /**
+   * Unique identifier for this survey on Qualtrics
+   */
+  qualtricsId: string;
+  /**
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
+  /**
+   * Date and time at which this survey was modified on Qualtrics
+   */
+  qualtricsModDate: string;
   /**
    * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
    */
@@ -38,5 +44,5 @@ export interface ImportQualtricsSurvey {
 }
 
 export interface ImportQualtricsSurveyVariables {
-  qualtricsImportInput: QualtricsImportInput;
+  qualtricsId: string;
 }

@@ -189,8 +189,12 @@ export class SurveyService extends BaseService {
     });
   }
 
-  deleteSurvey(id: number) {
-    return this.surveyRepo.delete(id).then(response => response.affected);
+  async deleteSurvey(id: number) {
+    return this.entityManager.transaction(async manager => {
+      await manager.delete(SurveyItem, { surveyId: id });
+      const deleteResult = await manager.delete(Survey, id);
+      return deleteResult.affected;
+    });
   }
 
   // This is a helper method to avoid nested transactions; do not call directly.

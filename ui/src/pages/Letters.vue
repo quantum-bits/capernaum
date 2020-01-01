@@ -1,10 +1,10 @@
 <template>
   <v-container>
-    <v-layout row wrap>
-      <v-flex xs9>
-        <h1 class="headline mb-5">Letters</h1>
-      </v-flex>
-      <v-flex xs3 class="text-xs-right">
+    <v-row>
+      <v-col>
+        <h1 class="headline">Letters</h1>
+      </v-col>
+      <v-col class="text-xs-right">
         <span v-if="allSurveysHaveLetters">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -29,8 +29,10 @@
             New Letter
           </v-btn>
         </span>
-      </v-flex>
-      <v-flex xs12>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-data-table :headers="headers" :items="letters" class="elevation-1">
           <template v-slot:item="{ item }">
             <tr>
@@ -95,8 +97,8 @@
             </tr>
           </template>
         </v-data-table>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

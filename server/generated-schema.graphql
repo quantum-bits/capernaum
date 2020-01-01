@@ -409,6 +409,7 @@ type Survey {
   """
   surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
   surveyDimensions: [SurveyDimension!]!
+  surveyResponses: [SurveyResponse!]!
 
   """Unique identifier for this survey on Qualtrics"""
   qualtricsId: String!

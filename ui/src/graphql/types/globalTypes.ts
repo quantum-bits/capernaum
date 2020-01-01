@@ -82,11 +82,6 @@ export interface PredictionTableEntryReplaceInput {
   entries: PartialPredictionTableEntry[];
 }
 
-export interface QualtricsImportInput {
-  qualtricsId: string;
-  title: string;
-}
-
 export interface ScriptureEngagementPracticeCreateInput {
   title: string;
   description: string;

@@ -14,6 +14,7 @@ export class SurveyItem extends AbstractEntity {
   )
   @Field(type => Survey)
   survey: Survey;
+  @Column("integer", { nullable: true }) surveyId: number;
 
   @ManyToOne(
     type => SurveyIndex,

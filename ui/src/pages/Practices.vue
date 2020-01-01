@@ -1,70 +1,17 @@
 <template>
   <v-container>
-    <v-layout row wrap>
-      <v-dialog
-        v-model="createUpdateSEPracticeDialog"
-        persistent
-        max-width="800"
-      >
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-card>
-            <v-card-title class="headline"
-              >Scripture Engagement Practice
-            </v-card-title>
-            <v-card-text>
-              <v-text-field
-                v-model="scriptureEngagementPracticeTitle"
-                label="Title"
-                :rules="titleRules"
-                :counter="50"
-                outlined
-                required
-                persistent-hint
-              ></v-text-field>
-              <v-textarea
-                v-model="scriptureEngagementPracticeDescription"
-                label="Description"
-                :rules="descriptionRules"
-                outlined
-                required
-                persistent-hint
-              ></v-textarea>
-              <v-text-field
-                v-model="moreInfoUrl"
-                label="Scripture Engagement Website URL"
-                :rules="urlRules"
-                hint="e.g., https://www.biblegateway.com/resources/scripture-engagement/journaling-scripture/home"
-                outlined
-                required
-                persistent-hint
-              ></v-text-field>
-            </v-card-text>
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="green darken-1" text @click="cancelDialog()"
-                >Cancel
-              </v-btn>
-              <v-btn
-                color="green darken-1"
-                :disabled="!valid"
-                text
-                @click="submitSEPractice()"
-                >Submit
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
-      </v-dialog>
-
-      <v-flex xs9>
-        <h1 class="headline mb-5">Scripture Engagement Practices</h1>
-      </v-flex>
-      <v-flex xs3 class="text-xs-right">
+    <v-row>
+      <v-col>
+        <h1 class="headline">Scripture Engagement Practices</h1>
+      </v-col>
+      <v-col class="text-xs-right">
         <v-btn color="primary" dark @click="newSEPractice">
-          New SE Practice
+          New Practice
         </v-btn>
-      </v-flex>
-      <v-flex xs12>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-data-table
           :headers="headers"
           :items="scriptureEngagementPractices"
@@ -127,8 +74,59 @@
             </tr>
           </template>
         </v-data-table>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
+
+    <v-dialog v-model="createUpdateSEPracticeDialog" persistent max-width="800">
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-card>
+          <v-card-title class="headline"
+            >Scripture Engagement Practice
+          </v-card-title>
+          <v-card-text>
+            <v-text-field
+              v-model="scriptureEngagementPracticeTitle"
+              label="Title"
+              :rules="titleRules"
+              :counter="50"
+              outlined
+              required
+              persistent-hint
+            />
+            <v-textarea
+              v-model="scriptureEngagementPracticeDescription"
+              label="Description"
+              :rules="descriptionRules"
+              outlined
+              required
+              persistent-hint
+            />
+            <v-text-field
+              v-model="moreInfoUrl"
+              label="Scripture Engagement Website URL"
+              :rules="urlRules"
+              hint="e.g., https://www.biblegateway.com/resources/scripture-engagement/journaling-scripture/home"
+              outlined
+              required
+              persistent-hint
+            />
+          </v-card-text>
+          <v-card-actions>
+            <div class="flex-grow-1"></div>
+            <v-btn color="green darken-1" text @click="cancelDialog()"
+              >Cancel
+            </v-btn>
+            <v-btn
+              color="green darken-1"
+              :disabled="!valid"
+              text
+              @click="submitSEPractice()"
+              >Submit
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -149,7 +147,7 @@ import {
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */
-  name: "ScriptureEngagementPractices",
+  name: "Practices",
 
   props: {},
   components: {

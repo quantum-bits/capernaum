@@ -14,6 +14,27 @@ export interface AllSurveys_surveys_letters {
   title: string;
 }
 
+export interface AllSurveys_surveys_surveyDimensions {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
+export interface AllSurveys_surveys_surveyItems {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
+export interface AllSurveys_surveys_surveyResponses {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
 export interface AllSurveys_surveys {
   /**
    * Unique ID for this entity
@@ -32,6 +53,12 @@ export interface AllSurveys_surveys {
    */
   qualtricsModDate: string;
   letters: AllSurveys_surveys_letters[];
+  surveyDimensions: AllSurveys_surveys_surveyDimensions[];
+  /**
+   * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+   */
+  surveyItems: AllSurveys_surveys_surveyItems[];
+  surveyResponses: AllSurveys_surveys_surveyResponses[];
 }
 
 export interface AllSurveys {

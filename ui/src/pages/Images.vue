@@ -1,72 +1,18 @@
 <template>
   <v-container>
-    <v-layout row wrap>
-      <v-dialog v-model="showDialog" persistent max-width="800">
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-card>
-            <v-card-title class="headline">
-              {{ dialogState.heading }}
-            </v-card-title>
+    <v-row>
+      <v-col>
+        <h1 class="headline">Uploaded Images</h1>
+      </v-col>
 
-            <v-card-text>
-              <v-text-field
-                v-model="dialogState.title"
-                label="Title"
-                :rules="titleRules"
-                :counter="50"
-                outlined
-                required
-                persistent-hint
-              />
-              <v-layout v-if="showFilePond">
-                <v-flex xs6 offset-xs3>
-                  <file-pond
-                    name="filepondUpload"
-                    :server="{
-                      url: '/images/',
-                      process: 'process'
-                    }"
-                    @processfile="fileProcessed"
-                    @removefile="fileRemoved"
-                  />
-                </v-flex>
-              </v-layout>
-              <v-layout v-if="fileNotUploadedMessage">
-                <v-flex class="text-center red--text" xs6 offset-xs3>
-                  {{ fileNotUploadedMessage }}
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="green darken-1" text @click="closeDialog">
-                Cancel
-              </v-btn>
-              <v-btn
-                color="green darken-1"
-                :disabled="!valid"
-                text
-                @click="handleDialogSubmit"
-              >
-                Submit
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
-      </v-dialog>
-
-      <v-flex xs9>
-        <h1 class="headline mb-5">Uploaded Images</h1>
-      </v-flex>
-
-      <v-flex xs3 class="text-xs-right">
+      <v-col class="text-xs-right">
         <v-btn color="primary" dark @click.stop="openDialogForCreate">
           Upload New Image
         </v-btn>
-      </v-flex>
-
-      <v-flex xs12>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-data-table
           :headers="headers"
           :items="imageDetails"
@@ -108,8 +54,63 @@
             </v-tooltip>
           </template>
         </v-data-table>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
+
+    <v-dialog v-model="showDialog" persistent max-width="800">
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-card>
+          <v-card-title class="headline">
+            {{ dialogState.heading }}
+          </v-card-title>
+
+          <v-card-text>
+            <v-text-field
+              v-model="dialogState.title"
+              label="Title"
+              :rules="titleRules"
+              :counter="50"
+              outlined
+              required
+              persistent-hint
+            />
+            <v-layout v-if="showFilePond">
+              <v-flex xs6 offset-xs3>
+                <file-pond
+                  name="filepondUpload"
+                  :server="{
+                    url: '/images/',
+                    process: 'process'
+                  }"
+                  @processfile="fileProcessed"
+                  @removefile="fileRemoved"
+                />
+              </v-flex>
+            </v-layout>
+            <v-layout v-if="fileNotUploadedMessage">
+              <v-flex class="text-center red--text" xs6 offset-xs3>
+                {{ fileNotUploadedMessage }}
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+
+          <v-card-actions>
+            <div class="flex-grow-1"></div>
+            <v-btn color="green darken-1" text @click="closeDialog">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="green darken-1"
+              :disabled="!valid"
+              text
+              @click="handleDialogSubmit"
+            >
+              Submit
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </v-container>
 </template>
 

@@ -2,7 +2,11 @@
   <v-container>
     <v-row>
       <v-col>
-        <h2>Events</h2>
+        <h1 class="headline">Events</h1>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-data-table :headers="headers" :items="allEvents" class="elevation-1">
           <template v-slot:item.date="{ item }">
             {{ item.date | formatDate }}
