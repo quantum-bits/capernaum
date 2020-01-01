@@ -11,60 +11,75 @@
 
     <v-row>
       <v-col>
-        <v-data-table
-          :headers="headers"
-          :items="combinedSurveys"
-          class="elevation-1"
-        >
-          <template v-slot:item.qualtricsIsActive="{ item }">
-            <v-icon color="success" v-if="item.qualtricsIsActive">
-              mdi-check
-            </v-icon>
-            <v-icon color="warning" v-else>
-              mdi-minus
-            </v-icon>
-          </template>
+        <v-card>
+          <v-card-title>
+            <v-spacer />
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              clearable
+              hide-details
+            />
+          </v-card-title>
+          <v-data-table
+            :headers="headers"
+            :items="combinedSurveys"
+            :search="search"
+            class="elevation-1"
+          >
+            <template v-slot:item.qualtricsIsActive="{ item }">
+              <v-icon color="success" v-if="item.qualtricsIsActive">
+                mdi-check
+              </v-icon>
+              <v-icon color="warning" v-else>
+                mdi-minus
+              </v-icon>
+            </template>
 
-          <template v-slot:item.action="{ item }">
-            <v-chip
-              v-if="item.isImported && item.hasReference"
-              @click="showReason(item)"
-              color="info"
-              text-color="white"
-              small
-            >
-              <v-icon small left>mdi-help-circle</v-icon>
-              Can't remove
-            </v-chip>
+            <template v-slot:item.action="{ item }">
+              <v-chip
+                v-if="item.isImported && item.hasReference"
+                @click="showReason(item)"
+                color="info"
+                text-color="white"
+                small
+              >
+                <v-icon small left>mdi-help-circle</v-icon>
+                Can't remove
+              </v-chip>
 
-            <v-chip
-              v-else-if="item.isImported"
-              @click="deleteSurvey(item.capId)"
-              color="warning"
-              text-color="white"
-              small
-            >
-              <v-icon small left>mdi-delete</v-icon>
-              Remove
-            </v-chip>
+              <v-chip
+                v-else-if="item.isImported"
+                @click="deleteSurvey(item.capId)"
+                color="warning"
+                text-color="white"
+                small
+              >
+                <v-icon small left>mdi-delete</v-icon>
+                Remove
+              </v-chip>
 
-            <v-chip
-              v-else
-              @click="importQualtricsSurvey(item.qualtricsId)"
-              color="primary"
-              text-color="white"
-              small
-            >
-              <v-icon small left>mdi-arrow-down-bold-circle</v-icon>
-              Import
-            </v-chip>
-          </template>
-        </v-data-table>
+              <v-chip
+                v-else
+                @click="importQualtricsSurvey(item.qualtricsId)"
+                color="primary"
+                text-color="white"
+                small
+              >
+                <v-icon small left>mdi-arrow-down-bold-circle</v-icon>
+                Import
+              </v-chip>
+            </template>
+          </v-data-table>
+        </v-card>
       </v-col>
     </v-row>
 
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
+      <v-btn text @click="snackbar.visible = false">Close</v-btn>
     </v-snackbar>
 
     <v-bottom-sheet v-model="bottomSheet.visible" inset>
@@ -137,6 +152,7 @@ export default Vue.extend({
       surveys: [] as Survey[],
       qualtricsSurveys: [] as QualtricsSurvey[],
       showAllSurveys: false,
+      search: "",
 
       snackbar: {
         text: "",

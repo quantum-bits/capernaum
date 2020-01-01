@@ -234,7 +234,7 @@ type Mutation {
   importQualtricsSurvey(qualtricsId: String!): Survey!
 
   """Fetch responses to a survey"""
-  importQualtricsSurveyResponses(qualtricsId: String!): [SurveyResponse!]!
+  importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
   createEvent(createInput: EventCreateInput!): Event!
   updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
@@ -311,6 +311,12 @@ input PredictionTableEntryUpdateInput {
   surveyIndexId: Int
   practiceId: Int
   sequence: Int
+}
+
+type QualtricsResponseImportStats {
+  importCount: Int!
+  duplicateCount: Int!
+  surveyResponses: [SurveyResponse!]!
 }
 
 type QualtricsSurveyListItem {

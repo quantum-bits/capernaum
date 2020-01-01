@@ -25,7 +25,7 @@ import {
 import { SurveyService } from "./survey.service";
 import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
-import { WhichItems } from "./survey.types";
+import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
@@ -204,7 +204,7 @@ export class SurveyResponseResolver {
     return this.surveyService.findOneOrFail(Survey, surveyResponse.surveyId);
   }
 
-  @Mutation(returns => [SurveyResponse], {
+  @Mutation(returns => QualtricsResponseImportStats, {
     description: "Fetch responses to a survey"
   })
   async importQualtricsSurveyResponses(
@@ -219,16 +219,21 @@ export class SurveyResponseResolver {
     const allResponses = JSON.parse(zipFileEntries[0].content).responses;
 
     // For each response retrieved from Qualtrics, import it into the database.
-    const responses: SurveyResponse[] = [];
+    const importStats = new QualtricsResponseImportStats();
     for (const oneResponse of allResponses) {
-      const response = await this.surveyService.importQualtricsSurveyResponse(
+      const importResponse = await this.surveyService.importQualtricsSurveyResponse(
         survey[0].id,
         oneResponse
       );
-      responses.push(response);
+
+      importStats.importCount += 1;
+      if (importResponse.isDuplicate) {
+        importStats.duplicateCount += 1;
+      }
+      importStats.surveyResponses.push(importResponse.surveyResponse);
     }
 
-    return responses;
+    return importStats;
   }
 
   @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])

@@ -7,11 +7,30 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="allEvents" class="elevation-1">
-          <template v-slot:item.date="{ item }">
-            {{ item.date | formatDate }}
-          </template>
-        </v-data-table>
+        <v-card>
+          <v-card-title>
+            <v-spacer />
+            <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+              clearable
+            />
+          </v-card-title>
+
+          <v-data-table
+            :headers="headers"
+            :items="allEvents"
+            :search="search"
+            class="elevation-1"
+          >
+            <template v-slot:item.date="{ item }">
+              {{ item.date | formatDate }}
+            </template>
+          </v-data-table>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -32,6 +51,7 @@ export default Vue.extend({
   data() {
     return {
       allEvents: [] as Event[],
+      search: "",
 
       headers: [
         { text: "Date", value: "date" },

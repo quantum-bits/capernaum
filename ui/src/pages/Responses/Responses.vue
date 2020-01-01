@@ -1,23 +1,27 @@
 <template>
   <v-container>
-    <v-row class="align-baseline justify-space-between">
+    <v-row class="align-baseline">
       <v-col>
         <h1 class="headline">Responses</h1>
       </v-col>
-      <v-col cols="6">
+      <v-col>
         <v-row class="align-baseline">
-          <v-select
-            class="mr-2"
-            v-model="selectedQualtricsId"
-            :items="availableSurveys"
-            label="Choose imported survey"
-          />
-          <v-btn
-            color="primary"
-            :disabled="selectedQualtricsId.length === 0"
-            @click="fetchFromQualtrics"
-            >Fetch</v-btn
-          >
+          <v-col>
+            <v-select
+              class="mr-2"
+              v-model="selectedQualtricsId"
+              :items="availableSurveys"
+              label="Choose survey to import"
+          /></v-col>
+          <v-col>
+            <v-btn
+              color="primary"
+              :disabled="selectedQualtricsId.length === 0"
+              @click="fetchFromQualtrics"
+            >
+              Fetch
+            </v-btn>
+          </v-col>
         </v-row>
       </v-col>
       <v-col cols="1">
@@ -27,35 +31,57 @@
 
     <v-row>
       <v-col>
-        <h4>All Responses</h4>
-        <v-data-table
-          :headers="masterHeaders"
-          :items="allResponses.surveyResponses"
-          class="elevation-1"
-        >
-          <template v-slot:item.letter="{ item }">
-            {{ letterTitle(item) }}
-          </template>
-          <template v-slot:item.date="{ item }">
-            {{ item.endDate | sensibleDate }}
-          </template>
-          <template v-slot:item.action="{ item }">
-            <v-icon :disabled="!hasOneLetter(item)" @click="sendEmail(item)">
-              mdi-email
-            </v-icon>
-            <v-icon
-              class="ml-2"
-              :disabled="!hasOneLetter(item)"
-              @click="generatePDF(item)"
+        <v-card>
+          <v-card-title>
+            <v-btn
+              color="warning"
+              :disabled="!selectedResponses.length"
+              @click="deleteDialog.visible = true"
             >
-              mdi-adobe-acrobat
-            </v-icon>
-            <v-icon class="ml-2" @click="confirmDelete(item)">
-              mdi-close-circle
-            </v-icon>
-          </template>
-        </v-data-table>
-      </v-col>
+              Delete Selected
+            </v-btn>
+            <v-spacer />
+            <v-text-field
+              v-model="responseSearch"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+              clearable
+            />
+          </v-card-title>
+          <v-data-table
+            :headers="masterHeaders"
+            :items="allResponses.surveyResponses"
+            :search="responseSearch"
+            v-model="selectedResponses"
+            show-select
+            class="elevation-1"
+          >
+            <template v-slot:item.letter="{ item }">
+              {{ letterTitle(item) }}
+            </template>
+            <template v-slot:item.date="{ item }">
+              {{ item.endDate | sensibleDate }}
+            </template>
+            <template v-slot:item.action="{ item }">
+              <v-icon :disabled="!hasOneLetter(item)" @click="sendEmail(item)">
+                mdi-email
+              </v-icon>
+              <v-icon
+                class="ml-2"
+                :disabled="!hasOneLetter(item)"
+                @click="generatePDF(item)"
+              >
+                mdi-adobe-acrobat
+              </v-icon>
+              <v-icon class="ml-2" @click="deleteResponse(item)">
+                mdi-close-circle
+              </v-icon>
+            </template>
+          </v-data-table>
+        </v-card></v-col
+      >
     </v-row>
 
     <response-summary
@@ -73,15 +99,29 @@
     <confirm-dialog
       v-model="deleteDialog.visible"
       dialog-title="Confirm delete"
-      dialog-text="Delete this survey response? Only deletes from Capernaum, not Qualtrics"
+      :dialog-text="bulkDeleteText"
       button-label="Delete"
-      @confirmed="deleteResponse"
+      @confirmed="deleteSelected"
     />
 
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
       <v-btn text @click="snackbar.visible = false">Close</v-btn>
     </v-snackbar>
+
+    <v-bottom-sheet v-model="bottomSheet.visible" inset>
+      <v-sheet class="text-center" height="200px">
+        <v-btn
+          class="my-6"
+          color="success"
+          @click="bottomSheet.visible = false"
+        >
+          <v-icon left>mdi-close</v-icon>
+          Close
+        </v-btn>
+        <div>{{ bottomSheet.content }}</div>
+      </v-sheet>
+    </v-bottom-sheet>
   </v-container>
 </template>
 
@@ -108,6 +148,8 @@ import isEmpty from "lodash/isEmpty";
 import MailDialog from "./MailDialog.vue";
 import ResponseSummary from "./ResponseSummary.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
+import pluralize from "pluralize";
 
 interface ImportedSurvey {
   id: number;
@@ -141,6 +183,8 @@ export default Vue.extend({
     return {
       surveys: [] as ImportedSurvey[],
       selectedQualtricsId: "",
+      responseSearch: "",
+      selectedResponses: [],
 
       allResponses: {} as AllResponses,
       masterHeaders: [
@@ -166,6 +210,11 @@ export default Vue.extend({
         text: ""
       },
 
+      bottomSheet: {
+        visible: false,
+        content: ""
+      },
+
       deleteDialog: {
         visible: false,
         response: {} as SurveyResponse
@@ -181,6 +230,15 @@ export default Vue.extend({
         text: survey.qualtricsName,
         value: survey.qualtricsId
       }));
+    },
+
+    bulkDeleteText(): string {
+      const numSelected = this.selectedResponses.length;
+      return `Delete ${numSelected} ${pluralize(
+        "response",
+        numSelected
+      )} from Capernaum?
+      Qualtrics is not affected.`;
     },
 
     haveLetterWriterOutput(): boolean {
@@ -247,8 +305,7 @@ export default Vue.extend({
       this.deleteDialog.visible = true;
     },
 
-    deleteResponse() {
-      const surveyResponse = this.deleteDialog.response;
+    deleteResponse(surveyResponse: SurveyResponse) {
       this.$apollo
         .mutate({
           mutation: DELETE_SURVEY_RESPONSE,
@@ -256,13 +313,31 @@ export default Vue.extend({
             id: surveyResponse.id
           }
         })
-        .then(response => {
-          console.log("DELETE", response);
+        .then(() => {
           const responseIndex = this.allResponses.surveyResponses.findIndex(
             item => item.id === surveyResponse.id
           );
           this.allResponses.surveyResponses.splice(responseIndex, 1);
         });
+    },
+
+    async deleteSelected() {
+      try {
+        this.spinnerVisible = true;
+        for (let response of this.selectedResponses) {
+          await this.deleteResponse(response);
+        }
+
+        const numDeleted = this.selectedResponses.length;
+        this.showSnackbar(
+          `Deleted ${numDeleted} ${pluralize("response", numDeleted)}`
+        );
+      } catch (err) {
+        this.showSnackbar(err);
+      } finally {
+        this.selectedResponses = [];
+        this.spinnerVisible = false;
+      }
     },
 
     letterTitle(item: SurveyResponse) {
@@ -278,21 +353,23 @@ export default Vue.extend({
       this.spinnerVisible = true;
 
       this.$apollo
-        .mutate({
+        .mutate<ImportSurveyResponses>({
           mutation: IMPORT_SURVEY_RESPONSES,
           variables: {
             qId: this.selectedQualtricsId
           },
           refetchQueries: ["AllResponses"]
         })
-        .then(() => {
-          // Read everything to refresh the table.
-          return this.$apollo.query<AllResponses>({
-            query: ALL_RESPONSES_QUERY
-          });
-        })
-        .then(queryResult => {
-          this.allResponses = queryResult.data;
+        .then(mutationResult => {
+          const stats = mutationResult.data!.importQualtricsSurveyResponses;
+          this.bottomSheet.content = `Imported ${stats.importCount} ${pluralize(
+            "response",
+            stats.importCount
+          )} (${stats.duplicateCount} ${pluralize(
+            "duplicate",
+            stats.duplicateCount
+          )})`;
+          this.bottomSheet.visible = true;
           this.selectedQualtricsId = "";
         })
         .finally(() => {

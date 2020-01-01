@@ -1,5 +1,6 @@
 import { ScriptureEngagementPractice } from "../prediction/entities";
 import { Field, Float, Int, ObjectType } from "type-graphql";
+import { SurveyResponse } from "./entities";
 
 // Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
@@ -63,4 +64,22 @@ export class Prediction {
 
   @Field()
   predict: boolean;
+}
+
+@ObjectType()
+export class QualtricsResponseImportStats {
+  @Field(type => Int) importCount: number;
+  @Field(type => Int) duplicateCount: number;
+  @Field(type => [SurveyResponse]) surveyResponses: SurveyResponse[];
+
+  constructor() {
+    this.importCount = 0;
+    this.duplicateCount = 0;
+    this.surveyResponses = [];
+  }
+}
+
+export interface QualtricsImportedResponse {
+  isDuplicate: boolean;
+  surveyResponse: SurveyResponse;
 }

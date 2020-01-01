@@ -25,11 +25,15 @@ export const ALL_RESPONSES_QUERY = gql`
 export const IMPORT_SURVEY_RESPONSES = gql`
   mutation ImportSurveyResponses($qId: String!) {
     importQualtricsSurveyResponses(qualtricsId: $qId) {
-      duration
-      email
-      qualtricsResponseId
-      startDate
-      endDate
+      importCount
+      duplicateCount
+      surveyResponses {
+        duration
+        email
+        qualtricsResponseId
+        startDate
+        endDate
+      }
     }
   }
 `;

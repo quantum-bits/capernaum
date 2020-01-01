@@ -21,7 +21,7 @@ import {
   QualtricsSurveyResponse
 } from "../qualtrics/qualtrics.types";
 import { assign, difference, pick } from "lodash";
-import { WhichItems } from "./survey.types";
+import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
 import debug from "debug";
 
@@ -337,16 +337,18 @@ export class SurveyService extends BaseService {
   async importQualtricsSurveyResponse(
     surveyId: number,
     createInput: QualtricsSurveyResponse
-  ) {
+  ): Promise<QualtricsImportedResponse> {
     return this.entityManager.transaction(async manager => {
       const surveyResponseRepo = manager.getRepository(SurveyResponse);
       const surveyItemResponseRepo = manager.getRepository(SurveyItemResponse);
 
       // Check for an existing import of this response using its Qualtrics ID.
+      let foundPreviousImport = false;
       const previousImport = await surveyResponseRepo.findOne({
         qualtricsResponseId: createInput.responseId
       });
       if (previousImport) {
+        foundPreviousImport = true;
         // We've previously imported this response; toss it and replace it from Qualtrics.
         surveyDebug(
           "Delete previously imported response %s",
@@ -403,7 +405,10 @@ export class SurveyService extends BaseService {
         }
       }
 
-      return newSurveyResponse;
+      return {
+        isDuplicate: foundPreviousImport,
+        surveyResponse: newSurveyResponse
+      };
     });
   }
 }
