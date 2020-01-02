@@ -79,13 +79,13 @@
   tasks:
     - name: create database user
       postgresql_user:
-        name: "{{ pg_username }}"
-        password: "{{ pg_password }}"
+        name: "{{ postgres.username }}"
+        password: "{{ postgres.password }}"
 
     - name: create database
       postgresql_db:
-        name: "{{ pg_database }}"
-        owner: "{{ pg_username }}"
+        name: "{{ postgres.database }}"
+        owner: "{{ postgres.username }}"
 
 - name: build everything
   hosts: all

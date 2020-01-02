@@ -10,10 +10,10 @@ QUALTRICS_ORG_ID={{ qualtrics_org_id }}
 
 ##### Postgres
 
-PG_HOST={{ pg_host }}
-PG_DATABASE={{ pg_database }}
-PG_USERNAME={{ pg_username }}
-PG_PASSWORD={{ pg_password }}
+PG_HOST={{ postgres.host }}
+PG_DATABASE={{ postgres.database }}
+PG_USERNAME={{ postgres.username }}
+PG_PASSWORD={{ postgres.password }}
 
 ##### Capernaum
 
