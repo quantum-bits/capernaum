@@ -14,8 +14,15 @@ const loggingLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+if (!process.env.URL_WEBSOCKET) {
+  throw Error("No URL configured for websocket connection");
+}
+if (!process.env.URL_HTTP) {
+  throw Error("No URL configured for http connection");
+}
+
 const wsLink = new WebSocketLink({
-  uri: "ws://localhost:3000/graphql",
+  uri: process.env.URL_WEBSOCKET,
   options: {
     reconnect: true
   }
@@ -33,7 +40,7 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const httpLink = new HttpLink({
-  uri: "http://localhost:3000/graphql"
+  uri: process.env.URL_HTTP
 });
 
 const splitLink = split(

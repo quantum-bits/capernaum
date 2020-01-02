@@ -43,6 +43,32 @@
         - silversearcher-ag
         - multitail
 
+- name: provision capernaum
+  hosts: all
+  tags: capernaum
+  become: yes
+  become_user: "{{ cap_username }}"
+  vars_files:
+    - public.yaml
+    - private.yaml
+  tasks:
+    - name: create capernaum user
+      when: inventory_hostname not in groups.development
+      become_user: root
+      user:
+        name: "{{ cap_username }}"
+        password: "{{ cap_password | password_hash('sha512') }}"
+        shell: /bin/bash
+
+    - name: create directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - "{{ cap_static_abs_dir }}/{{ cap_upload_rel_dir }}"
+        - "{{ cap_static_abs_dir }}/{{ cap_pdf_rel_dir }}"
+
 - name: provision database
   hosts: staging, production
   tags: database
@@ -61,44 +87,8 @@
         name: "{{ pg_database }}"
         owner: "{{ pg_username }}"
 
-- name: provision capernaum
-  hosts: all
-  tags: capernaum
-  become: yes
-  become_user: "{{ cap_username }}"
-  vars_files:
-    - public.yaml
-    - private.yaml
-  tasks:
-    - name: create capernaum user
-      when: inventory_hostname not in groups.development
-      become_user: root
-      user:
-        name: "{{ cap_username }}"
-        password: "{{ cap_password | password_hash('sha512') }}"
-        shell: /bin/bash
-
-    - name: create .env file
-      tags: dot-env, update
-      template:
-        src: templates/dot-env
-        dest: "{{ cap_server_abs_dir }}/.env"
-        mode: 0400
-
-    - name: create image upload directory
-      file:
-        path: "{{ cap_static_abs_dir }}/{{ cap_upload_rel_dir }}"
-        state: directory
-        mode: 0755
-
-    - name: create generated PDF directory
-      file:
-        path: "{{ cap_static_abs_dir }}/{{ cap_pdf_rel_dir }}"
-        state: directory
-        mode: 0755
-
 - name: build everything
-  hosts: production, staging
+  hosts: all
   tags: build, update
   become: yes
   become_user: "{{ cap_username }}"
@@ -111,6 +101,20 @@
         repo: "{{ cap_repo }}"
         dest: "{{ cap_app_abs_dir }}"
         version: master
+
+    - name: create server .env file
+      tags: dot-env
+      template:
+        src: templates/dot-env.server
+        dest: "{{ cap_server_abs_dir }}/.env"
+        mode: 0400
+
+    - name: create ui .env file
+      tags: dot-env
+      template:
+        src: templates/dot-env.ui
+        dest: "{{ cap_ui_abs_dir }}/.env"
+        mode: 0400
 
     - name: install node modules for user interface
       yarn:
