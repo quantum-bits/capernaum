@@ -107,21 +107,23 @@ export class QualtricsController {
       survey.id,
       qualtricsResponse as QualtricsSurveyResponse
     );
-    qualtricsDebug("response - %O", importedResponse);
+    qualtricsDebug("importedResponse - %O", importedResponse);
 
     // Write a letter.
-    const letterWriterOutput = await this.writerService.renderLetter(
+    const writerOutput = await this.writerService.renderLetter(
       survey.letter,
       importedResponse.surveyResponse
     );
+    qualtricsDebug("writerOutput - %O", writerOutput);
 
-    // Send an email
-    await this.mailService.sendMail({
+    // Send an email.
+    const mailInfo = await this.mailService.sendMail({
       to: importedResponse.surveyResponse.email,
       subject: "Your Christian Life Survey Results",
       textContent: "Here are your CLS results",
-      attachmentPath: letterWriterOutput.pdfAbsolutePath
+      attachmentPath: writerOutput.pdfAbsolutePath
     });
+    qualtricsDebug("mailInfo - %O", mailInfo);
 
     // Create event.
     const createInput: EventCreateInput = {
