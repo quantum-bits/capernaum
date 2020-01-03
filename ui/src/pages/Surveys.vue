@@ -246,37 +246,7 @@ export default Vue.extend({
       bottomSheet: {
         content: "",
         visible: false
-      },
-
-      headers: [
-        {
-          text: "Name",
-          align: "left",
-          sortable: true,
-          value: "qualtricsName"
-        },
-        {
-          text: "Cap ID",
-          value: "capId"
-        },
-        {
-          text: "Qualtrics ID",
-          value: "qualtricsId"
-        },
-        {
-          text: "Last Update",
-          value: "qualtricsModDate"
-        },
-        {
-          text: "Active",
-          value: "qualtricsIsActive"
-        },
-        {
-          text: "Action",
-          value: "action",
-          align: "center"
-        }
-      ]
+      }
     };
   },
 

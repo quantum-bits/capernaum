@@ -1,6 +1,20 @@
 export interface QualtricsResponse<T> {
   result: T;
   meta: {
+    httpStatus: string;
+    requestId?: string;
+    error?: {
+      errorMessage: string;
+    };
+  };
+}
+
+export interface QualtricsArrayResponse<T> {
+  result: {
+    elements: T[];
+    nextPage?: number;
+  };
+  meta: {
     requestId: string;
     httpStatus: string;
   };
@@ -24,17 +38,6 @@ export interface ResponseExportProgress {
   percentComplete: number;
   status: ResponseExportStatus;
   fileId: string;
-}
-
-export interface QualtricsOrganization {
-  id: string;
-  name: string;
-  baseUrl: string;
-  type: string;
-  status: string;
-  creationDate: string;
-  expirationDate: string;
-  stats: object;
 }
 
 export interface QualtricsQuestion {

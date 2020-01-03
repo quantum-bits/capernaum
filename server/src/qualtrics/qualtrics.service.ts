@@ -7,7 +7,7 @@ import {
 import {
   CreateResponseData,
   CreateResponseExportResponse,
-  QualtricsOrganization,
+  QualtricsArrayResponse,
   QualtricsResponse,
   QualtricsSurvey,
   QualtricsSurveyList,
@@ -18,9 +18,7 @@ import { Injectable } from "@nestjs/common";
 import debug from "debug";
 import got, { Got, GotOptions } from "got";
 import ProxyAgent from "https-proxy-agent";
-import { Survey, SurveyItem } from "../survey/entities";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { QualtricsOrganization, QualtricsSubscription } from "./entities";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -134,13 +132,25 @@ export class QualtricsService {
     return response.body.result;
   }
 
+  private async qualtricsGetArray<T>(url: URL) {
+    qualtricsDebug("qualtricsGetArray - URL %s", url);
+    const response = await this.client.get<QualtricsArrayResponse<T>>(
+      url.href,
+      {
+        responseType: "json"
+      }
+    );
+    qualtricsDebug("qualtricsGet - response %O", response.body);
+    return response.body.result.elements;
+  }
+
   private async qualtricsDelete<T>(url: URL) {
     qualtricsDebug("qualtricsDelete - URL %s", url);
     const response = await this.client.delete<QualtricsResponse<T>>(url.href, {
       responseType: "json"
     });
     qualtricsDebug("qualtricsDelete - response %O", response.body);
-    return response.body.result;
+    return response.body.meta.httpStatus;
   }
 
   /**
@@ -184,7 +194,10 @@ export class QualtricsService {
   }
 
   listSubscriptions() {
-    return this.qualtricsGet(this.makeUrl("eventsubscriptions"));
+    const url = this.makeUrl("eventsubscriptions");
+    const subscriptions = this.qualtricsGetArray<QualtricsSubscription>(url);
+    qualtricsDebug("listSubscriptions - %O", subscriptions);
+    return subscriptions;
   }
 
   /** Create an event subscription */

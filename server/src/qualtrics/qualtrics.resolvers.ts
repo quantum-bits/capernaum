@@ -6,6 +6,8 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Survey } from "../survey/entities";
 import { SurveyService } from "../survey/survey.service";
 import { QualtricsResponseImportStats } from "../survey/survey.types";
+import { QualtricsOrganization, QualtricsSubscription } from "./entities";
+import { Int } from "type-graphql";
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
@@ -104,5 +106,27 @@ export class QualtricsResolver {
     }
 
     return importStats;
+  }
+
+  @Query(returns => QualtricsOrganization)
+  qualtricsOrganization(
+    @Args({
+      name: "organizationId",
+      type: () => String,
+      defaultValue: process.env.QUALTRICS_ORG_ID
+    })
+    organizationId?: string
+  ) {
+    return this.qualtricsService.getOrganization(organizationId);
+  }
+
+  @Query(returns => [QualtricsSubscription])
+  qualtricsListSubscriptions() {
+    return this.qualtricsService.listSubscriptions();
+  }
+
+  @Mutation(returns => String)
+  qualtricsDeleteSubscription(@Args("subscriptionId") subscriptionId: string) {
+    return this.qualtricsService.deleteSubscription(subscriptionId);
   }
 }

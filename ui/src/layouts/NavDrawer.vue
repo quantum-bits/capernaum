@@ -53,12 +53,7 @@ export default Vue.extend({
       {
         title: "Responses",
         route: "responses",
-        icon: "mdi-message-outline"
-      },
-      {
-        title: "Events",
-        route: "events",
-        icon: "mdi-alarm",
+        icon: "mdi-message-outline",
         divider: true
       },
       {
@@ -80,7 +75,19 @@ export default Vue.extend({
       {
         title: "Letters",
         route: "letters",
-        icon: "mdi-email"
+        icon: "mdi-email",
+        divider: true
+      },
+      {
+        heading: "SYS ADMIN",
+        title: "Events",
+        route: "events",
+        icon: "mdi-alarm"
+      },
+      {
+        title: "Web Hooks",
+        route: "web-hooks",
+        icon: "mdi-pipe"
       }
     ];
     return {

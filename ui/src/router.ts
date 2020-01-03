@@ -73,6 +73,11 @@ const router = new VueRouter({
       component: () => import("./pages/Images.vue")
     },
     {
+      path: "/web-hooks",
+      name: "web-hooks",
+      component: () => import("./pages/WebHooks.vue")
+    },
+    {
       // See https://router.vuejs.org/guide/essentials/history-mode.html#caveat
       path: "*",
       component: NotFound
