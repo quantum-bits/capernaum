@@ -18,6 +18,9 @@ import { Injectable } from "@nestjs/common";
 import debug from "debug";
 import got, { Got, GotOptions } from "got";
 import ProxyAgent from "https-proxy-agent";
+import { Survey, SurveyItem } from "../survey/entities";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 const qualtricsDebug = debug("qualtrics");
 

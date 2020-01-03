@@ -54,13 +54,4 @@ export class LetterService extends BaseService {
       order: { sequence: "ASC" }
     });
   }
-
-  createLetterElementType(key: string, description: string) {
-    return this.letterElementTypeRepo.save(
-      this.letterElementTypeRepo.create({
-        key,
-        description
-      })
-    );
-  }
 }

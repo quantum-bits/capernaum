@@ -1,4 +1,4 @@
-import { Letter, LetterElement, LetterWriterOutput } from "./entities";
+import { Letter, LetterElement } from "../letter/entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
 import { SurveyResponse } from "../survey/entities";
@@ -11,6 +11,7 @@ import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { DateTime } from "luxon";
 import debug from "debug";
 import { ResponseSummary } from "../survey/entities/survey-response-summary";
+import { WriterOutput } from "./entities";
 
 const letterDebug = debug("letter");
 
@@ -74,10 +75,9 @@ export class LineBuffer {
 }
 
 @Injectable()
-export default class LetterWriter {
+export default class WriterService {
   constructor(
-    @Inject(IMAGE_FILE_SERVICE)
-    private readonly imageFileService: FileService,
+    @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
     @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService
   ) {}
 
@@ -316,7 +316,7 @@ export default class LetterWriter {
     pdfAbsolutePath: string = "",
     responseSummary: ResponseSummary = null
   ) {
-    const letterWriterOutput: LetterWriterOutput = {
+    const writerOutput: WriterOutput = {
       ok,
       message,
       pdfFileName,
@@ -324,15 +324,15 @@ export default class LetterWriter {
       pdfAbsolutePath,
       responseSummary
     };
-    letterDebug("constructOutput: %O", letterWriterOutput);
-    return letterWriterOutput;
+    letterDebug("constructOutput: %O", writerOutput);
+    return writerOutput;
   }
 
   private runLaTeX(
     renderedElements,
     letter: Letter,
     surveyResponse: SurveyResponse
-  ): Promise<LetterWriterOutput> {
+  ): Promise<WriterOutput> {
     return new Promise((resolve, reject) => {
       // Set up paths.
       const baseName = generateBaseName(letter.id, surveyResponse.id);
@@ -364,7 +364,7 @@ export default class LetterWriter {
             letterDebug("STDOUT %s", stdout);
             letterDebug("STDERR %s", stderr);
 
-            const letterWriterOutput = this.constructOutput(
+            const writerOutput = this.constructOutput(
               true,
               "Letter created successfully",
               pdfFileName,
@@ -373,14 +373,14 @@ export default class LetterWriter {
               surveyResponse.summarize()
             );
 
-            resolve(letterWriterOutput);
+            resolve(writerOutput);
           }
         );
       });
     });
   }
 
-  renderLetter(letter: Letter, surveyResponse: SurveyResponse) {
+  async renderLetter(letter: Letter, surveyResponse: SurveyResponse) {
     letterDebug("renderLetter - letter %O", letter);
     letterDebug("renderLetter - response %O", surveyResponse);
 

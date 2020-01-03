@@ -152,30 +152,6 @@ input LetterUpdateInput {
   surveyId: Int
 }
 
-input LetterWriterInput {
-  letterId: Int!
-  surveyResponseId: Int!
-}
-
-type LetterWriterOutput {
-  ok: Boolean!
-
-  """Message to UI"""
-  message: String!
-
-  """Name of PDF file (e.g., 'abc.pdf')"""
-  pdfFileName: String!
-
-  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
-  pdfRelativePath: String!
-
-  """
-  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
-  """
-  pdfAbsolutePath: String!
-  responseSummary: ResponseSummary
-}
-
 input LoginCredentials {
   email: String!
   password: String!
@@ -187,14 +163,6 @@ type LoginResponse {
 }
 
 type Mutation {
-  createLetter(createInput: LetterCreateInput!): Letter!
-  createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
-  updateLetter(letterData: LetterUpdateInput!): Letter!
-  updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
-  deleteLetter(id: Int!): Int!
-  deleteLetterElement(id: Int!): Int!
-  writeLetter(letterWriterInput: LetterWriterInput!): LetterWriterOutput!
-
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
 
@@ -227,17 +195,6 @@ type Mutation {
 
   """Delete a survey response"""
   deleteSurveyResponse(id: Int!): Int!
-
-  """
-  Import a survey from Qualtrics. Always use this to create a Capernaum survey.
-  """
-  importQualtricsSurvey(qualtricsId: String!): Survey!
-
-  """Fetch responses to a survey"""
-  importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
-  createEvent(createInput: EventCreateInput!): Event!
-  updateImage(updateInput: ImageUpdateInput!): Image!
-  deleteImage(id: Int!): Int!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
   replacePredictionTableEntries(replaceInput: PredictionTableEntryReplaceInput!): [PredictionTableEntry!]!
 
@@ -251,6 +208,24 @@ type Mutation {
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
   sendLetter(mailInput: SendMailInput!): String!
+  createLetter(createInput: LetterCreateInput!): Letter!
+  createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
+  updateLetter(letterData: LetterUpdateInput!): Letter!
+  updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
+  deleteLetter(id: Int!): Int!
+  deleteLetterElement(id: Int!): Int!
+  updateImage(updateInput: ImageUpdateInput!): Image!
+  deleteImage(id: Int!): Int!
+  writeLetter(writerInput: WriterInput!): WriterOutput!
+
+  """
+  Import a survey from Qualtrics. Always use this to create a Capernaum survey.
+  """
+  importQualtricsSurvey(qualtricsId: String!): Survey!
+
+  """Fetch responses to a survey"""
+  importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
+  createEvent(createInput: EventCreateInput!): Event!
 }
 
 input PartialPredictionTableEntry {
@@ -326,13 +301,10 @@ type QualtricsSurveyListItem {
   qualtricsModDate: String!
   qualtricsCreationDate: String!
   qualtricsIsActive: Boolean!
-  importedAs: [Survey!]!
+  importedToCapernaum: Boolean!
 }
 
 type Query {
-  letter(id: Int!): Letter!
-  letters: [Letter!]!
-  letterElementTypes: [LetterElementType!]!
   survey(id: Int!): Survey!
   surveys: [Survey!]!
   surveyDimensions: [SurveyDimension!]!
@@ -344,15 +316,18 @@ type Query {
   surveyResponses: [SurveyResponse!]!
   surveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
-  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  events: [Event!]!
-  images: [Image!]!
-  image(id: Int!): Image!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   user(id: Int!): User!
   users: [User!]!
   userRoles: [UserRole!]!
+  letter(id: Int!): Letter!
+  letters: [Letter!]!
+  letterElementTypes: [LetterElementType!]!
+  images: [Image!]!
+  image(id: Int!): Image!
+  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
+  events: [Event!]!
 }
 
 type ResponseSummary {
@@ -408,7 +383,7 @@ type Subscription {
 type Survey {
   """Unique ID for this entity"""
   id: Int!
-  letters: [Letter!]!
+  letter: Letter!
 
   """
   Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
@@ -428,6 +403,7 @@ type Survey {
 
   """Convenience property to retrieve SE practices"""
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+  letters: [Letter!]!
 }
 
 input SurveyCreateInput {
@@ -650,4 +626,28 @@ enum WhichItems {
   All
   WithIndex
   WithoutIndex
+}
+
+input WriterInput {
+  letterId: Int!
+  surveyResponseId: Int!
+}
+
+type WriterOutput {
+  ok: Boolean!
+
+  """Message to UI"""
+  message: String!
+
+  """Name of PDF file (e.g., 'abc.pdf')"""
+  pdfFileName: String!
+
+  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
+  pdfRelativePath: String!
+
+  """
+  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
+  """
+  pdfAbsolutePath: String!
+  responseSummary: ResponseSummary
 }

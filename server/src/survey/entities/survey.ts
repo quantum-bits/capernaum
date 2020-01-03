@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -12,12 +12,13 @@ import { SurveyResponse } from "./survey-response";
   description: "All information about a survey imported from Qualtrics"
 })
 export class Survey extends AbstractEntity {
-  @OneToMany(
+  @OneToOne(
     type => Letter,
     letter => letter.survey
   )
-  @Field(type => [Letter])
-  letters: Letter[];
+  @JoinColumn()
+  @Field(type => Letter)
+  letter: Letter;
 
   @OneToMany(
     type => SurveyItem,

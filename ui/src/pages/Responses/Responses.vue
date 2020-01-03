@@ -271,7 +271,7 @@ export default Vue.extend({
         .mutate<WriteLetter>({
           mutation: WRITE_LETTER_MUTATION,
           variables: {
-            letterWriterInput: {
+            writerInput: {
               letterId: surveyResponse.survey.letters[0].id,
               surveyResponseId: surveyResponse.id
             }

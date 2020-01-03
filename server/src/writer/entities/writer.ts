@@ -1,14 +1,14 @@
 import { Field, InputType, Int, ObjectType } from "type-graphql";
-import { ResponseSummary } from "../../survey/entities/survey-response-summary";
+import { ResponseSummary } from "../../survey/entities";
 
 @InputType()
-export class LetterWriterInput {
+export class WriterInput {
   @Field(type => Int) letterId: number;
   @Field(type => Int) surveyResponseId: number;
 }
 
 @ObjectType()
-export class LetterWriterOutput {
+export class WriterOutput {
   @Field() ok: boolean;
   @Field({ description: "Message to UI" })
   message: string;

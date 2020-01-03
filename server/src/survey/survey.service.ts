@@ -119,12 +119,8 @@ export class SurveyService extends BaseService {
     });
   }
 
-  findOneSurveyByQualtricsId(qualtricsId: string) {
-    return this.surveyRepo.findOne({ qualtricsId });
-  }
-
   findSurveyByQualtricsId(qualtricsId: string) {
-    return this.surveyRepo.find({ qualtricsId });
+    return this.surveyRepo.findOne({ qualtricsId });
   }
 
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
@@ -272,6 +268,30 @@ export class SurveyService extends BaseService {
     );
   }
 
+  private async _deleteSurveyResponse(
+    manager: EntityManager,
+    surveyResponseId: number
+  ) {
+    // Delete responses to each question.
+    await manager.delete(SurveyItemResponse, {
+      surveyResponseId
+    });
+
+    return manager.delete(SurveyResponse, {
+      id: surveyResponseId
+    });
+  }
+
+  async deleteSurveyResponse(surveyResponseId: number) {
+    return this.entityManager.transaction(async manager => {
+      const result = await this._deleteSurveyResponse(
+        manager,
+        surveyResponseId
+      );
+      return result.affected;
+    });
+  }
+
   async importQualtricsSurvey(qualtricsSurvey: QualtricsSurvey) {
     // FIXME: This should use a transaction.
     // Create a list of survey items.
@@ -303,30 +323,6 @@ export class SurveyService extends BaseService {
       surveyItems: newSurveyItems
     });
     return this.surveyRepo.save(newSurvey);
-  }
-
-  private async _deleteSurveyResponse(
-    manager: EntityManager,
-    surveyResponseId: number
-  ) {
-    // Delete responses to each question.
-    await manager.delete(SurveyItemResponse, {
-      surveyResponseId
-    });
-
-    return manager.delete(SurveyResponse, {
-      id: surveyResponseId
-    });
-  }
-
-  async deleteSurveyResponse(surveyResponseId: number) {
-    return this.entityManager.transaction(async manager => {
-      const result = await this._deleteSurveyResponse(
-        manager,
-        surveyResponseId
-      );
-      return result.affected;
-    });
   }
 
   /**

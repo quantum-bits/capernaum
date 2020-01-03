@@ -23,7 +23,6 @@ async function makeFakeSurvey() {
   const surveyRepo = getRepository(Survey);
   const survey = await surveyRepo.save(
     surveyRepo.create({
-      title: "Fake Survey",
       qualtricsId: "Fake ID",
       qualtricsName: "My Fake Survey",
       qualtricsModDate: "2019-12-24"
@@ -56,8 +55,7 @@ async function makeFakeSurvey() {
       surveyDimensionRepo.create({
         survey: survey,
         title: `Survey Dimension ${dimIdx}`,
-        sequence: dimIdx,
-        useForPredictions: true
+        sequence: dimIdx
       })
     );
 
@@ -67,7 +65,8 @@ async function makeFakeSurvey() {
         surveyIndexRepo.create({
           surveyDimension: surveyDimension,
           abbreviation: `Survey Index Abbrev ${indexIdx}`,
-          title: `Survey Index ${indexIdx}`
+          title: `Survey Index ${indexIdx}`,
+          useForPredictions: true
         })
       );
 

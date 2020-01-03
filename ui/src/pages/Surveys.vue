@@ -5,75 +5,145 @@
         <h1 class="headline mb-5">Surveys</h1>
       </v-col>
       <v-col cols="2">
-        <v-checkbox v-model="showAllSurveys" label="Show All" />
+        <v-switch v-model="showAllSurveys" label="Show All" />
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
-        <v-card>
-          <v-card-title>
-            <v-spacer />
-            <v-text-field
-              v-model="search"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              clearable
-              hide-details
-            />
-          </v-card-title>
-          <v-data-table
-            :headers="headers"
-            :items="combinedSurveys"
-            :search="search"
-            class="elevation-1"
-          >
-            <template v-slot:item.qualtricsIsActive="{ item }">
-              <v-icon color="success" v-if="item.qualtricsIsActive">
-                mdi-check
-              </v-icon>
-              <v-icon color="warning" v-else>
-                mdi-minus
-              </v-icon>
-            </template>
-
-            <template v-slot:item.action="{ item }">
-              <v-chip
-                v-if="item.isImported && item.hasReference"
-                @click="showReason(item)"
-                color="info"
-                text-color="white"
-                small
+        <v-data-iterator
+          :items="combinedSurveys"
+          :search="searchFor"
+          :sort-by="sortBy"
+          :sort-desc="sortDesc"
+        >
+          <template v-slot:header>
+            <v-toolbar>
+              <v-text-field
+                v-model="searchFor"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                clearable
+                hide-details
+              />
+              <v-spacer />
+              <v-select
+                v-model="sortBy"
+                flat
+                hide-details
+                :items="sortCriteria"
+                label="Sort by"
+              />
+              <v-btn-toggle v-model="sortDesc" mandatory>
+                <v-btn class="ml-2" icon :value="false">
+                  <v-icon>mdi-sort-ascending</v-icon>
+                </v-btn>
+                <v-btn icon :value="true">
+                  <v-icon>mdi-sort-descending</v-icon>
+                </v-btn>
+              </v-btn-toggle>
+            </v-toolbar>
+          </template>
+          <template v-slot:default="props">
+            <v-row>
+              <v-col
+                v-for="item in props.items"
+                :key="item.qualtricsId"
+                cols="12"
+                md="6"
+                lg="4"
               >
-                <v-icon small left>mdi-help-circle</v-icon>
-                Can't remove
-              </v-chip>
+                <v-card>
+                  <v-toolbar>
+                    <v-toolbar-title>{{ item.qualtricsName }}</v-toolbar-title>
+                    <v-spacer />
+                    <v-chip
+                      v-if="item.qualtricsIsActive"
+                      color="info"
+                      text-color="white"
+                      small
+                    >
+                      Active
+                    </v-chip>
+                    <v-chip
+                      v-if="item.isImported"
+                      class="ml-2"
+                      color="info"
+                      text-color="white"
+                      small
+                    >
+                      Imported
+                    </v-chip>
+                    <v-menu>
+                      <template v-slot:activator="{ on }">
+                        <v-btn icon v-on="on">
+                          <v-icon>mdi-dots-vertical</v-icon>
+                        </v-btn>
+                      </template>
+                      <v-list>
+                        <v-list-item
+                          :disabled="item.isImported"
+                          @click="importQualtricsSurvey(item.qualtricsId)"
+                        >
+                          <v-list-item-title>Import</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item
+                          :disabled="!item.isImported || item.hasReference"
+                          @click="deleteSurvey(item.capId)"
+                        >
+                          <v-list-item-title>Remove</v-list-item-title>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </v-toolbar>
 
-              <v-chip
-                v-else-if="item.isImported"
-                @click="deleteSurvey(item.capId)"
-                color="warning"
-                text-color="white"
-                small
-              >
-                <v-icon small left>mdi-delete</v-icon>
-                Remove
-              </v-chip>
+                  <v-list dense>
+                    <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Letters</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.letterCount }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Dimensions</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.dimensionCount }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Responses</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.responseCount }}
+                      </v-list-item-content>
+                    </v-list-item>
 
-              <v-chip
-                v-else
-                @click="importQualtricsSurvey(item.qualtricsId)"
-                color="primary"
-                text-color="white"
-                small
-              >
-                <v-icon small left>mdi-arrow-down-bold-circle</v-icon>
-                Import
-              </v-chip>
-            </template>
-          </v-data-table>
-        </v-card>
+                    <v-divider v-show="item.isImported" />
+
+                    <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Capernaum ID</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.capId }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>Qualtrics ID</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.qualtricsId }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                      <v-list-item-content>Last Modified</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.qualtricsModDate | dateAndTime }}
+                      </v-list-item-content>
+                    </v-list-item>
+                  </v-list>
+                </v-card>
+              </v-col>
+            </v-row>
+          </template>
+        </v-data-iterator>
       </v-col>
     </v-row>
 
@@ -152,7 +222,21 @@ export default Vue.extend({
       surveys: [] as Survey[],
       qualtricsSurveys: [] as QualtricsSurvey[],
       showAllSurveys: false,
-      search: "",
+
+      searchFor: "",
+
+      sortBy: "qualtricsName",
+      sortDesc: false,
+      sortCriteria: [
+        {
+          text: "Name",
+          value: "qualtricsName"
+        },
+        {
+          text: "Date",
+          value: "qualtricsModDate"
+        }
+      ],
 
       snackbar: {
         text: "",

@@ -11,6 +11,8 @@ import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
 import { QualtricsService } from "./qualtrics.service";
 import { SurveyService } from "../survey/survey.service";
+import WriterService from "../writer/writer.service";
+import { MailService } from "../mail/mail.service";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -19,7 +21,9 @@ export class QualtricsController {
   constructor(
     private readonly eventService: EventService,
     private readonly qualtricsService: QualtricsService,
-    private readonly surveyService: SurveyService
+    private readonly surveyService: SurveyService,
+    private readonly writerService: WriterService,
+    private readonly mailService: MailService
   ) {}
 
   private parseActivateDeactivate(
@@ -81,7 +85,7 @@ export class QualtricsController {
     const qualtricsResponseId = reply.ResponseID;
 
     // Find the survey
-    const survey = await this.surveyService.findOneSurveyByQualtricsId(
+    const survey = await this.surveyService.findSurveyByQualtricsId(
       qualtricsSurveyId
     );
     qualtricsDebug(
@@ -99,11 +103,27 @@ export class QualtricsController {
     qualtricsDebug("qualtricsResponse - %O", qualtricsResponse);
 
     // Store it locally.
-    const capResponse = await this.surveyService.importQualtricsSurveyResponse(
+    const importedResponse = await this.surveyService.importQualtricsSurveyResponse(
       survey.id,
       qualtricsResponse as QualtricsSurveyResponse
     );
-    qualtricsDebug("response - %O", capResponse);
+    qualtricsDebug("importedResponse - %O", importedResponse);
+
+    // Write a letter.
+    const writerOutput = await this.writerService.renderLetter(
+      survey.letter,
+      importedResponse.surveyResponse
+    );
+    qualtricsDebug("writerOutput - %O", writerOutput);
+
+    // Send an email.
+    const mailInfo = await this.mailService.sendMail({
+      to: importedResponse.surveyResponse.email,
+      subject: "Your Christian Life Survey Results",
+      textContent: "Here are your CLS results",
+      attachmentPath: writerOutput.pdfAbsolutePath
+    });
+    qualtricsDebug("mailInfo - %O", mailInfo);
 
     // Create event.
     const createInput: EventCreateInput = {

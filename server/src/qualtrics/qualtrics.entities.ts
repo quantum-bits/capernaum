@@ -1,5 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
-import { Survey } from "../survey/entities";
+import { Field, Int, ObjectType } from "type-graphql";
 
 @ObjectType()
 export class QualtricsSurveyListItem {
@@ -9,5 +8,5 @@ export class QualtricsSurveyListItem {
   @Field() qualtricsModDate: string;
   @Field() qualtricsCreationDate: string;
   @Field() qualtricsIsActive: boolean;
-  @Field(type => [Survey]) importedAs: Survey[];
+  @Field() importedToCapernaum: boolean;
 }
