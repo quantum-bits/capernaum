@@ -91,7 +91,7 @@ import {
   DimensionDialogResponse,
   IndexDialogResponse,
   SurveyItemSelection
-} from "@/pages/SurveyDimensions/dialog.types";
+} from "@/pages/dialog.types";
 
 export default Vue.extend({
   name: "DimensionBranch",

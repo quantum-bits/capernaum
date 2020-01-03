@@ -40,7 +40,7 @@ const router = new VueRouter({
     {
       path: "/survey-dimensions",
       name: "survey-dimensions",
-      component: () => import("./pages/SurveyDimensions/SurveyDimensions.vue")
+      component: () => import("./pages/SurveyDimensions.vue")
     },
     {
       path: "/surveys",
@@ -60,7 +60,7 @@ const router = new VueRouter({
     {
       path: "/responses",
       name: "responses",
-      component: () => import("./pages/Responses/Responses.vue")
+      component: () => import("./pages/Responses.vue")
     },
     {
       path: "/scripture-engagement-practices",

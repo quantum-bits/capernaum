@@ -85,18 +85,18 @@ import {
   SurveyDimensionEnum,
   SurveyDimensionView,
   SurveySelection
-} from "../survey.types";
+} from "./survey.types";
 
 import {
   OneSurvey_survey as Survey,
   OneSurvey_survey_surveyDimensions as SurveyDimension,
   OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex
 } from "@/graphql/types/OneSurvey";
-import DimensionBranch from "./DimensionBranch.vue";
+import DimensionBranch from "../components/DimensionBranch.vue";
 import isEmpty from "lodash/isEmpty";
-import DimensionDialog from "./DimensionDialog.vue";
-import IndexBranch from "./IndexBranch.vue";
-import { DimensionDialogResponse } from "@/pages/SurveyDimensions/dialog.types";
+import DimensionDialog from "../components/DimensionDialog.vue";
+import IndexBranch from "../components/IndexBranch.vue";
+import { DimensionDialogResponse } from "@/pages/dialog.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */

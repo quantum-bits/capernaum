@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DimensionDialogResponse } from "@/pages/SurveyDimensions/dialog.types";
+import { DimensionDialogResponse } from "@/pages/dialog.types";
 
 export default Vue.extend({
   name: "DimensionDialog",

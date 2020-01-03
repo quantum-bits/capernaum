@@ -76,10 +76,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  IndexDialogResponse,
-  SurveyItemSelection
-} from "@/pages/SurveyDimensions/dialog.types";
+import { IndexDialogResponse, SurveyItemSelection } from "@/pages/dialog.types";
 
 export default Vue.extend({
   name: "IndexDialog",

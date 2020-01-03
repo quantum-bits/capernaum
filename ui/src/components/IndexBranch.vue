@@ -73,16 +73,13 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SurveyIndexView } from "../survey.types";
+import { SurveyIndexView } from "../pages/survey.types";
 
 import { DELETE_INDEX, UPDATE_INDEX_MUTATION } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import {
-  IndexDialogResponse,
-  SurveyItemSelection
-} from "@/pages/SurveyDimensions/dialog.types";
-import IndexDialog from "@/pages/SurveyDimensions/IndexDialog.vue";
+import { IndexDialogResponse, SurveyItemSelection } from "@/pages/dialog.types";
+import IndexDialog from "@/components/IndexDialog.vue";
 
 export default Vue.extend({
   name: "IndexBranch",
