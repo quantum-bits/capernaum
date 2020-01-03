@@ -17,6 +17,7 @@ import {
 import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
+import { Machine } from "./machine/entities";
 
 config();
 
@@ -41,7 +42,8 @@ const options: ConnectionOptions = {
     PredictionTableEntry,
     Image,
     User,
-    UserRole
+    UserRole,
+    Machine
   ]
 };
 

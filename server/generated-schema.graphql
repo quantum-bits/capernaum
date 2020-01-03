@@ -162,6 +162,20 @@ type LoginResponse {
   user: UserPayload!
 }
 
+type Machine {
+  """Unique ID for this entity"""
+  id: Int!
+  name: String!
+  hostname: String!
+  active: Boolean!
+}
+
+input MachineCreateInput {
+  name: String!
+  hostname: String!
+  active: Boolean!
+}
+
 type Mutation {
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
@@ -227,6 +241,7 @@ type Mutation {
   importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
   qualtricsDeleteSubscription(subscriptionId: String!): String!
   createEvent(createInput: EventCreateInput!): Event!
+  createMachine(createInput: MachineCreateInput!): Machine!
 }
 
 input PartialPredictionTableEntry {
@@ -350,6 +365,7 @@ type Query {
   qualtricsOrganization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   qualtricsListSubscriptions: [QualtricsSubscription!]!
   events: [Event!]!
+  machines: [Machine!]!
 }
 
 type ResponseSummary {

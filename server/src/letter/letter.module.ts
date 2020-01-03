@@ -8,9 +8,6 @@ import {
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
-import { ImageModule } from "../image/image.module";
-import WriterService from "../writer/writer.service";
-import { FileModule } from "../file/file.module";
 
 @Module({
   imports: [

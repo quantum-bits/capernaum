@@ -10,6 +10,7 @@ import typeORMConfig from "./typeorm-config";
 import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { inDevelopmentMode } from "./shared/helpers";
+import { MachineModule } from "./machine/machine.module";
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { inDevelopmentMode } from "./shared/helpers";
     AuthModule,
     MailModule,
     WriterModule,
-    QualtricsModule
+    QualtricsModule,
+    MachineModule
   ]
 })
 export class AppModule {}

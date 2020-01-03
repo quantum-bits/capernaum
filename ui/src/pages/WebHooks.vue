@@ -11,77 +11,14 @@
 
     <v-row>
       <v-col>
-        <v-data-iterator :items="qualtricsSubscriptions">
-          <template v-slot:default="props">
-            <v-row>
-              <v-col
-                v-for="item in props.items"
-                :key="item.id"
-                cols="12"
-                md="6"
-                lg="4"
-              >
-                <v-card>
-                  <v-toolbar>
-                    <v-toolbar-title>
-                      {{ item.subscriptionType }}
-                    </v-toolbar-title>
-                    <v-spacer />
-                    <v-menu>
-                      <template v-slot:activator="{ on }">
-                        <v-btn icon v-on="on">
-                          <v-icon>mdi-dots-vertical</v-icon>
-                        </v-btn>
-                      </template>
-                      <v-list>
-                        <v-list-item @click="removeSubscription(item.id)">
-                          <v-list-item-title>Remove</v-list-item-title>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </v-toolbar>
-                  <v-list dense>
-                    <v-list-item>
-                      <v-list-item-content>Hostname</v-list-item-content>
-                      <v-list-item-content class="align-end">
-                        {{ item.url.hostname }}
-                      </v-list-item-content>
-                    </v-list-item>
-                    <template v-if="item.surveyId">
-                      <v-list-item>
-                        <v-list-item-content>Survey ID</v-list-item-content>
-                        <v-list-item-content class="align-end">
-                          {{ item.surveyId }}
-                        </v-list-item-content>
-                      </v-list-item>
-                      <v-list-item>
-                        <v-list-item-content>Survey Name</v-list-item-content>
-                        <v-list-item-content class="align-end">
-                          {{ surveyNameById.get(item.surveyId) }}
-                        </v-list-item-content>
-                      </v-list-item>
-                    </template>
-                    <v-list-item>
-                      <v-list-item-content>
-                        Successful Calls
-                      </v-list-item-content>
-                      <v-list-item-content class="align-end">
-                        {{ item.successfulCalls }}
-                      </v-list-item-content>
-                    </v-list-item>
-                    <v-divider />
-                    <v-list-item>
-                      <v-list-item-content>Subscription ID</v-list-item-content>
-                      <v-list-item-content class="align-end">
-                        {{ item.id }}
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-card>
-              </v-col>
-            </v-row>
-          </template>
-        </v-data-iterator>
+        <web-hook-cards :qualtrics-subscriptions="qualtricsSubscriptions" />
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <h1 class="headline">Machines</h1>
+        <machine-cards></machine-cards>
       </v-col>
     </v-row>
 
@@ -115,32 +52,22 @@ import {
 } from "@/graphql/qualtrics.graphql";
 
 import URLParse from "url-parse";
-import { QualtricsListSubscriptions_qualtricsListSubscriptions } from "@/graphql/types/QualtricsListSubscriptions";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
-
-type CategoryType = "controlpanel" | "surveyengine";
-type SubscriptionType =
-  | "activateSurvey"
-  | "deactivateSurvey"
-  | "completedResponse";
-
-interface QualtricsSubscription
-  extends QualtricsListSubscriptions_qualtricsListSubscriptions {
-  categoryType: CategoryType;
-  subscriptionType: SubscriptionType;
-  surveyId?: string;
-  url: {
-    protocol: string;
-    hostname: string;
-    path: string;
-  };
-}
+import WebHookCards from "@/components/WebHookCards.vue";
+import {
+  CategoryType,
+  QualtricsSubscription,
+  SubscriptionType
+} from "@/types/qualtrics.types";
+import MachineCards from "@/components/MachineCards.vue";
 
 type StringToStringMap = Map<string, string>;
 
 export default Vue.extend({
   name: "WebHooks",
+
+  components: { WebHookCards, MachineCards },
 
   apollo: {
     qualtricsOrganization: {
