@@ -25,11 +25,15 @@ import {
 import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { EntityManager } from "typeorm";
 
 @Resolver(of => Letter)
 @UseGuards(GqlAuthGuard)
 export class LetterResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    protected readonly entityManager: EntityManager,
+    private readonly letterService: LetterService
+  ) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
@@ -84,7 +88,11 @@ export class LetterResolver {
 
   @ResolveProperty("survey", type => Survey)
   resolveSurvey(@Parent() letter: Letter) {
-    return this.letterService.findOneOrFail(Survey, letter.surveyId);
+    return this.entityManager.findOne(Survey, {
+      where: {
+        letterId: letter.id
+      }
+    });
   }
 
   @ResolveProperty("letterElements", type => [LetterElement])

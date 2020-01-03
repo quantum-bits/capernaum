@@ -197,7 +197,7 @@ export default class LetterInfoForm extends Vue {
   // .filter(...).map(...) might not be the fastest approach (https://stackoverflow.com/questions/34398279/map-and-filter-an-array-at-the-same-time)
   get selections(): SurveySelection[] {
     return this.surveys
-      .filter(survey => survey.letters.length === 0)
+      .filter(survey => !survey.letter)
       .map(survey => ({
         text: survey.qualtricsName,
         value: survey.id

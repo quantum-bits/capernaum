@@ -112,7 +112,10 @@ import {
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
-import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
+import {
+  AllSurveys,
+  AllSurveys_surveys as Survey
+} from "@/graphql/types/AllSurveys";
 
 @Component({
   apollo: {
@@ -125,17 +128,13 @@ import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
       },
       fetchPolicy: "network-only"
     },
+
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      update(data) {
-        console.log("inside update: ", data);
-        this.allSurveysHaveLetters = true;
-        data.surveys.forEach((survey: Survey) => {
-          if (survey.letters.length === 0) {
-            this.allSurveysHaveLetters = false;
-          }
-        });
-
+      update(data: AllSurveys) {
+        this.allSurveysHaveLetters = data.surveys.every(
+          survey => survey.letter !== null
+        );
         return data.surveys;
       },
       fetchPolicy: "network-only"
@@ -230,13 +229,6 @@ export default class LettersPage extends Vue {
     this.$apollo.queries.surveys.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });
-  }
-
-  mounted() {
-    console.log("inside mounted!");
-    //this.$apollo.queries.letters.refetch().then(({ data }) => {
-    //  console.log("item(s) refetched!", data);
-    //});
   }
 }
 </script>

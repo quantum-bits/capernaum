@@ -158,6 +158,9 @@ export interface Letters_letters_survey {
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
+  /**
+   * Dimensions for this survey; groups indices, which group items.
+   */
   surveyDimensions: Letters_letters_survey_surveyDimensions[];
 }
 

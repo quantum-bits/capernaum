@@ -383,13 +383,21 @@ type Subscription {
 type Survey {
   """Unique ID for this entity"""
   id: Int!
-  letter: Letter!
+
+  """Fetch the (optional) letter for this survey"""
+  letter: Letter
 
   """
-  Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+  All the Qualtrics items for this survey; 
+      for groupings, see survey dimension and index.
+      Pass 'whichItems' to choose which to return (default 'All')
   """
   surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
+
+  """Dimensions for this survey; groups indices, which group items."""
   surveyDimensions: [SurveyDimension!]!
+
+  """Responses for this survey"""
   surveyResponses: [SurveyResponse!]!
 
   """Unique identifier for this survey on Qualtrics"""
@@ -403,7 +411,6 @@ type Survey {
 
   """Convenience property to retrieve SE practices"""
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
-  letters: [Letter!]!
 }
 
 input SurveyCreateInput {

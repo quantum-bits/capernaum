@@ -304,9 +304,7 @@ export default Vue.extend({
         // Note that we do not check for survey items because these are
         // owned by the survey itself and are not added when creating a letter,
         // adding survey dimensions, etc.
-        combinedSurvey.letterCount = capSurvey.letters
-          ? capSurvey.letters.length
-          : 0;
+        combinedSurvey.letterCount = capSurvey.letter ? 1 : 0;
         combinedSurvey.dimensionCount = capSurvey.surveyDimensions
           ? capSurvey.surveyDimensions.length
           : 0;

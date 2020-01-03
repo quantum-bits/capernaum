@@ -39,6 +39,14 @@ export class MailService {
   }
 
   sendMail(mailInput: SendMailInput) {
+    if (!mailInput.from) {
+      if (!process.env.MAIL_FROM) {
+        throw Error("No MAIL_FROM configured");
+      }
+      mailInput.from = process.env.MAIL_FROM;
+    }
+    mailDebug("sendMail mailInput - %O", mailInput);
+
     const options: Mail.Options = {
       from: mailInput.from,
       to: mailInput.to,

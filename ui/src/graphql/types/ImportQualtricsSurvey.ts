@@ -31,7 +31,9 @@ export interface ImportQualtricsSurvey_importQualtricsSurvey {
    */
   qualtricsModDate: string;
   /**
-   * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+   * All the Qualtrics items for this survey; 
+   *     for groupings, see survey dimension and index.
+   *     Pass 'whichItems' to choose which to return (default 'All')
    */
   surveyItems: ImportQualtricsSurvey_importQualtricsSurvey_surveyItems[];
 }

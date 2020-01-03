@@ -7,8 +7,9 @@ export const ALL_RESPONSES_QUERY = gql`
       qualtricsResponseId
       email
       survey {
+        qualtricsId
         qualtricsName
-        letters {
+        letter {
           id
           title
           description

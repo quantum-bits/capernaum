@@ -134,14 +134,18 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyResponse(id);
   }
 
-  @ResolveProperty("letters", type => [Letter])
+  @ResolveProperty("letter", type => Letter, {
+    nullable: true,
+    description: "Fetch the (optional) letter for this survey"
+  })
   resolveLetters(@Parent() survey: Survey) {
-    return this.surveyService.find(Letter, { survey });
+    return this.surveyService.findOne(Letter, survey.letterId);
   }
 
   @ResolveProperty("surveyItems", type => [SurveyItem], {
-    description:
-      "Retrieve survey items; pass `whichItems` to choose which to return (default `All`)"
+    description: `All the Qualtrics items for this survey; 
+    for groupings, see survey dimension and index.
+    Pass 'whichItems' to choose which to return (default 'All')`
   })
   resolveSurveyItems(
     @Parent() survey: Survey,
@@ -155,12 +159,17 @@ export class SurveyResolver {
     return this.surveyService.findItemsForSurvey(survey, whichItems);
   }
 
-  @ResolveProperty("surveyDimensions", type => [SurveyDimension])
+  @ResolveProperty("surveyDimensions", type => [SurveyDimension], {
+    description:
+      "Dimensions for this survey; groups indices, which group items."
+  })
   resolveSurveyDimensions(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyDimension, { survey });
   }
 
-  @ResolveProperty("surveyResponses", type => [SurveyResponse])
+  @ResolveProperty("surveyResponses", type => [SurveyResponse], {
+    description: "Responses for this survey"
+  })
   resolveSurveyResponses(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyResponse, { survey });
   }

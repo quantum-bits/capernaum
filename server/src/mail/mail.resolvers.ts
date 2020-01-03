@@ -14,14 +14,6 @@ export class MailResolver {
 
   @Mutation(returns => String)
   sendLetter(@Args("mailInput") mailInput: SendMailInput) {
-    if (!mailInput.from) {
-      if (!process.env.MAIL_FROM) {
-        throw Error("No MAIL_FROM configured");
-      }
-      mailInput.from = process.env.MAIL_FROM;
-    }
-    mailDebug("sendLetter %O", mailInput);
-
     return this.mailService.sendMail(mailInput);
   }
 }

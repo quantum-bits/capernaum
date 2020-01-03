@@ -9,13 +9,14 @@ import { MailModule } from "./mail/mail.module";
 import typeORMConfig from "./typeorm-config";
 import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
+import { inDevelopmentMode } from "./shared/helpers";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
-      logging: false // inDevelopmentMode()
+      logging: inDevelopmentMode()
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",

@@ -52,7 +52,7 @@
           </v-card-title>
           <v-data-table
             :headers="masterHeaders"
-            :items="allResponses.surveyResponses"
+            :items="surveyResponses"
             :search="responseSearch"
             v-model="selectedResponses"
             show-select
@@ -65,12 +65,12 @@
               {{ item.endDate | sensibleDate }}
             </template>
             <template v-slot:item.action="{ item }">
-              <v-icon :disabled="!hasOneLetter(item)" @click="sendEmail(item)">
+              <v-icon :disabled="!hasLetter(item)" @click="sendEmail(item)">
                 mdi-email
               </v-icon>
               <v-icon
                 class="ml-2"
-                :disabled="!hasOneLetter(item)"
+                :disabled="!hasLetter(item)"
                 @click="generatePDF(item)"
               >
                 mdi-adobe-acrobat
@@ -173,9 +173,9 @@ export default Vue.extend({
       query: ALL_SURVEYS_QUERY
     },
 
-    allResponses: {
+    surveyResponses: {
       query: ALL_RESPONSES_QUERY,
-      update: data => data
+      update: data => data.surveyResponses
     }
   },
 
@@ -185,8 +185,8 @@ export default Vue.extend({
       selectedQualtricsId: "",
       responseSearch: "",
       selectedResponses: [],
+      surveyResponses: [] as SurveyResponse[],
 
-      allResponses: {} as AllResponses,
       masterHeaders: [
         { text: "Date", value: "date" },
         { text: "Survey", value: "survey.qualtricsName" },
@@ -264,6 +264,10 @@ export default Vue.extend({
     },
 
     generatePDF(surveyResponse: SurveyResponse) {
+      if (!surveyResponse.survey.letter) {
+        throw Error("Survey has no letter");
+      }
+
       this.clearLetterWriterOutput();
       this.spinnerVisible = true;
 
@@ -272,7 +276,7 @@ export default Vue.extend({
           mutation: WRITE_LETTER_MUTATION,
           variables: {
             writerInput: {
-              letterId: surveyResponse.survey.letters[0].id,
+              letterId: surveyResponse.survey.letter.id,
               surveyResponseId: surveyResponse.id
             }
           }
@@ -296,8 +300,8 @@ export default Vue.extend({
         });
     },
 
-    hasOneLetter(item: SurveyResponse) {
-      return item.survey.letters && item.survey.letters.length === 1;
+    hasLetter(item: SurveyResponse) {
+      return item.survey.letter !== null;
     },
 
     confirmDelete(item: SurveyResponse) {
@@ -314,10 +318,10 @@ export default Vue.extend({
           }
         })
         .then(() => {
-          const responseIndex = this.allResponses.surveyResponses.findIndex(
+          const responseIndex = this.surveyResponses.findIndex(
             item => item.id === surveyResponse.id
           );
-          this.allResponses.surveyResponses.splice(responseIndex, 1);
+          this.surveyResponses.splice(responseIndex, 1);
         });
     },
 
@@ -341,10 +345,10 @@ export default Vue.extend({
     },
 
     letterTitle(item: SurveyResponse) {
-      if (this.hasOneLetter(item)) {
-        return item.survey.letters[0].title;
+      if (item.survey.letter) {
+        return item.survey.letter.title;
       } else {
-        return "No letter!";
+        return "No letter";
       }
     },
 

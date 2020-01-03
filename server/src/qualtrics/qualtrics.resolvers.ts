@@ -78,7 +78,9 @@ export class QualtricsResolver {
   async importQualtricsSurveyResponses(
     @Args("qualtricsId") qualtricsId: string
   ) {
-    const survey = await this.surveyService.find(Survey, { qualtricsId });
+    const survey = await this.surveyService.findSurveyByQualtricsId(
+      qualtricsId
+    );
 
     // Get from Qualtrics all responses to this survey.
     const zipFileEntries = await this.qualtricsService.getResponses(
@@ -90,7 +92,7 @@ export class QualtricsResolver {
     const importStats = new QualtricsResponseImportStats();
     for (const oneResponse of allResponses) {
       const importResponse = await this.surveyService.importQualtricsSurveyResponse(
-        survey[0].id,
+        survey.id,
         oneResponse
       );
 

@@ -3,8 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
+  OneToOne,
   UpdateDateColumn
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -40,16 +40,24 @@ export class Letter extends AbstractEntity {
   @Column()
   isFrozen: boolean = false;
 
-  @Column("int") surveyId: number;
-  @ManyToOne(type => Survey)
-  @Field(type => Survey)
-  survey: Survey;
+  @OneToOne(
+    type => Survey,
+    survey => survey.letter
+  )
+  @Field(type => Survey, { nullable: true })
+  survey?: Survey;
 
-  @OneToMany(type => LetterElement, letterElement => letterElement.letter)
+  @OneToMany(
+    type => LetterElement,
+    letterElement => letterElement.letter
+  )
   @Field(type => [LetterElement])
   letterElements: LetterElement[];
 
-  @OneToMany(type => PredictionTableEntry, entry => entry.letter)
+  @OneToMany(
+    type => PredictionTableEntry,
+    entry => entry.letter
+  )
   @Field(type => [PredictionTableEntry])
   tableEntries: PredictionTableEntry[];
 }

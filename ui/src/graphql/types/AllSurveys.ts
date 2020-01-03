@@ -6,7 +6,7 @@
 // GraphQL query operation: AllSurveys
 // ====================================================
 
-export interface AllSurveys_surveys_letters {
+export interface AllSurveys_surveys_letter {
   /**
    * Unique ID for this entity
    */
@@ -52,12 +52,23 @@ export interface AllSurveys_surveys {
    * Date and time at which this survey was modified on Qualtrics
    */
   qualtricsModDate: string;
-  letters: AllSurveys_surveys_letters[];
+  /**
+   * Fetch the (optional) letter for this survey
+   */
+  letter: AllSurveys_surveys_letter | null;
+  /**
+   * Dimensions for this survey; groups indices, which group items.
+   */
   surveyDimensions: AllSurveys_surveys_surveyDimensions[];
   /**
-   * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+   * All the Qualtrics items for this survey; 
+   *     for groupings, see survey dimension and index.
+   *     Pass 'whichItems' to choose which to return (default 'All')
    */
   surveyItems: AllSurveys_surveys_surveyItems[];
+  /**
+   * Responses for this survey
+   */
   surveyResponses: AllSurveys_surveys_surveyResponses[];
 }
 

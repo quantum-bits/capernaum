@@ -381,8 +381,8 @@ export default class WriterService {
   }
 
   async renderLetter(letter: Letter, surveyResponse: SurveyResponse) {
-    letterDebug("renderLetter - letter %O", letter);
-    letterDebug("renderLetter - response %O", surveyResponse);
+    letterDebug("renderLetter - %O", letter);
+    letterDebug("renderLetter - %O", surveyResponse);
 
     if (!letter) {
       return Promise.resolve(this.constructOutput(false, "No letter found"));

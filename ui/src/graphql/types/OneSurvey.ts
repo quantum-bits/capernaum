@@ -96,9 +96,14 @@ export interface OneSurvey_survey {
    */
   qualtricsName: string;
   /**
-   * Retrieve survey items; pass `whichItems` to choose which to return (default `All`)
+   * All the Qualtrics items for this survey; 
+   *     for groupings, see survey dimension and index.
+   *     Pass 'whichItems' to choose which to return (default 'All')
    */
   surveyItems: OneSurvey_survey_surveyItems[];
+  /**
+   * Dimensions for this survey; groups indices, which group items.
+   */
   surveyDimensions: OneSurvey_survey_surveyDimensions[];
 }
 

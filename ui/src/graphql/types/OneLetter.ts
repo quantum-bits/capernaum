@@ -172,6 +172,9 @@ export interface OneLetter_letter_survey {
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
+  /**
+   * Dimensions for this survey; groups indices, which group items.
+   */
   surveyDimensions: OneLetter_letter_survey_surveyDimensions[];
 }
 
