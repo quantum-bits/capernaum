@@ -23,7 +23,6 @@ import {
   SurveyUpdateInput
 } from "./entities";
 import { SurveyService } from "./survey.service";
-import { QualtricsService } from "../qualtrics/qualtrics.service";
 import { Int } from "type-graphql";
 import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
@@ -34,10 +33,7 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 @Resolver(of => Survey)
 @UseGuards(GqlAuthGuard)
 export class SurveyResolver {
-  constructor(
-    private readonly surveyService: SurveyService,
-    private readonly qualtricsService: QualtricsService
-  ) {}
+  constructor(private readonly surveyService: SurveyService) {}
 
   @Mutation(returns => Survey, {
     description: "Create a new survey.",
@@ -168,26 +164,11 @@ export class SurveyResolver {
   resolveSurveyResponses(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyResponse, { survey });
   }
-
-  @Mutation(returns => Survey, {
-    description:
-      "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
-  })
-  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: string) {
-    // Fetch the survey with the given ID from the Qualtrics API.
-    const qualtricsSurvey = await this.qualtricsService.getSurvey(qualtricsId);
-
-    // Import survey into the database.
-    return this.surveyService.importQualtricsSurvey(qualtricsSurvey);
-  }
 }
 
 @Resolver(of => SurveyResponse)
 export class SurveyResponseResolver {
-  constructor(
-    private readonly surveyService: SurveyService,
-    private readonly qualtricsService: QualtricsService
-  ) {}
+  constructor(private readonly surveyService: SurveyService) {}
 
   @Query(returns => SurveyResponse)
   surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
@@ -202,38 +183,6 @@ export class SurveyResponseResolver {
   @ResolveProperty("survey", type => Survey)
   resolveSurvey(@Parent() surveyResponse: SurveyResponse) {
     return this.surveyService.findOneOrFail(Survey, surveyResponse.surveyId);
-  }
-
-  @Mutation(returns => QualtricsResponseImportStats, {
-    description: "Fetch responses to a survey"
-  })
-  async importQualtricsSurveyResponses(
-    @Args("qualtricsId") qualtricsId: string
-  ) {
-    const survey = await this.surveyService.find(Survey, { qualtricsId });
-
-    // Get from Qualtrics all responses to this survey.
-    const zipFileEntries = await this.qualtricsService.getResponses(
-      qualtricsId
-    );
-    const allResponses = JSON.parse(zipFileEntries[0].content).responses;
-
-    // For each response retrieved from Qualtrics, import it into the database.
-    const importStats = new QualtricsResponseImportStats();
-    for (const oneResponse of allResponses) {
-      const importResponse = await this.surveyService.importQualtricsSurveyResponse(
-        survey[0].id,
-        oneResponse
-      );
-
-      importStats.importCount += 1;
-      if (importResponse.isDuplicate) {
-        importStats.duplicateCount += 1;
-      }
-      importStats.surveyResponses.push(importResponse.surveyResponse);
-    }
-
-    return importStats;
   }
 
   @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])

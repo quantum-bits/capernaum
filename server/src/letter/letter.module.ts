@@ -8,9 +8,8 @@ import {
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
-import { SurveyModule } from "../survey/survey.module";
 import { ImageModule } from "../image/image.module";
-import LetterWriter from "./letter.writer";
+import WriterService from "../writer/writer.service";
 import { FileModule } from "../file/file.module";
 
 @Module({
@@ -20,17 +19,14 @@ import { FileModule } from "../file/file.module";
       LetterElement,
       LetterElementType,
       PredictionTableEntry
-    ]),
-    SurveyModule,
-    ImageModule,
-    FileModule
+    ])
   ],
   providers: [
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    LetterElementResolver,
-    LetterWriter
-  ]
+    LetterElementResolver
+  ],
+  exports: [LetterService]
 })
 export class LetterModule {}

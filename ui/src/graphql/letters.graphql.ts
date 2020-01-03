@@ -211,8 +211,8 @@ export const DELETE_LETTER_ELEMENT_MUTATION = gql`
 `;
 
 export const WRITE_LETTER_MUTATION = gql`
-  mutation WriteLetter($letterWriterInput: LetterWriterInput!) {
-    writeLetter(letterWriterInput: $letterWriterInput) {
+  mutation WriteLetter($writerInput: WriterInput!) {
+    writeLetter(writerInput: $writerInput) {
       ok
       message
       pdfFileName

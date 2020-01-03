@@ -2,7 +2,7 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { LetterWriterInput } from "./globalTypes";
+import { WriterInput } from "./globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: WriteLetter
@@ -91,5 +91,5 @@ export interface WriteLetter {
 }
 
 export interface WriteLetterVariables {
-  letterWriterInput: LetterWriterInput;
+  writerInput: WriterInput;
 }

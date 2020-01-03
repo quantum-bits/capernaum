@@ -1,9 +1,11 @@
-import { Args, Query, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { QualtricsService } from "./qualtrics.service";
 import { QualtricsSurveyListItem } from "./qualtrics.entities";
-import { SurveyService } from "../survey/survey.service";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { Survey } from "../survey/entities";
+import { SurveyService } from "../survey/survey.service";
+import { QualtricsResponseImportStats } from "../survey/survey.types";
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
@@ -30,7 +32,10 @@ export class QualtricsResolver {
       const response = await this.qualtricsService.listSurveys(offset);
       const { elements, nextPage } = response;
 
-      elements.forEach(element => {
+      for (let element of elements) {
+        const survey = await this.surveyService.findSurveyByQualtricsId(
+          element.id
+        );
         if (element.isActive || includeInactive) {
           surveyList.push({
             qualtricsId: element.id,
@@ -39,10 +44,10 @@ export class QualtricsResolver {
             qualtricsModDate: element.lastModified,
             qualtricsCreationDate: element.creationDate,
             qualtricsIsActive: element.isActive,
-            importedAs: []
+            importedToCapernaum: survey !== null
           });
         }
-      });
+      }
 
       if (nextPage) {
         const url = new URL(nextPage);
@@ -52,16 +57,50 @@ export class QualtricsResolver {
       }
     }
 
-    for (let qualtricsSurvey of surveyList) {
-      const surveys = await this.surveyService.findSurveyByQualtricsId(
-        qualtricsSurvey.qualtricsId
+    return surveyList;
+  }
+
+  @Mutation(returns => Survey, {
+    description:
+      "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
+  })
+  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: string) {
+    // Fetch the survey with the given ID from the Qualtrics API.
+    const qualtricsSurvey = await this.qualtricsService.getSurvey(qualtricsId);
+
+    // Import survey into the database.
+    return this.surveyService.importQualtricsSurvey(qualtricsSurvey);
+  }
+
+  @Mutation(returns => QualtricsResponseImportStats, {
+    description: "Fetch responses to a survey"
+  })
+  async importQualtricsSurveyResponses(
+    @Args("qualtricsId") qualtricsId: string
+  ) {
+    const survey = await this.surveyService.find(Survey, { qualtricsId });
+
+    // Get from Qualtrics all responses to this survey.
+    const zipFileEntries = await this.qualtricsService.getResponses(
+      qualtricsId
+    );
+    const allResponses = JSON.parse(zipFileEntries[0].content).responses;
+
+    // For each response retrieved from Qualtrics, import it into the database.
+    const importStats = new QualtricsResponseImportStats();
+    for (const oneResponse of allResponses) {
+      const importResponse = await this.surveyService.importQualtricsSurveyResponse(
+        survey[0].id,
+        oneResponse
       );
-      for (const survey of surveys) {
-        qualtricsSurvey.importedAs.push(survey);
-        // console.log(JSON.stringify(survey, null, 2));
+
+      importStats.importCount += 1;
+      if (importResponse.isDuplicate) {
+        importStats.duplicateCount += 1;
       }
+      importStats.surveyResponses.push(importResponse.surveyResponse);
     }
 
-    return surveyList;
+    return importStats;
   }
 }

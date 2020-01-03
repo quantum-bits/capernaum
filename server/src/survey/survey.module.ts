@@ -17,7 +17,6 @@ import {
   SurveyItemResponse,
   SurveyResponse
 } from "./entities";
-import { QualtricsModule } from "../qualtrics/qualtrics.module";
 import { registerEnumType } from "type-graphql";
 import { WhichItems } from "./survey.types";
 
@@ -30,8 +29,7 @@ import { WhichItems } from "./survey.types";
       SurveyResponse,
       SurveyItemResponse,
       SurveyItem
-    ]),
-    forwardRef(() => QualtricsModule)
+    ])
   ],
   providers: [
     SurveyService,

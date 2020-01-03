@@ -6,13 +6,6 @@
 // GraphQL query operation: QualtricsSurveys
 // ====================================================
 
-export interface QualtricsSurveys_qualtricsSurveys_importedAs {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-}
-
 export interface QualtricsSurveys_qualtricsSurveys {
   qualtricsId: string;
   qualtricsOwnerId: string;
@@ -20,7 +13,7 @@ export interface QualtricsSurveys_qualtricsSurveys {
   qualtricsModDate: string;
   qualtricsIsActive: boolean;
   qualtricsCreationDate: string;
-  importedAs: QualtricsSurveys_qualtricsSurveys_importedAs[];
+  importedToCapernaum: boolean;
 }
 
 export interface QualtricsSurveys {

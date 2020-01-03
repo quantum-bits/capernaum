@@ -6,13 +6,13 @@ config({
 
 import commander from "commander";
 import { table } from "table";
-import { QualtricsService } from "../qualtrics/qualtrics.service";
 import {
   QualtricsSurveyList,
   QualtricsSurveyMetadata
 } from "../qualtrics/qualtrics.types";
 import chalk from "chalk";
 import { DateTime } from "luxon";
+import { QualtricsService } from "../qualtrics/qualtrics.service";
 
 const program = new commander.Command();
 program

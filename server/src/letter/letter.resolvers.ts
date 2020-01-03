@@ -13,9 +13,7 @@ import {
   LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
-  LetterUpdateInput,
-  LetterWriterInput,
-  LetterWriterOutput
+  LetterUpdateInput
 } from "./entities";
 import { LetterService } from "./letter.service";
 import { Int } from "type-graphql";
@@ -24,20 +22,14 @@ import {
   PredictionTableEntry,
   ScriptureEngagementPractice
 } from "../prediction/entities";
-import LetterWriter from "./letter.writer";
-import { SurveyService } from "../survey/survey.service";
 import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver(of => Letter)
-// @UseGuards(GqlAuthGuard)
+@UseGuards(GqlAuthGuard)
 export class LetterResolver {
-  constructor(
-    private readonly letterService: LetterService,
-    private readonly surveyService: SurveyService,
-    private readonly letterWriter: LetterWriter
-  ) {}
+  constructor(private readonly letterService: LetterService) {}
 
   @Mutation(returns => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
@@ -81,19 +73,6 @@ export class LetterResolver {
   @Mutation(returns => Int)
   deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterService.delete(LetterElement, id);
-  }
-
-  @Mutation(returns => LetterWriterOutput)
-  async writeLetter(
-    @Args("letterWriterInput") letterWriterInput: LetterWriterInput
-  ) {
-    const letter = await this.letterService.letter(letterWriterInput.letterId);
-    const surveyResponse = await this.surveyService.surveyResponseComplete(
-      letterWriterInput.surveyResponseId
-    );
-
-    const result = await this.letterWriter.renderLetter(letter, surveyResponse);
-    return result;
   }
 
   @ResolveProperty("scriptureEngagementPractices", type => [

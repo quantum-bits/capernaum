@@ -17,10 +17,7 @@ import Vue from "vue";
 import { isEmpty } from "lodash";
 import { ALL_QUALTRICS_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { QualtricsSurveys_qualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
-import {
-  //QualtricsSurvey,
-  QualtricsSurveySelection
-} from "@/pages/survey.types";
+import { QualtricsSurveySelection } from "@/pages/survey.types";
 
 export default Vue.extend({
   /**
@@ -62,7 +59,7 @@ export default Vue.extend({
   computed: {
     selections(): QualtricsSurveySelection[] {
       return this.availableQualtricsSurveys
-        .filter(survey => survey.importedAs.length === 0)
+        .filter(survey => survey.importedToCapernaum)
         .map(survey => ({
           text: survey.qualtricsName,
           value: survey.qualtricsId

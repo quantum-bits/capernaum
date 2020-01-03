@@ -61,11 +61,6 @@ export interface LetterUpdateInput {
   surveyId?: number | null;
 }
 
-export interface LetterWriterInput {
-  letterId: number;
-  surveyResponseId: number;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -143,6 +138,11 @@ export interface UserUpdateInput {
   firstName?: string | null;
   lastName?: string | null;
   userRoleIds?: number[] | null;
+}
+
+export interface WriterInput {
+  letterId: number;
+  surveyResponseId: number;
 }
 
 //==============================================================

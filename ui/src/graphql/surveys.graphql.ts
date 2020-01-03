@@ -9,9 +9,7 @@ export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
       qualtricsModDate
       qualtricsIsActive
       qualtricsCreationDate
-      importedAs {
-        id
-      }
+      importedToCapernaum
     }
   }
 `;
