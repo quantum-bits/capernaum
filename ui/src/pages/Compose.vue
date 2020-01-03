@@ -261,7 +261,7 @@ import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
   ONE_LETTER_QUERY,
-  UPDATE_LETTER_ELEMENT_MUTATION,
+  UPDATE_LETTER_ELEMENT_MUTATION
 } from "@/graphql/letters.graphql";
 
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
