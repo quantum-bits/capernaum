@@ -83,16 +83,15 @@ export class QualtricsController {
 
     const qualtricsSurveyId = reply.SurveyID;
     const qualtricsResponseId = reply.ResponseID;
+    qualtricsDebug(
+      "qSurveyId %s - qResponseId %s",
+      qualtricsSurveyId,
+      qualtricsResponseId
+    );
 
     // Find the survey
     const survey = await this.surveyService.findSurveyByQualtricsId(
       qualtricsSurveyId
-    );
-    qualtricsDebug(
-      "qSurveyId %s - qResponseId %s - surveyId %s",
-      qualtricsSurveyId,
-      qualtricsResponseId,
-      survey.id
     );
     qualtricsDebug("survey - %O", survey);
 
@@ -110,9 +109,13 @@ export class QualtricsController {
     );
     qualtricsDebug("importedResponse - %O", importedResponse);
 
+    // Fetch the letter.
+    // TODO: Sort out how to pass stuff to `renderLetter`.
+    const letter = await this.surveyService.findLetter(survey.id);
+
     // Write a letter.
     const writerOutput = await this.writerService.renderLetter(
-      survey.letter.id,
+      letter.id,
       importedResponse.surveyResponse.id
     );
     qualtricsDebug("writerOutput - %O", writerOutput);

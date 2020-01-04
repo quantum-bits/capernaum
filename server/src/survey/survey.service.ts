@@ -24,6 +24,7 @@ import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
 import debug from "debug";
+import { Letter } from "../letter/entities";
 
 const surveyDebug = debug("survey");
 
@@ -121,6 +122,12 @@ export class SurveyService extends BaseService {
 
   findSurveyByQualtricsId(qualtricsId: string) {
     return this.surveyRepo.findOne({ qualtricsId });
+  }
+
+  findLetter(surveyId: number) {
+    return this.entityManager.findOne(Letter, {
+      surveyId
+    });
   }
 
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {

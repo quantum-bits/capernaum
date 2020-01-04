@@ -143,10 +143,7 @@ export class SurveyResolver {
     description: "Fetch the (optional) letter for this survey"
   })
   resolveLetter(@Parent() survey: Survey) {
-    //return this.surveyService.findOne(Letter, survey.letterId);
-    return this.entityManager.findOne(Letter, {
-      where: { surveyId: survey.id }
-    });
+    return this.surveyService.findLetter(survey.id);
   }
 
   @ResolveProperty("surveyItems", type => [SurveyItem], {
