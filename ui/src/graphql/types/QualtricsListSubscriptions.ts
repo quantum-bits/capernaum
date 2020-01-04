@@ -6,7 +6,7 @@
 // GraphQL query operation: QualtricsListSubscriptions
 // ====================================================
 
-export interface QualtricsListSubscriptions_qualtricsListSubscriptions {
+export interface QualtricsListSubscriptions_subscriptions {
   id: string;
   topics: string;
   publicationUrl: string;
@@ -16,5 +16,5 @@ export interface QualtricsListSubscriptions_qualtricsListSubscriptions {
 }
 
 export interface QualtricsListSubscriptions {
-  qualtricsListSubscriptions: QualtricsListSubscriptions_qualtricsListSubscriptions[];
+  subscriptions: QualtricsListSubscriptions_subscriptions[];
 }

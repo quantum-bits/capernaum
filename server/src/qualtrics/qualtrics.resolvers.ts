@@ -6,8 +6,11 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Survey } from "../survey/entities";
 import { SurveyService } from "../survey/survey.service";
 import { QualtricsResponseImportStats } from "../survey/survey.types";
-import { QualtricsOrganization, QualtricsSubscription } from "./entities";
-import { Int } from "type-graphql";
+import {
+  QualtricsOrganization,
+  QualtricsSubscription,
+  QualtricsSubscriptionCreateInput
+} from "./entities";
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
@@ -109,7 +112,7 @@ export class QualtricsResolver {
   }
 
   @Query(returns => QualtricsOrganization)
-  qualtricsOrganization(
+  organization(
     @Args({
       name: "organizationId",
       type: () => String,
@@ -120,13 +123,53 @@ export class QualtricsResolver {
     return this.qualtricsService.getOrganization(organizationId);
   }
 
+  @Mutation(returns => QualtricsSubscription)
+  createSubscription(
+    @Args("createInput") createInput: QualtricsSubscriptionCreateInput
+  ) {
+    let finalSegment = "";
+    let eventType = "";
+    let surveyId = "";
+
+    switch (createInput.subscriptionType) {
+      case "activate-survey":
+      case "deactivate-survey":
+        eventType = finalSegment = createInput.subscriptionType;
+        break;
+      case "started-session":
+      case "partial-response":
+        throw Error(
+          `No support for subscription '${createInput.subscriptionType}'`
+        );
+        break;
+      case "completed-response":
+        if (createInput.surveyId) {
+          eventType = finalSegment = createInput.subscriptionType;
+          surveyId = createInput.surveyId;
+        } else {
+          throw Error("Missing survey ID for completed response");
+        }
+        break;
+      default:
+        throw Error(
+          `Invalid subscription type '${createInput.subscriptionType}'`
+        );
+    }
+
+    return this.qualtricsService.createSubscription(
+      `https://${createInput.hostName}/qualtrics/${finalSegment}`,
+      eventType,
+      surveyId
+    );
+  }
+
   @Query(returns => [QualtricsSubscription])
-  qualtricsListSubscriptions() {
+  subscriptions() {
     return this.qualtricsService.listSubscriptions();
   }
 
   @Mutation(returns => String)
-  qualtricsDeleteSubscription(@Args("subscriptionId") subscriptionId: string) {
+  deleteSubscription(@Args("subscriptionId") subscriptionId: string) {
     return this.qualtricsService.deleteSubscription(subscriptionId);
   }
 }

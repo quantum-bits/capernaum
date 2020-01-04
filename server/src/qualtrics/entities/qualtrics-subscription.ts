@@ -1,4 +1,5 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
+import { SubscriptionType } from "../qualtrics.types";
 
 @ObjectType()
 export class QualtricsSubscription {
@@ -8,4 +9,11 @@ export class QualtricsSubscription {
   @Field() publicationUrl: string;
   @Field() encrypted: boolean;
   @Field(type => Int) successfulCalls: number;
+}
+
+@InputType()
+export class QualtricsSubscriptionCreateInput {
+  @Field() hostName: string;
+  @Field(type => String) subscriptionType: SubscriptionType;
+  @Field({ nullable: true }) surveyId?: string;
 }

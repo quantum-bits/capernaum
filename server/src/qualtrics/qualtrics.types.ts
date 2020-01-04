@@ -178,3 +178,10 @@ export interface WebHookCompletedResponse {
   CompletedDate: string;
   BrandID: string;
 }
+
+export type SubscriptionType =
+  | "activate-survey"
+  | "deactivate-survey"
+  | "started-session"
+  | "partial-response"
+  | "completed-response";

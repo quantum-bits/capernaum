@@ -2,6 +2,7 @@ import {
   SurveyDimensionCreateInput,
   SurveyIndexCreateInput
 } from "../../graphql/types/globalTypes";
+import { SubscriptionType } from "@/types/qualtrics.types";
 
 export type DimensionDialogResponse = Pick<SurveyDimensionCreateInput, "title">;
 
@@ -14,3 +15,8 @@ export type IndexDialogResponse = Omit<
   SurveyIndexCreateInput,
   "surveyDimensionId"
 >;
+
+export interface SubscriptionDialogResponse {
+  hostId: number;
+  subscriptionType: SubscriptionType;
+}

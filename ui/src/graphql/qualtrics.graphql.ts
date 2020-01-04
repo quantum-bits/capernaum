@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 
 export const QUALTRICS_ORG_QUERY = gql`
   query QualtricsOrganization {
-    qualtricsOrganization {
+    organization {
       id
       name
       status
@@ -13,7 +13,7 @@ export const QUALTRICS_ORG_QUERY = gql`
 
 export const QUALTRICS_LIST_SUBSCRIPTIONS = gql`
   query QualtricsListSubscriptions {
-    qualtricsListSubscriptions {
+    subscriptions {
       id
       topics
       publicationUrl
@@ -26,6 +26,6 @@ export const QUALTRICS_LIST_SUBSCRIPTIONS = gql`
 
 export const QUALTRICS_REMOVE_SUBSCRIPTION = gql`
   mutation QualtricsRemoveSubscription($subscriptionId: String!) {
-    qualtricsDeleteSubscription(subscriptionId: $subscriptionId)
+    deleteSubscription(subscriptionId: $subscriptionId)
   }
 `;

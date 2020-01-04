@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="800">
+  <v-dialog persistent v-model="visible" max-width="600">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="theForm" v-model="formValid" lazy-validation>

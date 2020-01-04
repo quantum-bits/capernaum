@@ -7,7 +7,7 @@
 // ====================================================
 
 export interface QualtricsRemoveSubscription {
-  qualtricsDeleteSubscription: string;
+  deleteSubscription: string;
 }
 
 export interface QualtricsRemoveSubscriptionVariables {

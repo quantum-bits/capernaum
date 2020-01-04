@@ -5,7 +5,7 @@
         <h1 class="headline">Web Hooks</h1>
       </v-col>
       <v-col>
-        <h1 class="body-1">{{ qualtricsOrganization.name }}</h1>
+        <h1 class="body-1">{{ organization.name }}</h1>
       </v-col>
     </v-row>
 
@@ -29,7 +29,17 @@
     <v-row>
       <v-col>
         <h1 class="title">Subscriptions</h1>
-        <web-hook-cards :qualtrics-subscriptions="qualtricsSubscriptions" />
+      </v-col>
+      <v-col>
+        <v-btn color="primary" @click="subscriptionDialog.visible = true">
+          Add Subscription
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <web-hook-cards :qualtrics-subscriptions="subscriptions" />
       </v-col>
     </v-row>
 
@@ -45,6 +55,14 @@
       :host-name="machineDialog.hostName"
       :is-active="machineDialog.isActive"
       @ready="createMachine"
+    />
+
+    <subscription-dialog
+      v-model="subscriptionDialog.visible"
+      dialog-title="Add a Subscription"
+      :host-id="subscriptionDialog.hostId"
+      :subscription-type="subscriptionDialog.subscriptionType"
+      @ready="createSubscription"
     />
   </v-container>
 </template>
@@ -77,16 +95,18 @@ import { MachineCreateInput } from "@/graphql/types/globalTypes";
 import { AllMachines_machines as Machine } from "@/graphql/types/AllMachines";
 import { CreateMachine } from "@/graphql/types/CreateMachine";
 import { DeleteMachine } from "@/graphql/types/DeleteMachine";
+import SubscriptionDialog from "@/components/dialogs/SubscriptionDialog.vue";
+import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
 
 type StringToStringMap = Map<string, string>;
 
 export default Vue.extend({
   name: "WebHooks",
 
-  components: { WebHookCards, MachineCards, MachineDialog },
+  components: { WebHookCards, MachineCards, MachineDialog, SubscriptionDialog },
 
   apollo: {
-    qualtricsOrganization: {
+    organization: {
       query: QUALTRICS_ORG_QUERY
     },
 
@@ -105,11 +125,10 @@ export default Vue.extend({
       }
     },
 
-    qualtricsSubscriptions: {
+    subscriptions: {
       query: QUALTRICS_LIST_SUBSCRIPTIONS,
       update: data => {
-        const subscriptions: QualtricsSubscription[] =
-          data.qualtricsListSubscriptions;
+        const subscriptions: QualtricsSubscription[] = data.subscriptions;
 
         for (const subscription of subscriptions) {
           const [catType, subType, surveyId] = subscription.topics.split(".");
@@ -133,8 +152,8 @@ export default Vue.extend({
 
   data() {
     return {
-      qualtricsOrganization: {},
-      qualtricsSubscriptions: [] as QualtricsSubscription[],
+      organization: {},
+      subscriptions: [] as QualtricsSubscription[],
       surveyNameById: {} as StringToStringMap,
       machines: [] as Machine[],
 
@@ -142,6 +161,12 @@ export default Vue.extend({
         name: "",
         hostName: "",
         isActive: true,
+        visible: false
+      },
+
+      subscriptionDialog: {
+        hostId: NaN,
+        subscriptionType: "completedResponse",
         visible: false
       },
 
@@ -192,6 +217,16 @@ export default Vue.extend({
         .catch(error => this.showSnackbar(error));
     },
 
+    createSubscription(subscription: SubscriptionDialogResponse) {
+      console.log("SUBSCRIPTION", subscription);
+      // this.$apollo.mutate({
+      //   mutation: CREATE_MACHINE,
+      //   variables: {
+      //     createInput
+      //   }
+      // });
+    },
+
     removeSubscription(subscriptionId: string) {
       this.$apollo
         .mutate({
@@ -202,7 +237,7 @@ export default Vue.extend({
         })
         .then(httpStatus => {
           console.log("STATUS", httpStatus);
-          this.qualtricsSubscriptions = this.qualtricsSubscriptions.filter(
+          this.subscriptions = this.subscriptions.filter(
             subscription => subscription.id !== subscriptionId
           );
           this.showSnackbar("Subscription removed");

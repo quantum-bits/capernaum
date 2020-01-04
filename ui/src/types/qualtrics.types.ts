@@ -1,13 +1,16 @@
-import { QualtricsListSubscriptions_qualtricsListSubscriptions } from "@/graphql/types/QualtricsListSubscriptions";
+import { QualtricsListSubscriptions_subscriptions } from "@/graphql/types/QualtricsListSubscriptions";
 
 export type CategoryType = "controlpanel" | "surveyengine";
+
 export type SubscriptionType =
-  | "activateSurvey"
-  | "deactivateSurvey"
-  | "completedResponse";
+  | "activate-survey"
+  | "deactivate-survey"
+  | "started-session"
+  | "partial-response"
+  | "completed-response";
 
 export interface QualtricsSubscription
-  extends QualtricsListSubscriptions_qualtricsListSubscriptions {
+  extends QualtricsListSubscriptions_subscriptions {
   categoryType: CategoryType;
   subscriptionType: SubscriptionType;
   surveyId?: string;

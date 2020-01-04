@@ -6,7 +6,7 @@
 // GraphQL query operation: QualtricsOrganization
 // ====================================================
 
-export interface QualtricsOrganization_qualtricsOrganization {
+export interface QualtricsOrganization_organization {
   id: string;
   name: string;
   status: string;
@@ -14,5 +14,5 @@ export interface QualtricsOrganization_qualtricsOrganization {
 }
 
 export interface QualtricsOrganization {
-  qualtricsOrganization: QualtricsOrganization_qualtricsOrganization;
+  organization: QualtricsOrganization_organization;
 }

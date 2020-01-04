@@ -239,7 +239,8 @@ type Mutation {
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
-  qualtricsDeleteSubscription(subscriptionId: String!): String!
+  createSubscription(createInput: QualtricsSubscriptionCreateInput!): QualtricsSubscription!
+  deleteSubscription(subscriptionId: String!): String!
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
@@ -330,6 +331,12 @@ type QualtricsSubscription {
   successfulCalls: Int!
 }
 
+input QualtricsSubscriptionCreateInput {
+  hostName: String!
+  subscriptionType: String!
+  surveyId: String
+}
+
 type QualtricsSurveyListItem {
   qualtricsId: String!
   qualtricsName: String!
@@ -363,8 +370,8 @@ type Query {
   images: [Image!]!
   image(id: Int!): Image!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  qualtricsOrganization(organizationId: String = "taylorcfse"): QualtricsOrganization!
-  qualtricsListSubscriptions: [QualtricsSubscription!]!
+  organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
+  subscriptions: [QualtricsSubscription!]!
   events: [Event!]!
   machines: [Machine!]!
 }
