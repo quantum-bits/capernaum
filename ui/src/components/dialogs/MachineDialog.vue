@@ -13,7 +13,7 @@
           <v-text-field
             v-model="dialogState.hostName"
             label="Host Name"
-            hint="(e.g., 'galilee.cse.taylor.edu', '192.168.1.101')"
+            hint="(e.g., 'galilee.cse.taylor.edu')"
             :rules="rules.required"
           />
           <v-switch v-model="dialogState.isActive" label="Active" />

@@ -7,6 +7,7 @@ import {
 import {
   CreateResponseData,
   CreateResponseExportResponse,
+  CreateSubscriptionResponse,
   QualtricsArrayResponse,
   QualtricsResponse,
   QualtricsSurvey,
@@ -165,8 +166,13 @@ export class QualtricsService {
         responseType: "json",
         json: data
       })
-      .then(response => response.body.result)
-      .catch(err => console.error("qualtricsPost", err));
+      .then(response => {
+        qualtricsDebug("qualtricsPost - response %O", response.body);
+        return response.body.result;
+      })
+      .catch(error => {
+        throw Error(error);
+      });
   }
 
   /** Get an organization's details. */
@@ -201,16 +207,22 @@ export class QualtricsService {
   }
 
   /** Create an event subscription */
-  createSubscription(
+  async createSubscription(
     publicationUrl: string,
     eventName: string,
     surveyId?: string
   ) {
     const url = this.makeUrl("eventsubscriptions");
-    return this.qualtricsPost(url, {
+    const response = await this.qualtricsPost<CreateSubscriptionResponse>(url, {
       publicationUrl: publicationUrl,
       topics: this.eventFactory.makeEvent(eventName, surveyId)
     });
+    if (response) {
+      const subscriptionId = response.id;
+      return this.getSubscription(subscriptionId);
+    } else {
+      throw Error("Couldn't create subscription");
+    }
   }
 
   deleteSubscription(subscriptionId: string) {

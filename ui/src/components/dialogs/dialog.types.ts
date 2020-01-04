@@ -17,6 +17,7 @@ export type IndexDialogResponse = Omit<
 >;
 
 export interface SubscriptionDialogResponse {
-  hostId: number;
+  hostName: string;
   subscriptionType: SubscriptionType;
+  surveyId: string;
 }

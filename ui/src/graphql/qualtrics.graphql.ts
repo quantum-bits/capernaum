@@ -29,3 +29,16 @@ export const QUALTRICS_REMOVE_SUBSCRIPTION = gql`
     deleteSubscription(subscriptionId: $subscriptionId)
   }
 `;
+
+export const QUALTRICS_CREATE_SUBSCRIPTION = gql`
+  mutation CreateSubscription($createInput: QualtricsSubscriptionCreateInput!) {
+    createSubscription(createInput: $createInput) {
+      id
+      scope
+      topics
+      publicationUrl
+      encrypted
+      successfulCalls
+    }
+  }
+`;

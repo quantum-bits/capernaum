@@ -40,15 +40,6 @@
               <!--<td class="text-xs-right">{{ item.description }}</td>-->
               <td class="text-xs-right">{{ item.surveyTitle }}</td>
               <td class="text-xs-right">{{ item.updated | dateAndTime }}</td>
-              <td class="text-xs-center">
-                <span v-if="item.isFrozen">
-                  <!-- https://stackoverflow.com/questions/47785750/how-to-use-colors-in-vuetify -->
-                  <v-icon color="success">mdi-check-circle</v-icon>
-                </span>
-              </td>
-              <td class="text-xs-center">
-                -- is active ? --
-              </td>
               <td class="text-xs-right">
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -149,11 +140,8 @@ export default class LettersPage extends Vue {
       sortable: false,
       value: "title"
     },
-    //{ text: "Description", value: "description" },
     { text: "Survey", value: "surveyTitle" },
     { text: "Last Update", value: "lastUpdate" },
-    { text: "Frozen?", value: "isFrozen" },
-    { text: "Active?", value: "isActive" },
     { text: "Actions", sortable: false }
   ];
 

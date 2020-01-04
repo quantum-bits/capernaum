@@ -22,7 +22,7 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item @click="removeSubscription(item.id)">
+                  <v-list-item @click="$emit('delete', item.id)">
                     <v-list-item-title>Remove</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -35,20 +35,14 @@
                   {{ item.url.hostname }}
                 </v-list-item-content>
               </v-list-item>
-              <template v-if="item.surveyId">
-                <v-list-item>
-                  <v-list-item-content>Survey ID</v-list-item-content>
-                  <v-list-item-content class="align-end">
-                    {{ item.surveyId }}
-                  </v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-content>Survey Name</v-list-item-content>
-                  <v-list-item-content class="align-end">
-                    {{ surveyNameById.get(item.surveyId) }}
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
+
+              <v-list-item v-if="item.surveyId">
+                <v-list-item-content>Survey Name</v-list-item-content>
+                <v-list-item-content class="align-end">
+                  {{ surveyNameById.get(item.surveyId) }}
+                </v-list-item-content>
+              </v-list-item>
+
               <v-list-item>
                 <v-list-item-content>
                   Successful Calls
@@ -57,7 +51,16 @@
                   {{ item.successfulCalls }}
                 </v-list-item-content>
               </v-list-item>
+
               <v-divider />
+
+              <v-list-item v-if="item.surveyId">
+                <v-list-item-content>Survey ID</v-list-item-content>
+                <v-list-item-content class="align-end">
+                  {{ item.surveyId }}
+                </v-list-item-content>
+              </v-list-item>
+
               <v-list-item>
                 <v-list-item-content>Subscription ID</v-list-item-content>
                 <v-list-item-content class="align-end">
@@ -74,14 +77,17 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { QualtricsSubscription } from "@/types/qualtrics.types";
+import { EnhancedSubscription } from "@/types/qualtrics.types";
 
 export default Vue.extend({
   name: "WebHookCards",
 
   props: {
     qualtricsSubscriptions: {
-      type: Array as () => QualtricsSubscription[],
+      type: Array as () => EnhancedSubscription[],
+      required: true
+    },
+    surveyNameById: {
       required: true
     }
   }

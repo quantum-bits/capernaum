@@ -83,6 +83,12 @@ export interface PredictionTableEntryReplaceInput {
   entries: PartialPredictionTableEntry[];
 }
 
+export interface QualtricsSubscriptionCreateInput {
+  hostName: string;
+  subscriptionType: string;
+  surveyId?: string | null;
+}
+
 export interface ScriptureEngagementPracticeCreateInput {
   title: string;
   description: string;

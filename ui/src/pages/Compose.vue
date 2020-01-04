@@ -158,7 +158,7 @@
             :letterId="theLetter.id"
             :allowHideTable="allowHideTable"
             v-on:hide-table="hideTable"
-          ></AssociationTable>
+          />
         </v-flex>
       </v-layout>
       <v-layout row wrap>
@@ -176,7 +176,7 @@
             :isEmailText="'true'"
             v-on:edit-mode-on="setEmailEditModeOn()"
             v-on:edit-mode-off="setEmailEditModeOff()"
-          ></LetterTextArea>
+          />
         </v-flex>
       </v-layout>
     </div>
@@ -217,7 +217,7 @@
             v-on:refresh-page="refreshPage()"
             v-on:edit-mode-on="setEditModeOn(element)"
             v-on:edit-mode-off="setEditModeOff(element)"
-          ></component>
+          />
         </div>
       </v-flex>
 

@@ -9,7 +9,7 @@ export type SubscriptionType =
   | "partial-response"
   | "completed-response";
 
-export interface QualtricsSubscription
+export interface EnhancedSubscription
   extends QualtricsListSubscriptions_subscriptions {
   categoryType: CategoryType;
   subscriptionType: SubscriptionType;

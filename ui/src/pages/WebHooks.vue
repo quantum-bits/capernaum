@@ -39,7 +39,11 @@
 
     <v-row>
       <v-col>
-        <web-hook-cards :qualtrics-subscriptions="subscriptions" />
+        <web-hook-cards
+          :qualtrics-subscriptions="subscriptions"
+          :survey-name-by-id="surveyNameById"
+          @delete="deleteSubscription"
+        />
       </v-col>
     </v-row>
 
@@ -60,8 +64,9 @@
     <subscription-dialog
       v-model="subscriptionDialog.visible"
       dialog-title="Add a Subscription"
-      :host-id="subscriptionDialog.hostId"
+      :host-name="subscriptionDialog.hostName"
       :subscription-type="subscriptionDialog.subscriptionType"
+      :survey-id="subscriptionDialog.surveyId"
       @ready="createSubscription"
     />
   </v-container>
@@ -70,6 +75,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {
+  QUALTRICS_CREATE_SUBSCRIPTION,
   QUALTRICS_LIST_SUBSCRIPTIONS,
   QUALTRICS_ORG_QUERY,
   QUALTRICS_REMOVE_SUBSCRIPTION
@@ -81,7 +87,7 @@ import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 import WebHookCards from "@/components/WebHookCards.vue";
 import {
   CategoryType,
-  QualtricsSubscription,
+  EnhancedSubscription,
   SubscriptionType
 } from "@/types/qualtrics.types";
 import MachineCards from "@/components/MachineCards.vue";
@@ -97,6 +103,8 @@ import { CreateMachine } from "@/graphql/types/CreateMachine";
 import { DeleteMachine } from "@/graphql/types/DeleteMachine";
 import SubscriptionDialog from "@/components/dialogs/SubscriptionDialog.vue";
 import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
+import { CreateSubscription } from "@/graphql/types/CreateSubscription";
+import { QualtricsListSubscriptions_subscriptions as QualtricsSubscription } from "@/graphql/types/QualtricsListSubscriptions";
 
 type StringToStringMap = Map<string, string>;
 
@@ -127,25 +135,10 @@ export default Vue.extend({
 
     subscriptions: {
       query: QUALTRICS_LIST_SUBSCRIPTIONS,
-      update: data => {
-        const subscriptions: QualtricsSubscription[] = data.subscriptions;
-
-        for (const subscription of subscriptions) {
-          const [catType, subType, surveyId] = subscription.topics.split(".");
-          subscription.categoryType = catType as CategoryType;
-          subscription.subscriptionType = subType as SubscriptionType;
-          if (subscription.categoryType === "surveyengine") {
-            subscription.surveyId = surveyId;
-          }
-
-          const url = new URLParse(subscription.publicationUrl);
-          subscription.url = {
-            protocol: url.protocol,
-            hostname: url.hostname,
-            path: url.pathname
-          };
-        }
-        return subscriptions;
+      update: function(data) {
+        return data.subscriptions.map((subscription: QualtricsSubscription) =>
+          this.enhanceSubscription(subscription)
+        );
       }
     }
   },
@@ -153,7 +146,7 @@ export default Vue.extend({
   data() {
     return {
       organization: {},
-      subscriptions: [] as QualtricsSubscription[],
+      subscriptions: [] as EnhancedSubscription[],
       surveyNameById: {} as StringToStringMap,
       machines: [] as Machine[],
 
@@ -165,8 +158,9 @@ export default Vue.extend({
       },
 
       subscriptionDialog: {
-        hostId: NaN,
-        subscriptionType: "completedResponse",
+        hostName: "",
+        subscriptionType: "completed-response",
+        surveyId: "",
         visible: false
       },
 
@@ -217,17 +211,48 @@ export default Vue.extend({
         .catch(error => this.showSnackbar(error));
     },
 
-    createSubscription(subscription: SubscriptionDialogResponse) {
-      console.log("SUBSCRIPTION", subscription);
-      // this.$apollo.mutate({
-      //   mutation: CREATE_MACHINE,
-      //   variables: {
-      //     createInput
-      //   }
-      // });
+    enhanceSubscription(
+      subscription: QualtricsSubscription
+    ): EnhancedSubscription {
+      const enhancedSubscription = { ...subscription } as EnhancedSubscription;
+
+      const [catType, subType, surveyId] = subscription.topics.split(".");
+      enhancedSubscription.categoryType = catType as CategoryType;
+      enhancedSubscription.subscriptionType = subType as SubscriptionType;
+      if (enhancedSubscription.categoryType === "surveyengine") {
+        enhancedSubscription.surveyId = surveyId;
+      }
+
+      const url = new URLParse(subscription.publicationUrl);
+      enhancedSubscription.url = {
+        protocol: url.protocol,
+        hostname: url.hostname,
+        path: url.pathname
+      };
+
+      return enhancedSubscription;
     },
 
-    removeSubscription(subscriptionId: string) {
+    createSubscription(dialogResponse: SubscriptionDialogResponse) {
+      console.log("RESPONSE", dialogResponse);
+      this.$apollo
+        .mutate<CreateSubscription>({
+          mutation: QUALTRICS_CREATE_SUBSCRIPTION,
+          variables: {
+            createInput: dialogResponse
+          }
+        })
+        .then(({ data }) => {
+          console.log("RESULT", data);
+          this.subscriptions.push(
+            this.enhanceSubscription(data!.createSubscription)
+          );
+          this.showSnackbar("Subscription created");
+        });
+    },
+
+    deleteSubscription(subscriptionId: string) {
+      console.log("SUB ID", subscriptionId);
       this.$apollo
         .mutate({
           mutation: QUALTRICS_REMOVE_SUBSCRIPTION,

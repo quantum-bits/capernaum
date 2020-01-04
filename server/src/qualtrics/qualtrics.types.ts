@@ -185,3 +185,7 @@ export type SubscriptionType =
   | "started-session"
   | "partial-response"
   | "completed-response";
+
+export interface CreateSubscriptionResponse {
+  id: string;
+}

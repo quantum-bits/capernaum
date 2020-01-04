@@ -156,11 +156,13 @@ export class QualtricsResolver {
         );
     }
 
-    return this.qualtricsService.createSubscription(
+    const returnValue = this.qualtricsService.createSubscription(
       `https://${createInput.hostName}/qualtrics/${finalSegment}`,
       eventType,
       surveyId
     );
+    console.log(JSON.stringify(returnValue, null, 2));
+    return returnValue;
   }
 
   @Query(returns => [QualtricsSubscription])
