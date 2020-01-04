@@ -5,20 +5,31 @@
         <h1 class="headline">Web Hooks</h1>
       </v-col>
       <v-col>
-        <h4 class="subtitle-1">{{ qualtricsOrganization.name }}</h4>
+        <h1 class="body-1">{{ qualtricsOrganization.name }}</h1>
+      </v-col>
+    </v-row>
+
+    <v-row class="align-baseline">
+      <v-col>
+        <h1 class="title">Machines</h1>
+      </v-col>
+      <v-col>
+        <v-btn color="primary" @click="machineDialog.visible = true">
+          Add Machine
+        </v-btn>
       </v-col>
     </v-row>
 
     <v-row>
       <v-col>
+        <machine-cards :machines="machines" @deleteMachine="deleteMachine" />
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <h1 class="title">Subscriptions</h1>
         <web-hook-cards :qualtrics-subscriptions="qualtricsSubscriptions" />
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col>
-        <h1 class="headline">Machines</h1>
-        <machine-cards></machine-cards>
       </v-col>
     </v-row>
 
@@ -27,19 +38,14 @@
       <v-btn text @click="snackbar.visible = false">Close</v-btn>
     </v-snackbar>
 
-    <v-bottom-sheet v-model="bottomSheet.visible" inset>
-      <v-sheet class="text-center" height="200px">
-        <v-btn
-          class="my-6"
-          color="success"
-          @click="bottomSheet.visible = false"
-        >
-          <v-icon left>mdi-close</v-icon>
-          Close
-        </v-btn>
-        <div>{{ bottomSheet.content }}</div>
-      </v-sheet>
-    </v-bottom-sheet>
+    <machine-dialog
+      v-model="machineDialog.visible"
+      dialog-title="Add a Machine"
+      :machine-name="machineDialog.name"
+      :host-name="machineDialog.hostName"
+      :is-active="machineDialog.isActive"
+      @ready="createMachine"
+    />
   </v-container>
 </template>
 
@@ -61,17 +67,31 @@ import {
   SubscriptionType
 } from "@/types/qualtrics.types";
 import MachineCards from "@/components/MachineCards.vue";
+import {
+  ALL_MACHINES,
+  CREATE_MACHINE,
+  DELETE_MACHINE
+} from "@/graphql/machine.graphql";
+import MachineDialog from "@/components/dialogs/MachineDialog.vue";
+import { MachineCreateInput } from "@/graphql/types/globalTypes";
+import { AllMachines_machines as Machine } from "@/graphql/types/AllMachines";
+import { CreateMachine } from "@/graphql/types/CreateMachine";
+import { DeleteMachine } from "@/graphql/types/DeleteMachine";
 
 type StringToStringMap = Map<string, string>;
 
 export default Vue.extend({
   name: "WebHooks",
 
-  components: { WebHookCards, MachineCards },
+  components: { WebHookCards, MachineCards, MachineDialog },
 
   apollo: {
     qualtricsOrganization: {
       query: QUALTRICS_ORG_QUERY
+    },
+
+    machines: {
+      query: ALL_MACHINES
     },
 
     surveyNameById: {
@@ -106,7 +126,6 @@ export default Vue.extend({
             path: url.pathname
           };
         }
-        console.log("UPDATE", subscriptions);
         return subscriptions;
       }
     }
@@ -117,14 +136,17 @@ export default Vue.extend({
       qualtricsOrganization: {},
       qualtricsSubscriptions: [] as QualtricsSubscription[],
       surveyNameById: {} as StringToStringMap,
+      machines: [] as Machine[],
 
-      snackbar: {
-        text: "",
+      machineDialog: {
+        name: "",
+        hostName: "",
+        isActive: true,
         visible: false
       },
 
-      bottomSheet: {
-        content: "",
+      snackbar: {
+        text: "",
         visible: false
       }
     };
@@ -136,9 +158,38 @@ export default Vue.extend({
       this.snackbar.visible = true;
     },
 
-    showBottomSheet(content: string) {
-      this.bottomSheet.content = content;
-      this.bottomSheet.visible = true;
+    createMachine(machine: MachineCreateInput) {
+      this.$apollo
+        .mutate<CreateMachine>({
+          mutation: CREATE_MACHINE,
+          variables: {
+            createInput: machine
+          }
+        })
+        .then(({ data }) => {
+          console.log("RESULT", data);
+          this.machines.push(data!.createMachine);
+          this.showSnackbar("Machine added");
+        })
+        .catch(error => this.showSnackbar(error));
+    },
+
+    deleteMachine(machineId: number) {
+      this.$apollo
+        .mutate<DeleteMachine>({
+          mutation: DELETE_MACHINE,
+          variables: {
+            machineId
+          }
+        })
+        .then(result => {
+          console.log("RESULT", result);
+          this.machines = this.machines.filter(
+            machine => machine.id !== machineId
+          );
+          this.showSnackbar("Machine deleted");
+        })
+        .catch(error => this.showSnackbar(error));
     },
 
     removeSubscription(subscriptionId: string) {

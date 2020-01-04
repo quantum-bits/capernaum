@@ -5,7 +5,7 @@ export const CREATE_MACHINE = gql`
     createMachine(createInput: $createInput) {
       id
       name
-      hostname
+      hostName
       active
     }
   }
@@ -16,8 +16,14 @@ export const ALL_MACHINES = gql`
     machines {
       id
       name
-      hostname
+      hostName
       active
     }
+  }
+`;
+
+export const DELETE_MACHINE = gql`
+  mutation DeleteMachine($machineId: Int!) {
+    deleteMachine(id: $machineId)
   }
 `;

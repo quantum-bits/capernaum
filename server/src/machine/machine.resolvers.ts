@@ -3,6 +3,7 @@ import { Machine, MachineCreateInput } from "./entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { MachineService } from "./machine.service";
+import { Int } from "type-graphql";
 
 @Resolver(of => Machine)
 @UseGuards(GqlAuthGuard)
@@ -17,5 +18,10 @@ export class MachineResolver {
   @Query(returns => [Machine])
   machines() {
     return this.machineService.find(Machine);
+  }
+
+  @Mutation(returns => Int)
+  deleteMachine(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.machineService.delete(Machine, id);
   }
 }

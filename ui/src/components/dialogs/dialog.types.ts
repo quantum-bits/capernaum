@@ -1,7 +1,7 @@
 import {
   SurveyDimensionCreateInput,
   SurveyIndexCreateInput
-} from "../graphql/types/globalTypes";
+} from "../../graphql/types/globalTypes";
 
 export type DimensionDialogResponse = Pick<SurveyDimensionCreateInput, "title">;
 

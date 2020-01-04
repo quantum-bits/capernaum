@@ -22,7 +22,7 @@
                   </v-btn>
                 </template>
                 <v-list>
-                  <v-list-item @click="removeSubscription(item.id)">
+                  <v-list-item @click="$emit('deleteMachine', item.id)">
                     <v-list-item-title>Remove</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -30,38 +30,15 @@
             </v-toolbar>
             <v-list dense>
               <v-list-item>
-                <v-list-item-content>Hostname</v-list-item-content>
+                <v-list-item-content>Host name</v-list-item-content>
                 <v-list-item-content class="align-end">
-                  {{ item.url.hostname }}
+                  {{ item.hostName }}
                 </v-list-item-content>
               </v-list-item>
-              <template v-if="item.surveyId">
-                <v-list-item>
-                  <v-list-item-content>Survey ID</v-list-item-content>
-                  <v-list-item-content class="align-end">
-                    {{ item.surveyId }}
-                  </v-list-item-content>
-                </v-list-item>
-                <v-list-item>
-                  <v-list-item-content>Survey Name</v-list-item-content>
-                  <v-list-item-content class="align-end">
-                    {{ surveyNameById.get(item.surveyId) }}
-                  </v-list-item-content>
-                </v-list-item>
-              </template>
               <v-list-item>
-                <v-list-item-content>
-                  Successful Calls
-                </v-list-item-content>
+                <v-list-item-content>Active</v-list-item-content>
                 <v-list-item-content class="align-end">
-                  {{ item.successfulCalls }}
-                </v-list-item-content>
-              </v-list-item>
-              <v-divider />
-              <v-list-item>
-                <v-list-item-content>Subscription ID</v-list-item-content>
-                <v-list-item-content class="align-end">
-                  {{ item.id }}
+                  {{ item.active }}
                 </v-list-item-content>
               </v-list-item>
             </v-list>
@@ -74,8 +51,16 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { AllMachines_machines as Machine } from "@/graphql/types/AllMachines";
 
 export default Vue.extend({
-  name: "MachineCards"
+  name: "MachineCards",
+
+  props: {
+    machines: {
+      type: Array as () => Machine[],
+      required: true
+    }
+  }
 });
 </script>

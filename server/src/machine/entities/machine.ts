@@ -7,13 +7,13 @@ import { Column, Entity } from "typeorm";
 @ObjectType()
 export class Machine extends AbstractEntity {
   @Column() @Field() name: string;
-  @Column() @Field() hostname: string;
+  @Column() @Field() hostName: string;
   @Column() @Field() active: boolean;
 }
 
 @InputType()
 export class MachineCreateInput {
   @Field() name: string;
-  @Field() hostname: string;
+  @Field() hostName: string;
   @Field() active: boolean;
 }

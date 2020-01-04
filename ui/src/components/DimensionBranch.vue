@@ -83,15 +83,15 @@ import {
   UPDATE_DIMENSION_MUTATION
 } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import DimensionDialog from "./DimensionDialog.vue";
-import IndexDialog from "./IndexDialog.vue";
+import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
+import DimensionDialog from "./dialogs/DimensionDialog.vue";
+import IndexDialog from "./dialogs/IndexDialog.vue";
 import { SurveyIndexCreateInput } from "@/graphql/types/globalTypes";
 import {
   DimensionDialogResponse,
   IndexDialogResponse,
   SurveyItemSelection
-} from "@/pages/dialog.types";
+} from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
   name: "DimensionBranch",

@@ -145,9 +145,9 @@ import {
   WriteLetter_writeLetter as LetterWriterOutput
 } from "@/graphql/types/WriteLetter";
 import isEmpty from "lodash/isEmpty";
-import MailDialog from "@/components/MailDialog.vue";
+import MailDialog from "@/components/dialogs/MailDialog.vue";
 import ResponseSummary from "@/components/ResponseSummary.vue";
-import ConfirmDialog from "@/components/ConfirmDialog.vue";
+import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import pluralize from "pluralize";
 

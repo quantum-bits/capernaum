@@ -94,9 +94,9 @@ import {
 } from "@/graphql/types/OneSurvey";
 import DimensionBranch from "../components/DimensionBranch.vue";
 import isEmpty from "lodash/isEmpty";
-import DimensionDialog from "../components/DimensionDialog.vue";
+import DimensionDialog from "../components/dialogs/DimensionDialog.vue";
 import IndexBranch from "../components/IndexBranch.vue";
-import { DimensionDialogResponse } from "@/pages/dialog.types";
+import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
   /** page to create/update survey dimensions and indexes */

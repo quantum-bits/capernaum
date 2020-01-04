@@ -166,13 +166,13 @@ type Machine {
   """Unique ID for this entity"""
   id: Int!
   name: String!
-  hostname: String!
+  hostName: String!
   active: Boolean!
 }
 
 input MachineCreateInput {
   name: String!
-  hostname: String!
+  hostName: String!
   active: Boolean!
 }
 
@@ -242,6 +242,7 @@ type Mutation {
   qualtricsDeleteSubscription(subscriptionId: String!): String!
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
+  deleteMachine(id: Int!): Int!
 }
 
 input PartialPredictionTableEntry {

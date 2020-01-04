@@ -66,6 +66,12 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface MachineCreateInput {
+  name: string;
+  hostName: string;
+  active: boolean;
+}
+
 export interface PartialPredictionTableEntry {
   surveyIndexId: number;
   practiceId: number;
