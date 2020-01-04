@@ -95,7 +95,7 @@ export default Vue.extend({
         { text: "Response Completed", value: "completed-response" }
       ],
 
-      formValid: false,
+      formValid: false
     };
   },
 

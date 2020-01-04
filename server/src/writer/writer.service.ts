@@ -12,6 +12,8 @@ import { DateTime } from "luxon";
 import debug from "debug";
 import { ResponseSummary } from "../survey/entities/survey-response-summary";
 import { WriterOutput } from "./entities";
+import { LetterService } from "../letter/letter.service";
+import { SurveyService } from "../survey/survey.service";
 
 const letterDebug = debug("letter");
 
@@ -78,7 +80,9 @@ export class LineBuffer {
 export default class WriterService {
   constructor(
     @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
-    @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService
+    @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,
+    private readonly letterService: LetterService,
+    private readonly surveyService: SurveyService
   ) {}
 
   private renderImage(letterElement: LetterElement) {
@@ -380,7 +384,12 @@ export default class WriterService {
     });
   }
 
-  async renderLetter(letter: Letter, surveyResponse: SurveyResponse) {
+  async renderLetter(letterId: number, surveyResponseId: number) {
+    const letter = await this.letterService.letter(letterId);
+    const surveyResponse = await this.surveyService.surveyResponseComplete(
+      surveyResponseId
+    );
+
     letterDebug("renderLetter - %O", letter);
     letterDebug("renderLetter - %O", surveyResponse);
 

@@ -94,6 +94,7 @@ export class QualtricsController {
       qualtricsResponseId,
       survey.id
     );
+    qualtricsDebug("survey - %O", survey);
 
     // Grab the response from Qualtrics
     const qualtricsResponse = await this.qualtricsService.getOneResponse(
@@ -111,8 +112,8 @@ export class QualtricsController {
 
     // Write a letter.
     const writerOutput = await this.writerService.renderLetter(
-      survey.letter,
-      importedResponse.surveyResponse
+      survey.letterId,
+      importedResponse.surveyResponse.id
     );
     qualtricsDebug("writerOutput - %O", writerOutput);
 

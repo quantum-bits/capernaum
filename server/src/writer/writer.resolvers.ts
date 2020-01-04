@@ -18,11 +18,9 @@ export class WriterResolver {
 
   @Mutation(returns => WriterOutput)
   async writeLetter(@Args("writerInput") writerInput: WriterInput) {
-    const letter = await this.letterService.letter(writerInput.letterId);
-    const surveyResponse = await this.surveyService.surveyResponseComplete(
+    return this.letterWriter.renderLetter(
+      writerInput.letterId,
       writerInput.surveyResponseId
     );
-
-    return this.letterWriter.renderLetter(letter, surveyResponse);
   }
 }
