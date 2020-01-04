@@ -12,15 +12,11 @@ import { SurveyResponse } from "./survey-response";
   description: "All information about a survey imported from Qualtrics"
 })
 export class Survey extends AbstractEntity {
-  @Column("int", { nullable: true })
-  letterId?: number;
-
   @OneToOne(
     type => Letter,
     letter => letter.survey
   )
-  @JoinColumn()
-  @Field({ nullable: true })
+  @Field(type => Letter, { nullable: true })
   letter?: Letter;
 
   @OneToMany(

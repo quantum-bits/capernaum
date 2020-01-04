@@ -88,11 +88,7 @@ export class LetterResolver {
 
   @ResolveProperty("survey", type => Survey)
   resolveSurvey(@Parent() letter: Letter) {
-    return this.entityManager.findOne(Survey, {
-      where: {
-        letterId: letter.id
-      }
-    });
+    return this.entityManager.findOne(Survey, letter.surveyId);
   }
 
   @ResolveProperty("letterElements", type => [LetterElement])

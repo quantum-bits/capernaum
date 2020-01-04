@@ -112,7 +112,7 @@ export class QualtricsController {
 
     // Write a letter.
     const writerOutput = await this.writerService.renderLetter(
-      survey.letterId,
+      survey.letter.id,
       importedResponse.surveyResponse.id
     );
     qualtricsDebug("writerOutput - %O", writerOutput);

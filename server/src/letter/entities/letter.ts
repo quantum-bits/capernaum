@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   UpdateDateColumn
@@ -44,8 +45,12 @@ export class Letter extends AbstractEntity {
     type => Survey,
     survey => survey.letter
   )
+  @JoinColumn()
   @Field(type => Survey, { nullable: true })
   survey?: Survey;
+
+  @Column("int", { nullable: true })
+  surveyId?: number;
 
   @OneToMany(
     type => LetterElement,

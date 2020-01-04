@@ -137,7 +137,6 @@ export default class LettersPage extends Vue {
     {
       text: "Letter",
       align: "left",
-      sortable: false,
       value: "title"
     },
     { text: "Survey", value: "surveyTitle" },

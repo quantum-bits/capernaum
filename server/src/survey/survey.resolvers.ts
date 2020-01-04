@@ -29,11 +29,15 @@ import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { EntityManager } from "typeorm";
 
 @Resolver(of => Survey)
 @UseGuards(GqlAuthGuard)
 export class SurveyResolver {
-  constructor(private readonly surveyService: SurveyService) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    private readonly surveyService: SurveyService
+  ) {}
 
   @Mutation(returns => Survey, {
     description: "Create a new survey.",
@@ -138,8 +142,11 @@ export class SurveyResolver {
     nullable: true,
     description: "Fetch the (optional) letter for this survey"
   })
-  resolveLetters(@Parent() survey: Survey) {
-    return this.surveyService.findOne(Letter, survey.letterId);
+  resolveLetter(@Parent() survey: Survey) {
+    //return this.surveyService.findOne(Letter, survey.letterId);
+    return this.entityManager.findOne(Letter, {
+      where: { surveyId: survey.id }
+    });
   }
 
   @ResolveProperty("surveyItems", type => [SurveyItem], {
