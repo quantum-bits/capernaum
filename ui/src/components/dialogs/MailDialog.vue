@@ -55,7 +55,8 @@ export default Vue.extend({
     visible: { type: Boolean, required: true },
     respondentEmail: { type: String, required: true },
     adminEmail: { type: String, required: true },
-    attachmentPath: { type: String, required: true }
+    attachmentPath: { type: String, required: true },
+    textContent: { type: String, required: true }
   },
 
   data() {
@@ -84,14 +85,14 @@ export default Vue.extend({
       this.$emit("action", false);
     },
 
-    sendHelper(to: string, subject: string, textContent: string) {
+    sendHelper(to: string, subject: string) {
       return this.$apollo.mutate<SendLetter>({
         mutation: SEND_LETTER_MUTATION,
         variables: {
           mailInput: {
             to,
             subject,
-            textContent,
+            textContent: this.textContent,
             attachmentPath: this.attachmentPath
           }
         }
@@ -100,17 +101,12 @@ export default Vue.extend({
 
     onSend() {
       if (this.recipients.respondent) {
-        this.sendHelper(
-          this.respondentEmail,
-          "Your CLS results",
-          "Here are your CLS results"
-        );
+        this.sendHelper(this.respondentEmail, "Your CLS results");
       }
 
       if (this.recipients.admin) {
         this.sendHelper(
           this.adminEmail,
-          `CLS results for ${this.respondentEmail}`,
           `CLS results for ${this.respondentEmail}`
         );
       }
@@ -118,7 +114,6 @@ export default Vue.extend({
       if (this.recipients.other) {
         this.sendHelper(
           this.otherEmail,
-          `CLS results for ${this.respondentEmail}`,
           `CLS results for ${this.respondentEmail}`
         );
       }

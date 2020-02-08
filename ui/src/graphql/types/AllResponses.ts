@@ -13,6 +13,7 @@ export interface AllResponses_surveyResponses_survey_letter {
   id: number;
   title: string;
   description: string;
+  emailMessage: string;
 }
 
 export interface AllResponses_surveyResponses_survey {

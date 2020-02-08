@@ -13,6 +13,7 @@ export const ALL_RESPONSES_QUERY = gql`
           id
           title
           description
+          emailMessage
         }
       }
       startDate

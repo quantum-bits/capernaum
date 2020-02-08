@@ -93,6 +93,7 @@
       v-model="mailDialog.visible"
       :respondent-email="mailDialog.respondentEmail"
       :admin-email="mailDialog.adminEmail"
+      :text-content="mailDialog.textContent"
       :attachment-path="mailDialog.attachmentPath"
     />
 
@@ -202,6 +203,7 @@ export default Vue.extend({
         visible: false,
         respondentEmail: "",
         adminEmail: "",
+        textContent: "",
         attachmentPath: ""
       },
 
@@ -257,9 +259,15 @@ export default Vue.extend({
     },
 
     sendEmail(surveyResponse: SurveyResponse) {
+      let textContent = "Survey results";
+      if (surveyResponse.survey.letter) {
+        textContent = surveyResponse.survey.letter.emailMessage;
+      }
+
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
       this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
+      this.mailDialog.textContent = textContent;
       this.mailDialog.visible = true;
     },
 
