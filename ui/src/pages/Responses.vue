@@ -151,6 +151,7 @@ import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import pluralize from "pluralize";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 interface ImportedSurvey {
   id: number;
@@ -261,7 +262,11 @@ export default Vue.extend({
     sendEmail(surveyResponse: SurveyResponse) {
       let textContent = "Survey results";
       if (surveyResponse.survey.letter) {
-        textContent = surveyResponse.survey.letter.emailMessage;
+        const converter = new QuillDeltaToHtmlConverter(
+          JSON.parse(surveyResponse.survey.letter.emailMessage),
+          {}
+        );
+        textContent = converter.convert();
       }
 
       this.mailDialog.respondentEmail = surveyResponse.email;
