@@ -48,6 +48,7 @@
     "pify": "^4.0.1",
     "pluralize": "^8.0.0",
     "quill-delta": "^4.2.1",
+    "quill-delta-to-html": "^0.10.13",
     "raw-body": "^2.4.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",

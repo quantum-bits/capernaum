@@ -136,7 +136,7 @@
 
 - name: provision process manager
   hosts: production, staging
-  tags: pm2, update
+  tags: pm2
   become: yes
   become_user: "{{ cap_username }}"
   vars_files:
@@ -166,7 +166,7 @@
 
 - name: provision nginx
   hosts: production, staging
-  tags: nginx, update
+  tags: nginx
   become: yes
   vars_files:
     - public.yaml

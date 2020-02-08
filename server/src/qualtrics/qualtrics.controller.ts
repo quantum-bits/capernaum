@@ -13,6 +13,7 @@ import { QualtricsService } from "./qualtrics.service";
 import { SurveyService } from "../survey/survey.service";
 import WriterService from "../writer/writer.service";
 import { MailService } from "../mail/mail.service";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -120,11 +121,17 @@ export class QualtricsController {
     );
     qualtricsDebug("writerOutput - %O", writerOutput);
 
+    // Convert Quill deltas to HTML.
+    const deltaConverter = new QuillDeltaToHtmlConverter(
+      JSON.parse(letter.emailMessage),
+      {}
+    );
+
     // Send an email.
     const mailInfo = await this.mailService.sendMail({
       to: importedResponse.surveyResponse.email,
       subject: "Your Christian Life Survey Results",
-      textContent: "Here are your CLS results",
+      textContent: deltaConverter.convert(),
       attachmentPath: writerOutput.pdfAbsolutePath
     });
     qualtricsDebug("mailInfo - %O", mailInfo);
