@@ -266,6 +266,14 @@ export const WRITE_LETTER_MUTATION = gql`
 
 export const SEND_LETTER_MUTATION = gql`
   mutation SendLetter($mailInput: SendMailInput!) {
-    sendLetter(mailInput: $mailInput)
+    sendLetter(mailInput: $mailInput) {
+      accepted
+      rejected
+      messageId
+      envelope {
+        from
+        to
+      }
+    }
   }
 `;

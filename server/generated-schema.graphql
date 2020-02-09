@@ -35,6 +35,11 @@ type DimensionSummary {
   indexSummaries: [IndexSummary!]!
 }
 
+type Envelope {
+  from: String!
+  to: [String!]!
+}
+
 type Event {
   """Unique ID for this entity"""
   id: Int!
@@ -221,7 +226,7 @@ type Mutation {
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   login(loginCredentials: LoginCredentials!): LoginResponse!
-  sendLetter(mailInput: SendMailInput!): String!
+  sendLetter(mailInput: SendMailInput!): SendMailResponse!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
@@ -419,6 +424,17 @@ input SendMailInput {
   textContent: String!
   htmlContent: String
   attachmentPath: String
+}
+
+type SendMailResponse {
+  accepted: [String!]!
+  rejected: [String!]!
+  envelopeTime: Float!
+  messageTime: Float!
+  messageSize: Float!
+  response: String!
+  envelope: Envelope!
+  messageId: String!
 }
 
 type Subscription {
