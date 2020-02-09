@@ -94,6 +94,7 @@
       :respondent-email="mailDialog.respondentEmail"
       :admin-email="mailDialog.adminEmail"
       :text-content="mailDialog.textContent"
+      :html-content="mailDialog.htmlContent"
       :attachment-path="mailDialog.attachmentPath"
     />
 
@@ -151,7 +152,10 @@ import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import pluralize from "pluralize";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import {
+  quillDeltaToHtml,
+  quillHtmlToText
+} from "../../../server/src/helpers/quill";
 
 interface ImportedSurvey {
   id: number;
@@ -205,6 +209,7 @@ export default Vue.extend({
         respondentEmail: "",
         adminEmail: "",
         textContent: "",
+        htmlContent: "",
         attachmentPath: ""
       },
 
@@ -260,19 +265,18 @@ export default Vue.extend({
     },
 
     sendEmail(surveyResponse: SurveyResponse) {
-      let textContent = "Survey results";
+      let htmlContent = "<p>Survey results</p>";
       if (surveyResponse.survey.letter) {
-        const converter = new QuillDeltaToHtmlConverter(
-          JSON.parse(surveyResponse.survey.letter.emailMessage),
-          {}
+        htmlContent = quillDeltaToHtml(
+          surveyResponse.survey.letter.emailMessage
         );
-        textContent = converter.convert();
       }
 
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
       this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
-      this.mailDialog.textContent = textContent;
+      this.mailDialog.textContent = quillHtmlToText(htmlContent);
+      this.mailDialog.htmlContent = htmlContent;
       this.mailDialog.visible = true;
     },
 

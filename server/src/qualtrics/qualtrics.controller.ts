@@ -14,6 +14,7 @@ import { SurveyService } from "../survey/survey.service";
 import WriterService from "../writer/writer.service";
 import { MailService } from "../mail/mail.service";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { quillDeltaToHtml, quillHtmlToText } from "../helpers/quill";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -121,17 +122,16 @@ export class QualtricsController {
     );
     qualtricsDebug("writerOutput - %O", writerOutput);
 
-    // Convert Quill deltas to HTML.
-    const deltaConverter = new QuillDeltaToHtmlConverter(
-      JSON.parse(letter.emailMessage),
-      {}
-    );
+    // Convert Quill deltas to HTML and text.
+    const htmlContent = quillDeltaToHtml(letter.emailMessage);
+    const textContent = quillHtmlToText(htmlContent);
 
     // Send an email.
     const mailInfo = await this.mailService.sendMail({
       to: importedResponse.surveyResponse.email,
       subject: "Your Christian Life Survey Results",
-      textContent: deltaConverter.convert(),
+      textContent,
+      htmlContent,
       attachmentPath: writerOutput.pdfAbsolutePath
     });
     qualtricsDebug("mailInfo - %O", mailInfo);

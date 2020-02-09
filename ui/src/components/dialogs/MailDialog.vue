@@ -41,7 +41,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { SEND_LETTER_MUTATION } from "@/graphql/letters.graphql";
-import { SendLetter } from "@/graphql/types/SendLetter";
+import { SendLetter, SendLetterVariables } from "@/graphql/types/SendLetter";
 
 export default Vue.extend({
   name: "MailDialog",
@@ -56,7 +56,8 @@ export default Vue.extend({
     respondentEmail: { type: String, required: true },
     adminEmail: { type: String, required: true },
     attachmentPath: { type: String, required: true },
-    textContent: { type: String, required: true }
+    textContent: { type: String, required: true },
+    htmlContent: { type: String, required: true }
   },
 
   data() {
@@ -85,14 +86,15 @@ export default Vue.extend({
       this.$emit("action", false);
     },
 
-    sendHelper(to: string, subject: string) {
-      return this.$apollo.mutate<SendLetter>({
+    sendHelper: function(to: string, subject: string) {
+      return this.$apollo.mutate<SendLetter, SendLetterVariables>({
         mutation: SEND_LETTER_MUTATION,
         variables: {
           mailInput: {
             to,
             subject,
             textContent: this.textContent,
+            htmlContent: this.htmlContent,
             attachmentPath: this.attachmentPath
           }
         }
@@ -124,7 +126,7 @@ export default Vue.extend({
 
   watch: {
     visible: {
-      handler: function(newValue, oldValue) {
+      handler: function(newValue) {
         if (newValue) {
           this.recipients.respondent = false;
           this.recipients.admin = false;

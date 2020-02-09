@@ -23,6 +23,7 @@
     "filepond-plugin-image-preview": "^4.5.0",
     "graphql": "^14.5.8",
     "graphql-tag": "^2.10.1",
+    "html-to-text": "^5.1.1",
     "lodash": "^4.17.15",
     "luxon": "^1.19.3",
     "pluralize": "^8.0.0",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@mdi/font": "^4.4.95",
+    "@types/html-to-text": "^1.4.31",
     "@types/jest": "^24.0.18",
     "@types/lodash": "^4.14.141",
     "@types/luxon": "^1.15.2",
