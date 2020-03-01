@@ -58,23 +58,28 @@
                   <v-toolbar>
                     <v-toolbar-title>{{ item.qualtricsName }}</v-toolbar-title>
                     <v-spacer />
-                    <v-chip
-                      v-if="item.qualtricsIsActive"
-                      color="info"
-                      text-color="white"
-                      small
-                    >
-                      Active
-                    </v-chip>
-                    <v-chip
-                      v-if="item.isImported"
-                      class="ml-2"
-                      color="info"
-                      text-color="white"
-                      small
-                    >
-                      Imported
-                    </v-chip>
+                    <v-tooltip top v-if="item.qualtricsIsActive">
+                      <template v-slot:activator="{ on }">
+                        <v-chip v-on="on" color="info" text-color="white" small>
+                          Active
+                        </v-chip>
+                      </template>
+                      <span>Survey is active on Qualtrics</span>
+                    </v-tooltip>
+                    <v-tooltip top v-if="item.isImported">
+                      <template v-slot:activator="{ on }">
+                        <v-chip
+                          v-on="on"
+                          class="ml-2"
+                          color="info"
+                          text-color="white"
+                          small
+                        >
+                          Imported
+                        </v-chip>
+                      </template>
+                      <span>Survey is imported into Capernaum</span>
+                    </v-tooltip>
                     <v-menu>
                       <template v-slot:activator="{ on }">
                         <v-btn icon v-on="on">
@@ -82,18 +87,52 @@
                         </v-btn>
                       </template>
                       <v-list>
-                        <v-list-item
-                          :disabled="item.isImported"
-                          @click="importQualtricsSurvey(item.qualtricsId)"
-                        >
-                          <v-list-item-title>Import</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item
-                          :disabled="!item.isImported || item.hasReference"
-                          @click="deleteSurvey(item.capId)"
-                        >
-                          <v-list-item-title>Remove</v-list-item-title>
-                        </v-list-item>
+                        <v-tooltip left :disabled="disableImport(item)">
+                          <template v-slot:activator="{ on }">
+                            <v-list-item
+                              v-on="on"
+                              :disabled="disableImport(item)"
+                              @click="
+                                importQualtricsSurvey(item.qualtricsId, false)
+                              "
+                            >
+                              <v-list-item-title>Import</v-list-item-title>
+                            </v-list-item>
+                          </template>
+                          <span>Import from Qualtrics</span>
+                        </v-tooltip>
+
+                        <v-tooltip left :disabled="disableUpdate(item)">
+                          <template v-slot:activator="{ on }">
+                            <v-list-item
+                              v-on="on"
+                              :disabled="disableUpdate(item)"
+                              @click="
+                                importQualtricsSurvey(item.qualtricsId, true)
+                              "
+                            >
+                              <v-list-item-title>Update</v-list-item-title>
+                            </v-list-item>
+                          </template>
+                          <span>Update from Qualtrics</span>
+                        </v-tooltip>
+
+                        <v-tooltip left :disabled="disableRemove(item)">
+                          <template v-slot:activator="{ on }">
+                            <v-list-item
+                              v-on="on"
+                              :disabled="disableRemove(item)"
+                              @click="deleteSurvey(item.capId)"
+                            >
+                              <v-list-item-title>
+                                Remove
+                              </v-list-item-title>
+                            </v-list-item>
+                          </template>
+                          <span>
+                            Remove from Capernaum (no change on Qualtrics)
+                          </span>
+                        </v-tooltip>
                       </v-list>
                     </v-menu>
                   </v-toolbar>
@@ -305,20 +344,35 @@ export default Vue.extend({
   },
 
   methods: {
-    importQualtricsSurvey(qualtricsSurveyId: string) {
+    importQualtricsSurvey(qualtricsSurveyId: string, updateOk: boolean) {
       this.$apollo
         .mutate({
           mutation: IMPORT_QUALTRICS_SURVEY,
           variables: {
-            qualtricsId: qualtricsSurveyId
+            qualtricsId: qualtricsSurveyId,
+            updateOk
           },
           refetchQueries: ["AllSurveys", "QualtricsSurveys"]
         })
         .then(result => {
           console.log("IMPORT RESULT", result);
-          this.showSnackbar("Imported successfully");
+          if (updateOk) {
+            this.showSnackbar("Updated successfully");
+          } else {
+            this.showSnackbar("Imported successfully");
+          }
         })
         .catch(error => this.showSnackbar(error));
+    },
+
+    disableImport(item: CombinedSurvey) {
+      return item.isImported;
+    },
+    disableUpdate(item: CombinedSurvey) {
+      return !item.isImported;
+    },
+    disableRemove(item: CombinedSurvey) {
+      return !item.isImported || item.hasReference;
     },
 
     literateJoin(phrases: string[]) {

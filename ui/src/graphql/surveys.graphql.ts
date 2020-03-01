@@ -43,8 +43,8 @@ export const ALL_SURVEYS_QUERY = gql`
 `;
 
 export const IMPORT_QUALTRICS_SURVEY = gql`
-  mutation ImportQualtricsSurvey($qualtricsId: String!) {
-    importQualtricsSurvey(qualtricsId: $qualtricsId) {
+  mutation ImportQualtricsSurvey($qualtricsId: String!, $updateOk: Boolean!) {
+    importQualtricsSurvey(qualtricsId: $qualtricsId, updateOk: $updateOk) {
       id
       qualtricsId
       qualtricsName

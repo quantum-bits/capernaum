@@ -121,7 +121,10 @@ export class SurveyService extends BaseService {
   }
 
   findSurveyByQualtricsId(qualtricsId: string) {
-    return this.surveyRepo.findOne({ qualtricsId });
+    return this.surveyRepo.findOne(
+      { qualtricsId },
+      { relations: ["surveyItems"] }
+    );
   }
 
   findLetter(surveyId: number) {
@@ -299,37 +302,82 @@ export class SurveyService extends BaseService {
     });
   }
 
-  async importQualtricsSurvey(qualtricsSurvey: QualtricsSurvey) {
-    // FIXME: This should use a transaction.
-    // Create a list of survey items.
-    const newSurveyItems: SurveyItem[] = [];
-    for (let [questionId, question] of Object.entries(
-      qualtricsSurvey.questions
-    )) {
-      if (
-        question.questionType.type === "MC" &&
-        question.choices &&
-        Object.keys(question.choices).length == 7
-      ) {
-        // Looks like a valid survey question.
-        newSurveyItems.push(
-          this.surveyItemRepo.create({
-            qualtricsId: questionId,
-            qualtricsText: question.questionText.trim()
-          })
-        );
-      }
-    }
-    await this.surveyItemRepo.save(newSurveyItems);
+  async importQualtricsSurvey(
+    qualtricsSurvey: QualtricsSurvey,
+    updateOk: boolean
+  ) {
+    // surveyDebug("QualtricsSurvey %O", qualtricsSurvey);
 
-    // Construct the survey.
-    const newSurvey = this.surveyRepo.create({
-      qualtricsId: qualtricsSurvey.id,
-      qualtricsName: qualtricsSurvey.name,
-      qualtricsModDate: qualtricsSurvey.lastModifiedDate,
-      surveyItems: newSurveyItems
+    return this.entityManager.transaction(async manager => {
+      const surveyItemRepo = manager.getRepository(SurveyItem);
+      const surveyRepo = manager.getRepository(Survey);
+
+      // Check whether we already have imported the survey.
+      let workingSurvey = await this.findSurveyByQualtricsId(
+        qualtricsSurvey.id
+      );
+
+      if (!workingSurvey) {
+        // Haven't imported this survey. Create a new one.
+        surveyDebug("Survey not in database; creating new one");
+        workingSurvey = surveyRepo.create({
+          qualtricsId: qualtricsSurvey.id,
+          qualtricsName: qualtricsSurvey.name,
+          qualtricsModDate: qualtricsSurvey.lastModifiedDate,
+          surveyItems: []
+        });
+      } else {
+        if (updateOk) {
+          surveyDebug(
+            `Survey '${qualtricsSurvey.id}' already in database; updating`
+          );
+        } else {
+          // Have imported this survey previously, but we're not enabled to update it.
+          surveyDebug("Survey already in database; update not authorized");
+          throw Error(
+            `Already have qualtrics survey '${qualtricsSurvey.id}' but update not enabled`
+          );
+        }
+      }
+
+      // Create or update questions for this survey.
+      for (let [qualtricsId, question] of Object.entries(
+        qualtricsSurvey.questions
+      )) {
+        if (
+          question.questionType.type === "MC" &&
+          question.choices &&
+          Object.keys(question.choices).length == 7
+        ) {
+          surveyDebug("Handling question %s", qualtricsId);
+          const trimmedQuestionText = question.questionText.trim();
+
+          // Looks like a valid survey question. See if we've already imported it.
+          const existingItem = workingSurvey.findItem(qualtricsId);
+          if (existingItem) {
+            // Already have this question; update it.
+            surveyDebug(`Update existing question to '${trimmedQuestionText}'`);
+            existingItem.qualtricsText = trimmedQuestionText;
+            await surveyItemRepo.save(existingItem);
+          } else {
+            // New question; create it.
+            surveyDebug(
+              `Add new question ${qualtricsId} - ${trimmedQuestionText}`
+            );
+            const newItem = surveyItemRepo.create({
+              qualtricsId,
+              qualtricsText: trimmedQuestionText
+            });
+            await surveyItemRepo.save(newItem);
+            workingSurvey.surveyItems.push(newItem);
+          }
+        }
+      }
+
+      // Save everything to the database.
+      surveyDebug("Save to the database");
+      return surveyRepo.save(workingSurvey);
     });
-    return this.surveyRepo.save(newSurvey);
   }
 
   /**

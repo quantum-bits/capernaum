@@ -47,4 +47,5 @@ export interface ImportQualtricsSurvey {
 
 export interface ImportQualtricsSurveyVariables {
   qualtricsId: string;
+  updateOk: boolean;
 }

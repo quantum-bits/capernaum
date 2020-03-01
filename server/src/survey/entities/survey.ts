@@ -1,5 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "type-graphql";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -58,6 +58,22 @@ export class Survey extends AbstractEntity {
     description: "Convenience property to retrieve SE practices"
   })
   scriptureEngagementPractices: ScriptureEngagementPractice[];
+
+  /**
+   * Find a Capernaum item (corresponds to Qualtrics question) by Qualtrics ID
+   * @param qualtricsId - qualtrics ID for item
+   */
+  findItem(qualtricsId: string) {
+    return this.surveyItems.find(item => item.qualtricsId === qualtricsId);
+  }
+
+  /**
+   * Check whether the survey has a qualtrics item with the given ID.
+   * @param qualtricsId - Id of item (Qualtrics question) to check
+   */
+  hasItem(qualtricsId: string) {
+    return !!this.findItem(qualtricsId);
+  }
 }
 
 @InputType()

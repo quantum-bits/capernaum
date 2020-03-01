@@ -69,12 +69,15 @@ export class QualtricsResolver {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
   })
-  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: string) {
+  async importQualtricsSurvey(
+    @Args("qualtricsId") qualtricsId: string,
+    @Args("updateOk") updateOk: boolean
+  ) {
     // Fetch the survey with the given ID from the Qualtrics API.
     const qualtricsSurvey = await this.qualtricsService.getSurvey(qualtricsId);
 
     // Import survey into the database.
-    return this.surveyService.importQualtricsSurvey(qualtricsSurvey);
+    return this.surveyService.importQualtricsSurvey(qualtricsSurvey, updateOk);
   }
 
   @Mutation(returns => QualtricsResponseImportStats, {
