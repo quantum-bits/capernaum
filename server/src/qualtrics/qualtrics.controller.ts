@@ -3,7 +3,6 @@ import debug from "debug";
 import { Body, Controller, Post, Headers } from "@nestjs/common";
 import {
   QualtricsSurveyResponse,
-  RawActivateDeactivateSurvey,
   WebHookActivateDeactivateSurvey,
   WebHookCompletedResponse
 } from "./qualtrics.types";
@@ -13,7 +12,6 @@ import { QualtricsService } from "./qualtrics.service";
 import { SurveyService } from "../survey/survey.service";
 import WriterService from "../writer/writer.service";
 import { MailService } from "../mail/mail.service";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { quillDeltaToHtml, quillHtmlToText } from "../helpers/quill";
 
 const qualtricsDebug = debug("qualtrics");
@@ -28,40 +26,28 @@ export class QualtricsController {
     private readonly mailService: MailService
   ) {}
 
-  private parseActivateDeactivate(
-    body: RawActivateDeactivateSurvey
-  ): WebHookActivateDeactivateSurvey {
-    return {
-      Topic: body.Topic,
-      event: JSON.parse(body.event),
-      BrandID: body.BrandID
-    };
-  }
-
   private surveyName(reply: WebHookActivateDeactivateSurvey) {
-    return `'${reply.event.common.SurveyName}' (${reply.event.common.SurveyID})`;
+    return `${reply.SurveyID}`;
   }
 
   @Post("activate-survey")
-  activateSurvey(@Body() body) {
-    const reply = this.parseActivateDeactivate(body);
-    qualtricsDebug("activateSurvey %O", reply);
+  activateSurvey(@Body() body: WebHookActivateDeactivateSurvey) {
+    qualtricsDebug("activateSurvey %O", body);
 
     const createInput: EventCreateInput = {
       type: "Activated",
-      details: `Survey ${this.surveyName(reply)} activated`
+      details: `Survey ${this.surveyName(body)} activated`
     };
     return this.eventService.createEvent(createInput);
   }
 
   @Post("deactivate-survey")
-  deactivateSurvey(@Body() body) {
-    const reply = this.parseActivateDeactivate(body);
-    qualtricsDebug("deactivateSurvey %O", reply);
+  deactivateSurvey(@Body() body: WebHookActivateDeactivateSurvey) {
+    qualtricsDebug("deactivateSurvey %O", body);
 
     const createInput: EventCreateInput = {
       type: "Deactivated",
-      details: `Survey ${this.surveyName(reply)} deactivated`
+      details: `Survey ${this.surveyName(body)} deactivated`
     };
     return this.eventService.createEvent(createInput);
   }

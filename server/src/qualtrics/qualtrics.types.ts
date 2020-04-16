@@ -138,33 +138,10 @@ export interface QualtricsSurveyResponse {
   };
 }
 
-interface WebHookCommon {
-  SurveyID: string;
-  SurveyName: string;
-  SurveyStatus: string;
-  BrandID: string;
-  OwnerID: string;
-  CreatorID: string;
-  QuestionCount: string;
-  LastActivated: string;
-  LastAccessed: string;
-  LastModified: string;
-}
-
-export interface RawActivateDeactivateSurvey {
-  Topic: string;
-  event: string;
-  BrandID: string;
-}
-
 export interface WebHookActivateDeactivateSurvey {
   Topic: string;
-  event: {
-    contextId: string;
-    event_type: string;
-    snapshot: string;
-    common: WebHookCommon;
-  };
+  Status: string;
+  SurveyID: string;
   BrandID: string;
 }
 
