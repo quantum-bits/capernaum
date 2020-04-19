@@ -344,7 +344,19 @@ export class SurveyService extends BaseService {
       for (let [qualtricsId, question] of Object.entries(
         qualtricsSurvey.questions
       )) {
-        if (
+        if (question.questionType.type === "TE") {
+          surveyDebug("Found a text question %O", question);
+          const responseKey = `${qualtricsId}_TEXT`;
+          if (question.questionName === "EMAIL") {
+            surveyDebug("Found the EMAIL question");
+            workingSurvey.emailKey = responseKey;
+          } else if (question.questionName === "GROUP_CODE") {
+            surveyDebug("Found the GROUP_CODE question");
+            workingSurvey.groupCodeKey = responseKey;
+          } else {
+            surveyDebug("Ignoring this text question");
+          }
+        } else if (
           question.questionType.type === "MC" &&
           question.choices &&
           Object.keys(question.choices).length == 7
@@ -417,8 +429,8 @@ export class SurveyService extends BaseService {
       const newSurveyResponse = await surveyResponseRepo.save(
         surveyResponseRepo.create({
           survey,
-          email: createInput.values["QID2_TEXT"] || "??",
-          groupCode: createInput.values["QID3_TEXT"] || "??",
+          email: createInput.values[survey.emailKey] || "??",
+          groupCode: createInput.values[survey.groupCodeKey] || "??",
           qualtricsResponseId: createInput.responseId || "??",
           startDate: createInput.values["startDate"] || "??",
           endDate: createInput.values["endDate"] || "??",

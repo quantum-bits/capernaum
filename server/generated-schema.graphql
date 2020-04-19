@@ -471,6 +471,12 @@ type Survey {
   """Date and time at which this survey was modified on Qualtrics"""
   qualtricsModDate: String!
 
+  """Key of response value containing email address"""
+  emailKey: String!
+
+  """Key of response value containing group code"""
+  groupCodeKey: String!
+
   """Convenience property to retrieve SE practices"""
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }

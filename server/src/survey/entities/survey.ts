@@ -54,6 +54,18 @@ export class Survey extends AbstractEntity {
   })
   qualtricsModDate: string;
 
+  @Column({ default: "??" })
+  @Field({
+    description: "Key of response value containing email address"
+  })
+  emailKey: string;
+
+  @Column({ default: "??" })
+  @Field({
+    description: "Key of response value containing group code"
+  })
+  groupCodeKey: string;
+
   @Field(type => [ScriptureEngagementPractice], {
     description: "Convenience property to retrieve SE practices"
   })
