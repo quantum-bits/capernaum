@@ -34,7 +34,7 @@ function formatEnvironment(name: string, content: string) {
 }
 
 function formatHref(url: string, text: string) {
-  return `\\href{${url}}{${text}}`;
+  return `\\href{${url}}{\\underline{${text}}}`;
 }
 
 // Generate a hash digest for the file.
@@ -174,7 +174,7 @@ export default class WriterService {
           nodes near coords,
           nodes near coords align={horizontal},
           ]
-          \\addplot coordinates {
+          \\addplot [fill = fillColor] coordinates {
             ${chartData.allCoordinates()}
           };
         \\end{axis}
@@ -232,15 +232,28 @@ export default class WriterService {
 
   private renderDocument(renderedElements: string[]) {
     return `
-    \\documentclass{article}
+    \\documentclass[11pt]{article}
     
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
     \\usepackage{graphicx}
-    \\usepackage[colorlinks]{hyperref}
+    \\usepackage{hyperref}
+    \\hypersetup{
+      colorlinks = true,
+      urlcolor=[rgb]{0.31,0.51,0.21}
+    }
     
     \\usepackage{pgfplots}
-    \\pgfplotsset{compat=1.15}
+    \\pgfplotsset{compat=1.16}
+    \\usepackage{fontspec}
+    \\usepackage[sfdefault,lf]{carlito}
+    \\renewcommand*\\oldstylenums[1]{\\carlitoOsF #1}
+    \\setmainfont{Carlito}
     
+    \\colorlet{fillColor}{rgb:red,1;green,2;blue,3}
+
+    \\setlength{\\parskip}{1em}
+    \\setlength\\parindent{0pt}
+
     \\begin{document}
     
     ${renderedElements.join("\n\n")}
