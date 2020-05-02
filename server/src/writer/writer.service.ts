@@ -104,11 +104,16 @@ export default class WriterService {
     const lineBuffer = new LineBuffer();
 
     for (let op of quillDelta.ops) {
-      assert.ok(op.hasOwnProperty("insert"));
       // console.log(JSON.stringify(op, null, 2));
+
+      // All Quill Delta ops appear to have an `insert` property.
+      assert.ok(op.hasOwnProperty("insert"));
 
       if (op.insert === "\n") {
         // Insert op that is just a newline.
+        // Quill docs: Attributes associated with a newline character
+        // describes formatting for that line.
+
         assert.ok(op.hasOwnProperty("attributes"));
         let wrapper = "";
         if (op.attributes.hasOwnProperty("header")) {
