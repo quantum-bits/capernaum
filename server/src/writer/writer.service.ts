@@ -243,7 +243,7 @@ export default class WriterService {
     }
     
     \\usepackage{pgfplots}
-    \\pgfplotsset{compat=1.16}
+    \\pgfplotsset{compat=1.15}
     \\usepackage{fontspec}
     \\usepackage[sfdefault,lf]{carlito}
     \\renewcommand*\\oldstylenums[1]{\\carlitoOsF #1}
