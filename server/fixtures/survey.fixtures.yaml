@@ -2,7 +2,6 @@ fixtures:
   - table: survey
     rows:
       christian-life-survey:
-        title: Christian Life Survey
         qualtricsId: bogus-id
         qualtricsName: CLS
         qualtricsModDate: 2019-12-25
