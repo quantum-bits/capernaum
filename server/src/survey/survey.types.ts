@@ -2,6 +2,8 @@ import { ScriptureEngagementPractice } from "../prediction/entities";
 import { Field, Float, Int, ObjectType } from "type-graphql";
 import { SurveyResponse } from "./entities";
 
+import numbro from 'numbro';
+
 // Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
   All,
@@ -46,10 +48,12 @@ export class ChartData {
       .map(entry => {
         if ( entry.value >= 4 ) {
           let horizCoord = entry.value - 0.35;
-          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${entry.value}};`
+          let value = numbro(entry.value).format({thousandSeparated: false, trimMantissa: true, mantissa: 2});
+          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${value}};`
         } else {
           let horizCoord = entry.value + 0.35;
-          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${entry.value}};`
+          let value = numbro(entry.value).format({thousandSeparated: false, trimMantissa: true, mantissa: 2});
+          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${value}};`
         }
       })
       .join("\n");
