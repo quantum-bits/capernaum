@@ -250,7 +250,7 @@ export default class WriterService {
     
     \\usepackage{pgfplots}
     \\pgfplotsset{
-      compat=1.16,
+      compat=1.15,
       xticklabel={$\\mathsf{\\pgfmathprintnumber{\\tick}}$}
     }
     \\usepackage{fontspec}
