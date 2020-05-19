@@ -159,7 +159,7 @@ export default class WriterService {
   }
 
   private chartHeight(chartData: ChartData) {
-    const height = Math.max(chartData.entries.length + 1, 3);
+    const height = 2.218962113+0.372607394*(2*chartData.entries.length-1);//Math.max(chartData.entries.length + 1, 3);
     return `height=${height}cm`;
   }
 
@@ -167,6 +167,8 @@ export default class WriterService {
     letterDebug("renderChart %O", chartData);
 
     const chart = `
+      \\begin{adjustwidth}{0cm}{1.5cm}
+      \\begin{flushright}
       \\begin{tikzpicture}
         \\begin{axis}[
           title=${chartData.title},
@@ -176,14 +178,17 @@ export default class WriterService {
           enlarge y limits={abs=0.5cm},
           symbolic y coords={${chartData.allTitles()}},
           ytick=data,
-          nodes near coords,
-          nodes near coords align={horizontal},
+          %nodes near coords,
+          %nodes near coords align={horizontal},
           ]
           \\addplot [fill = fillColor] coordinates {
             ${chartData.allCoordinates()}
           };
+          ${chartData.allBarLabels()}
         \\end{axis}
-      \\end{tikzpicture}`;
+      \\end{tikzpicture}
+      \\end{flushright}
+      \\end{adjustwidth}`;
 
     return formatEnvironment("center", chart);
   }
@@ -241,6 +246,7 @@ export default class WriterService {
     
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
     \\usepackage{graphicx}
+    \\usepackage{changepage}
     \\usepackage{hyperref}
     \\hypersetup{
       colorlinks = true,
@@ -248,7 +254,10 @@ export default class WriterService {
     }
     
     \\usepackage{pgfplots}
-    \\pgfplotsset{compat=1.16}
+    \\pgfplotsset{
+      compat=1.15,
+      xticklabel={$\\mathsf{\\pgfmathprintnumber{\\tick}}$}
+    }
     \\usepackage{fontspec}
     \\usepackage[sfdefault,lf]{carlito}
     \\renewcommand*\\oldstylenums[1]{\\carlitoOsF #1}

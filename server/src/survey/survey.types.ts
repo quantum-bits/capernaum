@@ -40,6 +40,21 @@ export class ChartData {
       .map(entry => `(${entry.value},${entry.title})`)
       .join("\n");
   }
+
+  allBarLabels() {
+    return this.entries
+      .map(entry => {
+        if ( entry.value >= 4 ) {
+          let horizCoord = entry.value - 0.35;
+          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${entry.value}};`
+        } else {
+          let horizCoord = entry.value + 0.35;
+          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${entry.value}};`
+        }
+      })
+      .join("\n");
+  }
+
 }
 
 @ObjectType()

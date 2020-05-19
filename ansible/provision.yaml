@@ -37,7 +37,7 @@
         - nginx
         - postgresql
         - python3-psycopg2
-        - texlive-pictures
+        - texlive-full
         - htop
         - tree
         - silversearcher-ag
