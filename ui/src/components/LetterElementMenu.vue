@@ -27,13 +27,13 @@ export default Vue.extend({
 
   apollo: {
     letterElementTypes: {
-      query: ALL_LETTER_ELEMENT_TYPES_QUERY
-    }
+      query: ALL_LETTER_ELEMENT_TYPES_QUERY,
+    },
   },
 
   data() {
     return {
-      letterElementTypes: []
+      letterElementTypes: [],
     };
   },
 
@@ -42,7 +42,7 @@ export default Vue.extend({
       letterElementType: OneLetter_letter_letterElements_letterElementType
     ) {
       this.$emit("click", letterElementType);
-    }
-  }
+    },
+  },
 });
 </script>

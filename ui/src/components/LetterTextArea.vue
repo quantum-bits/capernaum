@@ -64,15 +64,15 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { LetterElementType } from "@/types/letter.types";
 import {
   UPDATE_LETTER_MUTATION,
-  UPDATE_LETTER_ELEMENT_MUTATION
+  UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
 import Quill from "quill";
 import cloneDeep from "lodash/cloneDeep";
 
 @Component({
   components: {
-    VueEditor
-  }
+    VueEditor,
+  },
 })
 export default class LetterTextArea extends Vue {
   /** Item to display */
@@ -102,19 +102,19 @@ export default class LetterTextArea extends Vue {
       { align: "" },
       { align: "center" },
       { align: "right" },
-      { align: "justify" }
+      { align: "justify" },
     ],
     //[{ size: ["small", false, "large", "huge"] }], // custom dropdown
     [{ list: "ordered" }, { list: "bullet" }],
     //[{ header: [1, 2, false] }],
-    ["link"]
+    ["link"],
   ];
 
   // used with QuillDeltaToHtmlConverter; for more configuration options, see: https://github.com/nozer/quill-delta-to-html
   // might possibly want to set allowBackgroundClasses or classPrefix to non-default values in order to mess with the css styling
   // inside the boilerplate text area
   cfg: any = {
-    multiLineParagraph: false
+    multiLineParagraph: false,
   };
 
   // Authoritative source for the boilerplate content.
@@ -130,17 +130,17 @@ export default class LetterTextArea extends Vue {
   savedTextDelta = [];
 
   // Grab a copy of the current content so we can support canceling and edit.
-  saveTextDelta() {
+  private saveTextDelta() {
     this.savedTextDelta = cloneDeep(this.textDelta);
   }
 
   // Restore the content from the saved version.
-  restoreTextDelta() {
+  private restoreTextDelta() {
     this.textDelta = cloneDeep(this.savedTextDelta);
   }
 
   // Update the HTML version of the content for use by the editor and by the non-editing display.
-  updateHtmlFromTextDelta() {
+  private updateHtmlFromTextDelta() {
     this.htmlForEditor = new QuillDeltaToHtmlConverter(
       this.textDelta.ops,
       this.cfg
@@ -148,7 +148,7 @@ export default class LetterTextArea extends Vue {
   }
 
   // Make sure to initialize the HTML version of the content.
-  mounted() {
+  private mounted() {
     console.log("parsed text delta: ", this.textDelta);
     console.log("initial text delta: ", this.initialTextDelta);
     console.log("json parse: ", JSON.parse(this.initialTextDelta));
@@ -203,9 +203,9 @@ export default class LetterTextArea extends Vue {
           variables: {
             updateInput: {
               id: this.letterElementId,
-              textDelta: JSON.stringify(this.textDelta)
-            }
-          }
+              textDelta: JSON.stringify(this.textDelta),
+            },
+          },
         })
         .then(({ data }) => {
           console.log("done!", data);
@@ -214,7 +214,7 @@ export default class LetterTextArea extends Vue {
           //this.refreshPage();
           //this.$emit("letter-created", data.createLetter.id);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
           //this.errorMessage =
           //  "Sorry, there appears to have been an error.  Please tray again later.";
@@ -226,15 +226,15 @@ export default class LetterTextArea extends Vue {
           variables: {
             letterData: {
               id: this.letterId,
-              emailMessage: JSON.stringify(this.textDelta)
-            }
-          }
+              emailMessage: JSON.stringify(this.textDelta),
+            },
+          },
         })
         .then(({ data }) => {
           console.log("done!", data);
           this.$emit("edit-mode-off");
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
     }

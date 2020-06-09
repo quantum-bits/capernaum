@@ -18,13 +18,13 @@ export default Vue.extend({
   name: "SpinnerBtn",
 
   props: {
-    spinning: { type: Boolean, default: false }
+    spinning: { type: Boolean, default: false },
   },
 
   methods: {
     onClick() {
       this.$emit("click");
-    }
-  }
+    },
+  },
 });
 </script>

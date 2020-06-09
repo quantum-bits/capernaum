@@ -54,7 +54,7 @@ import { OneLetter, OneLetter_letter } from "@/graphql/types/OneLetter";
       query: ONE_LETTER_QUERY,
       variables() {
         return {
-          letterId: parseInt(this.$route.params.letterId)
+          letterId: parseInt(this.$route.params.letterId),
         };
       },
       update(oneLetter: OneLetter) {
@@ -64,14 +64,12 @@ import { OneLetter, OneLetter_letter } from "@/graphql/types/OneLetter";
       skip() {
         console.log("skipping fetch of letter data....");
         return this.$route.params.letterId === undefined;
-      }
-    }
-  }
+      },
+    },
+  },
 })
 export default class BooleanAssociations extends Vue {
   oneLetter: OneLetter_letter | null = null;
-  allowHideTable: boolean = false;
-
-  mounted() {}
+  allowHideTable = false;
 }
 </script>

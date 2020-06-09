@@ -57,11 +57,11 @@ import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 import {
   ADD_LETTER_MUTATION,
-  UPDATE_LETTER_MUTATION
+  UPDATE_LETTER_MUTATION,
 } from "@/graphql/letters.graphql";
 import {
   LetterCreateInput,
-  LetterUpdateInput
+  LetterUpdateInput,
 } from "@/graphql/types/globalTypes";
 
 // used for data returned from the db (for the list used in the drop-down)
@@ -75,9 +75,9 @@ import {
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      fetchPolicy: "network-only"
-    }
-  }
+      fetchPolicy: "network-only",
+    },
+  },
 })
 export default class LetterInfoForm extends Vue {
   /** Form to create/update Letter Info (e.g., title, etc.) */
@@ -93,32 +93,32 @@ export default class LetterInfoForm extends Vue {
   //booleanAssociations: BooleanAssociationType[] = [];
   title: string = this.initialTitle;
   description: string = this.initialDescription;
-  errorMessage: string = "";
+  errorMessage = "";
   //https://www.geeksforgeeks.org/what-is-negative-infinity-in-javascript/
   surveySelect: { text: string; value: number } = {
     text: "",
-    value: -Infinity
+    value: -Infinity,
   };
 
-  valid: boolean = true;
+  valid = true;
   //name: string = "";
-  titleRules: any = [
-    (v: any) => !!v || "Title is required",
-    (v: any) =>
+  titleRules = [
+    (v: string) => !!v || "Title is required",
+    (v: string) =>
       (v && v.length <= 80) ||
-      "Title of letter must be fewer than 80 characters"
+      "Title of letter must be fewer than 80 characters",
   ];
-  descriptionRules: any = [
-    (v: any) =>
-      (v && v.length <= 120) || "Description must be fewer than 120 characters"
+  descriptionRules = [
+    (v: string) =>
+      (v && v.length <= 120) || "Description must be fewer than 120 characters",
   ];
-  surveySelectionRules: any = [
+  surveySelectionRules = [
     (v: any) =>
       (v && v.value !== -Infinity) ||
-      "Survey is required.  Note that only one letter may be associated with each imported survey, so if no surveys show up in the above list, it may mean that all surveys already have a letter."
+      "Survey is required.  Note that only one letter may be associated with each imported survey, so if no surveys show up in the above list, it may mean that all surveys already have a letter.",
   ];
 
-  submit() {
+  submit(): void {
     // TODO:
     // - add description
     // - add surveyId
@@ -138,16 +138,16 @@ export default class LetterInfoForm extends Vue {
                 isFrozen: false,
                 surveyId: this.surveySelect.value,
                 emailMessage: JSON.stringify({
-                  ops: []
-                })
-              }
-            }
+                  ops: [],
+                }),
+              },
+            },
           })
           .then(({ data }) => {
             console.log("done!", data);
             this.$emit("letter-created", data.createLetter.id);
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("there appears to have been an error: ", error);
             this.errorMessage =
               "Sorry, there appears to have been an error.  Please tray again later.";
@@ -163,15 +163,15 @@ export default class LetterInfoForm extends Vue {
               letterData: {
                 id: this.id,
                 title: this.title,
-                description: this.description
-              }
-            }
+                description: this.description,
+              },
+            },
           })
           .then(({ data }) => {
             console.log("done!", data);
             this.$emit("letter-info-updated");
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("there appears to have been an error: ", error);
             this.errorMessage =
               "Sorry, there appears to have been an error.  Please tray again later.";
@@ -188,7 +188,7 @@ export default class LetterInfoForm extends Vue {
   }
 
   @Emit("letter-info-updated")
-  letterInfoUpdated() {
+  letterInfoUpdated(): void {
     // nothing to send back
   }
 
@@ -197,17 +197,17 @@ export default class LetterInfoForm extends Vue {
   // .filter(...).map(...) might not be the fastest approach (https://stackoverflow.com/questions/34398279/map-and-filter-an-array-at-the-same-time)
   get selections(): SurveySelection[] {
     return this.surveys
-      .filter(survey => !survey.letter)
-      .map(survey => ({
+      .filter((survey) => !survey.letter)
+      .map((survey) => ({
         text: survey.qualtricsName,
-        value: survey.id
+        value: survey.id,
       }));
   }
 
   get surveyTitle() {
     let surveyTitle = "";
     if (!this.isNew) {
-      this.surveys.forEach(survey => {
+      this.surveys.forEach((survey) => {
         if (survey.id === this.surveyId) {
           surveyTitle = survey.qualtricsName;
         }

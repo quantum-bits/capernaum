@@ -73,14 +73,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SurveyIndexView } from "../pages/survey.types";
+import { SurveyIndexView } from "@/pages/survey.types";
 
 import { DELETE_INDEX, UPDATE_INDEX_MUTATION } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import {
   IndexDialogResponse,
-  SurveyItemSelection
+  SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 import IndexDialog from "@/components/dialogs/IndexDialog.vue";
 
@@ -89,31 +89,31 @@ export default Vue.extend({
 
   components: {
     ConfirmDialog,
-    IndexDialog
+    IndexDialog,
   },
 
   // https://frontendsociety.com/using-a-typescript-interfaces-and-types-as-a-prop-type-in-vuejs-508ab3f83480
   props: {
     survey: {
       type: Object as () => Survey,
-      required: true
+      required: true,
     },
     surveyIndex: {
       type: Object as () => SurveyIndexView,
-      required: true
-    }
+      required: true,
+    },
   },
 
   data() {
     return {
       visible: {
         indexDialog: false,
-        deleteDialog: false
+        deleteDialog: false,
       },
 
       rules: {
-        required: [(v: any) => !!v || "Required field"]
-      }
+        required: [(v: never) => !!v || "Required field"],
+      },
     };
   },
 
@@ -129,15 +129,15 @@ export default Vue.extend({
           variables: {
             updateInput: {
               id: this.surveyIndex.id,
-              ...dialogResponse
-            }
-          }
+              ...dialogResponse,
+            },
+          },
         })
         .then(() => {
           this.visible.indexDialog = false;
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
     },
@@ -147,34 +147,34 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_INDEX,
           variables: {
-            id: this.surveyIndex.id
-          }
+            id: this.surveyIndex.id,
+          },
         })
         .then(() => {
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
-    }
+    },
   },
 
   computed: {
     availableItems(): SurveyItemSelection[] {
       return this.survey.surveyItems
-        .map(item => ({
+        .map((item) => ({
           id: item.id,
-          name: item.qualtricsText
+          name: item.qualtricsText,
         }))
         .concat(this.selectedItems);
     },
 
     selectedItems(): SurveyItemSelection[] {
-      return this.surveyIndex.children.map(item => ({
+      return this.surveyIndex.children.map((item) => ({
         id: item.id,
-        name: item.name
+        name: item.name,
       }));
-    }
-  }
+    },
+  },
 });
 </script>

@@ -7,7 +7,7 @@
         <v-select
           v-model="surveySelection"
           :items="selections"
-          :rules="[v => !!v || 'Survey is required']"
+          :rules="[(v) => !!v || 'Survey is required']"
           label="Survey"
           required
           persistent-hint
@@ -77,20 +77,20 @@ import Vue from "vue";
 import {
   ADD_DIMENSION_MUTATION,
   ALL_SURVEYS_QUERY,
-  ONE_SURVEY_QUERY
+  ONE_SURVEY_QUERY,
 } from "@/graphql/surveys.graphql";
 
 import {
   WhichItems,
   SurveyDimensionEnum,
   SurveyDimensionView,
-  SurveySelection
+  SurveySelection,
 } from "./survey.types";
 
 import {
   OneSurvey_survey as Survey,
   OneSurvey_survey_surveyDimensions as SurveyDimension,
-  OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex
+  OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex,
 } from "@/graphql/types/OneSurvey";
 import DimensionBranch from "../components/DimensionBranch.vue";
 import isEmpty from "lodash/isEmpty";
@@ -105,13 +105,13 @@ export default Vue.extend({
   components: {
     DimensionBranch,
     DimensionDialog,
-    IndexBranch
+    IndexBranch,
   },
 
   apollo: {
     allSurveys: {
       query: ALL_SURVEYS_QUERY,
-      update: data => data.surveys
+      update: (data) => data.surveys,
     },
 
     // The following query runs automatically when this.surveySelection updates
@@ -121,7 +121,7 @@ export default Vue.extend({
       variables(): object {
         return {
           surveyId: this.surveySelection.value,
-          which: WhichItems.WITHOUT_INDEX
+          which: WhichItems.WITHOUT_INDEX,
         };
       },
       update(data) {
@@ -130,8 +130,8 @@ export default Vue.extend({
       skip(): boolean {
         return !this.isSurveySelected;
       },
-      fetchPolicy: "network-only"
-    }
+      fetchPolicy: "network-only",
+    },
   },
 
   data() {
@@ -143,15 +143,15 @@ export default Vue.extend({
       survey: {} as Survey,
 
       dimensionDialog: {
-        visible: false
-      }
+        visible: false,
+      },
     };
   },
 
   methods: {
     canDeleteSurveyDimension(surveyDimension: SurveyDimension) {
       return surveyDimension.surveyIndices.every(
-        surveyIndex => surveyIndex.predictionTableEntries.length === 0
+        (surveyIndex) => surveyIndex.predictionTableEntries.length === 0
       );
     },
 
@@ -162,7 +162,7 @@ export default Vue.extend({
     refetchSurveyData() {
       this.$apollo.queries.survey
         .refetch()
-        .catch(err => console.error("Something went wrong", err));
+        .catch((err) => console.error("Something went wrong", err));
     },
 
     createDimension(dialogResponse: DimensionDialogResponse) {
@@ -174,25 +174,25 @@ export default Vue.extend({
               surveyId: this.survey.id,
               title: dialogResponse.title,
               // FIXME: sequence should not be hard-coded
-              sequence: 10
-            }
-          }
+              sequence: 10,
+            },
+          },
         })
         .then(() => {
           this.dimensionDialog.visible = false;
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
-    }
+    },
   },
 
   computed: {
     selections(): SurveySelection[] {
-      return this.allSurveys.map(survey => ({
+      return this.allSurveys.map((survey) => ({
         text: survey.qualtricsName,
-        value: survey.id
+        value: survey.id,
       }));
     },
 
@@ -211,7 +211,7 @@ export default Vue.extend({
 
       // Dimensions
       return this.survey.surveyDimensions
-        .map(dim => ({
+        .map((dim) => ({
           id: dim.id,
           name: dim.title,
           type: SurveyDimensionEnum.SURVEY_DIMENSION,
@@ -219,7 +219,7 @@ export default Vue.extend({
 
           // Indices
           children: dim.surveyIndices
-            .map(index => ({
+            .map((index) => ({
               id: index.id,
               dimensionId: dim.id,
               dimensionName: dim.title,
@@ -230,16 +230,16 @@ export default Vue.extend({
               canDelete: this.canDeleteSurveyIndex(index),
 
               // Items
-              children: index.surveyItems.map(item => ({
+              children: index.surveyItems.map((item) => ({
                 id: item.id,
                 name: item.qualtricsText,
-                type: SurveyDimensionEnum.SURVEY_ITEM
-              }))
+                type: SurveyDimensionEnum.SURVEY_ITEM,
+              })),
             }))
-            .sort((a, b) => compareStrings(a.name, b.name))
+            .sort((a, b) => compareStrings(a.name, b.name)),
         }))
         .sort((a, b) => compareStrings(a.name, b.name));
-    }
-  }
+    },
+  },
 });
 </script>

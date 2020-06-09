@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import Delta from "quill-delta";
 
 import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
@@ -57,9 +57,7 @@ import { LetterElementEnum, LetterElementType } from "../types/letter.types";
     theImage: {
       query: ONE_IMAGE_QUERY,
       variables() {
-        return {
-          id: this.imageId
-        };
+        return { id: this.imageId };
       },
       update(data: OneImage) {
         console.log("image fetched! ", data.image);
@@ -70,9 +68,9 @@ import { LetterElementEnum, LetterElementType } from "../types/letter.types";
           console.log("skipping fetch of image....");
         }
         return this.imageId === -Infinity;
-      }
-    }
-  }
+      },
+    },
+  },
 })
 export default class StaticLetterElement extends Vue {
   /** Non-boilerplate letter element */
@@ -90,6 +88,7 @@ export default class StaticLetterElement extends Vue {
   letterElements: LetterElementType[] = [];
   theImage: OneImage_image | null = null;
 
+  /*
   @Emit("move-up")
   moveUp() {}
 
@@ -98,20 +97,21 @@ export default class StaticLetterElement extends Vue {
 
   @Emit("delete-element")
   deleteElement() {}
+  */
 
-  get showMoveDown() {
+  get showMoveDown(): boolean {
     return this.order < this.largestSequenceNumber;
   }
 
-  get showMoveUp() {
+  get showMoveUp(): boolean {
     return this.order > this.smallestSequenceNumber;
   }
 
-  get displayChart() {
+  get displayChart(): boolean {
     return this.letterElementKey === LetterElementEnum.CHART;
   }
 
-  get displaySEStrategies() {
+  get displaySEStrategies(): boolean {
     return (
       this.letterElementKey === LetterElementEnum.BOOLEAN_CALCULATION_RESULTS
     );

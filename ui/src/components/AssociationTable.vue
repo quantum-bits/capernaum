@@ -108,7 +108,7 @@ import { orderBy } from "lodash";
 import {
   AssociationTableHeader,
   SpiritualFocusOrientation,
-  TableData
+  TableData,
 } from "../types/association-table.types";
 
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
@@ -118,7 +118,7 @@ import {
   OneLetter,
   OneLetter_letter,
   OneLetter_letter_scriptureEngagementPractices,
-  OneLetter_letter_survey_surveyDimensions
+  OneLetter_letter_survey_surveyDimensions,
 } from "@/graphql/types/OneLetter";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 
@@ -129,7 +129,7 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
       query: ONE_LETTER_QUERY,
       variables() {
         return {
-          letterId: parseInt(this.letterId)
+          letterId: parseInt(this.letterId),
         };
       },
       update(oneLetter: OneLetter) {
@@ -141,21 +141,21 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
           text: "SE Practice",
           align: "left",
           sortable: true,
-          value: "practice"
+          value: "practice",
         });
         let surveyDimensions: OneLetter_letter_survey_surveyDimensions[] = orderBy(
           oneLetter.letter.survey.surveyDimensions,
           "sequence"
         );
-        surveyDimensions.forEach(dimension => {
-          dimension.surveyIndices.forEach(index => {
+        surveyDimensions.forEach((dimension) => {
+          dimension.surveyIndices.forEach((index) => {
             if (index.useForPredictions) {
               //this.tableColumns.push(index);
               this.headers.push({
                 text: index.abbreviation,
                 align: "left",
                 sortable: true,
-                value: "columnId-" + index.id // unique id for this index
+                value: "columnId-" + index.id, // unique id for this index
               });
             }
           });
@@ -167,17 +167,17 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
         );
 
         let tableEntriesDict: { [key: number]: string[] } = {};
-        scriptureEngagementPractices.forEach(practice => {
+        scriptureEngagementPractices.forEach((practice) => {
           tableEntriesDict[practice.id] = [];
         });
-        oneLetter.letter.tableEntries.forEach(entry => {
+        oneLetter.letter.tableEntries.forEach((entry) => {
           tableEntriesDict[entry.practice.id].push(
             "columnId-" + entry.surveyIndex.id
           );
         });
 
         this.tableData = [];
-        scriptureEngagementPractices.forEach(practice => {
+        scriptureEngagementPractices.forEach((practice) => {
           let idDict: any = {};
           this.headers.forEach((header: AssociationTableHeader) => {
             if (header.value !== "practice") {
@@ -190,7 +190,7 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
             practice: practice.title,
             practiceId: practice.id, // added so that we can figure out which practice this is when we go to save the data
             practiceOrder: practice.sequence, // added so we know the original ordering...not sure if we will allow this to change
-            spiritualFocusOrientationIdDict: idDict
+            spiritualFocusOrientationIdDict: idDict,
           });
         });
         console.log("table data: ", this.tableData);
@@ -201,9 +201,9 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
       skip() {
         console.log("skipping fetch of letter data....");
         return this.letterId === null;
-      }
-    }
-  }
+      },
+    },
+  },
 })
 export default class AssociationTable extends Vue {
   @Prop({ default: null }) letterId!: number; // letter id
@@ -215,22 +215,22 @@ export default class AssociationTable extends Vue {
   originalTableData: TableData[] = [];
   headers: AssociationTableHeader[] = [];
 
-  tableEditModeOn: boolean = false;
+  tableEditModeOn = false;
 
-  hideTable() {
+  hideTable(): void {
     this.$emit("hide-table");
   }
 
-  editTable() {
+  editTable(): void {
     this.tableEditModeOn = true;
   }
 
-  cancelEdits() {
+  cancelEdits(): void {
     this.tableData = JSON.parse(JSON.stringify(this.originalTableData));
     this.tableEditModeOn = false;
   }
 
-  saveTableEdits() {
+  saveTableEdits(): void {
     // save edits to db....
     this.tableEditModeOn = false;
     let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
@@ -248,7 +248,7 @@ export default class AssociationTable extends Vue {
               surveyIndexId: id,
               practiceId: tableRow.practiceId,
               // hard-coding the sequence for now....
-              sequence: 10
+              sequence: 10,
             });
           }
         }
@@ -261,26 +261,24 @@ export default class AssociationTable extends Vue {
         mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
         variables: {
           replaceInput: {
-            letterId: this.oneLetter!.id,
-            entries: partialPredictionTableEntries
-          }
-        }
+            letterId: this.oneLetter?.id,
+            entries: partialPredictionTableEntries,
+          },
+        },
       })
       .then(({ data }) => {
         console.log("done!", data);
         this.refetchLetterData();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("there appears to have been an error: ", error);
       });
   }
 
-  refetchLetterData() {
+  refetchLetterData(): void {
     this.$apollo.queries.oneLetter.refetch().then(({ data }) => {
       console.log("survey data refetched! ", data);
     });
   }
-
-  mounted() {}
 }
 </script>

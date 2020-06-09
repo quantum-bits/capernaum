@@ -11,7 +11,7 @@
                 <v-select
                   v-model="selectedSurveyDimension"
                   :items="chartElements"
-                  :rules="[v => !!v || 'Chart type is required']"
+                  :rules="[(v) => !!v || 'Chart type is required']"
                   label="Type of Chart"
                   return-object
                   required
@@ -51,7 +51,7 @@
                 <v-select
                   v-model="selectedImage"
                   :items="imageElements"
-                  :rules="[v => !!v || 'Image is required']"
+                  :rules="[(v) => !!v || 'Image is required']"
                   label="Image"
                   return-object
                   required
@@ -261,7 +261,7 @@ import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
   ONE_LETTER_QUERY,
-  UPDATE_LETTER_ELEMENT_MUTATION
+  UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
 
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
@@ -274,7 +274,7 @@ import {
   OneLetter,
   OneLetter_letter,
   OneLetter_letter_letterElements,
-  OneLetter_letter_letterElements_letterElementType
+  OneLetter_letter_letterElements_letterElementType,
 } from "@/graphql/types/OneLetter";
 
 import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
@@ -303,7 +303,7 @@ interface Letter extends Omit<OneLetter_letter, "letterElements"> {
     LetterInfoForm,
     LetterElementMenu,
     AssociationTable,
-    SpinnerBtn
+    SpinnerBtn,
   },
   apollo: {
     theLetter: {
@@ -311,7 +311,7 @@ interface Letter extends Omit<OneLetter_letter, "letterElements"> {
       variables() {
         console.log("route params: ", parseInt(this.$route.params.letterId));
         return {
-          letterId: parseInt(this.$route.params.letterId)
+          letterId: parseInt(this.$route.params.letterId),
         };
       },
       update(data: OneLetter) {
@@ -329,15 +329,15 @@ interface Letter extends Omit<OneLetter_letter, "letterElements"> {
           console.log("skipping fetch for now....");
         }
         return this.$route.params.letterId === undefined;
-      }
+      },
     },
     imageDetails: {
       query: ALL_IMAGES_QUERY,
       update(data: AllImages) {
         return data.images;
-      }
-    }
-  }
+      },
+    },
+  },
 })
 export default class Compose extends Vue {
   imageDetails: AllImages_images[] = [];
@@ -370,14 +370,14 @@ export default class Compose extends Vue {
     tableEntries: [],
     letterElements: [],
     emailMessage: JSON.stringify({
-      ops: []
+      ops: [],
     }),
     survey: {
       id: -1,
       qualtricsId: "",
       qualtricsName: "",
-      surveyDimensions: []
-    }
+      surveyDimensions: [],
+    },
   };
 
   //booleanAssociation: BooleanAssociationBriefType | null = null;
@@ -407,16 +407,16 @@ export default class Compose extends Vue {
   }
 
   get imageElements() {
-    return this.imageDetails.map(image => ({
+    return this.imageDetails.map((image) => ({
       text: image.title,
-      value: image.id
+      value: image.id,
     }));
   }
 
   get chartElements() {
-    return this.theLetter.survey.surveyDimensions.map(surveyDimension => ({
+    return this.theLetter.survey.surveyDimensions.map((surveyDimension) => ({
       text: surveyDimension.title,
-      value: surveyDimension.id
+      value: surveyDimension.id,
     }));
   }
 
@@ -462,8 +462,8 @@ export default class Compose extends Vue {
   }
 
   get largestSequenceNumber() {
-    let largestSN: number = -1;
-    this.surveyLetterElements.forEach(surveyLetterElement => {
+    let largestSN = -1;
+    this.surveyLetterElements.forEach((surveyLetterElement) => {
       if (largestSN < surveyLetterElement.sequence) {
         largestSN = surveyLetterElement.sequence;
       }
@@ -473,7 +473,7 @@ export default class Compose extends Vue {
 
   get smallestSequenceNumber() {
     let smallestSN: number = this.largestSequenceNumber;
-    this.surveyLetterElements.forEach(surveyLetterElement => {
+    this.surveyLetterElements.forEach((surveyLetterElement) => {
       if (smallestSN > surveyLetterElement.sequence) {
         smallestSN = surveyLetterElement.sequence;
       }
@@ -566,9 +566,9 @@ export default class Compose extends Vue {
         variables: {
           updateInput: {
             id: letterElement1.id,
-            sequence: newSequence1
-          }
-        }
+            sequence: newSequence1,
+          },
+        },
       })
       .then(({ data }) => {
         console.log("done first element!", data);
@@ -579,16 +579,16 @@ export default class Compose extends Vue {
             variables: {
               updateInput: {
                 id: letterElement2.id,
-                sequence: newSequence2
-              }
-            }
+                sequence: newSequence2,
+              },
+            },
           })
           .then(({ data }) => {
             console.log("done second element!", data);
             this.refreshPage();
             //this.$emit("letter-created", data.createLetter.id);
           })
-          .catch(error => {
+          .catch((error) => {
             console.log(
               "there appears to have been an error updating the 2nd element: ",
               error
@@ -598,7 +598,7 @@ export default class Compose extends Vue {
           });
         //this.$emit("letter-created", data.createLetter.id);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(
           "there appears to have been an error updating the 1st element: ",
           error
@@ -614,15 +614,15 @@ export default class Compose extends Vue {
       .mutate({
         mutation: DELETE_LETTER_ELEMENT_MUTATION,
         variables: {
-          id: letterElementId
-        }
+          id: letterElementId,
+        },
       })
       .then(({ data }) => {
         console.log("done!", data);
         this.refreshPage();
         //this.$emit("letter-created", data.createLetter.id);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("there appears to have been an error: ", error);
         //this.errorMessage =
         //  "Sorry, there appears to have been an error.  Please tray again later.";
@@ -655,8 +655,8 @@ export default class Compose extends Vue {
   addChartElement() {
     console.log("survey dimension id: ", this.selectedSurveyDimension.value);
     const letterElements = this.surveyLetterElements;
-    let maxSequence: number = -1; //assuming the max sequence will be 0 or greater....
-    letterElements.forEach(letterElement => {
+    let maxSequence = -1; //assuming the max sequence will be 0 or greater....
+    letterElements.forEach((letterElement) => {
       if (maxSequence < letterElement.sequence) {
         maxSequence = letterElement.sequence;
       }
@@ -670,16 +670,16 @@ export default class Compose extends Vue {
             sequence: newSequence,
             letterId: this.theLetter.id,
             letterElementTypeId: this.chartTypeElementId,
-            surveyDimensionId: this.selectedSurveyDimension.value
-          }
-        }
+            surveyDimensionId: this.selectedSurveyDimension.value,
+          },
+        },
       })
       .then(({ data }) => {
         console.log("done!", data);
         this.cancelChartSelection();
         this.refreshPage();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("there appears to have been an error: ", error);
       });
   }
@@ -687,7 +687,7 @@ export default class Compose extends Vue {
   // Return the next sequence number larger than those in existing letter elements.
   // If the list of letter elements is empty, return 1.
   nextSequenceNumber(letterElements: LetterElement[]) {
-    const existingNumbers = letterElements.map(elt => elt.sequence);
+    const existingNumbers = letterElements.map((elt) => elt.sequence);
     return Math.max(0, ...existingNumbers) + 1;
   }
 
@@ -703,16 +703,16 @@ export default class Compose extends Vue {
             sequence: nextSequence,
             letterId: this.theLetter.id,
             letterElementTypeId: this.imageTypeElementId,
-            imageId: this.selectedImage.value
-          }
-        }
+            imageId: this.selectedImage.value,
+          },
+        },
       })
       .then(({ data }) => {
         console.log("done!", data);
         this.cancelImageSelection();
         this.refreshPage();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("there appears to have been an error: ", error);
       });
   }
@@ -730,13 +730,13 @@ export default class Compose extends Vue {
         sequence: nextSequence,
         letterId: this.theLetter.id,
         letterElementTypeId: letterElementType.id,
-        textDelta: JSON.stringify(emptyTextDelta)
+        textDelta: JSON.stringify(emptyTextDelta),
       };
     } else {
       createInput = {
         sequence: nextSequence,
         letterId: this.theLetter.id,
-        letterElementTypeId: letterElementType.id
+        letterElementTypeId: letterElementType.id,
       };
     }
 
@@ -744,15 +744,15 @@ export default class Compose extends Vue {
       .mutate({
         mutation: CREATE_LETTER_ELEMENT_MUTATION,
         variables: {
-          createInput: createInput
-        }
+          createInput: createInput,
+        },
       })
       .then(({ data }) => {
         console.log("done!", data);
         this.refreshPage();
         //this.$emit("letter-created", data.createLetter.id);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("there appears to have been an error: ", error);
       });
   }
