@@ -8,7 +8,7 @@ import {
   UserUpdateInput
 } from "./entities";
 import { UserService } from "./user.service";
-import { Int } from "type-graphql";
+import { Int } from "@nestjs/graphql";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { UseGuards } from "@nestjs/common";
 import { validatePassword } from "../auth/crypto";

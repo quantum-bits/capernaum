@@ -1,5 +1,5 @@
 import { AbstractEntity } from "../../shared/abstract-entity";
-import { Field, InputType, ObjectType } from "type-graphql";
+import { Field, InputType, ObjectType } from "@nestjs/graphql";
 import { Column, Entity, ManyToMany } from "typeorm";
 
 @Entity()

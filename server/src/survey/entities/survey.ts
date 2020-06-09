@@ -1,4 +1,4 @@
-import { InputType, Int, ObjectType, Field } from "type-graphql";
+import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
 import { Column, Entity, OneToMany, OneToOne } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";

@@ -3,7 +3,7 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver
 } from "@nestjs/graphql";
 import {
@@ -23,7 +23,7 @@ import {
   SurveyUpdateInput
 } from "./entities";
 import { SurveyService } from "./survey.service";
-import { Int } from "type-graphql";
+import { Int } from "@nestjs/graphql";
 import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
@@ -138,7 +138,7 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyResponse(id);
   }
 
-  @ResolveProperty("letter", type => Letter, {
+  @ResolveField("letter", type => Letter, {
     nullable: true,
     description: "Fetch the (optional) letter for this survey"
   })
@@ -146,7 +146,7 @@ export class SurveyResolver {
     return this.surveyService.findLetter(survey.id);
   }
 
-  @ResolveProperty("surveyItems", type => [SurveyItem], {
+  @ResolveField("surveyItems", type => [SurveyItem], {
     description: `All the Qualtrics items for this survey; 
     for groupings, see survey dimension and index.
     Pass 'whichItems' to choose which to return (default 'All')`
@@ -163,7 +163,7 @@ export class SurveyResolver {
     return this.surveyService.findItemsForSurvey(survey, whichItems);
   }
 
-  @ResolveProperty("surveyDimensions", type => [SurveyDimension], {
+  @ResolveField("surveyDimensions", type => [SurveyDimension], {
     description:
       "Dimensions for this survey; groups indices, which group items."
   })
@@ -171,7 +171,7 @@ export class SurveyResolver {
     return this.surveyService.find(SurveyDimension, { survey });
   }
 
-  @ResolveProperty("surveyResponses", type => [SurveyResponse], {
+  @ResolveField("surveyResponses", type => [SurveyResponse], {
     description: "Responses for this survey"
   })
   resolveSurveyResponses(@Parent() survey: Survey) {
@@ -193,12 +193,12 @@ export class SurveyResponseResolver {
     return this.surveyService.find(SurveyResponse);
   }
 
-  @ResolveProperty("survey", type => Survey)
+  @ResolveField("survey", type => Survey)
   resolveSurvey(@Parent() surveyResponse: SurveyResponse) {
     return this.surveyService.findOneOrFail(Survey, surveyResponse.surveyId);
   }
 
-  @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
+  @ResolveField("surveyItemResponses", type => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyResponse: SurveyResponse) {
     return this.surveyService.find(SurveyItemResponse, { surveyResponse });
   }
@@ -208,7 +208,7 @@ export class SurveyResponseResolver {
 export class SurveyItemResponseResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveProperty("surveyItem", type => SurveyItem)
+  @ResolveField("surveyItem", type => SurveyItem)
   resolveSurveyItem(@Parent() surveyItemResponse: SurveyItemResponse) {
     return this.surveyService.findOneOrFail(
       SurveyItem,
@@ -236,12 +236,12 @@ export class SurveyDimensionResolver {
     return this.surveyService.update(SurveyDimension, updateInput);
   }
 
-  @ResolveProperty(type => Survey)
+  @ResolveField(type => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
     return this.surveyService.findOne(Survey, surveyDimension.surveyId);
   }
 
-  @ResolveProperty(type => [SurveyIndex], {
+  @ResolveField(type => [SurveyIndex], {
     description: "List of survey index entries for this dimension."
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
@@ -253,14 +253,14 @@ export class SurveyDimensionResolver {
 export class SurveyIndexResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveProperty(type => [SurveyItem], {
+  @ResolveField(type => [SurveyItem], {
     description: "List of survey items for this index"
   })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.find(SurveyItem, { surveyIndex });
   }
 
-  @ResolveProperty(type => SurveyDimension)
+  @ResolveField(type => SurveyDimension)
   surveyDimension(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.findOne(
       SurveyDimension,
@@ -268,7 +268,7 @@ export class SurveyIndexResolver {
     );
   }
 
-  @ResolveProperty(type => [PredictionTableEntry])
+  @ResolveField(type => [PredictionTableEntry])
   predictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.find(PredictionTableEntry, { surveyIndex });
   }
@@ -278,7 +278,7 @@ export class SurveyIndexResolver {
 export class SurveyItemResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveProperty(type => SurveyIndex, {
+  @ResolveField(type => SurveyIndex, {
     description: "Index associated with this item (if any)"
   })
   surveyIndex(@Parent() surveyItem: SurveyItem) {
@@ -289,12 +289,12 @@ export class SurveyItemResolver {
     }
   }
 
-  @ResolveProperty("surveyItemResponses", type => [SurveyItemResponse])
+  @ResolveField("surveyItemResponses", type => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
     return this.surveyService.find(SurveyItemResponse, { surveyItem });
   }
 
-  @ResolveProperty("surveyItemResponse", type => SurveyItemResponse, {
+  @ResolveField("surveyItemResponse", type => SurveyItemResponse, {
     nullable: true
   })
   resolveSurveyItemResponse(

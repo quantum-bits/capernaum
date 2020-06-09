@@ -1,6 +1,6 @@
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Column, CreateDateColumn, Entity } from "typeorm";
-import { Field, InputType, ObjectType } from "type-graphql";
+import { Field, InputType, ObjectType } from "@nestjs/graphql";
 
 @Entity()
 @ObjectType()

@@ -1,4 +1,4 @@
-import { Field, InputType, Int, ObjectType } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { SubscriptionType } from "../qualtrics.types";
 
 @ObjectType()

@@ -3,7 +3,7 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver
 } from "@nestjs/graphql";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./entities";
 import { PredictionService } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
-import { Int } from "type-graphql";
+import { Int } from "@nestjs/graphql";
 import { Letter, LetterUpdateInput } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
@@ -40,7 +40,7 @@ export class PredictionTableEntryResolver {
     return this.predictionService.replacePredictionTableEntries(replaceInput);
   }
 
-  @ResolveProperty("surveyIndex", type => SurveyIndex)
+  @ResolveField("surveyIndex", type => SurveyIndex)
   resolveSurveyIndex(@Parent() predictionTableEntry: PredictionTableEntry) {
     return this.predictionService.findOneOrFail(
       SurveyIndex,
@@ -48,7 +48,7 @@ export class PredictionTableEntryResolver {
     );
   }
 
-  @ResolveProperty("practice", type => ScriptureEngagementPractice)
+  @ResolveField("practice", type => ScriptureEngagementPractice)
   resolveScriptureEngagementPractice(
     @Parent() predictionTableEntry: PredictionTableEntry
   ) {
@@ -58,7 +58,7 @@ export class PredictionTableEntryResolver {
     );
   }
 
-  @ResolveProperty("letter", type => Letter)
+  @ResolveField("letter", type => Letter)
   resolveLetter(@Parent() predictionTableEntry: PredictionTableEntry) {
     return this.predictionService.findOneOrFail(
       Letter,
@@ -113,7 +113,7 @@ export class ScriptureEngagementPracticeResolver {
     return this.predictionService.delete(ScriptureEngagementPractice, id);
   }
 
-  @ResolveProperty("predictionTableEntries", type => [PredictionTableEntry])
+  @ResolveField("predictionTableEntries", type => [PredictionTableEntry])
   resolvePredictionTableEntries(
     @Parent() scriptureEngagementPractice: ScriptureEngagementPractice
   ) {

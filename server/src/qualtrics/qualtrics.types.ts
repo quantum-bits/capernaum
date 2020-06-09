@@ -26,6 +26,13 @@ export interface CreateResponseData {
   endDate?: string;
 }
 
+export interface CreateSubscriptionData {
+  publicationUrl: string;
+  topics: string;
+}
+
+export type QualtricsPostData = CreateResponseData | CreateSubscriptionData;
+
 type ResponseExportStatus = "inProgress" | "complete" | "failed";
 
 export interface CreateResponseExportResponse {

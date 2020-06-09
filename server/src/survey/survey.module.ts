@@ -17,7 +17,7 @@ import {
   SurveyItemResponse,
   SurveyResponse
 } from "./entities";
-import { registerEnumType } from "type-graphql";
+import { registerEnumType } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
 
 @Module({

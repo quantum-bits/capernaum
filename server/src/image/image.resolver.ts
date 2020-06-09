@@ -3,11 +3,11 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver
 } from "@nestjs/graphql";
 import { ImageService } from "./image.service";
-import { Int } from "type-graphql";
+import { Int } from "@nestjs/graphql";
 import { Image, ImageUpdateInput } from "./entities";
 import { FileService } from "../file/file.service";
 import { LetterElement } from "../letter/entities";
@@ -47,17 +47,17 @@ export class ImageResolver {
     return this.imageService.delete(Image, id);
   }
 
-  @ResolveProperty(returns => String)
+  @ResolveField(returns => String)
   url(@Parent() image: Image) {
     return `/images/${image.id}`;
   }
 
-  @ResolveProperty(returns => String)
+  @ResolveField(returns => String)
   fullPath(@Parent() image: Image) {
     return this.fileService.absolutePath(image.fileName());
   }
 
-  @ResolveProperty("letterElements", type => [LetterElement])
+  @ResolveField("letterElements", type => [LetterElement])
   resolveLetterElements(@Parent() image: Image) {
     return this.imageService.find(LetterElement, { image });
   }

@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryColumn, Index } from "typeorm";
-import { Field, InputType, Int, ObjectType } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
 import { Letter } from "../../letter/entities";
