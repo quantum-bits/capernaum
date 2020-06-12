@@ -88,16 +88,21 @@ export default class StaticLetterElement extends Vue {
   letterElements: LetterElementType[] = [];
   theImage: OneImage_image | null = null;
 
-  /*
-  @Emit("move-up")
-  moveUp() {}
+  
+  //@Emit("move-up")
+  moveUp() {
+    this.$emit("move-up");
+  }
 
-  @Emit("move-down")
-  moveDown() {}
+  //@Emit("move-down")
+  moveDown() {
+    this.$emit("move-down");
+  }
 
-  @Emit("delete-element")
-  deleteElement() {}
-  */
+  //@Emit("delete-element")
+  deleteElement() {
+    this.$emit("delete-element");
+  }
 
   get showMoveDown(): boolean {
     return this.order < this.largestSequenceNumber;
