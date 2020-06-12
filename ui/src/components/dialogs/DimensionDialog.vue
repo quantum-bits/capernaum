@@ -79,7 +79,7 @@ export default Vue.extend({
           this.dimensionTitle = this.initialTitle;
 
           if (this.$refs.dimensionForm) {
-            (this.$refs.form as Vue & {
+            (this.$refs.dimensionForm as Vue & {
               resetValidation: () => boolean;
             }).resetValidation();
           }

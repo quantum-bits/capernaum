@@ -152,7 +152,7 @@ export default Vue.extend({
 
           if (this.$refs.indexForm) {
             // FIXME: Replace the `as any` hack.
-            (this.$refs.form as Vue & {
+            (this.$refs.indexForm as Vue & {
               resetValidation: () => boolean;
             }).resetValidation();
           }

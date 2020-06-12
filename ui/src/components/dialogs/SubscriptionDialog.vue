@@ -136,7 +136,7 @@ export default Vue.extend({
           this.dialogState.surveyId = this.surveyId;
 
           if (this.$refs.theForm) {
-            (this.$refs.form as Vue & {
+            (this.$refs.theForm as Vue & {
               resetValidation: () => boolean;
             }).resetValidation();
           }

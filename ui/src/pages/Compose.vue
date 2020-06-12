@@ -3,7 +3,7 @@
     <template>
       <v-row justify="center">
         <v-dialog v-model="chooseChartTypeDialog" persistent max-width="600">
-          <v-form ref="form" v-model="chartSelectionValid" lazy-validation>
+          <v-form ref="chartForm" v-model="chartSelectionValid" lazy-validation>
             <v-card>
               <v-card-title class="headline">Chart Letter Element</v-card-title>
               <v-card-text>
@@ -343,6 +343,7 @@ interface SelectedItem {
       update(data: AllImages) {
         return data.images;
       },
+      fetchPolicy: "network-only",
     },
   },
 })
@@ -513,7 +514,7 @@ export default class Compose extends Vue {
 
   // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   cancelChartSelection(): void {
-    (this.$refs.form as Vue & {
+    (this.$refs.chartForm as Vue & {
       resetValidation: () => boolean;
     }).resetValidation();
     this.chartSelectionValid = true;
@@ -523,9 +524,13 @@ export default class Compose extends Vue {
   }
 
   cancelImageSelection(): void {
+    console.log("inside cancel image...", this.$refs.form);
     (this.$refs.form as Vue & {
       resetValidation: () => boolean;
     }).resetValidation();
+    (this.$refs.form as Vue & {
+      reset: () => boolean;
+    }).reset();
     this.imageSelectionValid = true;
     this.selectedImage = null;
     this.chooseImageDialog = false;
@@ -534,9 +539,10 @@ export default class Compose extends Vue {
 
   // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   submitChartSelection(): void {
-    console.log("selected survey dimension: ", this.selectedSurveyDimension);
-    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-      console.log("form is valid!");
+    //console.log("selected survey dimension: ", this.selectedSurveyDimension);
+    //console.log("chart form: ", this.$refs.chartForm);
+    if ((this.$refs.chartForm as Vue & { validate: () => boolean }).validate()) {
+      console.log("chart form is valid!");
       this.addChartElement();
     } else {
       console.log("form is not valid!");

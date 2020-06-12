@@ -92,7 +92,7 @@ export default Vue.extend({
           this.dialogState.isActive = this.isActive;
 
           if (this.$refs.theForm) {
-            (this.$refs.form as Vue & {
+            (this.$refs.theForm as Vue & {
               resetValidation: () => boolean;
             }).resetValidation();
           }
