@@ -187,7 +187,8 @@ export default class LetterTextArea extends Vue {
   // Fetch a properly typed Quill.
   // FIXME: Refactor this egregious type hack.
   // FIXME: function needs a return type
-  get quillEditor() {
+  get quillEditor(): Quill {
+    console.log("quill editor: ", this.$refs.editor);
     return (this.$refs.editor as Vue & { quill: Quill }).quill;
   }
 

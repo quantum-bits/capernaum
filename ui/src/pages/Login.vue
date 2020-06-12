@@ -43,7 +43,9 @@
 
 <script lang="ts">
 import { LOGIN_MUTATION } from "../graphql/users.graphql";
+import Vue from "vue";
 
+/*
 interface SnackbarData {
   show: boolean;
   text: string;
@@ -54,9 +56,12 @@ interface UserData {
   password: string;
   snackbar: SnackbarData;
 }
+*/
 
-export default {
-  data(): UserData {
+export default Vue.extend({
+  name: "Login",
+
+  data() {
     return {
       email: "",
       password: "",
@@ -69,7 +74,7 @@ export default {
   },
 
   methods: {
-    showSnackbar(text: string): void {
+    showSnackbar(text: string) {
       this.snackbar.text = text;
       this.snackbar.show = true;
     },
@@ -95,5 +100,5 @@ export default {
         });
     },
   },
-};
+});
 </script>

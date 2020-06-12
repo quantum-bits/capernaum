@@ -59,6 +59,7 @@
 </template>
 
 <script lang="ts">
+import Vue from "vue";
 import { LOGIN_MUTATION, ONE_USER_QUERY } from "../graphql/users.graphql";
 import { OneUser } from "../graphql/types/OneUser";
 
@@ -68,6 +69,7 @@ interface UserData {
   lastName: string;
 }
 
+/*
 interface AccountInfo {
   id: number;
   firstName: string;
@@ -76,18 +78,21 @@ interface AccountInfo {
   newPasswordOne: string;
   newPasswordTwo: string;
 }
+*/
 
 interface SnackbarData {
   show: boolean;
   text: string;
 }
 
+/*
 interface AccountData {
   account: AccountInfo;
   snackbar: SnackbarData;
 }
+*/
 
-export default {
+export default Vue.extend({
   name: "Account",
 
   apollo: {
@@ -106,7 +111,7 @@ export default {
     },
   },
 
-  data(): AccountData {
+  data() {
     return {
       account: {
         id: NaN,
@@ -151,5 +156,5 @@ export default {
         });
     },
   },
-};
+});
 </script>

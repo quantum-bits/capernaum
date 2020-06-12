@@ -668,35 +668,39 @@ export default class Compose extends Vue {
   }
 
   addChartElement(): void {
-    console.log("survey dimension id: ", this.selectedSurveyDimension.value);
-    const letterElements = this.surveyLetterElements;
-    let maxSequence = -1; //assuming the max sequence will be 0 or greater....
-    letterElements.forEach((letterElement) => {
-      if (maxSequence < letterElement.sequence) {
-        maxSequence = letterElement.sequence;
-      }
-    });
-    let newSequence: number = maxSequence + 1;
-    this.$apollo
-      .mutate({
-        mutation: CREATE_LETTER_ELEMENT_MUTATION,
-        variables: {
-          createInput: {
-            sequence: newSequence,
-            letterId: this.theLetter.id,
-            letterElementTypeId: this.chartTypeElementId,
-            surveyDimensionId: this.selectedSurveyDimension.value,
-          },
-        },
-      })
-      .then(({ data }) => {
-        console.log("done!", data);
-        this.cancelChartSelection();
-        this.refreshPage();
-      })
-      .catch((error) => {
-        console.log("there appears to have been an error: ", error);
+    //console.log("survey dimension id: ", this.selectedSurveyDimension.value);
+    if (this.selectedSurveyDimension !== null) {
+      // this object should not be null, since it is required in the form in order for it to be valid,
+      // but typescript was giving an error
+      const letterElements = this.surveyLetterElements;
+      let maxSequence = -1; //assuming the max sequence will be 0 or greater....
+      letterElements.forEach((letterElement) => {
+        if (maxSequence < letterElement.sequence) {
+          maxSequence = letterElement.sequence;
+        }
       });
+      let newSequence: number = maxSequence + 1;
+      this.$apollo
+        .mutate({
+          mutation: CREATE_LETTER_ELEMENT_MUTATION,
+          variables: {
+            createInput: {
+              sequence: newSequence,
+              letterId: this.theLetter.id,
+              letterElementTypeId: this.chartTypeElementId,
+              surveyDimensionId: this.selectedSurveyDimension.value,
+            },
+          },
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          this.cancelChartSelection();
+          this.refreshPage();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    }
   }
 
   // Return the next sequence number larger than those in existing letter elements.
@@ -707,29 +711,33 @@ export default class Compose extends Vue {
   }
 
   addImageElement(): void {
-    console.log("image id: ", this.selectedImage.value);
-    const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
+    if (this.selectedImage !== null) {
+      // selectedImage should not be null, since it is a required element in the form, but
+      // typescript was giving an error
+      console.log("image id: ", this.selectedImage.value);
+      const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
 
-    this.$apollo
-      .mutate({
-        mutation: CREATE_LETTER_ELEMENT_MUTATION,
-        variables: {
-          createInput: {
-            sequence: nextSequence,
-            letterId: this.theLetter.id,
-            letterElementTypeId: this.imageTypeElementId,
-            imageId: this.selectedImage.value,
+      this.$apollo
+        .mutate({
+          mutation: CREATE_LETTER_ELEMENT_MUTATION,
+          variables: {
+            createInput: {
+              sequence: nextSequence,
+              letterId: this.theLetter.id,
+              letterElementTypeId: this.imageTypeElementId,
+              imageId: this.selectedImage.value,
+            },
           },
-        },
-      })
-      .then(({ data }) => {
-        console.log("done!", data);
-        this.cancelImageSelection();
-        this.refreshPage();
-      })
-      .catch((error) => {
-        console.log("there appears to have been an error: ", error);
-      });
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          this.cancelImageSelection();
+          this.refreshPage();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    }
   }
 
   addNonChartElement(

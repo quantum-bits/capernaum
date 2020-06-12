@@ -348,7 +348,7 @@ export default Vue.extend({
       query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
       update(
         scriptureEngagementPractices: ScriptureEngagementPractices
-      ): ScriptureEngagementPractices_scriptureEngagementPractices {
+      ): ScriptureEngagementPractices_scriptureEngagementPractices[] {
         console.log(
           "letter data: ",
           scriptureEngagementPractices.scriptureEngagementPractices

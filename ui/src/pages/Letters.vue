@@ -205,14 +205,17 @@ export default class LettersPage extends Vue {
     console.log("item: ", item);
     this.$router.push({
       name: "association-table",
-      params: { letterId: item.id },
+      params: { letterId: item.id.toString() },
     });
   }
 
   viewLetter(item: LetterInfo): void {
     console.log("item: ", item);
     console.log("view letter!");
-    this.$router.push({ name: "compose", params: { letterId: item.id } });
+    this.$router.push({
+      name: "compose",
+      params: { letterId: item.id.toString() },
+    });
   }
 
   refreshLetterData(): void {

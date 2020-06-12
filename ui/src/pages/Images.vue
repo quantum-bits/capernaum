@@ -274,7 +274,7 @@ export default Vue.extend({
             },
           },
         })
-        .then((_) => {
+        .then(() => {
           this.dialogState.itemForUpdate.title = this.dialogState.title;
           this.closeDialog();
         })
@@ -307,7 +307,7 @@ export default Vue.extend({
             id,
           },
         })
-        .then((_) => {
+        .then(() => {
           this.imageDetails = this.imageDetails.filter(
             (detail) => detail.id !== id
           );

@@ -39,24 +39,26 @@
   </v-app-bar>
 </template>
 
-<script lang="ts">
-export default {
+<script>
+import Vue from "vue";
+
+export default Vue.extend({
   name: "ToolBar",
 
   methods: {
-    toggleDrawer(): void {
+    toggleDrawer() {
       this.$emit("toggleDrawer");
     },
-    logOut(): void {
+    logOut() {
       this.$store.commit("logOut");
       this.$router.push({ name: "login" });
     },
   },
 
   computed: {
-    isLoggedIn(): boolean {
+    isLoggedIn() {
       return this.$store.getters.isLoggedIn;
     },
   },
-};
+});
 </script>
