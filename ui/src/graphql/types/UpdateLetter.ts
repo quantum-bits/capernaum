@@ -17,7 +17,7 @@ export interface UpdateLetter_updateLetter {
   title: string;
   description: string;
   updated: any;
-  isFrozen: boolean | null;
+  isFrozen: boolean;
 }
 
 export interface UpdateLetter {

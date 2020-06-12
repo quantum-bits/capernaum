@@ -98,15 +98,24 @@ import { Component, Vue } from "vue-property-decorator";
 
 import {
   ALL_LETTERS_QUERY,
-  DELETE_LETTER_MUTATION
+  DELETE_LETTER_MUTATION,
 } from "@/graphql/letters.graphql";
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
 import {
   AllSurveys,
-  AllSurveys_surveys as Survey
+  AllSurveys_surveys as Survey,
 } from "@/graphql/types/AllSurveys";
+
+interface LetterInfo {
+  title: string;
+  isFrozen: boolean;
+  surveyTitle: string;
+  updated: string;
+  id: number;
+  canDelete: boolean;
+}
 
 @Component({
   apollo: {
@@ -117,69 +126,69 @@ import {
 
         return letters.letters;
       },
-      fetchPolicy: "network-only"
+      fetchPolicy: "network-only",
     },
 
     surveys: {
       query: ALL_SURVEYS_QUERY,
       update(data: AllSurveys) {
         this.allSurveysHaveLetters = data.surveys.every(
-          survey => survey.letter !== null
+          (survey) => survey.letter !== null
         );
         return data.surveys;
       },
-      fetchPolicy: "network-only"
-    }
-  }
+      fetchPolicy: "network-only",
+    },
+  },
 })
 export default class LettersPage extends Vue {
-  headers: any = [
+  headers = [
     {
       text: "Letter",
       align: "left",
-      value: "title"
+      value: "title",
     },
     { text: "Survey", value: "surveyTitle" },
     { text: "Last Update", value: "lastUpdate" },
-    { text: "Actions", sortable: false }
+    { text: "Actions", sortable: false },
   ];
 
   letterData: Letters_letters[] = [];
   surveys: Survey[] = [];
   allSurveysHaveLetters = false;
 
-  get letters() {
+  get letters(): LetterInfo[] {
     return this.letterData.map((letter: Letters_letters) => ({
       title: letter.title,
       isFrozen: letter.isFrozen,
       surveyTitle: letter.survey.qualtricsName,
       updated: letter.updated,
       id: letter.id,
-      canDelete: this.canDeleteLetter(letter)
+      canDelete: this.canDeleteLetter(letter),
     }));
   }
 
-  canDeleteLetter(letter: Letters_letters) {
+  canDeleteLetter(letter: Letters_letters): boolean {
     return (
       letter.letterElements.length === 0 && letter.tableEntries.length === 0
     );
   }
 
-  deleteLetter(id: number) {
+  deleteLetter(id: number): void {
     console.log("delete letter!", id);
     this.$apollo
       .mutate({
         mutation: DELETE_LETTER_MUTATION,
         variables: {
-          id: id
-        }
+          id: id,
+        },
       })
       .then(({ data }) => {
         console.log("letter successfully deleted!", data);
         this.refreshLetterData();
         this.refreshSurveyData();
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(
           "there appears to have been an error when attempting to delete the letter: ",
           error
@@ -187,32 +196,32 @@ export default class LettersPage extends Vue {
       });
   }
 
-  newLetter() {
+  newLetter(): void {
     console.log("create new letter");
     this.$router.push({ name: "compose" });
   }
 
-  viewAssociationTable(item: any) {
+  viewAssociationTable(item: LetterInfo): void {
     console.log("item: ", item);
     this.$router.push({
       name: "association-table",
-      params: { letterId: item.id }
+      params: { letterId: item.id },
     });
   }
 
-  viewLetter(item: any) {
+  viewLetter(item: LetterInfo): void {
     console.log("item: ", item);
     console.log("view letter!");
     this.$router.push({ name: "compose", params: { letterId: item.id } });
   }
 
-  refreshLetterData() {
+  refreshLetterData(): void {
     this.$apollo.queries.letterData.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });
   }
 
-  refreshSurveyData() {
+  refreshSurveyData(): void {
     this.$apollo.queries.surveys.refetch().then(({ data }) => {
       console.log("item(s) refetched!", data);
     });

@@ -48,8 +48,8 @@
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 
-import axios, { AxiosResponse } from "axios";
-import gql from "graphql-tag";
+//import axios, { AxiosResponse } from "axios";
+//import gql from "graphql-tag";
 
 //import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import { SurveySelection } from "@/pages/survey.types";
@@ -59,10 +59,10 @@ import {
   ADD_LETTER_MUTATION,
   UPDATE_LETTER_MUTATION,
 } from "@/graphql/letters.graphql";
-import {
-  LetterCreateInput,
-  LetterUpdateInput,
-} from "@/graphql/types/globalTypes";
+//import {
+//  LetterCreateInput,
+//  LetterUpdateInput,
+//} from "@/graphql/types/globalTypes";
 
 // used for data returned from the db (for the list used in the drop-down)
 // interface BooleanAssociationType {
@@ -70,7 +70,6 @@ import {
 //   title: string; // e.g., "General (<2019)"
 //   [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
 // }
-
 @Component({
   apollo: {
     surveys: {
@@ -103,17 +102,17 @@ export default class LetterInfoForm extends Vue {
   valid = true;
   //name: string = "";
   titleRules = [
-    (v: string) => !!v || "Title is required",
-    (v: string) =>
+    (v: string): string | boolean => !!v || "Title is required",
+    (v: string): string | boolean =>
       (v && v.length <= 80) ||
       "Title of letter must be fewer than 80 characters",
   ];
   descriptionRules = [
-    (v: string) =>
+    (v: string): string | boolean =>
       (v && v.length <= 120) || "Description must be fewer than 120 characters",
   ];
   surveySelectionRules = [
-    (v: any) =>
+    (v: SurveySelection): string | boolean =>
       (v && v.value !== -Infinity) ||
       "Survey is required.  Note that only one letter may be associated with each imported survey, so if no surveys show up in the above list, it may mean that all surveys already have a letter.",
   ];
@@ -126,7 +125,11 @@ export default class LetterInfoForm extends Vue {
     console.log("survey selected: ", this.surveySelect);
     //console.log(typeof this.surveySelect.value);
     if (this.isNew) {
-      if ((this.$refs.form as any).validate()) {
+      if (
+        (this.$refs.form as Vue & {
+          validate: () => boolean;
+        }).validate()
+      ) {
         console.log("title is: ", this.title);
         this.$apollo
           .mutate({
@@ -154,7 +157,11 @@ export default class LetterInfoForm extends Vue {
           });
       }
     } else {
-      if ((this.$refs.form as any).validate()) {
+      if (
+        (this.$refs.form as Vue & {
+          validate: () => boolean;
+        }).validate()
+      ) {
         console.log("title is: ", this.title);
         this.$apollo
           .mutate({
@@ -204,7 +211,7 @@ export default class LetterInfoForm extends Vue {
       }));
   }
 
-  get surveyTitle() {
+  get surveyTitle(): string {
     let surveyTitle = "";
     if (!this.isNew) {
       this.surveys.forEach((survey) => {
@@ -216,7 +223,7 @@ export default class LetterInfoForm extends Vue {
     return surveyTitle;
   }
 
-  mounted() {
+  mounted(): void {
     console.log("title: ", this.title);
     console.log(typeof this.title);
     //console.log("boolean association: ", this.initialBooleanAssociation);

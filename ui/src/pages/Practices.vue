@@ -203,7 +203,9 @@ export default Vue.extend({
       console.log("new SE practice!");
       if (this.$refs.form) {
         // FIXME: Replace the `as any` hack.
-        (this.$refs.form as any).resetValidation();
+        (this.$refs.form as Vue & {
+          resetValidation: () => boolean;
+        }).resetValidation();
       }
       this.resetForm();
       this.createUpdateSEPracticeDialog = true;

@@ -187,7 +187,7 @@ export interface OneLetter_letter {
   title: string;
   updated: any;
   description: string;
-  isFrozen: boolean | null;
+  isFrozen: boolean;
   emailMessage: string;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
   tableEntries: OneLetter_letter_tableEntries[];

@@ -78,7 +78,7 @@ import {
   QUALTRICS_CREATE_SUBSCRIPTION,
   QUALTRICS_LIST_SUBSCRIPTIONS,
   QUALTRICS_ORG_QUERY,
-  QUALTRICS_REMOVE_SUBSCRIPTION
+  QUALTRICS_REMOVE_SUBSCRIPTION,
 } from "@/graphql/qualtrics.graphql";
 
 import URLParse from "url-parse";
@@ -88,13 +88,13 @@ import WebHookCards from "@/components/WebHookCards.vue";
 import {
   CategoryType,
   EnhancedSubscription,
-  SubscriptionType
+  SubscriptionType,
 } from "@/types/qualtrics.types";
 import MachineCards from "@/components/MachineCards.vue";
 import {
   ALL_MACHINES,
   CREATE_MACHINE,
-  DELETE_MACHINE
+  DELETE_MACHINE,
 } from "@/graphql/machine.graphql";
 import MachineDialog from "@/components/dialogs/MachineDialog.vue";
 import { MachineCreateInput } from "@/graphql/types/globalTypes";
@@ -115,32 +115,32 @@ export default Vue.extend({
 
   apollo: {
     organization: {
-      query: QUALTRICS_ORG_QUERY
+      query: QUALTRICS_ORG_QUERY,
     },
 
     machines: {
-      query: ALL_MACHINES
+      query: ALL_MACHINES,
     },
 
     surveyNameById: {
       query: ALL_SURVEYS_QUERY,
-      update: data => {
+      update: (data) => {
         const nameById: StringToStringMap = new Map();
         data.surveys.forEach((survey: Survey) =>
           nameById.set(survey.qualtricsId, survey.qualtricsName)
         );
         return nameById;
-      }
+      },
     },
 
     subscriptions: {
       query: QUALTRICS_LIST_SUBSCRIPTIONS,
-      update: function(data) {
+      update: function (data) {
         return data.subscriptions.map((subscription: QualtricsSubscription) =>
           this.enhanceSubscription(subscription)
         );
-      }
-    }
+      },
+    },
   },
 
   data() {
@@ -154,20 +154,20 @@ export default Vue.extend({
         name: "",
         hostName: "",
         isActive: true,
-        visible: false
+        visible: false,
       },
 
       subscriptionDialog: {
         hostName: "",
         subscriptionType: "completed-response",
         surveyId: "",
-        visible: false
+        visible: false,
       },
 
       snackbar: {
         text: "",
-        visible: false
-      }
+        visible: false,
+      },
     };
   },
 
@@ -182,15 +182,15 @@ export default Vue.extend({
         .mutate<CreateMachine>({
           mutation: CREATE_MACHINE,
           variables: {
-            createInput: machine
-          }
+            createInput: machine,
+          },
         })
         .then(({ data }) => {
           console.log("RESULT", data);
           this.machines.push(data!.createMachine);
           this.showSnackbar("Machine added");
         })
-        .catch(error => this.showSnackbar(error));
+        .catch((error) => this.showSnackbar(error));
     },
 
     deleteMachine(machineId: number) {
@@ -198,17 +198,17 @@ export default Vue.extend({
         .mutate<DeleteMachine>({
           mutation: DELETE_MACHINE,
           variables: {
-            machineId
-          }
+            machineId,
+          },
         })
-        .then(result => {
+        .then((result) => {
           console.log("RESULT", result);
           this.machines = this.machines.filter(
-            machine => machine.id !== machineId
+            (machine) => machine.id !== machineId
           );
           this.showSnackbar("Machine deleted");
         })
-        .catch(error => this.showSnackbar(error));
+        .catch((error) => this.showSnackbar(error));
     },
 
     enhanceSubscription(
@@ -227,7 +227,7 @@ export default Vue.extend({
       enhancedSubscription.url = {
         protocol: url.protocol,
         hostname: url.hostname,
-        path: url.pathname
+        path: url.pathname,
       };
 
       return enhancedSubscription;
@@ -239,8 +239,8 @@ export default Vue.extend({
         .mutate<CreateSubscription>({
           mutation: QUALTRICS_CREATE_SUBSCRIPTION,
           variables: {
-            createInput: dialogResponse
-          }
+            createInput: dialogResponse,
+          },
         })
         .then(({ data }) => {
           console.log("RESULT", data);
@@ -257,18 +257,18 @@ export default Vue.extend({
         .mutate({
           mutation: QUALTRICS_REMOVE_SUBSCRIPTION,
           variables: {
-            subscriptionId
-          }
+            subscriptionId,
+          },
         })
-        .then(httpStatus => {
+        .then((httpStatus) => {
           console.log("STATUS", httpStatus);
           this.subscriptions = this.subscriptions.filter(
-            subscription => subscription.id !== subscriptionId
+            (subscription) => subscription.id !== subscriptionId
           );
           this.showSnackbar("Subscription removed");
         })
-        .catch(error => this.showSnackbar(error));
-    }
-  }
+        .catch((error) => this.showSnackbar(error));
+    },
+  },
 });
 </script>

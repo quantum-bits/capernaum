@@ -11,13 +11,13 @@ export default new Vuex.Store({
 
   state: {
     accessToken: "",
-    user: {}
+    user: {},
   },
 
   getters: {
     isLoggedIn(state) {
       return state.accessToken.length > 0;
-    }
+    },
   },
 
   mutations: {
@@ -29,6 +29,6 @@ export default new Vuex.Store({
     logOut(state) {
       state.accessToken = "";
       state.user = {};
-    }
-  }
+    },
+  },
 });
