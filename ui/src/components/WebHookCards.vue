@@ -85,11 +85,11 @@ export default Vue.extend({
   props: {
     qualtricsSubscriptions: {
       type: Array as () => EnhancedSubscription[],
-      required: true
+      required: true,
     },
     surveyNameById: {
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 });
 </script>

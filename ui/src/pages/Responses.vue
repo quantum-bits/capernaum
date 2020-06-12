@@ -138,10 +138,7 @@ import {
   DELETE_SURVEY_RESPONSE,
 } from "@/graphql/surveys.graphql";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
-import {
-  AllResponses,
-  AllResponses_surveyResponses as SurveyResponse,
-} from "@/graphql/types/AllResponses";
+import { AllResponses_surveyResponses as SurveyResponse } from "@/graphql/types/AllResponses";
 import {
   WriteLetter,
   WriteLetter_writeLetter as LetterWriterOutput,

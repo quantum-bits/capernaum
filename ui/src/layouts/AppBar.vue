@@ -39,24 +39,24 @@
   </v-app-bar>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: "ToolBar",
 
   methods: {
-    toggleDrawer() {
+    toggleDrawer(): void {
       this.$emit("toggleDrawer");
     },
-    logOut() {
+    logOut(): void {
       this.$store.commit("logOut");
       this.$router.push({ name: "login" });
-    }
+    },
   },
 
   computed: {
-    isLoggedIn() {
+    isLoggedIn(): boolean {
       return this.$store.getters.isLoggedIn;
-    }
-  }
+    },
+  },
 };
 </script>

@@ -78,7 +78,7 @@
 import Vue from "vue";
 import {
   IndexDialogResponse,
-  SurveyItemSelection
+  SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
@@ -86,7 +86,7 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "action"
+    event: "action",
   },
 
   props: {
@@ -96,7 +96,7 @@ export default Vue.extend({
     visible: { type: Boolean, required: true },
     availableItems: {
       type: Array as () => SurveyItemSelection[],
-      required: true
+      required: true,
     },
     // Can we turn off "use for predictions" slider?
     canTurnOffPredictions: { type: Boolean, required: true },
@@ -104,7 +104,7 @@ export default Vue.extend({
     title: String,
     abbreviation: String,
     useForPredictions: Boolean,
-    selectedItems: Array as () => SurveyItemSelection[]
+    selectedItems: Array as () => SurveyItemSelection[],
   },
 
   data() {
@@ -113,14 +113,14 @@ export default Vue.extend({
         title: "",
         abbreviation: "",
         useForPredictions: false,
-        selectedItems: [] as SurveyItemSelection[]
+        selectedItems: [] as SurveyItemSelection[],
       },
 
       formValid: false,
 
       rules: {
-        required: [(v: any) => !!v || "Required field"]
-      }
+        required: [(v: string): boolean | string => !!v || "Required field"],
+      },
     };
   },
 
@@ -134,16 +134,16 @@ export default Vue.extend({
         title: this.dialogState.title,
         abbreviation: this.dialogState.abbreviation,
         useForPredictions: this.dialogState.useForPredictions,
-        itemIds: this.dialogState.selectedItems.map(item => item.id)
+        itemIds: this.dialogState.selectedItems.map((item) => item.id),
       };
       this.$emit("ready", response);
       this.$emit("action", false);
-    }
+    },
   },
 
   watch: {
     visible: {
-      handler: function(newValue) {
+      handler: function (newValue) {
         if (newValue) {
           this.dialogState.title = this.title;
           this.dialogState.abbreviation = this.abbreviation;
@@ -152,12 +152,14 @@ export default Vue.extend({
 
           if (this.$refs.indexForm) {
             // FIXME: Replace the `as any` hack.
-            (this.$refs.indexForm as any).resetValidation();
+            (this.$refs.form as Vue & {
+              resetValidation: () => boolean;
+            }).resetValidation();
           }
         }
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>
