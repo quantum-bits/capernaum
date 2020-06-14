@@ -514,9 +514,16 @@ export default class Compose extends Vue {
 
   // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   cancelChartSelection(): void {
-    (this.$refs.chartForm as Vue & {
-      resetValidation: () => boolean;
-    }).resetValidation();
+    if (this.$refs.chartForm) {
+      (this.$refs.chartForm as Vue & {
+        resetValidation: () => boolean;
+      }).resetValidation();
+      (this.$refs.form as Vue & {
+        reset: () => boolean;
+      }).reset();
+    } else {
+      console.log("no form! ", this.$refs.chartForm);
+    }
     this.chartSelectionValid = true;
     this.selectedSurveyDimension = null;
     this.chooseChartTypeDialog = false;
@@ -525,12 +532,16 @@ export default class Compose extends Vue {
 
   cancelImageSelection(): void {
     console.log("inside cancel image...", this.$refs.form);
-    (this.$refs.form as Vue & {
-      resetValidation: () => boolean;
-    }).resetValidation();
-    (this.$refs.form as Vue & {
-      reset: () => boolean;
-    }).reset();
+    if (this.$refs.form) {
+      (this.$refs.form as Vue & {
+        resetValidation: () => boolean;
+      }).resetValidation();
+      (this.$refs.form as Vue & {
+        reset: () => boolean;
+      }).reset();
+    } else {
+      console.log("no form! ", this.$refs.form);
+    }
     this.imageSelectionValid = true;
     this.selectedImage = null;
     this.chooseImageDialog = false;
@@ -541,7 +552,9 @@ export default class Compose extends Vue {
   submitChartSelection(): void {
     //console.log("selected survey dimension: ", this.selectedSurveyDimension);
     //console.log("chart form: ", this.$refs.chartForm);
-    if ((this.$refs.chartForm as Vue & { validate: () => boolean }).validate()) {
+    if (
+      (this.$refs.chartForm as Vue & { validate: () => boolean }).validate()
+    ) {
       console.log("chart form is valid!");
       this.addChartElement();
     } else {
