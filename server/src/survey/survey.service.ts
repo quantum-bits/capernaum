@@ -11,14 +11,14 @@ import {
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemResponse,
-  SurveyResponse
+  SurveyResponse,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, IsNull, Not, Repository } from "typeorm";
 import {
   QualtricsQuestion,
   QualtricsSurvey,
-  QualtricsSurveyResponse
+  QualtricsSurveyResponse,
 } from "../qualtrics/qualtrics.types";
 import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
@@ -58,13 +58,13 @@ export class SurveyService extends BaseService {
       this.surveyDimensionRepo.create({
         survey,
         title: createInput.title,
-        sequence: createInput.sequence
+        sequence: createInput.sequence,
       })
     );
   }
 
   async createIndex(createInput: SurveyIndexCreateInput) {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
       const surveyItemRepo = manager.getRepository(SurveyItem);
@@ -78,7 +78,7 @@ export class SurveyService extends BaseService {
           surveyDimension: dimension,
           title: createInput.title,
           abbreviation: createInput.abbreviation,
-          useForPredictions: createInput.useForPredictions
+          useForPredictions: createInput.useForPredictions,
         })
       );
 
@@ -104,7 +104,7 @@ export class SurveyService extends BaseService {
       .leftJoinAndSelect("tableEntries.practice", "practice")
       .where("surveyResponse.id = :responseId", { responseId })
       .andWhere("responseItems.surveyResponseId = :responseId", {
-        responseId
+        responseId,
       })
       .getOne();
   }
@@ -116,7 +116,7 @@ export class SurveyService extends BaseService {
   findItemResponse(surveyItem: SurveyItem, responseId: number) {
     return this.surveyItemResponseRepo.findOne({
       surveyItemId: surveyItem.id,
-      surveyResponseId: responseId
+      surveyResponseId: responseId,
     });
   }
 
@@ -129,7 +129,7 @@ export class SurveyService extends BaseService {
 
   findLetter(surveyId: number) {
     return this.entityManager.findOne(Letter, {
-      surveyId
+      surveyId,
     });
   }
 
@@ -150,18 +150,18 @@ export class SurveyService extends BaseService {
 
     return this.surveyItemRepo.find({
       where,
-      order: { id: "ASC" }
+      order: { id: "ASC" },
     });
   }
 
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       // N.B., can also use the manager directly.
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
       const surveyItemRepo = manager.getRepository(SurveyItem);
 
       const index = await surveyIndexRepo.findOneOrFail(updateInput.id, {
-        relations: ["surveyItems"]
+        relations: ["surveyItems"],
       });
 
       // Assign scalar updates, if any. Only those props listed will be updated,
@@ -173,7 +173,7 @@ export class SurveyService extends BaseService {
 
       // Fetch survey items specified by the update.
       const updateItems = await surveyItemRepo.findByIds(updateInput.itemIds);
-      const validUpdateItemIds = updateItems.map(item => item.id);
+      const validUpdateItemIds = updateItems.map((item) => item.id);
 
       // Check that all specified items actually exist.
       const bogusItemIds = difference(updateInput.itemIds, validUpdateItemIds);
@@ -196,7 +196,7 @@ export class SurveyService extends BaseService {
   }
 
   async deleteSurvey(id: number) {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       await manager.delete(SurveyItem, { surveyId: id });
       const deleteResult = await manager.delete(Survey, id);
       return deleteResult.affected;
@@ -209,12 +209,12 @@ export class SurveyService extends BaseService {
     id: number
   ): Promise<SurveyIndexDeleteOutput> {
     const index = await manager.findOneOrFail(SurveyIndex, id, {
-      relations: ["surveyItems"]
+      relations: ["surveyItems"],
     });
 
     // Clear FK references from items to this index.
-    const removedItemIds = index.surveyItems.map(item => item.id);
-    for (let id of removedItemIds) {
+    const removedItemIds = index.surveyItems.map((item) => item.id);
+    for (const id of removedItemIds) {
       await manager.update(SurveyItem, id, { surveyIndex: null });
     }
 
@@ -222,12 +222,12 @@ export class SurveyService extends BaseService {
 
     return {
       deletedIndexId: id,
-      deletedItemIds: removedItemIds
+      deletedItemIds: removedItemIds,
     };
   }
 
   async deleteSurveyIndex(id: number) {
-    return this.entityManager.transaction(async manager =>
+    return this.entityManager.transaction(async (manager) =>
       this._deleteSurveyIndex(manager, id)
     );
   }
@@ -235,17 +235,17 @@ export class SurveyService extends BaseService {
   async deleteSurveyDimension(
     dimensionId: number
   ): Promise<SurveyDimensionDeleteOutput> {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
 
       const dimension = await surveyDimensionRepo.findOneOrFail(dimensionId, {
-        relations: ["surveyIndices"]
+        relations: ["surveyIndices"],
       });
 
       const dimensionDeleteOutput: SurveyDimensionDeleteOutput = {
         deletedDimensionId: dimensionId,
         deletedIndexIds: [],
-        deletedItemIds: []
+        deletedItemIds: [],
       };
 
       for (const index of dimension.surveyIndices) {
@@ -284,16 +284,16 @@ export class SurveyService extends BaseService {
   ) {
     // Delete responses to each question.
     await manager.delete(SurveyItemResponse, {
-      surveyResponseId
+      surveyResponseId,
     });
 
     return manager.delete(SurveyResponse, {
-      id: surveyResponseId
+      id: surveyResponseId,
     });
   }
 
   async deleteSurveyResponse(surveyResponseId: number) {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       const result = await this._deleteSurveyResponse(
         manager,
         surveyResponseId
@@ -308,7 +308,7 @@ export class SurveyService extends BaseService {
   ) {
     // surveyDebug("QualtricsSurvey %O", qualtricsSurvey);
 
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       const surveyItemRepo = manager.getRepository(SurveyItem);
       const surveyRepo = manager.getRepository(Survey);
 
@@ -324,13 +324,15 @@ export class SurveyService extends BaseService {
           qualtricsId: qualtricsSurvey.id,
           qualtricsName: qualtricsSurvey.name,
           qualtricsModDate: qualtricsSurvey.lastModifiedDate,
-          surveyItems: []
+          surveyItems: [],
         });
       } else {
         if (updateOk) {
           surveyDebug(
             `Survey '${qualtricsSurvey.id}' already in database; updating`
           );
+          workingSurvey.qualtricsName = qualtricsSurvey.name;
+          workingSurvey.qualtricsModDate = qualtricsSurvey.lastModifiedDate;
         } else {
           // Have imported this survey previously, but we're not enabled to update it.
           surveyDebug("Survey already in database; update not authorized");
@@ -341,7 +343,7 @@ export class SurveyService extends BaseService {
       }
 
       // Create or update questions for this survey.
-      for (let [qualtricsId, question] of Object.entries(
+      for (const [qualtricsId, question] of Object.entries(
         qualtricsSurvey.questions
       )) {
         if (question.questionType.type === "TE") {
@@ -378,7 +380,7 @@ export class SurveyService extends BaseService {
             );
             const newItem = surveyItemRepo.create({
               qualtricsId,
-              qualtricsText: trimmedQuestionText
+              qualtricsText: trimmedQuestionText,
             });
             await surveyItemRepo.save(newItem);
             workingSurvey.surveyItems.push(newItem);
@@ -401,14 +403,14 @@ export class SurveyService extends BaseService {
     surveyId: number,
     createInput: QualtricsSurveyResponse
   ): Promise<QualtricsImportedResponse> {
-    return this.entityManager.transaction(async manager => {
+    return this.entityManager.transaction(async (manager) => {
       const surveyResponseRepo = manager.getRepository(SurveyResponse);
       const surveyItemResponseRepo = manager.getRepository(SurveyItemResponse);
 
       // Check for an existing import of this response using its Qualtrics ID.
       let foundPreviousImport = false;
       const previousImport = await surveyResponseRepo.findOne({
-        qualtricsResponseId: createInput.responseId
+        qualtricsResponseId: createInput.responseId,
       });
       if (previousImport) {
         foundPreviousImport = true;
@@ -422,7 +424,7 @@ export class SurveyService extends BaseService {
 
       // Load the survey and its items from the database.
       const survey = await manager.findOneOrFail(Survey, surveyId, {
-        relations: ["surveyItems"]
+        relations: ["surveyItems"],
       });
 
       // Save response metadata to the database.
@@ -441,20 +443,20 @@ export class SurveyService extends BaseService {
           duration: parseInt(createInput.values["duration"]) || -1,
           finished: parseInt(createInput.values["finished"]) || -1,
           latitude: createInput.values["locationLatitude"] || "??",
-          longitude: createInput.values["locationLongitude"] || "??"
+          longitude: createInput.values["locationLongitude"] || "??",
         })
       );
 
       // Map the qualtrics ID for each question to its database ID.
       // We will only import responses to these questions.
       const qualtricsIdToId = new Map<string, number>(
-        survey.surveyItems.map(item => [item.qualtricsId, item.id])
+        survey.surveyItems.map((item) => [item.qualtricsId, item.id])
       );
 
       // Save response for each question to database. Use the above
       // map to avoid inserting any response that doesn't exist in the survey.
       // This may be unnecessarily paranoid.
-      for (let [key, value] of Object.entries(createInput.values)) {
+      for (const [key, value] of Object.entries(createInput.values)) {
         if (key.startsWith("QID") && qualtricsIdToId.has(key)) {
           const label = createInput.labels[key];
           await surveyItemResponseRepo.save(
@@ -462,7 +464,7 @@ export class SurveyService extends BaseService {
               surveyResponse: newSurveyResponse,
               surveyItemId: qualtricsIdToId.get(key),
               label: label,
-              value: parseInt(value)
+              value: parseInt(value),
             })
           );
         }
@@ -470,7 +472,7 @@ export class SurveyService extends BaseService {
 
       return {
         isDuplicate: foundPreviousImport,
-        surveyResponse: newSurveyResponse
+        surveyResponse: newSurveyResponse,
       };
     });
   }
