@@ -3,17 +3,18 @@ import {
   isValidDate,
   normalizeDateTime,
   sleep,
+  ZipFileEntry,
 } from "./helpers";
 import {
   CreateResponseData,
   CreateResponseExportResponse,
-  CreateSubscriptionData,
   CreateSubscriptionResponse,
-  QualtricsArrayResponse, QualtricsPostData,
+  QualtricsArrayResponse,
+  QualtricsPostData,
   QualtricsResponse,
   QualtricsSurvey,
   QualtricsSurveyList,
-  ResponseExportProgress
+  ResponseExportProgress,
 } from "./qualtrics.types";
 import { Injectable } from "@nestjs/common";
 
@@ -106,7 +107,7 @@ export class QualtricsService {
 
     // Configure proxy if required.
     if (process.env.PROXY_HOST && process.env.PROXY_PORT) {
-      const tunnelingAgent = tunnel.httpsOverHttps({
+      const tunnelingAgent = tunnel.httpsOverHttp({
         proxy: {
           host: process.env.PROXY_HOST,
           port: parseInt(process.env.PROXY_PORT),
@@ -181,21 +182,21 @@ export class QualtricsService {
   }
 
   /** Get an organization's details. */
-  getOrganization(organizationId: string) {
+  getOrganization(organizationId: string): Promise<QualtricsOrganization> {
     return this.qualtricsGet<QualtricsOrganization>(
       this.makeUrl("organizations", organizationId)
     );
   }
 
   /** Get a survey with the given ID. */
-  getSurvey(surveyId: string) {
+  getSurvey(surveyId: string): Promise<QualtricsSurvey> {
     return this.qualtricsGet<QualtricsSurvey>(
       this.makeUrl("surveys", surveyId)
     );
   }
 
   /** List all surveys */
-  listSurveys(offset: string = undefined) {
+  listSurveys(offset: string = undefined): Promise<QualtricsSurveyList> {
     const url = this.makeUrl("surveys");
     if (offset) {
       url.searchParams.set("offset", offset);
@@ -204,7 +205,7 @@ export class QualtricsService {
     return this.qualtricsGet<QualtricsSurveyList>(url);
   }
 
-  listSubscriptions() {
+  listSubscriptions(): Promise<QualtricsSubscription[]> {
     const url = this.makeUrl("eventsubscriptions");
     const subscriptions = this.qualtricsGetArray<QualtricsSubscription>(url);
     qualtricsDebug("listSubscriptions - %O", subscriptions);
@@ -216,7 +217,7 @@ export class QualtricsService {
     publicationUrl: string,
     eventName: string,
     surveyId?: string
-  ) {
+  ): Promise<QualtricsSubscription> {
     const url = this.makeUrl("eventsubscriptions");
     const response = await this.qualtricsPost<CreateSubscriptionResponse>(url, {
       publicationUrl: publicationUrl,
@@ -230,14 +231,14 @@ export class QualtricsService {
     }
   }
 
-  deleteSubscription(subscriptionId: string) {
+  deleteSubscription(subscriptionId: string): Promise<string> {
     return this.qualtricsDelete(
       this.makeUrl("eventsubscriptions", subscriptionId)
     );
   }
 
-  getSubscription(subscriptionId: string) {
-    return this.qualtricsGet(
+  getSubscription(subscriptionId: string): Promise<QualtricsSubscription> {
+    return this.qualtricsGet<QualtricsSubscription>(
       this.makeUrl("eventsubscriptions", subscriptionId)
     );
   }
@@ -254,7 +255,7 @@ export class QualtricsService {
     surveyId: string,
     startDate?: string,
     endDate?: string
-  ) {
+  ): Promise<CreateResponseExportResponse> {
     const postData: CreateResponseData = {
       format: "json",
     };
@@ -281,7 +282,10 @@ export class QualtricsService {
     );
   }
 
-  getResponseExportProgress(surveyId: string, progressId: string) {
+  getResponseExportProgress(
+    surveyId: string,
+    progressId: string
+  ): Promise<ResponseExportProgress> {
     return this.qualtricsGet<ResponseExportProgress>(
       this.makeUrl("surveys", surveyId, "export-responses", progressId)
     );
@@ -310,7 +314,11 @@ export class QualtricsService {
   }
 
   /** Request, await, and fetch responses. */
-  async getResponses(surveyId: string, startDate?: string, endDate?: string) {
+  async getResponses(
+    surveyId: string,
+    startDate?: string,
+    endDate?: string
+  ): Promise<ZipFileEntry[]> {
     // Start the export.
     const createResult = await this.createResponseExport(
       surveyId,

@@ -8,12 +8,12 @@ export class QualtricsSubscription {
   @Field() topics: string;
   @Field() publicationUrl: string;
   @Field() encrypted: boolean;
-  @Field(type => Int) successfulCalls: number;
+  @Field((type) => Int) successfulCalls: number;
 }
 
 @InputType()
 export class QualtricsSubscriptionCreateInput {
   @Field() hostName: string;
-  @Field(type => String) subscriptionType: SubscriptionType;
+  @Field((type) => String) subscriptionType: SubscriptionType;
   @Field({ nullable: true }) surveyId?: string;
 }
