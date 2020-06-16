@@ -230,7 +230,7 @@ import {
   ALL_QUALTRICS_SURVEYS_QUERY,
   ALL_SURVEYS_QUERY,
   DELETE_SURVEY,
-  IMPORT_QUALTRICS_SURVEY
+  IMPORT_QUALTRICS_SURVEY,
 } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 import { QualtricsSurveys_qualtricsSurveys as QualtricsSurvey } from "@/graphql/types/QualtricsSurveys";
@@ -242,18 +242,18 @@ export default Vue.extend({
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      update: data => data.surveys,
-      fetchPolicy: "network-only"
+      update: (data) => data.surveys,
+      fetchPolicy: "network-only",
     },
 
     qualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
       variables: {
-        includeInactive: true
+        includeInactive: true,
       },
-      update: data => data.qualtricsSurveys,
-      fetchPolicy: "network-only"
-    }
+      update: (data) => data.qualtricsSurveys,
+      fetchPolicy: "network-only",
+    },
   },
 
   data() {
@@ -269,23 +269,23 @@ export default Vue.extend({
       sortCriteria: [
         {
           text: "Name",
-          value: "qualtricsName"
+          value: "qualtricsName",
         },
         {
           text: "Date",
-          value: "qualtricsModDate"
-        }
+          value: "qualtricsModDate",
+        },
       ],
 
       snackbar: {
         text: "",
-        visible: false
+        visible: false,
       },
 
       bottomSheet: {
         content: "",
-        visible: false
-      }
+        visible: false,
+      },
     };
   },
 
@@ -337,10 +337,10 @@ export default Vue.extend({
       }
 
       return Array.from(combinedSurveyMap.values()).filter(
-        survey =>
+        (survey) =>
           survey.capId || survey.qualtricsIsActive || this.showAllSurveys
       );
-    }
+    },
   },
 
   methods: {
@@ -350,11 +350,11 @@ export default Vue.extend({
           mutation: IMPORT_QUALTRICS_SURVEY,
           variables: {
             qualtricsId: qualtricsSurveyId,
-            updateOk
+            updateOk,
           },
-          refetchQueries: ["AllSurveys", "QualtricsSurveys"]
+          refetchQueries: ["AllSurveys", "QualtricsSurveys"],
         })
-        .then(result => {
+        .then((result) => {
           console.log("IMPORT RESULT", result);
           if (updateOk) {
             this.showSnackbar("Updated successfully");
@@ -362,7 +362,7 @@ export default Vue.extend({
             this.showSnackbar("Imported successfully");
           }
         })
-        .catch(error => this.showSnackbar(error));
+        .catch((error) => this.showSnackbar(error));
     },
 
     disableImport(item: CombinedSurvey) {
@@ -424,21 +424,21 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_SURVEY,
           variables: {
-            id
+            id,
           },
-          refetchQueries: ["AllSurveys", "QualtricsSurveys"]
+          refetchQueries: ["AllSurveys", "QualtricsSurveys"],
         })
-        .then(result => {
+        .then((result) => {
           console.log("DELETE RESULT", result);
           this.showSnackbar("Deleted successfully");
         })
-        .catch(error => this.showSnackbar(error));
+        .catch((error) => this.showSnackbar(error));
     },
 
     showSnackbar(text: string) {
       this.snackbar.text = text;
       this.snackbar.visible = true;
-    }
-  }
+    },
+  },
 });
 </script>

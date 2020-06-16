@@ -122,6 +122,10 @@ import {
 } from "@/graphql/types/OneLetter";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 
+interface IdDict {
+  [key: string]: boolean;
+}
+
 @Component({
   //components: { AssociationTableInfoForm },
   apollo: {
@@ -178,7 +182,7 @@ import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 
         this.tableData = [];
         scriptureEngagementPractices.forEach((practice) => {
-          let idDict: any = {};
+          let idDict: IdDict = {};
           this.headers.forEach((header: AssociationTableHeader) => {
             if (header.value !== "practice") {
               idDict[header.value] = tableEntriesDict[practice.id].includes(

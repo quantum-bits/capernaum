@@ -1,11 +1,12 @@
-const Dotenv = require("dotenv-webpack");
+let Dotenv;
+Dotenv = require("dotenv-webpack");
 
 module.exports = {
   devServer: {
-    proxy: "http://localhost:3000"
+    proxy: "http://localhost:3000",
   },
 
   configureWebpack: {
-    plugins: [new Dotenv()]
-  }
+    plugins: [new Dotenv()],
+  },
 };

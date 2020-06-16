@@ -80,7 +80,7 @@
                   name="filepondUpload"
                   :server="{
                     url: '/images/',
-                    process: 'process'
+                    process: 'process',
                   }"
                   @processfile="fileProcessed"
                   @removefile="fileRemoved"
@@ -116,14 +116,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Route } from "vue-router";
+//import { Route } from "vue-router";
 
 import {
   ALL_IMAGES_QUERY,
   DELETE_IMAGE_MUTATION,
-  UPDATE_IMAGE_DETAILS_MUTATION
+  UPDATE_IMAGE_DETAILS_MUTATION,
 } from "@/graphql/images.graphql";
-import { AllImages_images } from "@/graphql/types/AllImages";
+import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
 
 import vueFilePond from "vue-filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js";
@@ -136,14 +136,14 @@ import { FilePondFile } from "@/types/filepond.types";
 enum DialogMode {
   CLOSED,
   OPEN_FOR_CREATE,
-  OPEN_FOR_EDIT
+  OPEN_FOR_EDIT,
 }
 
 export default Vue.extend({
   name: "Images",
 
   components: {
-    FilePond: vueFilePond(FilePondPluginImagePreview)
+    FilePond: vueFilePond(FilePondPluginImagePreview),
   },
 
   data() {
@@ -152,20 +152,20 @@ export default Vue.extend({
         {
           text: "Title",
           value: "title",
-          width: "35%"
+          width: "35%",
         },
         {
           text: "Image",
           value: "image",
           align: "center",
-          width: "50%"
+          width: "50%",
         },
         {
           text: "Action",
           value: "action",
           width: "15%",
-          sortable: false
-        }
+          sortable: false,
+        },
       ],
 
       valid: false,
@@ -175,31 +175,31 @@ export default Vue.extend({
         heading: "",
         mode: DialogMode.CLOSED,
         title: "",
-        itemForUpdate: {} as AllImages_images
+        itemForUpdate: {} as AllImages_images,
       },
 
       titleRules: [
-        (v: any) => !!v || "Title is required",
-        (v: any) =>
+        (v: string) => !!v || "Title is required",
+        (v: string) =>
           (v && v.length <= 50) ||
-          "Title of letter must be fewer than 50 characters"
+          "Title of letter must be fewer than 50 characters",
       ],
 
       fileUploaded: false,
       fileNotUploadedMessage: "",
 
-      uploadFileDetails: {} as FilePondFile
+      uploadFileDetails: {} as FilePondFile,
     };
   },
 
   apollo: {
     imageDetails: {
       query: ALL_IMAGES_QUERY,
-      update(data: any) {
+      update(data: AllImages) {
         return data.images;
       },
-      fetchPolicy: "network-only"
-    }
+      fetchPolicy: "network-only",
+    },
   },
 
   methods: {
@@ -214,7 +214,7 @@ export default Vue.extend({
       if (!this.valid) {
         // if the form is currently not valid (possibly because of an attempted submission
         // with no file uploaded), recheck it....
-        if ((this.$refs.form as any).validate()) {
+        if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
           this.valid = true;
         }
       }
@@ -244,16 +244,16 @@ export default Vue.extend({
             variables: {
               updateInput: {
                 id: parseInt(this.uploadFileDetails.serverId),
-                title: this.dialogState.title
-              }
-            }
+                title: this.dialogState.title,
+              },
+            },
           })
-          .then(response => {
+          .then((response) => {
             console.log("data for new image: ", response.data.updateImage);
             this.imageDetails.push(response.data.updateImage);
             this.closeDialog();
           })
-          .catch(err => {
+          .catch((err) => {
             throw err;
           });
       } else {
@@ -270,21 +270,21 @@ export default Vue.extend({
           variables: {
             updateInput: {
               id: this.dialogState.itemForUpdate.id,
-              title: this.dialogState.title
-            }
-          }
+              title: this.dialogState.title,
+            },
+          },
         })
-        .then(_ => {
+        .then(() => {
           this.dialogState.itemForUpdate.title = this.dialogState.title;
           this.closeDialog();
         })
-        .catch(err => {
+        .catch((err) => {
           throw err;
         });
     },
 
     handleDialogSubmit() {
-      if ((this.$refs.form as any).validate()) {
+      if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
         console.log(this.uploadFileDetails);
         switch (this.dialogState.mode) {
           case DialogMode.OPEN_FOR_CREATE:
@@ -304,15 +304,15 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_IMAGE_MUTATION,
           variables: {
-            id
-          }
+            id,
+          },
         })
-        .then(_ => {
+        .then(() => {
           this.imageDetails = this.imageDetails.filter(
-            detail => detail.id !== id
+            (detail) => detail.id !== id
           );
         })
-        .catch(err => {
+        .catch((err) => {
           throw err;
         });
     },
@@ -320,7 +320,7 @@ export default Vue.extend({
     openDialogForCreate() {
       this.dialogState.heading = "Upload a new image";
       if (this.$refs.form) {
-        (this.$refs.form as any).reset(); // FIXME - Don't cast to any.
+        (this.$refs.form as Vue & { reset: () => boolean }).reset(); // FIXME - Don't cast to any.
       }
       this.dialogState.mode = DialogMode.OPEN_FOR_CREATE;
     },
@@ -340,7 +340,7 @@ export default Vue.extend({
 
     canDelete(item: AllImages_images) {
       return item.letterElements.length === 0;
-    }
+    },
   },
 
   computed: {
@@ -350,7 +350,7 @@ export default Vue.extend({
 
     showFilePond(): boolean {
       return this.dialogState.mode === DialogMode.OPEN_FOR_CREATE;
-    }
-  }
+    },
+  },
 });
 </script>

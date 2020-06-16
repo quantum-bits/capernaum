@@ -57,7 +57,7 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "action"
+    event: "action",
   },
 
   props: {
@@ -66,17 +66,17 @@ export default Vue.extend({
 
     hostName: { type: String, required: true },
     subscriptionType: { type: String, required: true },
-    surveyId: { type: String, required: true }
+    surveyId: { type: String, required: true },
   },
 
   apollo: {
     machines: {
-      query: ALL_MACHINES
+      query: ALL_MACHINES,
     },
 
     surveys: {
-      query: ALL_SURVEYS_QUERY
-    }
+      query: ALL_SURVEYS_QUERY,
+    },
   },
 
   data() {
@@ -86,33 +86,33 @@ export default Vue.extend({
       dialogState: {
         hostName: "",
         subscriptionType: "",
-        surveyId: ""
+        surveyId: "",
       },
 
       subscriptionChoices: [
         { text: "Survey Activated", value: "activate-survey" },
         { text: "Survey Deactivated", value: "deactivate-survey" },
-        { text: "Response Completed", value: "completed-response" }
+        { text: "Response Completed", value: "completed-response" },
       ],
 
-      formValid: false
+      formValid: false,
     };
   },
 
   computed: {
     hostChoices(): StringStringChoice[] {
-      return this.machines.map(machine => ({
+      return this.machines.map((machine) => ({
         text: machine.name,
-        value: machine.hostName
+        value: machine.hostName,
       }));
     },
 
     surveyChoices(): StringStringChoice[] {
-      return this.surveys.map(survey => ({
+      return this.surveys.map((survey) => ({
         text: survey.qualtricsName,
-        value: survey.qualtricsId
+        value: survey.qualtricsId,
       }));
-    }
+    },
   },
 
   methods: {
@@ -120,29 +120,30 @@ export default Vue.extend({
       const result: SubscriptionDialogResponse = {
         hostName: this.dialogState.hostName,
         subscriptionType: this.dialogState.subscriptionType as SubscriptionType,
-        surveyId: this.dialogState.surveyId
+        surveyId: this.dialogState.surveyId,
       };
       this.$emit("action", false);
       this.$emit("ready", result);
-    }
+    },
   },
 
   watch: {
     visible: {
-      handler: function(newValue) {
+      handler: function (newValue) {
         if (newValue) {
           this.dialogState.hostName = this.hostName;
           this.dialogState.subscriptionType = this.subscriptionType;
           this.dialogState.surveyId = this.surveyId;
 
           if (this.$refs.theForm) {
-            // FIXME: Replace the `as any` hack.
-            (this.$refs.theForm as any).resetValidation();
+            (this.$refs.theForm as Vue & {
+              resetValidation: () => boolean;
+            }).resetValidation();
           }
         }
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>

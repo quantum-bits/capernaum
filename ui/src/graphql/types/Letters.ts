@@ -173,7 +173,7 @@ export interface Letters_letters {
   title: string;
   description: string;
   updated: any;
-  isFrozen: boolean | null;
+  isFrozen: boolean;
   scriptureEngagementPractices: Letters_letters_scriptureEngagementPractices[];
   tableEntries: Letters_letters_tableEntries[];
   letterElements: Letters_letters_letterElements[];

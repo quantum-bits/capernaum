@@ -24,23 +24,23 @@ if (!process.env.URL_HTTP) {
 const wsLink = new WebSocketLink({
   uri: process.env.URL_WEBSOCKET,
   options: {
-    reconnect: true
-  }
+    reconnect: true,
+  },
 });
 
 const authLink = setContext((_, { headers }) => {
   const context = {
     headers: {
       ...headers,
-      authorization: `Bearer ${store.state.accessToken}`
-    }
+      authorization: `Bearer ${store.state.accessToken}`,
+    },
   };
   // console.log("CONTEXT", context);
   return context;
 });
 
 const httpLink = new HttpLink({
-  uri: process.env.URL_HTTP
+  uri: process.env.URL_HTTP,
 });
 
 const splitLink = split(
@@ -59,13 +59,13 @@ const splitLink = split(
 const apolloClient = new ApolloClient({
   link: loggingLink.concat(splitLink),
   cache: new InMemoryCache(),
-  connectToDevTools: true
+  connectToDevTools: true,
 });
 
 Vue.use(VueApollo);
 
 const apolloProvider = new VueApollo({
-  defaultClient: apolloClient
+  defaultClient: apolloClient,
 });
 
 export default apolloProvider;

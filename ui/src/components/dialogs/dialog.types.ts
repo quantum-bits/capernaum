@@ -1,6 +1,6 @@
 import {
   SurveyDimensionCreateInput,
-  SurveyIndexCreateInput
+  SurveyIndexCreateInput,
 } from "../../graphql/types/globalTypes";
 import { SubscriptionType } from "@/types/qualtrics.types";
 

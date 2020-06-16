@@ -49,10 +49,10 @@ export default Vue.extend({
       availableQualtricsSurveys: [] as Array<QualtricsSurveys_qualtricsSurveys>,
       //https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
       surveySelectionRules: [
-        () =>
+        (): boolean | string =>
           !isEmpty(this.value) ||
           "Survey is required.  Note that each survey may only be imported once, so if the above list is empty, it may mean that all surveys have already been imported.",
-      ] as any,
+      ],
     };
   },
 

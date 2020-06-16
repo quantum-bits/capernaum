@@ -3,7 +3,7 @@
     <template>
       <v-row justify="center">
         <v-dialog v-model="chooseChartTypeDialog" persistent max-width="600">
-          <v-form ref="form" v-model="chartSelectionValid" lazy-validation>
+          <v-form ref="chartForm" v-model="chartSelectionValid" lazy-validation>
             <v-card>
               <v-card-title class="headline">Chart Letter Element</v-card-title>
               <v-card-text>
@@ -247,7 +247,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { Route } from "vue-router";
+import { Route, RawLocation } from "vue-router";
 
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
@@ -275,6 +275,8 @@ import {
   OneLetter_letter,
   OneLetter_letter_letterElements,
   OneLetter_letter_letterElements_letterElementType,
+  OneLetter_letter_survey,
+  OneLetter_letter_survey_surveyDimensions,
 } from "@/graphql/types/OneLetter";
 
 import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
@@ -290,6 +292,11 @@ interface LetterElement extends OneLetter_letter_letterElements {
 // https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
 interface Letter extends Omit<OneLetter_letter, "letterElements"> {
   letterElements: LetterElement[];
+}
+
+interface SelectedItem {
+  text: string;
+  value: number;
 }
 
 /**
@@ -336,6 +343,7 @@ interface Letter extends Omit<OneLetter_letter, "letterElements"> {
       update(data: AllImages) {
         return data.images;
       },
+      fetchPolicy: "network-only",
     },
   },
 })
@@ -349,8 +357,8 @@ export default class Compose extends Vue {
   chooseImageDialog = false;
   chartSelectionValid = false;
   imageSelectionValid = false;
-  selectedSurveyDimension: null | any = null;
-  selectedImage: null | any = null;
+  selectedSurveyDimension: null | SelectedItem = null;
+  selectedImage: null | SelectedItem = null;
   chartTypeElementId = -Infinity; //used when creating a chart type of letter element
   imageTypeElementId = -Infinity; //used when creating an image type of letter element
   confirmDialog = null;
@@ -382,7 +390,7 @@ export default class Compose extends Vue {
 
   //booleanAssociation: BooleanAssociationBriefType | null = null;
 
-  get predictionTableEntriesExist() {
+  get predictionTableEntriesExist(): boolean {
     if (this.theLetter) {
       return this.theLetter.tableEntries.length > 0;
     } else {
@@ -390,7 +398,7 @@ export default class Compose extends Vue {
     }
   }
 
-  get letter() {
+  get letter(): OneLetter_letter {
     if (this.theLetter) {
       return this.theLetter;
     } else {
@@ -406,21 +414,23 @@ export default class Compose extends Vue {
     }
   }
 
-  get imageElements() {
-    return this.imageDetails.map((image) => ({
+  get imageElements(): SelectedItem[] {
+    return this.imageDetails.map((image: AllImages_images) => ({
       text: image.title,
       value: image.id,
     }));
   }
 
-  get chartElements() {
-    return this.theLetter.survey.surveyDimensions.map((surveyDimension) => ({
-      text: surveyDimension.title,
-      value: surveyDimension.id,
-    }));
+  get chartElements(): SelectedItem[] {
+    return this.theLetter.survey.surveyDimensions.map(
+      (surveyDimension: OneLetter_letter_survey_surveyDimensions) => ({
+        text: surveyDimension.title,
+        value: surveyDimension.id,
+      })
+    );
   }
 
-  get survey() {
+  get survey(): OneLetter_letter_survey {
     if (this.theLetter) {
       return this.theLetter.survey;
     } else {
@@ -428,11 +438,11 @@ export default class Compose extends Vue {
     }
   }
 
-  get surveyLetterIsFrozen() {
+  get surveyLetterIsFrozen(): boolean {
     return this.theLetter && this.theLetter.isFrozen;
   }
 
-  get letterExistsAndIsFrozen() {
+  get letterExistsAndIsFrozen(): boolean {
     if (this.letterExists) {
       return this.theLetter.isFrozen;
     } else {
@@ -441,7 +451,7 @@ export default class Compose extends Vue {
     // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
   }
 
-  get letterExistsAndEditModeOff() {
+  get letterExistsAndEditModeOff(): boolean {
     if (this.letterExists) {
       return !this.editModeOn;
     } else {
@@ -449,7 +459,7 @@ export default class Compose extends Vue {
     }
   }
 
-  get letterExistsAndEditModeOn() {
+  get letterExistsAndEditModeOn(): boolean {
     if (this.letterExists) {
       return this.editModeOn;
     } else {
@@ -457,13 +467,13 @@ export default class Compose extends Vue {
     }
   }
 
-  get letterIsNewAndEditModeOn() {
+  get letterIsNewAndEditModeOn(): boolean {
     return this.isNew && this.editModeOn;
   }
 
-  get largestSequenceNumber() {
+  get largestSequenceNumber(): number {
     let largestSN = -1;
-    this.surveyLetterElements.forEach((surveyLetterElement) => {
+    this.surveyLetterElements.forEach((surveyLetterElement: LetterElement) => {
       if (largestSN < surveyLetterElement.sequence) {
         largestSN = surveyLetterElement.sequence;
       }
@@ -471,9 +481,9 @@ export default class Compose extends Vue {
     return largestSN;
   }
 
-  get smallestSequenceNumber() {
+  get smallestSequenceNumber(): number {
     let smallestSN: number = this.largestSequenceNumber;
-    this.surveyLetterElements.forEach((surveyLetterElement) => {
+    this.surveyLetterElements.forEach((surveyLetterElement: LetterElement) => {
       if (smallestSN > surveyLetterElement.sequence) {
         smallestSN = surveyLetterElement.sequence;
       }
@@ -481,7 +491,7 @@ export default class Compose extends Vue {
     return smallestSN;
   }
 
-  get allEditsSaved() {
+  get allEditsSaved(): boolean {
     console.log("email edit mode on:", this.emailEditModeOn);
     let editsSaved = !this.emailEditModeOn;
     this.theLetter.letterElements.forEach((letterElement: LetterElement) => {
@@ -494,43 +504,67 @@ export default class Compose extends Vue {
     return editsSaved;
   }
 
-  showTable() {
+  showTable(): void {
     this.tableIsHidden = false;
   }
 
-  hideTable() {
+  hideTable(): void {
     this.tableIsHidden = true;
   }
 
-  cancelChartSelection() {
-    (this.$refs.form as any).resetValidation();
+  // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
+  cancelChartSelection(): void {
+    if (this.$refs.chartForm) {
+      (this.$refs.chartForm as Vue & {
+        resetValidation: () => boolean;
+      }).resetValidation();
+      (this.$refs.form as Vue & {
+        reset: () => boolean;
+      }).reset();
+    } else {
+      console.log("no form! ", this.$refs.chartForm);
+    }
     this.chartSelectionValid = true;
     this.selectedSurveyDimension = null;
     this.chooseChartTypeDialog = false;
     this.chartTypeElementId = -Infinity;
   }
 
-  cancelImageSelection() {
-    (this.$refs.form as any).resetValidation();
+  cancelImageSelection(): void {
+    console.log("inside cancel image...", this.$refs.form);
+    if (this.$refs.form) {
+      (this.$refs.form as Vue & {
+        resetValidation: () => boolean;
+      }).resetValidation();
+      (this.$refs.form as Vue & {
+        reset: () => boolean;
+      }).reset();
+    } else {
+      console.log("no form! ", this.$refs.form);
+    }
     this.imageSelectionValid = true;
     this.selectedImage = null;
     this.chooseImageDialog = false;
     this.imageTypeElementId = -Infinity;
   }
 
-  submitChartSelection() {
-    console.log("chart selection: ", this.selectedSurveyDimension);
-    if ((this.$refs.form as any).validate()) {
-      console.log("form is valid!");
+  // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
+  submitChartSelection(): void {
+    //console.log("selected survey dimension: ", this.selectedSurveyDimension);
+    //console.log("chart form: ", this.$refs.chartForm);
+    if (
+      (this.$refs.chartForm as Vue & { validate: () => boolean }).validate()
+    ) {
+      console.log("chart form is valid!");
       this.addChartElement();
     } else {
       console.log("form is not valid!");
     }
   }
 
-  submitImageSelection() {
+  submitImageSelection(): void {
     console.log("image selection: ", this.selectedImage);
-    if ((this.$refs.form as any).validate()) {
+    if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
       console.log("form is valid!");
       this.addImageElement();
     } else {
@@ -540,14 +574,14 @@ export default class Compose extends Vue {
 
   // Move code from
   //   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
-  moveUp(index: number) {
+  moveUp(index: number): void {
     const letterElements = this.surveyLetterElements;
     let element: LetterElement = letterElements[index];
     let previousElement: LetterElement = letterElements[index - 1];
     this.exchangeElements(element, previousElement);
   }
 
-  moveDown(index: number) {
+  moveDown(index: number): void {
     const letterElements = this.surveyLetterElements;
     let element: LetterElement = letterElements[index];
     let nextElement: LetterElement = letterElements[index + 1];
@@ -557,7 +591,7 @@ export default class Compose extends Vue {
   exchangeElements(
     letterElement1: LetterElement,
     letterElement2: LetterElement
-  ) {
+  ): void {
     let newSequence1: number = letterElement2.sequence;
     let newSequence2: number = letterElement1.sequence;
     this.$apollo
@@ -608,7 +642,7 @@ export default class Compose extends Vue {
       });
   }
 
-  deleteElement(letterElementId: number) {
+  deleteElement(letterElementId: number): void {
     console.log(letterElementId);
     this.$apollo
       .mutate({
@@ -629,7 +663,7 @@ export default class Compose extends Vue {
       });
   }
 
-  resetSequenceProperty() {
+  resetSequenceProperty(): void {
     // cycles through the elements array and resets the 'order' property to reflect
     // the current ordering of the text boxes
     this.surveyLetterElements.forEach((elt, idx) => (elt.sequence = idx));
@@ -637,7 +671,7 @@ export default class Compose extends Vue {
 
   addElement(
     letterElementType: OneLetter_letter_letterElements_letterElementType
-  ) {
+  ): void {
     if (letterElementType.key === LetterElementEnum.CHART) {
       console.log("we have a chart!");
       this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
@@ -652,74 +686,82 @@ export default class Compose extends Vue {
     }
   }
 
-  addChartElement() {
-    console.log("survey dimension id: ", this.selectedSurveyDimension.value);
-    const letterElements = this.surveyLetterElements;
-    let maxSequence = -1; //assuming the max sequence will be 0 or greater....
-    letterElements.forEach((letterElement) => {
-      if (maxSequence < letterElement.sequence) {
-        maxSequence = letterElement.sequence;
-      }
-    });
-    let newSequence: number = maxSequence + 1;
-    this.$apollo
-      .mutate({
-        mutation: CREATE_LETTER_ELEMENT_MUTATION,
-        variables: {
-          createInput: {
-            sequence: newSequence,
-            letterId: this.theLetter.id,
-            letterElementTypeId: this.chartTypeElementId,
-            surveyDimensionId: this.selectedSurveyDimension.value,
-          },
-        },
-      })
-      .then(({ data }) => {
-        console.log("done!", data);
-        this.cancelChartSelection();
-        this.refreshPage();
-      })
-      .catch((error) => {
-        console.log("there appears to have been an error: ", error);
+  addChartElement(): void {
+    //console.log("survey dimension id: ", this.selectedSurveyDimension.value);
+    if (this.selectedSurveyDimension !== null) {
+      // this object should not be null, since it is required in the form in order for it to be valid,
+      // but typescript was giving an error
+      const letterElements = this.surveyLetterElements;
+      let maxSequence = -1; //assuming the max sequence will be 0 or greater....
+      letterElements.forEach((letterElement) => {
+        if (maxSequence < letterElement.sequence) {
+          maxSequence = letterElement.sequence;
+        }
       });
+      let newSequence: number = maxSequence + 1;
+      this.$apollo
+        .mutate({
+          mutation: CREATE_LETTER_ELEMENT_MUTATION,
+          variables: {
+            createInput: {
+              sequence: newSequence,
+              letterId: this.theLetter.id,
+              letterElementTypeId: this.chartTypeElementId,
+              surveyDimensionId: this.selectedSurveyDimension.value,
+            },
+          },
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          this.cancelChartSelection();
+          this.refreshPage();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    }
   }
 
   // Return the next sequence number larger than those in existing letter elements.
   // If the list of letter elements is empty, return 1.
-  nextSequenceNumber(letterElements: LetterElement[]) {
+  nextSequenceNumber(letterElements: LetterElement[]): number {
     const existingNumbers = letterElements.map((elt) => elt.sequence);
     return Math.max(0, ...existingNumbers) + 1;
   }
 
-  addImageElement() {
-    console.log("image id: ", this.selectedImage.value);
-    const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
+  addImageElement(): void {
+    if (this.selectedImage !== null) {
+      // selectedImage should not be null, since it is a required element in the form, but
+      // typescript was giving an error
+      console.log("image id: ", this.selectedImage.value);
+      const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
 
-    this.$apollo
-      .mutate({
-        mutation: CREATE_LETTER_ELEMENT_MUTATION,
-        variables: {
-          createInput: {
-            sequence: nextSequence,
-            letterId: this.theLetter.id,
-            letterElementTypeId: this.imageTypeElementId,
-            imageId: this.selectedImage.value,
+      this.$apollo
+        .mutate({
+          mutation: CREATE_LETTER_ELEMENT_MUTATION,
+          variables: {
+            createInput: {
+              sequence: nextSequence,
+              letterId: this.theLetter.id,
+              letterElementTypeId: this.imageTypeElementId,
+              imageId: this.selectedImage.value,
+            },
           },
-        },
-      })
-      .then(({ data }) => {
-        console.log("done!", data);
-        this.cancelImageSelection();
-        this.refreshPage();
-      })
-      .catch((error) => {
-        console.log("there appears to have been an error: ", error);
-      });
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          this.cancelImageSelection();
+          this.refreshPage();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    }
   }
 
   addNonChartElement(
     letterElementType: OneLetter_letter_letterElements_letterElementType
-  ) {
+  ): void {
     const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
 
     console.log("letter element type: ", letterElementType);
@@ -757,13 +799,13 @@ export default class Compose extends Vue {
       });
   }
 
-  refreshPage() {
+  refreshPage(): void {
     this.$apollo.queries.theLetter.refetch().then(({ data }) => {
       console.log("letter data refetched! ", data);
     });
   }
 
-  letterElement(key: string) {
+  letterElement(key: string): string {
     if (key === LetterElementEnum.BOILERPLATE) {
       return "LetterTextArea";
     } else {
@@ -771,7 +813,7 @@ export default class Compose extends Vue {
     }
   }
 
-  imageId(element: OneLetter_letter_letterElements) {
+  imageId(element: OneLetter_letter_letterElements): number {
     if (
       element.letterElementType.key === LetterElementEnum.IMAGE &&
       element.image !== null
@@ -782,25 +824,25 @@ export default class Compose extends Vue {
     }
   }
 
-  setEditModeOn(element: LetterElement) {
+  setEditModeOn(element: LetterElement): void {
     element.editModeOn = true;
     console.log("edit mode on!", this.theLetter.letterElements);
   }
 
-  setEditModeOff(element: LetterElement) {
+  setEditModeOff(element: LetterElement): void {
     element.editModeOn = false;
     console.log("edit mode off!");
   }
 
-  setEmailEditModeOn() {
+  setEmailEditModeOn(): void {
     this.emailEditModeOn = true;
   }
 
-  setEmailEditModeOff() {
+  setEmailEditModeOff(): void {
     this.emailEditModeOn = false;
   }
 
-  letterElementDescription(element: OneLetter_letter_letterElements) {
+  letterElementDescription(element: OneLetter_letter_letterElements): string {
     if (
       element.letterElementType.key === LetterElementEnum.CHART &&
       element.surveyDimension !== null
@@ -822,11 +864,11 @@ export default class Compose extends Vue {
     }
   }
 
-  toggleEditMode() {
+  toggleEditMode(): void {
     this.editModeOn = true;
   }
 
-  letterInfoUpdated() {
+  letterInfoUpdated(): void {
     // letter information has been successfully updated....
     console.log("letter info updated!");
     this.$apollo.queries.theLetter.refetch().then(({ data }) => {
@@ -835,7 +877,7 @@ export default class Compose extends Vue {
     this.editModeOn = false;
   }
 
-  newLetterCreated(id: number) {
+  newLetterCreated(id: number): void {
     // letter information has been successfully created or updated....reload the page, but now with the appropriate letterId
     console.log("new letter created!");
     console.log("id: ", id);
@@ -850,7 +892,14 @@ export default class Compose extends Vue {
   }
 
   // https://github.com/vuejs/vue-class-component/issues/270
-  beforeRouteUpdate(to: Route, from: Route, next: Function) {
+  // https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
+  beforeRouteUpdate(
+    to: Route,
+    from: Route,
+    next: (
+      to?: RawLocation | false | ((vm: Vue.Component) => any) | void
+    ) => void
+  ): void {
     console.log("before route update!");
     this.name = to.params.name;
     next();
@@ -858,7 +907,14 @@ export default class Compose extends Vue {
 
   // https://github.com/kaorun343/vue-property-decorator/issues/38
   // https://github.com/vuejs/vue-class-component/blob/master/README.md#adding-custom-hooks
-  beforeRouteLeave(to: Route, from: Route, next: Function) {
+  // https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
+  beforeRouteLeave(
+    to: Route,
+    from: Route,
+    next: (
+      to?: RawLocation | false | ((vm: Vue.Component) => any) | void
+    ) => void
+  ): void {
     console.log("inside before route leave!");
     if (!this.allEditsSaved) {
       const answer = window.confirm(
@@ -875,7 +931,7 @@ export default class Compose extends Vue {
   }
 
   // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
-  mounted() {
+  mounted(): void {
     this.name = this.$route.params.name;
     if (this.$route.params.letterId === undefined) {
       // launch form for creating a new letter

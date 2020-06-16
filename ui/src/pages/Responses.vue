@@ -138,10 +138,7 @@ import {
   DELETE_SURVEY_RESPONSE,
 } from "@/graphql/surveys.graphql";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
-import {
-  AllResponses,
-  AllResponses_surveyResponses as SurveyResponse,
-} from "@/graphql/types/AllResponses";
+import { AllResponses_surveyResponses as SurveyResponse } from "@/graphql/types/AllResponses";
 import {
   WriteLetter,
   WriteLetter_writeLetter as LetterWriterOutput,
@@ -382,16 +379,16 @@ export default Vue.extend({
           refetchQueries: ["AllResponses"],
         })
         .then((mutationResult) => {
-          const stats = mutationResult.data!.importQualtricsSurveyResponses;
-          this.bottomSheet.content = `Imported ${stats.importCount} ${pluralize(
-            "response",
-            stats.importCount
-          )} (${stats.duplicateCount} ${pluralize(
-            "duplicate",
-            stats.duplicateCount
-          )})`;
-          this.bottomSheet.visible = true;
-          this.selectedQualtricsId = "";
+          const stats = mutationResult.data?.importQualtricsSurveyResponses;
+          if (stats) {
+            this.bottomSheet.content = `Imported ${
+              stats.importCount
+            } ${pluralize("response", stats.importCount)} (${
+              stats.duplicateCount
+            } ${pluralize("duplicate", stats.duplicateCount)})`;
+            this.bottomSheet.visible = true;
+            this.selectedQualtricsId = "";
+          }
         })
         .finally(() => {
           this.spinnerVisible = false;

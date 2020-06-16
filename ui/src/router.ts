@@ -10,79 +10,74 @@ const router = new VueRouter({
   routes: [
     {
       path: "/",
-      redirect: { name: "letters" }
+      redirect: { name: "letters" },
     },
     {
       path: "/login",
       name: "login",
-      component: () => import("./pages/Login.vue")
+      component: () => import("./pages/Login.vue"),
     },
     {
       path: "/events",
       name: "events",
-      component: () => import("./pages/Events.vue")
-    },
-    {
-      path: "/accounts",
-      name: "accounts",
-      component: () => import("./pages/Accounts.vue")
+      component: () => import("./pages/Events.vue"),
     },
     {
       path: "/password",
       name: "password",
-      component: () => import("./pages/Password.vue")
+      component: () => import("./pages/Password.vue"),
     },
     {
       path: "/letters",
       name: "letters",
-      component: () => import("./pages/Letters.vue")
+      component: () => import("./pages/Letters.vue"),
     },
     {
       path: "/survey-dimensions",
       name: "survey-dimensions",
-      component: () => import("./pages/SurveyDimensions.vue")
+      component: () => import("./pages/SurveyDimensions.vue"),
     },
     {
       path: "/surveys",
       name: "surveys",
-      component: () => import("./pages/Surveys.vue")
+      component: () => import("./pages/Surveys.vue"),
     },
     {
       path: "/compose/:letterId?",
       name: "compose",
-      component: () => import("./pages/Compose.vue")
+      component: () => import("./pages/Compose.vue"),
     },
     {
       path: "/association-table/:letterId",
       name: "association-table",
-      component: () => import("./pages/BooleanAssociations.vue")
+      component: () => import("./pages/BooleanAssociations.vue"),
     },
     {
       path: "/responses",
       name: "responses",
-      component: () => import("./pages/Responses.vue")
+      component: () => import("./pages/Responses.vue"),
     },
     {
       path: "/scripture-engagement-practices",
       name: "scripture-engagement-practices",
-      component: () => import("./pages/Practices.vue")
+      component: () => import("./pages/Practices.vue"),
     },
     {
       path: "/images",
       name: "images",
-      component: () => import("./pages/Images.vue")
+      component: () => import("./pages/Images.vue"),
     },
     {
       path: "/web-hooks",
       name: "web-hooks",
-      component: () => import("./pages/WebHooks.vue")
+      component: () => import("./pages/WebHooks.vue"),
     },
     {
       // See https://router.vuejs.org/guide/essentials/history-mode.html#caveat
       path: "*",
-      component: NotFound
-    }
-  ]
+      component: NotFound,
+    },
+  ],
 });
 
 router.beforeEach((to, from, next) => {

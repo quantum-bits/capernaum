@@ -39,60 +39,60 @@ export default Vue.extend({
   computed: {
     isLoggedIn(): boolean {
       return this.$store.getters.isLoggedIn;
-    }
+    },
   },
 
-  data: function() {
+  data: function () {
     const navItems: NavItem[] = [
       {
         heading: "SURVEYS",
         title: "Surveys",
         route: "surveys",
-        icon: "mdi-format-list-bulleted-square"
+        icon: "mdi-format-list-bulleted-square",
       },
       {
         title: "Responses",
         route: "responses",
         icon: "mdi-message-outline",
-        divider: true
+        divider: true,
       },
       {
         heading: "RESPONSES",
         title: "Practices",
         route: "scripture-engagement-practices",
-        icon: "mdi-book-open"
+        icon: "mdi-book-open",
       },
       {
         title: "Dimensions",
         route: "survey-dimensions",
-        icon: "mdi-file-tree"
+        icon: "mdi-file-tree",
       },
       {
         title: "Images",
         route: "images",
-        icon: "mdi-image"
+        icon: "mdi-image",
       },
       {
         title: "Letters",
         route: "letters",
         icon: "mdi-email",
-        divider: true
+        divider: true,
       },
       {
         heading: "SYS ADMIN",
         title: "Events",
         route: "events",
-        icon: "mdi-alarm"
+        icon: "mdi-alarm",
       },
       {
         title: "Web Hooks",
         route: "web-hooks",
-        icon: "mdi-pipe"
-      }
+        icon: "mdi-pipe",
+      },
     ];
     return {
-      navItems
+      navItems,
     };
-  }
+  },
 });
 </script>

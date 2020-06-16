@@ -16,19 +16,19 @@ import NavDrawer from "./NavDrawer.vue";
 export default Vue.extend({
   components: {
     AppBar,
-    NavDrawer
+    NavDrawer,
   },
 
   data() {
     return {
-      drawerVisible: false
+      drawerVisible: false,
     };
   },
 
   methods: {
     toggleNavDrawer(): void {
       this.drawerVisible = !this.drawerVisible;
-    }
-  }
+    },
+  },
 });
 </script>

@@ -44,7 +44,7 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "action"
+    event: "action",
   },
 
   props: {
@@ -53,7 +53,7 @@ export default Vue.extend({
 
     machineName: { type: String, required: true },
     hostName: { type: String, required: true },
-    isActive: { type: Boolean, required: true }
+    isActive: { type: Boolean, required: true },
   },
 
   data() {
@@ -61,13 +61,13 @@ export default Vue.extend({
       dialogState: {
         machineName: "",
         hostName: "",
-        isActive: true
+        isActive: true,
       },
 
       formValid: false,
       rules: {
-        required: [(v: any) => !!v || "Required field"]
-      }
+        required: [(v: string): boolean | string => !!v || "Required field"],
+      },
     };
   },
 
@@ -76,29 +76,30 @@ export default Vue.extend({
       const result: MachineCreateInput = {
         name: this.dialogState.machineName,
         hostName: this.dialogState.hostName,
-        active: this.dialogState.isActive
+        active: this.dialogState.isActive,
       };
       this.$emit("ready", result);
       this.$emit("action", false);
-    }
+    },
   },
 
   watch: {
     visible: {
-      handler: function(newValue) {
+      handler: function (newValue) {
         if (newValue) {
           this.dialogState.machineName = this.machineName;
           this.dialogState.hostName = this.hostName;
           this.dialogState.isActive = this.isActive;
 
           if (this.$refs.theForm) {
-            // FIXME: Replace the `as any` hack.
-            (this.$refs.theForm as any).resetValidation();
+            (this.$refs.theForm as Vue & {
+              resetValidation: () => boolean;
+            }).resetValidation();
           }
         }
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>
