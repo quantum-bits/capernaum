@@ -89,7 +89,7 @@ export default Vue.extend({
   name: "ResponseSummary",
 
   props: {
-    writeLetter: Object as () => LetterWriterOutput
-  }
+    writeLetter: Object as () => LetterWriterOutput,
+  },
 });
 </script>

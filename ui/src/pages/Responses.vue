@@ -131,20 +131,20 @@
 import Vue from "vue";
 import {
   ALL_RESPONSES_QUERY,
-  IMPORT_SURVEY_RESPONSES
+  IMPORT_SURVEY_RESPONSES,
 } from "@/graphql/responses.graphql";
 import {
   ALL_SURVEYS_QUERY,
-  DELETE_SURVEY_RESPONSE
+  DELETE_SURVEY_RESPONSE,
 } from "@/graphql/surveys.graphql";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import {
   AllResponses,
-  AllResponses_surveyResponses as SurveyResponse
+  AllResponses_surveyResponses as SurveyResponse,
 } from "@/graphql/types/AllResponses";
 import {
   WriteLetter,
-  WriteLetter_writeLetter as LetterWriterOutput
+  WriteLetter_writeLetter as LetterWriterOutput,
 } from "@/graphql/types/WriteLetter";
 import isEmpty from "lodash/isEmpty";
 import MailDialog from "@/components/dialogs/MailDialog.vue";
@@ -154,7 +154,7 @@ import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import pluralize from "pluralize";
 import {
   quillDeltaToHtml,
-  quillHtmlToText
+  quillHtmlToText,
 } from "../../../server/src/helpers/quill";
 
 interface ImportedSurvey {
@@ -171,18 +171,18 @@ export default Vue.extend({
   components: {
     MailDialog,
     ConfirmDialog,
-    ResponseSummary
+    ResponseSummary,
   },
 
   apollo: {
     surveys: {
-      query: ALL_SURVEYS_QUERY
+      query: ALL_SURVEYS_QUERY,
     },
 
     surveyResponses: {
       query: ALL_RESPONSES_QUERY,
-      update: data => data.surveyResponses
-    }
+      update: (data) => data.surveyResponses,
+    },
   },
 
   data() {
@@ -199,7 +199,7 @@ export default Vue.extend({
         { text: "Letter", value: "letter" },
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
-        { text: "Action", value: "action", sortable: false }
+        { text: "Action", value: "action", sortable: false },
       ],
 
       letterWriterOutput: {} as LetterWriterOutput,
@@ -210,33 +210,33 @@ export default Vue.extend({
         adminEmail: "",
         textContent: "",
         htmlContent: "",
-        attachmentPath: ""
+        attachmentPath: "",
       },
 
       snackbar: {
         visible: false,
-        text: ""
+        text: "",
       },
 
       bottomSheet: {
         visible: false,
-        content: ""
+        content: "",
       },
 
       deleteDialog: {
         visible: false,
-        response: {} as SurveyResponse
+        response: {} as SurveyResponse,
       },
 
-      spinnerVisible: false
+      spinnerVisible: false,
     };
   },
 
   computed: {
-    availableSurveys(): object {
-      return this.surveys.map(survey => ({
+    availableSurveys(): Array<Record<string, string>> {
+      return this.surveys.map((survey) => ({
         text: survey.qualtricsName,
-        value: survey.qualtricsId
+        value: survey.qualtricsId,
       }));
     },
 
@@ -251,7 +251,7 @@ export default Vue.extend({
 
     haveLetterWriterOutput(): boolean {
       return !isEmpty(this.letterWriterOutput);
-    }
+    },
   },
 
   methods: {
@@ -294,11 +294,11 @@ export default Vue.extend({
           variables: {
             writerInput: {
               letterId: surveyResponse.survey.letter.id,
-              surveyResponseId: surveyResponse.id
-            }
-          }
+              surveyResponseId: surveyResponse.id,
+            },
+          },
         })
-        .then(response => {
+        .then((response) => {
           console.log("response", response);
           if (response.data) {
             const writeLetter = response.data.writeLetter;
@@ -309,7 +309,7 @@ export default Vue.extend({
             }
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error("generatePDF error", error);
         })
         .finally(() => {
@@ -331,12 +331,12 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_SURVEY_RESPONSE,
           variables: {
-            id: surveyResponse.id
-          }
+            id: surveyResponse.id,
+          },
         })
         .then(() => {
           const responseIndex = this.surveyResponses.findIndex(
-            item => item.id === surveyResponse.id
+            (item) => item.id === surveyResponse.id
           );
           this.surveyResponses.splice(responseIndex, 1);
         });
@@ -377,11 +377,11 @@ export default Vue.extend({
         .mutate<ImportSurveyResponses>({
           mutation: IMPORT_SURVEY_RESPONSES,
           variables: {
-            qId: this.selectedQualtricsId
+            qId: this.selectedQualtricsId,
           },
-          refetchQueries: ["AllResponses"]
+          refetchQueries: ["AllResponses"],
         })
-        .then(mutationResult => {
+        .then((mutationResult) => {
           const stats = mutationResult.data!.importQualtricsSurveyResponses;
           this.bottomSheet.content = `Imported ${stats.importCount} ${pluralize(
             "response",
@@ -396,7 +396,7 @@ export default Vue.extend({
         .finally(() => {
           this.spinnerVisible = false;
         });
-    }
-  }
+    },
+  },
 });
 </script>

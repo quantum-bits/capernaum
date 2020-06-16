@@ -2,13 +2,14 @@ import {
   extractZipContent,
   isValidDate,
   normalizeDateTime,
-  sleep
+  sleep,
 } from "./helpers";
 import {
   CreateResponseData,
   CreateResponseExportResponse,
+  CreateSubscriptionData,
   CreateSubscriptionResponse,
-  QualtricsArrayResponse,
+  QualtricsArrayResponse, QualtricsPostData,
   QualtricsResponse,
   QualtricsSurvey,
   QualtricsSurveyList,
@@ -17,9 +18,9 @@ import {
 import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
-import got, { Got, GotOptions } from "got";
-import ProxyAgent from "https-proxy-agent";
+import got, { Got, Options } from "got";
 import { QualtricsOrganization, QualtricsSubscription } from "./entities";
+import tunnel from "tunnel";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -34,36 +35,36 @@ class WebhookEventFactory {
     {
       name: "activate-survey",
       details: "controlpanel.activateSurvey",
-      takesSurveyId: false
+      takesSurveyId: false,
     },
     {
       name: "deactivate-survey",
       details: "controlpanel.deactivateSurvey",
-      takesSurveyId: false
+      takesSurveyId: false,
     },
     {
       name: "started-session",
       details: "surveyengine.startedRecipientSession",
-      takesSurveyId: true
+      takesSurveyId: true,
     },
     {
       name: "partial-response",
       details: "surveyengine.partialResponse",
-      takesSurveyId: true
+      takesSurveyId: true,
     },
     {
       name: "completed-response",
       details: "surveyengine.completedResponse",
-      takesSurveyId: true
-    }
+      takesSurveyId: true,
+    },
   ];
 
   private validNames() {
-    return this.webhookEvents.map(event => event.name).join(", ");
+    return this.webhookEvents.map((event) => event.name).join(", ");
   }
 
   makeEvent(name: string, surveyId?: string) {
-    for (let event of this.webhookEvents) {
+    for (const event of this.webhookEvents) {
       if (event.name === name) {
         if (event.takesSurveyId) {
           return `${event.details}.${surveyId}`;
@@ -80,8 +81,8 @@ class WebhookEventFactory {
 
 @Injectable()
 export class QualtricsService {
-  baseUrl: string = "";
-  apiToken: string = "";
+  baseUrl = "";
+  apiToken = "";
   client: Got;
   eventFactory: WebhookEventFactory = new WebhookEventFactory();
 
@@ -99,20 +100,24 @@ export class QualtricsService {
     }
 
     // Common client options.
-    const commonOptions: GotOptions = {
-      headers: { "x-api-token": this.apiToken }
+    const extendOptions: Options = {
+      headers: { "x-api-token": this.apiToken },
     };
 
     // Configure proxy if required.
     if (process.env.PROXY_HOST && process.env.PROXY_PORT) {
-      commonOptions.agent = new ProxyAgent({
-        host: process.env.PROXY_HOST,
-        port: parseInt(process.env.PROXY_PORT)
+      const tunnelingAgent = tunnel.httpsOverHttps({
+        proxy: {
+          host: process.env.PROXY_HOST,
+          port: parseInt(process.env.PROXY_PORT),
+        },
       });
+
+      extendOptions.agent = { https: tunnelingAgent };
     }
 
-    qualtricsDebug("common options %O", commonOptions);
-    this.client = got.extend(commonOptions);
+    qualtricsDebug("common options %O", extendOptions);
+    this.client = got.extend(extendOptions);
   }
 
   private makeUrl(...segments: string[]) {
@@ -127,7 +132,7 @@ export class QualtricsService {
   private async qualtricsGet<T>(url: URL) {
     qualtricsDebug("qualtricsGet - URL %s", url);
     const response = await this.client.get<QualtricsResponse<T>>(url.href, {
-      responseType: "json"
+      responseType: "json",
     });
     qualtricsDebug("qualtricsGet - response %O", response.body);
     return response.body.result;
@@ -138,7 +143,7 @@ export class QualtricsService {
     const response = await this.client.get<QualtricsArrayResponse<T>>(
       url.href,
       {
-        responseType: "json"
+        responseType: "json",
       }
     );
     qualtricsDebug("qualtricsGet - response %O", response.body);
@@ -148,7 +153,7 @@ export class QualtricsService {
   private async qualtricsDelete<T>(url: URL) {
     qualtricsDebug("qualtricsDelete - URL %s", url);
     const response = await this.client.delete<QualtricsResponse<T>>(url.href, {
-      responseType: "json"
+      responseType: "json",
     });
     qualtricsDebug("qualtricsDelete - response %O", response.body);
     return response.body.meta.httpStatus;
@@ -159,18 +164,18 @@ export class QualtricsService {
    * @param url
    * @param data
    */
-  private qualtricsPost<T>(url: URL, data: object) {
+  private qualtricsPost<T>(url: URL, data: QualtricsPostData) {
     qualtricsDebug("qualtricsPost - URL %s\nData %O", url, data);
     return this.client
       .post<QualtricsResponse<T>>(url.href, {
         responseType: "json",
-        json: data
+        json: data,
       })
-      .then(response => {
+      .then((response) => {
         qualtricsDebug("qualtricsPost - response %O", response.body);
         return response.body.result;
       })
-      .catch(error => {
+      .catch((error) => {
         throw Error(error);
       });
   }
@@ -215,7 +220,7 @@ export class QualtricsService {
     const url = this.makeUrl("eventsubscriptions");
     const response = await this.qualtricsPost<CreateSubscriptionResponse>(url, {
       publicationUrl: publicationUrl,
-      topics: this.eventFactory.makeEvent(eventName, surveyId)
+      topics: this.eventFactory.makeEvent(eventName, surveyId),
     });
     if (response) {
       const subscriptionId = response.id;
@@ -251,7 +256,7 @@ export class QualtricsService {
     endDate?: string
   ) {
     const postData: CreateResponseData = {
-      format: "json"
+      format: "json",
     };
 
     if (startDate) {
@@ -298,8 +303,8 @@ export class QualtricsService {
     );
     return this.client
       .get(url.href, { responseType: "buffer" })
-      .then(response => extractZipContent(response.body))
-      .catch(err => {
+      .then((response) => extractZipContent(response.body))
+      .catch((err) => {
         throw err;
       });
   }

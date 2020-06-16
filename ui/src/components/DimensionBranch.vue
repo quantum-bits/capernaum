@@ -80,17 +80,16 @@ import { SurveyDimensionView } from "@/pages/survey.types";
 import {
   ADD_INDEX_MUTATION,
   DELETE_DIMENSION,
-  UPDATE_DIMENSION_MUTATION
+  UPDATE_DIMENSION_MUTATION,
 } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import DimensionDialog from "./dialogs/DimensionDialog.vue";
 import IndexDialog from "./dialogs/IndexDialog.vue";
-import { SurveyIndexCreateInput } from "@/graphql/types/globalTypes";
 import {
   DimensionDialogResponse,
   IndexDialogResponse,
-  SurveyItemSelection
+  SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
@@ -99,18 +98,18 @@ export default Vue.extend({
   components: {
     ConfirmDialog,
     DimensionDialog,
-    IndexDialog
+    IndexDialog,
   },
 
   props: {
     survey: {
       type: Object as () => Survey,
-      required: true
+      required: true,
     },
     surveyDimension: {
       type: Object as () => SurveyDimensionView,
-      required: true
-    }
+      required: true,
+    },
   },
 
   data() {
@@ -118,12 +117,12 @@ export default Vue.extend({
       visible: {
         dimensionDialog: false,
         indexDialog: false,
-        deleteDialog: false
+        deleteDialog: false,
       },
 
       rules: {
-        required: [(v: any) => !!v || "Required field"]
-      }
+        required: [(v: string) => !!v || "Required field"],
+      },
     };
   },
 
@@ -141,15 +140,15 @@ export default Vue.extend({
               id: this.surveyDimension.id,
               title: dialogResponse.title,
               // FIXME: sequence should not be hard-coded
-              sequence: 10
-            }
-          }
+              sequence: 10,
+            },
+          },
         })
         .then(() => {
           this.visible.dimensionDialog = false;
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
     },
@@ -161,15 +160,15 @@ export default Vue.extend({
           variables: {
             createInput: {
               surveyDimensionId: this.surveyDimension.id,
-              ...dialogResponse
-            }
-          }
+              ...dialogResponse,
+            },
+          },
         })
         .then(() => {
           this.visible.indexDialog = false;
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
     },
@@ -179,25 +178,25 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_DIMENSION,
           variables: {
-            id: this.surveyDimension.id
-          }
+            id: this.surveyDimension.id,
+          },
         })
         .then(() => {
           this.refetchSurveyData();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
-    }
+    },
   },
 
   computed: {
     availableItems(): SurveyItemSelection[] {
-      return this.survey.surveyItems.map(item => ({
+      return this.survey.surveyItems.map((item) => ({
         id: item.id,
-        name: item.qualtricsText
+        name: item.qualtricsText,
       }));
-    }
-  }
+    },
+  },
 });
 </script>

@@ -32,16 +32,16 @@ export default Vue.extend({
   apollo: {
     availableQualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
-      update: data => data.qualtricsSurveys,
-      fetchPolicy: "network-only"
-    }
+      update: (data) => data.qualtricsSurveys,
+      fetchPolicy: "network-only",
+    },
   },
 
   props: {
     value: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
 
   data() {
@@ -51,20 +51,20 @@ export default Vue.extend({
       surveySelectionRules: [
         () =>
           !isEmpty(this.value) ||
-          "Survey is required.  Note that each survey may only be imported once, so if the above list is empty, it may mean that all surveys have already been imported."
-      ] as any
+          "Survey is required.  Note that each survey may only be imported once, so if the above list is empty, it may mean that all surveys have already been imported.",
+      ] as any,
     };
   },
 
   computed: {
     selections(): QualtricsSurveySelection[] {
       return this.availableQualtricsSurveys
-        .filter(survey => survey.importedToCapernaum)
-        .map(survey => ({
+        .filter((survey) => survey.importedToCapernaum)
+        .map((survey) => ({
           text: survey.qualtricsName,
-          value: survey.qualtricsId
+          value: survey.qualtricsId,
         }));
-    }
-  }
+    },
+  },
 });
 </script>

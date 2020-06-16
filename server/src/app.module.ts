@@ -17,12 +17,12 @@ import { MachineModule } from "./machine/machine.module";
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
-      logging: inDevelopmentMode()
+      logging: inDevelopmentMode(),
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",
       installSubscriptionHandlers: true,
-      context: ({ req }) => ({ req })
+      context: ({ req }) => ({ req }),
     }),
     SurveyModule,
     PredictionModule,
@@ -30,7 +30,7 @@ import { MachineModule } from "./machine/machine.module";
     MailModule,
     WriterModule,
     QualtricsModule,
-    MachineModule
-  ]
+    MachineModule,
+  ],
 })
 export class AppModule {}

@@ -59,8 +59,8 @@ export default Vue.extend({
   props: {
     machines: {
       type: Array as () => Machine[],
-      required: true
-    }
-  }
+      required: true,
+    },
+  },
 });
 </script>

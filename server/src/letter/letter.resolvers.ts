@@ -3,7 +3,7 @@ import {
   Mutation,
   Parent,
   Query,
-  ResolveProperty,
+  ResolveField,
   Resolver
 } from "@nestjs/graphql";
 import {
@@ -16,7 +16,7 @@ import {
   LetterUpdateInput
 } from "./entities";
 import { LetterService } from "./letter.service";
-import { Int } from "type-graphql";
+import { Int } from "@nestjs/graphql";
 import { Survey, SurveyDimension } from "../survey/entities";
 import {
   PredictionTableEntry,
@@ -79,24 +79,24 @@ export class LetterResolver {
     return this.letterService.delete(LetterElement, id);
   }
 
-  @ResolveProperty("scriptureEngagementPractices", type => [
+  @ResolveField("scriptureEngagementPractices", type => [
     ScriptureEngagementPractice
   ])
   resolveScriptureEngagementPractices(@Parent() survey: Survey) {
     return this.letterService.find(ScriptureEngagementPractice);
   }
 
-  @ResolveProperty("survey", type => Survey)
+  @ResolveField("survey", type => Survey)
   resolveSurvey(@Parent() letter: Letter) {
     return this.entityManager.findOne(Survey, letter.surveyId);
   }
 
-  @ResolveProperty("letterElements", type => [LetterElement])
+  @ResolveField("letterElements", type => [LetterElement])
   resolveElements(@Parent() letter: Letter) {
     return this.letterService.letterElements(letter);
   }
 
-  @ResolveProperty("tableEntries", type => [PredictionTableEntry])
+  @ResolveField("tableEntries", type => [PredictionTableEntry])
   resolveEntries(@Parent() letter: Letter) {
     return this.letterService.tableEntries(letter);
   }
@@ -107,7 +107,7 @@ export class LetterResolver {
 export class LetterElementResolver {
   constructor(private readonly letterService: LetterService) {}
 
-  @ResolveProperty("letterElementType", type => LetterElementType)
+  @ResolveField("letterElementType", type => LetterElementType)
   resolveLetterElementType(@Parent() letterElement: LetterElement) {
     return this.letterService.findOneOrFail(
       LetterElementType,
@@ -115,7 +115,7 @@ export class LetterElementResolver {
     );
   }
 
-  @ResolveProperty("image", type => Image, { nullable: true })
+  @ResolveField("image", type => Image, { nullable: true })
   resolveImage(@Parent() letterElement: LetterElement) {
     if (letterElement.imageId) {
       return this.letterService.findOneOrFail(Image, letterElement.imageId);
@@ -124,7 +124,7 @@ export class LetterElementResolver {
     }
   }
 
-  @ResolveProperty("surveyDimension", type => SurveyDimension, {
+  @ResolveField("surveyDimension", type => SurveyDimension, {
     nullable: true
   })
   resolveSurveyDimension(@Parent() letterElement: LetterElement) {

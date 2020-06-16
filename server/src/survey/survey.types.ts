@@ -1,5 +1,5 @@
 import { ScriptureEngagementPractice } from "../prediction/entities";
-import { Field, Float, Int, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyResponse } from "./entities";
 
 import numbro from 'numbro';

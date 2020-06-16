@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { Column, Entity, ManyToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { SurveyResponse } from "./survey-response";

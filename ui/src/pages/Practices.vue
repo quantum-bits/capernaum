@@ -136,11 +136,11 @@ import {
   ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
   ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
   DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
-  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION
+  UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
 } from "@/graphql/scripture-engagement-practices.graphql";
 import {
   ScriptureEngagementPractices,
-  ScriptureEngagementPractices_scriptureEngagementPractices
+  ScriptureEngagementPractices_scriptureEngagementPractices,
 } from "@/graphql/types/ScriptureEngagementPractices";
 
 //import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
@@ -160,15 +160,15 @@ export default Vue.extend({
           text: "Scripture Engagement Practice",
           align: "left",
           sortable: true,
-          value: "title"
+          value: "title",
         },
         {
           text: "Description",
           align: "left",
           sortable: false,
-          value: "description"
+          value: "description",
         },
-        { text: "Actions", sortable: false }
+        { text: "Actions", sortable: false },
       ],
       scriptureEngagementPracticeData: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
       createUpdateSEPracticeDialog: false as boolean,
@@ -180,13 +180,13 @@ export default Vue.extend({
       scriptureEngagementPracticeId: -1 as number, // only used when updating a current SE practice
       editOn: false as boolean, //true when editing an existing SE practice (as opposed to creating a new one)
       titleRules: [
-        (v: any) => !!v || "Title is required",
-        (v: any) =>
+        (v: string) => !!v || "Title is required",
+        (v: string) =>
           (v && v.length <= 50) ||
-          "Title of letter must be fewer than 50 characters"
+          "Title of letter must be fewer than 50 characters",
       ],
-      descriptionRules: [(v: any) => !!v || "Description is required"],
-      urlRules: [(v: any) => !!v || "A URL is required"]
+      descriptionRules: [(v: string) => !!v || "Description is required"],
+      urlRules: [(v: string) => !!v || "A URL is required"],
     };
   },
 
@@ -229,15 +229,15 @@ export default Vue.extend({
         .mutate({
           mutation: DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
           variables: {
-            id: practice.id
-          }
+            id: practice.id,
+          },
         })
         .then(({ data }) => {
           console.log("done!", data);
           this.refetchSEPracticeData();
           //this.cancelIndexDialog();
         })
-        .catch(error => {
+        .catch((error) => {
           console.log("there appears to have been an error: ", error);
           //this.serverError = true;
           //this.serverError = true
@@ -283,9 +283,9 @@ export default Vue.extend({
                   sequence: newSequence,
                   title: this.scriptureEngagementPracticeTitle,
                   description: this.scriptureEngagementPracticeDescription,
-                  moreInfoUrl: this.moreInfoUrl
-                }
-              }
+                  moreInfoUrl: this.moreInfoUrl,
+                },
+              },
             })
             .then(({ data }) => {
               console.log("done!", data);
@@ -293,7 +293,7 @@ export default Vue.extend({
               this.refetchSEPracticeData();
               //this.cancelIndexDialog();
             })
-            .catch(error => {
+            .catch((error) => {
               console.log("there appears to have been an error: ", error);
               (this.$refs.form as any).resetValidation();
               //this.serverError = true;
@@ -310,9 +310,9 @@ export default Vue.extend({
                   sequence: this.scriptureEngagementPracticeSequence,
                   title: this.scriptureEngagementPracticeTitle,
                   description: this.scriptureEngagementPracticeDescription,
-                  moreInfoUrl: this.moreInfoUrl
-                }
-              }
+                  moreInfoUrl: this.moreInfoUrl,
+                },
+              },
             })
             .then(({ data }) => {
               console.log("done!", data);
@@ -320,7 +320,7 @@ export default Vue.extend({
               this.refetchSEPracticeData();
               //this.cancelIndexDialog();
             })
-            .catch(error => {
+            .catch((error) => {
               console.log("there appears to have been an error: ", error);
               (this.$refs.form as any).resetValidation();
               //this.serverError = true;
@@ -328,7 +328,7 @@ export default Vue.extend({
             });
         }
       }
-    }
+    },
   },
 
   apollo: {
@@ -342,12 +342,14 @@ export default Vue.extend({
 
         return scriptureEngagementPractices.scriptureEngagementPractices;
       },
-      fetchPolicy: "network-only"
-    }
+      fetchPolicy: "network-only",
+    },
   },
 
   computed: {
-    scriptureEngagementPractices(): object {
+    scriptureEngagementPractices(): Array<
+      Partial<ScriptureEngagementPractices_scriptureEngagementPractices>
+    > {
       return this.scriptureEngagementPracticeData.map(
         (
           practice: ScriptureEngagementPractices_scriptureEngagementPractices
@@ -357,16 +359,16 @@ export default Vue.extend({
           description: practice.description,
           sequence: practice.sequence,
           moreInfoUrl: practice.moreInfoUrl,
-          canDelete: practice.predictionTableEntries.length === 0
+          canDelete: practice.predictionTableEntries.length === 0,
         })
       );
-    }
+    },
   },
 
   mounted() {
     console.log("mounted....");
     //this.refetchSEPracticeData();
-  }
+  },
 });
 </script>
 
