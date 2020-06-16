@@ -379,16 +379,16 @@ export default Vue.extend({
           refetchQueries: ["AllResponses"],
         })
         .then((mutationResult) => {
-          const stats = mutationResult.data!.importQualtricsSurveyResponses;
-          this.bottomSheet.content = `Imported ${stats.importCount} ${pluralize(
-            "response",
-            stats.importCount
-          )} (${stats.duplicateCount} ${pluralize(
-            "duplicate",
-            stats.duplicateCount
-          )})`;
-          this.bottomSheet.visible = true;
-          this.selectedQualtricsId = "";
+          const stats = mutationResult.data?.importQualtricsSurveyResponses;
+          if (stats) {
+            this.bottomSheet.content = `Imported ${
+              stats.importCount
+            } ${pluralize("response", stats.importCount)} (${
+              stats.duplicateCount
+            } ${pluralize("duplicate", stats.duplicateCount)})`;
+            this.bottomSheet.visible = true;
+            this.selectedQualtricsId = "";
+          }
         })
         .finally(() => {
           this.spinnerVisible = false;

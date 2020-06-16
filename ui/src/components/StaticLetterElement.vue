@@ -88,19 +88,18 @@ export default class StaticLetterElement extends Vue {
   letterElements: LetterElementType[] = [];
   theImage: OneImage_image | null = null;
 
-  
   //@Emit("move-up")
-  moveUp() {
+  private moveUp() {
     this.$emit("move-up");
   }
 
   //@Emit("move-down")
-  moveDown() {
+  private moveDown() {
     this.$emit("move-down");
   }
 
   //@Emit("delete-element")
-  deleteElement() {
+  private deleteElement() {
     this.$emit("delete-element");
   }
 

@@ -4,7 +4,7 @@ module.exports = {
   client: {
     service: {
       name: "capernaum-client",
-      localSchemaFile: "../server/generated-schema.graphql"
-    }
-  }
+      localSchemaFile: "../server/generated-schema.graphql",
+    },
+  },
 };

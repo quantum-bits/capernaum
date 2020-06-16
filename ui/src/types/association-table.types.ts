@@ -1,4 +1,4 @@
-/** type that specifies how scripture engagment practices are tied to spiritual foci and orientations; these come back from the db
+/** type that specifies how scripture engagement practices are tied to spiritual foci and orientations; these come back from the db
  */
 export interface ScriptureEngagementPractice {
   id: number; // id for this SE practice in the db
@@ -15,7 +15,7 @@ export interface TableData {
   practice: string; // e.g., "Journaling"
   practiceId: number; // id for this SE practice in the db
   practiceOrder: number; // order in which to display this SE practice in the association table
-  spiritualFocusOrientationIdDict: object; // key:value pairs of the of the form {"columnId-1": true, "columnId-2": false}, where columnId corresponds to a spiritual focus/orientation id
+  spiritualFocusOrientationIdDict: { [key: string]: boolean }; // key:value pairs of the of the form {"columnId-1": true, "columnId-2": false}, where columnId corresponds to a spiritual focus/orientation id
 }
 
 /**

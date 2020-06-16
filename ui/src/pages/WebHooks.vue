@@ -187,8 +187,10 @@ export default Vue.extend({
         })
         .then(({ data }) => {
           console.log("RESULT", data);
-          this.machines.push(data!.createMachine);
-          this.showSnackbar("Machine added");
+          if (data) {
+            this.machines.push(data.createMachine);
+            this.showSnackbar("Machine added");
+          }
         })
         .catch((error) => this.showSnackbar(error));
     },
@@ -243,11 +245,13 @@ export default Vue.extend({
           },
         })
         .then(({ data }) => {
-          console.log("RESULT", data);
-          this.subscriptions.push(
-            this.enhanceSubscription(data!.createSubscription)
-          );
-          this.showSnackbar("Subscription created");
+          if (data) {
+            console.log("RESULT", data);
+            this.subscriptions.push(
+              this.enhanceSubscription(data.createSubscription)
+            );
+            this.showSnackbar("Subscription created");
+          }
         });
     },
 

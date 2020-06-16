@@ -23,11 +23,6 @@ const router = new VueRouter({
       component: () => import("./pages/Events.vue"),
     },
     {
-      path: "/accounts",
-      name: "accounts",
-      component: () => import("./pages/Accounts.vue"),
-    },
-    {
       path: "/password",
       name: "password",
       component: () => import("./pages/Password.vue"),
