@@ -48,7 +48,7 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "action"
+    event: "action",
   },
 
   props: {
@@ -57,7 +57,7 @@ export default Vue.extend({
     adminEmail: { type: String, required: true },
     attachmentPath: { type: String, required: true },
     textContent: { type: String, required: true },
-    htmlContent: { type: String, required: true }
+    htmlContent: { type: String, required: true },
   },
 
   data() {
@@ -65,9 +65,9 @@ export default Vue.extend({
       recipients: {
         respondent: false,
         admin: false,
-        other: false
+        other: false,
       },
-      otherEmail: ""
+      otherEmail: "",
     };
   },
 
@@ -78,7 +78,7 @@ export default Vue.extend({
         this.recipients.admin ||
         this.otherEmail.length > 0
       );
-    }
+    },
   },
 
   methods: {
@@ -86,7 +86,7 @@ export default Vue.extend({
       this.$emit("action", false);
     },
 
-    sendHelper: function(to: string, subject: string) {
+    sendHelper: function (to: string, subject: string) {
       return this.$apollo.mutate<SendLetter, SendLetterVariables>({
         mutation: SEND_LETTER_MUTATION,
         variables: {
@@ -95,9 +95,9 @@ export default Vue.extend({
             subject,
             textContent: this.textContent,
             htmlContent: this.htmlContent,
-            attachmentPath: this.attachmentPath
-          }
-        }
+            attachmentPath: this.attachmentPath,
+          },
+        },
       });
     },
 
@@ -121,12 +121,12 @@ export default Vue.extend({
       }
 
       this.$emit("action", false);
-    }
+    },
   },
 
   watch: {
     visible: {
-      handler: function(newValue) {
+      handler: function (newValue) {
         if (newValue) {
           this.recipients.respondent = false;
           this.recipients.admin = false;
@@ -134,12 +134,14 @@ export default Vue.extend({
           this.otherEmail = "";
 
           if (this.$refs.dimensionForm) {
-            (this.$refs.dimensionForm as any).resetValidation();
+            (this.$refs.dimensionForm as Vue & {
+              resetValidation: () => boolean;
+            }).resetValidation();
           }
         }
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>

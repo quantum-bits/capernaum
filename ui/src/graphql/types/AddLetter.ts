@@ -17,7 +17,7 @@ export interface AddLetter_createLetter {
   title: string;
   description: string;
   updated: any;
-  isFrozen: boolean | null;
+  isFrozen: boolean;
 }
 
 export interface AddLetter {

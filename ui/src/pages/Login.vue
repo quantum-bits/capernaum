@@ -41,10 +41,26 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import { LOGIN_MUTATION } from "../graphql/users.graphql";
+import Vue from "vue";
 
-export default {
+/*
+interface SnackbarData {
+  show: boolean;
+  text: string;
+}
+
+interface UserData {
+  email: string;
+  password: string;
+  snackbar: SnackbarData;
+}
+*/
+
+export default Vue.extend({
+  name: "Login",
+
   data() {
     return {
       email: "",
@@ -52,29 +68,29 @@ export default {
 
       snackbar: {
         show: false,
-        text: ""
-      }
+        text: "",
+      },
     };
   },
 
   methods: {
-    showSnackbar(text) {
+    showSnackbar(text: string) {
       this.snackbar.text = text;
       this.snackbar.show = true;
     },
 
-    logIn() {
+    logIn(): void {
       this.$apollo
         .mutate({
           mutation: LOGIN_MUTATION,
           variables: {
             credentials: {
               email: this.email,
-              password: this.password
-            }
-          }
+              password: this.password,
+            },
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.$store.commit("logIn", response.data.login);
           this.$router.push({ name: "letters" });
         })
@@ -82,7 +98,7 @@ export default {
           this.$store.commit("logOut");
           this.showSnackbar("Invalid credentials; please try again.");
         });
-    }
-  }
-};
+    },
+  },
+});
 </script>

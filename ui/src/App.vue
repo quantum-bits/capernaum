@@ -8,7 +8,7 @@ import DefaultLayout from "@/layouts/DefaultLayout.vue";
 
 export default Vue.extend({
   components: {
-    DefaultLayout
-  }
+    DefaultLayout,
+  },
 });
 </script>

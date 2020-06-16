@@ -26,14 +26,14 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "show"
+    event: "show",
   },
 
   props: {
     visible: { type: Boolean, required: true },
     dialogTitle: { type: String, required: true },
     dialogText: { type: String, required: true },
-    buttonLabel: { type: String, required: true }
+    buttonLabel: { type: String, required: true },
   },
 
   methods: {
@@ -44,7 +44,7 @@ export default Vue.extend({
     confirm() {
       this.$emit("confirmed");
       this.$emit("show", false);
-    }
-  }
+    },
+  },
 });
 </script>

@@ -39,7 +39,7 @@ export default Vue.extend({
 
   model: {
     prop: "visible",
-    event: "action"
+    event: "action",
   },
 
   props: {
@@ -47,7 +47,7 @@ export default Vue.extend({
     titleHint: { type: String, required: true },
     visible: { type: Boolean, required: true, default: false },
 
-    initialTitle: String
+    initialTitle: String,
   },
 
   data() {
@@ -56,35 +56,37 @@ export default Vue.extend({
       formValid: false,
 
       rules: {
-        required: [(v: any) => !!v || "Required field"]
-      }
+        required: [(v: string): boolean | string => !!v || "Required field"],
+      },
     };
   },
 
   methods: {
     onSubmit() {
       const response: DimensionDialogResponse = {
-        title: this.dimensionTitle
+        title: this.dimensionTitle,
       };
       this.$emit("ready", response);
       this.$emit("action", false);
-    }
+    },
   },
 
   watch: {
     visible: {
-      handler: function(newValue, oldValue) {
+      handler: function (newValue) {
+        //KK: deleted oldValue here because it was not being used (typescript warning)
         if (newValue) {
           this.dimensionTitle = this.initialTitle;
 
           if (this.$refs.dimensionForm) {
-            // FIXME: Replace the `as any` hack.
-            (this.$refs.dimensionForm as any).resetValidation();
+            (this.$refs.dimensionForm as Vue & {
+              resetValidation: () => boolean;
+            }).resetValidation();
           }
         }
       },
-      immediate: true
-    }
-  }
+      immediate: true,
+    },
+  },
 });
 </script>

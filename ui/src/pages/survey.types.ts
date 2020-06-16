@@ -2,7 +2,7 @@
 export enum SurveyDimensionEnum {
   SURVEY_DIMENSION = "survey-dimension",
   SURVEY_INDEX = "survey-index",
-  SURVEY_ITEM = "survey-item"
+  SURVEY_ITEM = "survey-item",
 }
 
 /**
@@ -11,7 +11,7 @@ export enum SurveyDimensionEnum {
 export enum WhichItems {
   ALL = "All",
   WITH_INDEX = "WithIndex",
-  WITHOUT_INDEX = "WithoutIndex"
+  WITHOUT_INDEX = "WithoutIndex",
 }
 
 // These interfaces represent _views_ of the data in the UI.
@@ -19,6 +19,11 @@ export enum WhichItems {
 export interface SurveySelection {
   text: string;
   value: number;
+}
+
+export interface SurveyQueryVariables {
+  surveyId: number;
+  which: string;
 }
 
 export interface QualtricsSurveySelection {

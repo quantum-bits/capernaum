@@ -40,7 +40,9 @@
 </template>
 
 <script>
-export default {
+import Vue from "vue";
+
+export default Vue.extend({
   name: "ToolBar",
 
   methods: {
@@ -50,13 +52,13 @@ export default {
     logOut() {
       this.$store.commit("logOut");
       this.$router.push({ name: "login" });
-    }
+    },
   },
 
   computed: {
     isLoggedIn() {
       return this.$store.getters.isLoggedIn;
-    }
-  }
-};
+    },
+  },
+});
 </script>

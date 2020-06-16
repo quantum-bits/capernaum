@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { VueEditor } from "vue2-editor";
 
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
@@ -68,6 +68,10 @@ import {
 } from "@/graphql/letters.graphql";
 import Quill from "quill";
 import cloneDeep from "lodash/cloneDeep";
+
+export interface Cfg {
+  multiLineParagraph: boolean;
+}
 
 @Component({
   components: {
@@ -95,7 +99,7 @@ export default class LetterTextArea extends Vue {
   // https://www.vue2editor.com/examples/#custom-toolbar
   // https://quilljs.com/docs/formats/
   // https://github.com/davidroyer/vue2-editor/issues/106
-  customToolbar: any = [
+  customToolbar = [
     [{ header: [1, 2, false] }],
     ["bold", "italic"],
     [
@@ -113,7 +117,7 @@ export default class LetterTextArea extends Vue {
   // used with QuillDeltaToHtmlConverter; for more configuration options, see: https://github.com/nozer/quill-delta-to-html
   // might possibly want to set allowBackgroundClasses or classPrefix to non-default values in order to mess with the css styling
   // inside the boilerplate text area
-  cfg: any = {
+  cfg: Cfg = {
     multiLineParagraph: false,
   };
 
@@ -155,34 +159,42 @@ export default class LetterTextArea extends Vue {
     this.updateHtmlFromTextDelta();
   }
 
-  @Emit("move-up")
-  moveUp() {}
+  //@Emit("move-up")
+  moveUp(): void {
+    this.$emit("move-up");
+  }
 
-  @Emit("move-down")
-  moveDown() {}
+  //@Emit("move-down")
+  moveDown(): void {
+    this.$emit("move-down");
+  }
 
-  @Emit("delete-element")
-  deleteElement() {}
+  //@Emit("delete-element")
+  deleteElement(): void {
+    this.$emit("delete-element");
+  }
 
   editModeOn: boolean = this.initialEditModeOn;
 
-  get showMoveDown() {
+  get showMoveDown(): boolean {
     return this.order < this.largestSequenceNumber;
   }
 
-  get showMoveUp() {
+  get showMoveUp(): boolean {
     return this.order > this.smallestSequenceNumber;
   }
 
   // Fetch a properly typed Quill.
   // FIXME: Refactor this egregious type hack.
-  get quillEditor() {
+  // FIXME: function needs a return type
+  get quillEditor(): Quill {
+    console.log("quill editor: ", this.$refs.editor);
     return (this.$refs.editor as Vue & { quill: Quill }).quill;
   }
 
   // User canceled the edit. Restore the content and the HTML to their values
   // prior to editing.
-  cancelEdits() {
+  cancelEdits(): void {
     this.editModeOn = false;
     this.$emit("edit-mode-off");
     this.restoreTextDelta();
@@ -191,7 +203,7 @@ export default class LetterTextArea extends Vue {
 
   // User wants to save the edit. Update content and HTML to their new values.
   // Send a mutation to the server to update the database.
-  save() {
+  save(): void {
     this.editModeOn = false;
     this.textDelta = this.quillEditor.getContents();
     this.updateHtmlFromTextDelta();
@@ -242,7 +254,7 @@ export default class LetterTextArea extends Vue {
 
   // Open the editor. Hang on to the current content for a possible cancellation.
   // Update the editor to contain the content.
-  openEditor() {
+  openEditor(): void {
     this.editModeOn = true;
     this.$emit("edit-mode-on");
     this.saveTextDelta();

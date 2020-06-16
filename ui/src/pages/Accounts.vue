@@ -58,26 +58,57 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 import { LOGIN_MUTATION, ONE_USER_QUERY } from "../graphql/users.graphql";
+import { OneUser } from "../graphql/types/OneUser";
 
-export default {
+interface UserData {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+/*
+interface AccountInfo {
+  id: number;
+  firstName: string;
+  lastName: string;
+  currentPassword: string;
+  newPasswordOne: string;
+  newPasswordTwo: string;
+}
+*/
+
+interface SnackbarData {
+  show: boolean;
+  text: string;
+}
+
+/*
+interface AccountData {
+  account: AccountInfo;
+  snackbar: SnackbarData;
+}
+*/
+
+export default Vue.extend({
   name: "Account",
 
   apollo: {
     account: {
       query: ONE_USER_QUERY,
       variables: {
-        userId: 1
+        userId: 1,
       },
-      update: data => {
+      update: (data: OneUser): UserData => {
         return {
           id: data.user.id,
           firstName: data.user.firstName,
-          lastName: data.user.lastName
+          lastName: data.user.lastName,
         };
-      }
-    }
+      },
+    },
   },
 
   data() {
@@ -88,34 +119,34 @@ export default {
         lastName: "",
         currentPassword: "",
         newPasswordOne: "",
-        newPasswordTwo: ""
+        newPasswordTwo: "",
       },
 
       snackbar: {
         show: false,
-        text: ""
-      }
+        text: "",
+      },
     };
   },
 
   methods: {
-    showSnackbar(text) {
+    showSnackbar(text: string): void {
       this.snackbar.text = text;
       this.snackbar.show = true;
     },
 
-    update() {
+    update(): void {
       this.$apollo
         .mutate({
           mutation: LOGIN_MUTATION,
           variables: {
             credentials: {
               email: this.email,
-              password: this.password
-            }
-          }
+              password: this.password,
+            },
+          },
         })
-        .then(response => {
+        .then((response) => {
           this.$store.commit("logIn", response.data.login);
           this.$router.push({ name: "letters" });
         })
@@ -123,7 +154,7 @@ export default {
           this.$store.commit("logOut");
           this.showSnackbar("Invalid credentials; please try again.");
         });
-    }
-  }
-};
+    },
+  },
+});
 </script>

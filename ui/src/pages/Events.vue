@@ -40,7 +40,7 @@
 import Vue from "vue";
 import {
   ALL_EVENTS_QUERY,
-  NEW_EVENTS_SUBSCRIPTION
+  NEW_EVENTS_SUBSCRIPTION,
 } from "@/graphql/events.graphql";
 import { DateTime } from "luxon";
 import { AllEvents_events as Event } from "@/graphql/types/AllEvents";
@@ -56,30 +56,30 @@ export default Vue.extend({
       headers: [
         { text: "Date", value: "date" },
         { text: "Type", value: "type" },
-        { text: "Details", value: "details" }
-      ]
+        { text: "Details", value: "details" },
+      ],
     };
   },
 
   apollo: {
     allEvents: {
       query: ALL_EVENTS_QUERY,
-      update: data => data.events,
+      update: (data) => data.events,
       subscribeToMore: {
         document: NEW_EVENTS_SUBSCRIPTION,
-        updateQuery: function(previousQueryResult, { subscriptionData }) {
+        updateQuery: function (previousQueryResult, { subscriptionData }) {
           console.log("PREVIOUS", previousQueryResult);
           console.log("SUB DATA", subscriptionData);
           this.allEvents.push(subscriptionData.data.newEvent);
-        }
-      }
-    }
+        },
+      },
+    },
   },
 
   filters: {
     formatDate(epochSeconds: string) {
       return DateTime.fromMillis(parseInt(epochSeconds)).toFormat("y-M-d tt");
-    }
-  }
+    },
+  },
 });
 </script>

@@ -57,8 +57,8 @@ export default Vue.extend({
 
       snackbar: {
         show: false,
-        text: ""
-      }
+        text: "",
+      },
     };
   },
 
@@ -76,13 +76,13 @@ export default Vue.extend({
             passwordInput: {
               userId: this.$store.state.user.id,
               currentPassword: this.currentPassword,
-              newPassword: this.newPassword
-            }
-          }
+              newPassword: this.newPassword,
+            },
+          },
         })
         .then(() => this.$router.push({ name: "letters" }))
-        .catch(err => this.showSnackbar(`Error: ${err}`));
-    }
-  }
+        .catch((err) => this.showSnackbar(`Error: ${err}`));
+    },
+  },
 });
 </script>

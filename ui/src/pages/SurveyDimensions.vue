@@ -85,6 +85,7 @@ import {
   SurveyDimensionEnum,
   SurveyDimensionView,
   SurveySelection,
+  SurveyQueryVariables,
 } from "./survey.types";
 
 import {
@@ -118,7 +119,7 @@ export default Vue.extend({
     // (i.e., when something is chosen from the drop-down)
     survey: {
       query: ONE_SURVEY_QUERY,
-      variables(): object {
+      variables(): SurveyQueryVariables {
         return {
           surveyId: this.surveySelection.value,
           which: WhichItems.WITHOUT_INDEX,
