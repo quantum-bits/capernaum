@@ -350,11 +350,11 @@ export class SurveyService extends BaseService {
           surveyDebug("Found a text question %O", question);
           const responseKey = `${qualtricsId}_TEXT`;
           if (question.questionName === "EMAIL") {
-            surveyDebug("Found the EMAIL question");
             workingSurvey.emailKey = responseKey;
+            surveyDebug(`Found the EMAIL question - '${responseKey}'`);
           } else if (question.questionName === "GROUP_CODE") {
-            surveyDebug("Found the GROUP_CODE question");
             workingSurvey.groupCodeKey = responseKey;
+            surveyDebug(`Found the GROUP_CODE question - '${responseKey}'`);
           } else {
             surveyDebug("Ignoring this text question");
           }

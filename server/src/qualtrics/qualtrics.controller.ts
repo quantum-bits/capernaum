@@ -4,7 +4,7 @@ import { Body, Controller, Post, Headers } from "@nestjs/common";
 import {
   QualtricsSurveyResponse,
   WebHookActivateDeactivateSurvey,
-  WebHookCompletedResponse
+  WebHookCompletedResponse,
 } from "./qualtrics.types";
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
@@ -36,7 +36,7 @@ export class QualtricsController {
 
     const createInput: EventCreateInput = {
       type: "Activated",
-      details: `Survey ${this.surveyName(body)} activated`
+      details: `Survey ${this.surveyName(body)} activated`,
     };
     return this.eventService.createEvent(createInput);
   }
@@ -47,7 +47,7 @@ export class QualtricsController {
 
     const createInput: EventCreateInput = {
       type: "Deactivated",
-      details: `Survey ${this.surveyName(body)} deactivated`
+      details: `Survey ${this.surveyName(body)} deactivated`,
     };
     return this.eventService.createEvent(createInput);
   }
@@ -118,14 +118,14 @@ export class QualtricsController {
       subject: "Your Christian Life Survey Results",
       textContent,
       htmlContent,
-      attachmentPath: writerOutput.pdfAbsolutePath
+      attachmentPath: writerOutput.pdfAbsolutePath,
     });
     qualtricsDebug("mailInfo - %O", mailInfo);
 
     // Create event.
     const createInput: EventCreateInput = {
       type: "Completed",
-      details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`
+      details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`,
     };
     return this.eventService.createEvent(createInput);
   }

@@ -10,6 +10,6 @@ import { WriterModule } from "../writer/writer.module";
 @Module({
   imports: [SurveyModule, EventModule, WriterModule, MailModule],
   controllers: [QualtricsController],
-  providers: [QualtricsResolver, QualtricsService]
+  providers: [QualtricsResolver, QualtricsService],
 })
 export class QualtricsModule {}

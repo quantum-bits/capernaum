@@ -9,7 +9,7 @@ import { QualtricsResponseImportStats } from "../survey/survey.types";
 import {
   QualtricsOrganization,
   QualtricsSubscription,
-  QualtricsSubscriptionCreateInput
+  QualtricsSubscriptionCreateInput,
 } from "./entities";
 
 @Resolver()
@@ -20,24 +20,24 @@ export class QualtricsResolver {
     private readonly surveyService: SurveyService
   ) {}
 
-  @Query(returns => [QualtricsSurveyListItem])
+  @Query((returns) => [QualtricsSurveyListItem])
   async qualtricsSurveys(
     @Args({
       name: "includeInactive",
       type: () => Boolean,
       defaultValue: false,
-      nullable: true
+      nullable: true,
     })
     includeInactive: boolean
   ) {
-    let surveyList: QualtricsSurveyListItem[] = [];
+    const surveyList: QualtricsSurveyListItem[] = [];
     let fetchMore = true;
     let offset: string = undefined;
     while (fetchMore) {
       const response = await this.qualtricsService.listSurveys(offset);
       const { elements, nextPage } = response;
 
-      for (let element of elements) {
+      for (const element of elements) {
         const survey = await this.surveyService.findSurveyByQualtricsId(
           element.id
         );
@@ -49,7 +49,7 @@ export class QualtricsResolver {
             qualtricsModDate: element.lastModified,
             qualtricsCreationDate: element.creationDate,
             qualtricsIsActive: element.isActive,
-            importedToCapernaum: survey !== null
+            importedToCapernaum: survey !== null,
           });
         }
       }
@@ -65,9 +65,9 @@ export class QualtricsResolver {
     return surveyList;
   }
 
-  @Mutation(returns => Survey, {
+  @Mutation((returns) => Survey, {
     description:
-      "Import a survey from Qualtrics. Always use this to create a Capernaum survey."
+      "Import a survey from Qualtrics. Always use this to create a Capernaum survey.",
   })
   async importQualtricsSurvey(
     @Args("qualtricsId") qualtricsId: string,
@@ -80,8 +80,8 @@ export class QualtricsResolver {
     return this.surveyService.importQualtricsSurvey(qualtricsSurvey, updateOk);
   }
 
-  @Mutation(returns => QualtricsResponseImportStats, {
-    description: "Fetch responses to a survey"
+  @Mutation((returns) => QualtricsResponseImportStats, {
+    description: "Fetch responses to a survey",
   })
   async importQualtricsSurveyResponses(
     @Args("qualtricsId") qualtricsId: string
@@ -114,19 +114,19 @@ export class QualtricsResolver {
     return importStats;
   }
 
-  @Query(returns => QualtricsOrganization)
+  @Query((returns) => QualtricsOrganization)
   organization(
     @Args({
       name: "organizationId",
       type: () => String,
-      defaultValue: process.env.QUALTRICS_ORG_ID
+      defaultValue: process.env.QUALTRICS_ORG_ID,
     })
     organizationId?: string
   ) {
     return this.qualtricsService.getOrganization(organizationId);
   }
 
-  @Mutation(returns => QualtricsSubscription)
+  @Mutation((returns) => QualtricsSubscription)
   createSubscription(
     @Args("createInput") createInput: QualtricsSubscriptionCreateInput
   ) {
@@ -168,12 +168,12 @@ export class QualtricsResolver {
     return returnValue;
   }
 
-  @Query(returns => [QualtricsSubscription])
+  @Query((returns) => [QualtricsSubscription])
   subscriptions() {
     return this.qualtricsService.listSubscriptions();
   }
 
-  @Mutation(returns => String)
+  @Mutation((returns) => String)
   deleteSubscription(@Args("subscriptionId") subscriptionId: string) {
     return this.qualtricsService.deleteSubscription(subscriptionId);
   }
