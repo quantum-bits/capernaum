@@ -54,12 +54,12 @@ export default class App extends Vue {}
   background-image: url(./assets/TU-logo.png);
   //width: 772px;
   height: 212px;
-  background-size: 60% 60%;
+  background-size: 448px 128px;
 }
 
 .cls-banner-container {
   background: white;
-  padding-top: 12px;
+  padding-top: 15px;
 }
 
 </style>
