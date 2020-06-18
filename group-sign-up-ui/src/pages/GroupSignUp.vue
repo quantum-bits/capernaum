@@ -1,25 +1,37 @@
 <template>
   <v-container>
-    <div class="image-container">
-      <img
-        alt="Center for Scripture Engagement Logo"
-        src="../assets/Cls+results+letter+banner+2+half+size.png"
-      />
-    </div>
     <v-row align="center" justify="center">
-      <v-col cols="12" sm="8" md="6">
-        <v-card class="elevation-12">
-          <v-toolbar color="primary" dark flat>
+      <v-col cols="12" sm="12" md="12">
+        <!--<v-card>-->
+        <!--<v-toolbar color="primary" dark flat>
             <v-toolbar-title
-              >Request Group Administration of a Survey</v-toolbar-title
-            >
+              >-->
+        <h2>Request Group Administration of the Christian Life Survey</h2>
+        <p>
+          This form allows you to request an administration of the Christian
+          Life Survey for your group. Upon submission of this form you will
+          receive an email with instructions that you can forward to members of
+          your group. This email will include a <strong>group code</strong> that
+          members of your group will need to enter before they start the survey.
+        </p>
+
+        <p>
+          After completion of the survey, members of your group will each
+          receive an individualized response by email, suggesting which
+          scripture engagement practices might be helpful for them. In addition,
+          after the closing date of the survey, you as a group administrator
+          will receive a summary of group characteristics such as....
+        </p>
+        <!--</v-toolbar-title>
           </v-toolbar>
-          <v-card-text>
-            <!-- https://medium.com/js-dojo/form-validation-with-vuetify-in-a-vue-app-d72e3d9b65db -->
-            <v-form v-model="isValid">
+          <v-card-text>-->
+        <!-- https://medium.com/js-dojo/form-validation-with-vuetify-in-a-vue-app-d72e3d9b65db -->
+        <v-form v-model="isValid">
+          <v-row justify="center">
+            <v-col sm="12" md="8">
               <v-text-field
                 v-model="email"
-                label="E-mail"
+                label="Your Email"
                 name="email"
                 prepend-icon="mdi-email"
                 type="text"
@@ -28,7 +40,7 @@
               />
               <v-text-field
                 v-model="adminName"
-                label="Name"
+                label="Your Name"
                 name="adminName"
                 prepend-icon="mdi-pencil"
                 type="text"
@@ -54,59 +66,58 @@
                 required
               />
 
-              <v-col cols="12" sm="6" md="4">
-                <v-dialog
-                  ref="dialog"
-                  v-model="modal"
-                  :return-value.sync="closingDate"
-                  persistent
-                  width="290px"
-                  required
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      v-model="closingDate"
-                      label="Survey Closing Date"
-                      prepend-icon="mdi-calendar-range"
-                      hint="Recommend 4-6 wks"
-                      persistent-hint
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
-                  </template>
-                  <v-date-picker
+              <!--<v-col cols="12" sm="6" md="4">-->
+              <v-dialog
+                ref="dialog"
+                v-model="modal"
+                :return-value.sync="closingDate"
+                persistent
+                width="290px"
+                required
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
                     v-model="closingDate"
-                    :max="maxClosingDateString"
-                    :min="minClosingDateString"
-                    scrollable
+                    label="Survey Closing Date"
+                    prepend-icon="mdi-calendar-range"
+                    hint="Recommended 4-6 wks"
+                    persistent-hint
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                  v-model="closingDate"
+                  :max="maxClosingDateString"
+                  :min="minClosingDateString"
+                  scrollable
+                >
+                  <v-spacer></v-spacer>
+                  <v-btn text color="primary" @click="modal = false"
+                    >Cancel</v-btn
                   >
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="modal = false"
-                      >Cancel</v-btn
-                    >
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="$refs.dialog.save(closingDate)"
-                      >OK</v-btn
-                    >
-                  </v-date-picker>
-                </v-dialog>
-              </v-col>
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn @click="submit" color="primary" :disabled="!isValid"
-              >Submit</v-btn
-            >
-          </v-card-actions>
-        </v-card>
+                  <v-btn
+                    text
+                    color="primary"
+                    @click="$refs.dialog.save(closingDate)"
+                    >OK</v-btn
+                  >
+                </v-date-picker> </v-dialog
+              ><!--
+                  </v-card-text>
+          <v-card-actions>-->
+              <v-spacer />
+              <v-btn @click="submit" color="primary" :disabled="!isValid"
+                >Submit</v-btn
+              >
+            </v-col>
+          </v-row>
+        </v-form>
+        <!--</v-card-actions>
+        </v-card>-->
       </v-col>
     </v-row>
-
-    date: {{ closingDate }}
   </v-container>
 </template>
 
@@ -147,12 +158,6 @@ export default class GroupSignUp extends Vue {
     }
   };
 
-  emailRules = [
-    (v: string): boolean | string => !!v || "E-mail is required",
-    (v: string): boolean | string =>
-      /.+@.+\..+/.test(v) || "E-mail must be valid"
-  ];
-
   submit() {
     console.log("submit! ", this.email, this.closingDate);
   }
@@ -170,8 +175,15 @@ export default class GroupSignUp extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+/*
 .group-form-container {
-  width: 100%;
+  width: 80%;
+}
+*/
+
+p {
+  text-align: left;
 }
 
 h3 {

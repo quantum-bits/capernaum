@@ -5,6 +5,10 @@
         <div class="tu-logo"></div>
         <!--<div class="gradient-bar"></div>-->
         <div class="cls-banner-container">
+          <img
+            alt="Center for Scripture Engagement Logo"
+            src="./assets/Cls+results+letter+banner+2+half+size.png"
+          />
           <v-main>
             <router-view />
           </v-main>
@@ -62,6 +66,6 @@ export default class App extends Vue {}
 
 .cls-banner-container {
   background: white;
-  padding-top: 15px;
+  padding-top: 27px;
 }
 </style>
