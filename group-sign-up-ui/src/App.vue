@@ -68,4 +68,12 @@ export default class App extends Vue {}
   background: white;
   padding-top: 27px;
 }
+
+.button-colour {
+  color: #4e2b4d;
+}
+
+.alt-button-colour {
+  color: #846d82;
+}
 </style>

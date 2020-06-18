@@ -3,14 +3,14 @@
     <v-row align="center" justify="center">
       <v-col cols="12" sm="12" md="12">
         <!--<v-card>-->
-        <!--<v-toolbar color="primary" dark flat>
+        <!--<v-toolbar color="#5c335a" dark flat>
             <v-toolbar-title
               >-->
         <h2>Take the Christian Life Survey</h2>
         <div v-if="showChooseGroupOrNot">
           <p class="mt-2">Do you have a <strong>group code</strong>?</p>
-          <v-btn @click="haveGroupCode" color="primary" class="mr-1">Yes</v-btn>
-          <v-btn @click="redirectToSurveyNoCode" color="primary" class="ml-1"
+          <v-btn @click="haveGroupCode" color="#5c335a" class="white--text mr-1">Yes</v-btn>
+          <v-btn @click="redirectToSurveyNoCode" color="#5c335a" class="white--text ml-1"
             >No</v-btn
           >
           <p class="mt-5">
@@ -38,12 +38,12 @@
                 />
                 <v-btn
                   @click="submitGroupCode"
-                  color="primary"
+                  color="#5c335a"
                   :disabled="!isValid"
-                  class="mr-1 mt-2"
+                  class="white--text mr-1 mt-2"
                   >Submit Code</v-btn
                 >
-                <v-btn @click="cancel" color="primary" class="ml-1 mt-2"
+                <v-btn @click="cancel" color="#5c335a" class="white--text ml-1 mt-2"
                   >Cancel</v-btn
                 >
               </v-col>
@@ -62,14 +62,14 @@
           </p>
           <v-btn
             @click="redirectToSurveyWithCode"
-            color="primary"
-            class="mr-1 mt-2"
+            color="#5c335a"
+            class="white--text mr-1 mt-2"
             >Continue</v-btn
           >
           <v-btn
             @click="cancelAfterReceivingCode"
-            color="primary"
-            class="ml-1 mt-2"
+            color="#5c335a"
+            class="white--text ml-1 mt-2"
             >Cancel</v-btn
           >
         </div>
@@ -84,8 +84,8 @@
           </p>
           <v-btn
             @click="groupCodeIncorrectRedirect"
-            color="primary"
-            class="mr-1"
+            color="#5c335a"
+            class="white--text mr-1"
             >Got It</v-btn
           >
         </div>
@@ -95,7 +95,7 @@
           on the survey.
         </p>
         <v-spacer />
-        <v-btn @click="submit" color="primary">Take the Survey</v-btn>
+        <v-btn @click="submit" color="#5c335a">Take the Survey</v-btn>
 
         </v-card-actions>
         </v-card>-->
@@ -190,6 +190,10 @@ p {
   text-align: left;
 }
 */
+
+.button-colour {
+  color: #4e2b4d;
+}
 
 h3 {
   margin: 40px 0 0;

@@ -129,9 +129,26 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
-@Component
+import { ALL_SURVEYS_QUERY } from "../graphql/surveys.graphql";
+//import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
+
+@Component({
+  components: {},
+  apollo: {
+    allSurveys: {
+      query: ALL_SURVEYS_QUERY,
+      update: data => {
+        console.log("surveys! ", data);
+        return data.surveys;
+      }
+    }
+  }
+})
 export default class GroupSignUp extends Vue {
   //@Prop() private msg!: string;
+
+  // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
+  allSurveys = []; // All surveys, listed in drop-down.
 
   email: string = "";
   typeOfGroup: string = "";
@@ -175,7 +192,6 @@ export default class GroupSignUp extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 /*
 .group-form-container {
   width: 80%;
