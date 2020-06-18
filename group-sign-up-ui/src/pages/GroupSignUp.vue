@@ -148,7 +148,7 @@ export default class GroupSignUp extends Vue {
   //@Prop() private msg!: string;
 
   // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
-  allSurveys = []; // All surveys, listed in drop-down.
+  //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
   email: string = "";
   typeOfGroup: string = "";

@@ -15,10 +15,14 @@ const loggingLink = new ApolloLink((operation, forward) => {
   return forward(operation);
 });
 
+/*
 if (!process.env.URL_WEBSOCKET) {
   throw Error("No URL configured for websocket connection");
 }
+*/
+
 if (!process.env.URL_HTTP) {
+  console.log('process: ', process);
   throw Error("No URL configured for http connection");
 }
 
