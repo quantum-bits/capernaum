@@ -1,27 +1,30 @@
 <template>
-<v-app>
-  <div id="app">
-    <div class="tu-logo-container">
-      <div class="tu-logo"></div>
-    <!--<div class="gradient-bar"></div>-->
-      <div class="cls-banner-container">
-        <GroupSignUp msg="Welcome dude to Your Vue.js + TypeScript App"/>
+  <v-app>
+    <div id="app">
+      <div class="tu-logo-container">
+        <div class="tu-logo"></div>
+        <!--<div class="gradient-bar"></div>-->
+        <div class="cls-banner-container">
+          <v-main>
+            <router-view />
+          </v-main>
+          <!--<GroupSignUp msg="Welcome dude to Your Vue.js + TypeScript App"/>-->
+        </div>
       </div>
     </div>
-  </div>
-</v-app>
+  </v-app>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
-import GroupSignUp from './pages/GroupSignUp.vue';
+import { Component, Vue } from "vue-property-decorator";
+import HelloWorld from "./components/HelloWorld.vue";
+import GroupSignUp from "./pages/GroupSignUp.vue";
 
 @Component({
   components: {
     HelloWorld,
-    GroupSignUp,
-  },
+    GroupSignUp
+  }
 })
 export default class App extends Vue {}
 </script>
@@ -61,5 +64,4 @@ export default class App extends Vue {}
   background: white;
   padding-top: 15px;
 }
-
 </style>
