@@ -1,0 +1,13 @@
+config:
+  target: "https://galilee.cse.taylor.edu"
+  phases:
+    - duration: 60
+      arrivalCount: 30
+scenarios:
+  - name: "Completed Responses"
+    flow:
+      - post:
+          url: "/qualtrics/completed-response"
+          form:
+            SurveyID: "SV_ezJr6w5cW7Fu9z7"
+            ResponseID: "R_1GCgX1fFlQDO9va"
