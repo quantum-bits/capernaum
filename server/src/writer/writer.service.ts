@@ -9,12 +9,12 @@ import { ChartData, Prediction } from "../survey/survey.types";
 import { createHash } from "crypto";
 import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { DateTime } from "luxon";
-import debug from "debug";
-import { ResponseSummary } from "../survey/entities/survey-response-summary";
+import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
 import { LetterService } from "../letter/letter.service";
 import { SurveyService } from "../survey/survey.service";
 
+import debug from "debug";
 const letterDebug = debug("letter");
 
 function formatLaTeX(command: string, content: string, options?: string) {
@@ -39,29 +39,27 @@ function formatHref(url: string, text: string) {
 
 // Generate a hash digest for the file.
 function generateBaseName(letterId: number, responseId: number) {
-  return createHash("sha1")
-    .update(`${letterId}-${responseId}`)
-    .digest("hex");
+  return createHash("sha1").update(`${letterId}-${responseId}`).digest("hex");
 }
 
 export class LineBuffer {
   constructor(private allLines = [], private currentLine = "") {}
 
-  flushCurrentLine() {
+  flushCurrentLine(): void {
     this.allLines.push(this.currentLine);
     this.currentLine = "";
   }
 
-  appendToCurrentLine(moreChars: string) {
+  appendToCurrentLine(moreChars: string): void {
     this.currentLine += moreChars;
   }
 
-  wrapCurrentLine(wrapper: string) {
+  wrapCurrentLine(wrapper: string): void {
     this.currentLine = formatLaTeX(wrapper, this.currentLine);
   }
 
-  unpackMultipleLines(packed: string) {
-    for (let char of packed) {
+  unpackMultipleLines(packed: string): void {
+    for (const char of packed) {
       if (char === "\n") {
         this.flushCurrentLine();
       } else {
@@ -70,7 +68,7 @@ export class LineBuffer {
     }
   }
 
-  concatenateLines() {
+  concatenateLines(): string {
     this.flushCurrentLine();
     return "\n\n" + this.allLines.join("\n\n");
   }
@@ -95,15 +93,15 @@ export default class WriterService {
     );
   }
 
-  private renderParagraph(content: string) {
+  private static renderParagraph(content: string) {
     return ["", content, ""].join("\n");
   }
 
-  private renderBoilerplate(letterElement: LetterElement) {
+  private static renderBoilerplate(letterElement: LetterElement) {
     const quillDelta = JSON.parse(letterElement.textDelta);
     const lineBuffer = new LineBuffer();
 
-    for (let op of quillDelta.ops) {
+    for (const op of quillDelta.ops) {
       // console.log(JSON.stringify(op, null, 2));
 
       // All Quill Delta ops appear to have an `insert` property.
@@ -134,7 +132,7 @@ export default class WriterService {
         // Insert op that is not just a newline.
         if (op.hasOwnProperty("attributes")) {
           // More than a newline and has attributes.
-          for (let attribute of Object.keys(op.attributes)) {
+          for (const attribute of Object.keys(op.attributes)) {
             switch (attribute) {
               case "bold":
                 lineBuffer.appendToCurrentLine(
@@ -158,13 +156,14 @@ export default class WriterService {
     return lineBuffer.concatenateLines();
   }
 
-  private chartHeight(chartData: ChartData) {
-    const height = 2.218962113+0.372607394*(2*chartData.entries.length-1);//Math.max(chartData.entries.length + 1, 3);
+  private static chartHeight(chartData: ChartData) {
+    const height =
+      2.218962113 + 0.372607394 * (2 * chartData.entries.length - 1); //Math.max(chartData.entries.length + 1, 3);
     return `height=${height}cm`;
   }
 
-  private renderChart(chartData: ChartData) {
-    letterDebug("renderChart %O", chartData);
+  private static renderChart(chartData: ChartData) {
+    letterDebug("renderChart - %O", chartData);
 
     const chart = `
       \\begin{adjustwidth}{0cm}{1.5cm}
@@ -174,7 +173,7 @@ export default class WriterService {
           title=${chartData.title},
           xbar, xmin=0, xmax=7,
           width=0.75\\textwidth,
-          ${this.chartHeight(chartData)},
+          ${WriterService.chartHeight(chartData)},
           enlarge y limits={abs=0.5cm},
           symbolic y coords={${chartData.allTitles()}},
           ytick=data,
@@ -194,24 +193,24 @@ export default class WriterService {
   }
 
   private renderPredictions(predictions: Prediction[]) {
-    letterDebug("renderPredictions %O", predictions);
+    letterDebug("renderPredictions - %O", predictions);
 
     return predictions
-      .filter(prediction => prediction.predict)
-      .map(prediction => {
+      .filter((prediction) => prediction.predict)
+      .map((prediction) => {
         const practice = prediction.practice;
         return [
           formatLaTeX(
             "subsection*",
             formatHref(practice.moreInfoUrl, practice.title)
           ),
-          practice.description
+          practice.description,
         ].join("\n\n");
       })
       .join("\n\n");
   }
 
-  private renderFooter() {
+  private static renderFooter() {
     return `
       \\vfill
       \\begin{center}
@@ -227,7 +226,7 @@ export default class WriterService {
       `;
   }
 
-  private renderHeader() {
+  private static renderHeader() {
     return `
     \\begin{multicols}{2}
     \\begin{flushleft}
@@ -240,7 +239,7 @@ export default class WriterService {
     `;
   }
 
-  private renderDocument(renderedElements: string[]) {
+  private static renderDocument(renderedElements: string[]) {
     return `
     \\documentclass[11pt]{article}
     
@@ -276,8 +275,8 @@ export default class WriterService {
     `;
   }
 
-  private renderResponseDetails(surveyResponse: SurveyResponse) {
-    letterDebug("renderResponseDetails %O", surveyResponse);
+  private static renderResponseDetails(surveyResponse: SurveyResponse) {
+    letterDebug("renderResponseDetails - %O", surveyResponse);
 
     return [
       "\\vfill",
@@ -287,9 +286,9 @@ export default class WriterService {
           "\\scriptsize",
           `Response ID: ${surveyResponse.id}`,
           `Email: ${surveyResponse.email}`,
-          `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`
+          `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`,
         ].join("\n\n")
-      )
+      ),
     ].join("\n");
   }
 
@@ -297,10 +296,10 @@ export default class WriterService {
     const renderedElements = [];
 
     for (const letterElement of letter.letterElements) {
-      letterDebug("renderLetter - element %O", letterElement);
+      letterDebug("render element - %O", letterElement);
       switch (letterElement.letterElementType.key) {
         case "boilerplate":
-          renderedElements.push(this.renderBoilerplate(letterElement));
+          renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
         case "boolean-calculation-results":
           const predictions = surveyResponse.predictScriptureEngagement();
@@ -311,18 +310,20 @@ export default class WriterService {
             letterElement.surveyDimension.id
           );
           if (dimension) {
-            renderedElements.push(this.renderChart(dimension.chartData()));
+            renderedElements.push(
+              WriterService.renderChart(dimension.chartData())
+            );
           } else {
             renderedElements.push(
-              this.renderParagraph("No data for dimension")
+              WriterService.renderParagraph("No data for dimension")
             );
           }
           break;
         case "footer":
-          renderedElements.push(this.renderFooter());
+          renderedElements.push(WriterService.renderFooter());
           break;
         case "header":
-          renderedElements.push(this.renderHeader());
+          renderedElements.push(WriterService.renderHeader());
           break;
         case "image":
           renderedElements.push(this.renderImage(letterElement));
@@ -334,17 +335,17 @@ export default class WriterService {
       }
     }
 
-    renderedElements.push(this.renderResponseDetails(surveyResponse));
+    renderedElements.push(WriterService.renderResponseDetails(surveyResponse));
 
     return renderedElements;
   }
 
-  private constructOutput(
+  private static constructOutput(
     ok: boolean,
     message: string,
-    pdfFileName: string = "",
-    pdfRelativePath: string = "",
-    pdfAbsolutePath: string = "",
+    pdfFileName = "",
+    pdfRelativePath = "",
+    pdfAbsolutePath = "",
     responseSummary: ResponseSummary = null
   ) {
     const writerOutput: WriterOutput = {
@@ -353,9 +354,9 @@ export default class WriterService {
       pdfFileName,
       pdfRelativePath,
       pdfAbsolutePath,
-      responseSummary
+      responseSummary,
     };
-    letterDebug("constructOutput: %O", writerOutput);
+    letterDebug("constructOutput - %O", writerOutput);
     return writerOutput;
   }
 
@@ -373,13 +374,13 @@ export default class WriterService {
       const pdfAbsolutePath = this.pdfFileService.absolutePath(pdfFileName);
 
       // Create the document.
-      const renderedDocument = this.renderDocument(renderedElements);
+      const renderedDocument = WriterService.renderDocument(renderedElements);
       letterDebug("Rendered document %s", renderedDocument);
 
       // Write the LaTeX source file.
-      writeFile(texFilePath, renderedDocument, "utf8", err => {
+      writeFile(texFilePath, renderedDocument, "utf8", (err) => {
         if (err) {
-          letterDebug("writeFile failed %O", err);
+          letterDebug("writeFile failed - %O", err);
           reject(err);
         }
 
@@ -389,13 +390,13 @@ export default class WriterService {
           { cwd: this.pdfFileService.absoluteDir() },
           (err, stdout, stderr) => {
             if (err) {
-              letterDebug("lualatex exec failed %O", err);
+              letterDebug("lualatex exec failed - %O", err);
               reject(err);
             }
             letterDebug("STDOUT %s", stdout);
             letterDebug("STDERR %s", stderr);
 
-            const writerOutput = this.constructOutput(
+            const writerOutput = WriterService.constructOutput(
               true,
               "Letter created successfully",
               pdfFileName,
@@ -418,17 +419,19 @@ export default class WriterService {
     );
 
     letterDebug("renderLetter - %O", letter);
-    letterDebug("renderLetter - %O", surveyResponse);
+    letterDebug("renderLetter - ", surveyResponse);
 
     if (!letter) {
-      return Promise.resolve(this.constructOutput(false, "No letter found"));
+      return Promise.resolve(
+        WriterService.constructOutput(false, "No letter found")
+      );
     } else if (!surveyResponse) {
       return Promise.resolve(
-        this.constructOutput(false, "No responses for this survey")
+        WriterService.constructOutput(false, "No responses for this survey")
       );
     } else {
       const renderedElements = this.renderAllElements(letter, surveyResponse);
-      return this.runLaTeX(renderedElements, letter, surveyResponse);
+      return await this.runLaTeX(renderedElements, letter, surveyResponse);
     }
   }
 }

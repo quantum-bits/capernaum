@@ -9,6 +9,6 @@ import { WriterResolver } from "./writer.resolvers";
 @Module({
   imports: [SurveyModule, LetterModule, ImageModule, FileModule],
   providers: [WriterService, WriterResolver],
-  exports: [WriterService]
+  exports: [WriterService],
 })
 export class WriterModule {}

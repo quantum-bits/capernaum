@@ -7,6 +7,9 @@ import { SurveyIndex } from "./survey-index";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
+import debug from "debug";
+
+const surveyDebug = debug("survey");
 
 class ScriptureEngagementPracticePrediction {
   private surveyIndexMap: Map<number, SurveyIndex> = new Map();
@@ -30,14 +33,14 @@ class ScriptureEngagementPracticePrediction {
       results.push({
         title: surveyIndex.title,
         abbreviation: surveyIndex.abbreviation,
-        meanResponse: surveyIndex.meanResponse()
+        meanResponse: surveyIndex.meanResponse(),
       });
     }
 
     return {
       practice: this.scriptureEngagementPractice,
       details: results,
-      predict: results.every(result => result.meanResponse > threshold)
+      predict: results.every((result) => result.meanResponse > threshold),
     };
   }
 }
@@ -46,18 +49,15 @@ class ScriptureEngagementPracticePrediction {
 @ObjectType({ description: "One user's response to a survey" })
 export class SurveyResponse extends AbstractEntity {
   @Column("int") surveyId;
-  @ManyToOne(
-    type => Survey,
-    survey => survey.surveyItems
-  )
-  @Field(type => Survey)
+  @ManyToOne((type) => Survey, (survey) => survey.surveyItems)
+  @Field((type) => Survey)
   survey: Survey;
 
   @OneToMany(
-    type => SurveyItemResponse,
-    surveyItemResponse => surveyItemResponse.surveyResponse
+    (type) => SurveyItemResponse,
+    (surveyItemResponse) => surveyItemResponse.surveyResponse
   )
-  @Field(type => [SurveyItemResponse])
+  @Field((type) => [SurveyItemResponse])
   surveyItemResponses: SurveyItemResponse[];
 
   @Column() @Field() email: string;
@@ -66,10 +66,10 @@ export class SurveyResponse extends AbstractEntity {
   @Column() @Field() startDate: string;
   @Column() @Field() endDate: string;
   @Column() @Field() recordedDate: string;
-  @Column("int") @Field(type => Int) status: number;
-  @Column("int") @Field(type => Int) progress: number;
-  @Column("int") @Field(type => Int) duration: number;
-  @Column("int") @Field(type => Int) finished: number;
+  @Column("int") @Field((type) => Int) status: number;
+  @Column("int") @Field((type) => Int) progress: number;
+  @Column("int") @Field((type) => Int) duration: number;
+  @Column("int") @Field((type) => Int) finished: number;
   @Column() @Field() ipAddress: string;
   @Column() @Field() latitude: string;
   @Column() @Field() longitude: string;
@@ -84,17 +84,17 @@ export class SurveyResponse extends AbstractEntity {
         id: this.survey.id,
         title: this.survey.qualtricsName,
         qualtricsId: this.survey.qualtricsId,
-        qualtricsName: this.survey.qualtricsName
+        qualtricsName: this.survey.qualtricsName,
       },
-      dimensionSummaries: this.survey.surveyDimensions.map(dimension => ({
+      dimensionSummaries: this.survey.surveyDimensions.map((dimension) => ({
         id: dimension.id,
         title: dimension.title,
-        indexSummaries: dimension.surveyIndices.map(index => ({
+        indexSummaries: dimension.surveyIndices.map((index) => ({
           id: index.id,
           title: index.title,
           abbreviation: index.abbreviation,
           meanResponse: index.meanResponse(),
-          itemSummaries: index.surveyItems.map(item => {
+          itemSummaries: index.surveyItems.map((item) => {
             const itemResponse = item.surveyItemResponse();
             return {
               id: item.id,
@@ -102,29 +102,31 @@ export class SurveyResponse extends AbstractEntity {
               qualtricsText: item.qualtricsText,
               responseId: itemResponse.id,
               responseLabel: itemResponse.label,
-              responseValue: itemResponse.value
+              responseValue: itemResponse.value,
             };
-          })
-        }))
+          }),
+        })),
       })),
-      predictionSummaries: this.predictScriptureEngagement().map(prediction => {
-        const practice = prediction.practice;
-        return {
-          practiceSummary: {
-            id: practice.id,
-            title: practice.title,
-            description: practice.description
-          },
-          predictionDetails: prediction.details,
-          predict: prediction.predict
-        };
-      })
+      predictionSummaries: this.predictScriptureEngagement().map(
+        (prediction) => {
+          const practice = prediction.practice;
+          return {
+            practiceSummary: {
+              id: practice.id,
+              title: practice.title,
+              description: practice.description,
+            },
+            predictionDetails: prediction.details,
+            predict: prediction.predict,
+          };
+        }
+      ),
     };
   }
 
   public findDimensionById(dimensionId: number) {
     return this.survey.surveyDimensions.find(
-      dimension => dimension.id === dimensionId
+      (dimension) => dimension.id === dimensionId
     );
   }
 
@@ -162,23 +164,24 @@ export class SurveyResponse extends AbstractEntity {
     for (const sepPrediction of predictionMap.values()) {
       predictions.push(sepPrediction.getPrediction());
     }
+    surveyDebug("predictScriptureEngagement - %O", predictions);
     return predictions;
   }
 
-  private tab(n: number, msge: string) {
+  private static tab(n: number, msge: string) {
     return "|  ".repeat(n) + msge;
   }
 
   public dump() {
     console.log("RESPONSE", this.id);
 
-    for (let dim of this.survey.surveyDimensions) {
+    for (const dim of this.survey.surveyDimensions) {
       console.log(`DIM (${dim.id}) ${dim.title}`);
       console.log("CHART", dim.chartData());
 
-      for (let index of dim.surveyIndices) {
+      for (const index of dim.surveyIndices) {
         console.log(
-          this.tab(
+          SurveyResponse.tab(
             1,
             `IDX (${index.id}-${index.abbreviation}) ${index.title} 
                           ${
@@ -190,22 +193,24 @@ export class SurveyResponse extends AbstractEntity {
           )
         );
 
-        for (let pte of index.predictionTableEntries) {
-          console.log(this.tab(2, `PTE (${pte.id}) ${pte.practice.title}`));
+        for (const pte of index.predictionTableEntries) {
+          console.log(
+            SurveyResponse.tab(2, `PTE (${pte.id}) ${pte.practice.title}`)
+          );
         }
 
         if (false) {
-          for (let item of index.surveyItems) {
+          for (const item of index.surveyItems) {
             console.log(
-              this.tab(
+              SurveyResponse.tab(
                 2,
                 `ITEM (${item.id}-${item.qualtricsId}) ${item.qualtricsText}`
               )
             );
 
-            for (let response of item.surveyItemResponses) {
+            for (const response of item.surveyItemResponses) {
               console.log(
-                this.tab(
+                SurveyResponse.tab(
                   3,
                   `RESP (${response.id}) ${response.label}, ${response.value}`
                 )
@@ -217,9 +222,9 @@ export class SurveyResponse extends AbstractEntity {
     }
 
     console.log("SCRIPTURE ENGAGEMENT");
-    for (let prediction of this.predictScriptureEngagement()) {
+    for (const prediction of this.predictScriptureEngagement()) {
       console.log(
-        this.tab(
+        SurveyResponse.tab(
           1,
           `${prediction.practice.title} - ${
             prediction.predict ? "PREDICT" : "DON'T PREDICT"
@@ -227,9 +232,12 @@ export class SurveyResponse extends AbstractEntity {
         )
       );
 
-      for (let detail of prediction.details) {
+      for (const detail of prediction.details) {
         console.log(
-          this.tab(2, `${detail.abbreviation} - ${detail.meanResponse}`)
+          SurveyResponse.tab(
+            2,
+            `${detail.abbreviation} - ${detail.meanResponse}`
+          )
         );
       }
     }

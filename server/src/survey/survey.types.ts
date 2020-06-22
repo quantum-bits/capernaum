@@ -2,13 +2,13 @@ import { ScriptureEngagementPractice } from "../prediction/entities";
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyResponse } from "./entities";
 
-import numbro from 'numbro';
+import numbro from "numbro";
 
 // Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
   All,
   WithIndex,
-  WithoutIndex
+  WithoutIndex,
 }
 
 @ObjectType()
@@ -16,7 +16,7 @@ export class ChartEntry {
   @Field()
   title: string;
 
-  @Field(type => Int)
+  @Field((type) => Int)
   value: number;
 }
 
@@ -25,7 +25,7 @@ export class ChartData {
   @Field()
   title: string;
 
-  @Field(type => [ChartEntry])
+  @Field((type) => [ChartEntry])
   entries: ChartEntry[];
 
   constructor(title: string, entries: ChartEntry[]) {
@@ -33,32 +33,39 @@ export class ChartData {
     this.entries = entries;
   }
 
-  allTitles() {
-    return this.entries.map(entry => entry.title).join(",");
+  allTitles(): string {
+    return this.entries.map((entry) => entry.title).join(",");
   }
 
-  allCoordinates() {
+  allCoordinates(): string {
     return this.entries
-      .map(entry => `(${entry.value},${entry.title})`)
+      .map((entry) => `(${entry.value},${entry.title})`)
       .join("\n");
   }
 
-  allBarLabels() {
+  allBarLabels(): string {
     return this.entries
-      .map(entry => {
-        if ( entry.value >= 4 ) {
-          let horizCoord = entry.value - 0.35;
-          let value = numbro(entry.value).format({thousandSeparated: false, trimMantissa: true, mantissa: 2});
-          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${value}};`
+      .map((entry) => {
+        if (entry.value >= 4) {
+          const horizCoord = entry.value - 0.35;
+          const value = numbro(entry.value).format({
+            thousandSeparated: false,
+            trimMantissa: true,
+            mantissa: 2,
+          });
+          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${value}};`;
         } else {
-          let horizCoord = entry.value + 0.35;
-          let value = numbro(entry.value).format({thousandSeparated: false, trimMantissa: true, mantissa: 2});
-          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${value}};`
+          const horizCoord = entry.value + 0.35;
+          const value = numbro(entry.value).format({
+            thousandSeparated: false,
+            trimMantissa: true,
+            mantissa: 2,
+          });
+          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${value}};`;
         }
       })
       .join("\n");
   }
-
 }
 
 @ObjectType()
@@ -69,16 +76,16 @@ export class PredictionDetails {
   @Field()
   abbreviation: string;
 
-  @Field(type => Float)
+  @Field((type) => Float)
   meanResponse: number;
 }
 
 @ObjectType()
 export class Prediction {
-  @Field(type => ScriptureEngagementPractice)
+  @Field((type) => ScriptureEngagementPractice)
   practice: ScriptureEngagementPractice;
 
-  @Field(type => [PredictionDetails])
+  @Field((type) => [PredictionDetails])
   details: PredictionDetails[];
 
   @Field()
@@ -87,9 +94,9 @@ export class Prediction {
 
 @ObjectType()
 export class QualtricsResponseImportStats {
-  @Field(type => Int) importCount: number;
-  @Field(type => Int) duplicateCount: number;
-  @Field(type => [SurveyResponse]) surveyResponses: SurveyResponse[];
+  @Field((type) => Int) importCount: number;
+  @Field((type) => Int) duplicateCount: number;
+  @Field((type) => [SurveyResponse]) surveyResponses: SurveyResponse[];
 
   constructor() {
     this.importCount = 0;

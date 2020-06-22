@@ -1,6 +1,6 @@
 import debug from "debug";
 import { Injectable } from "@nestjs/common";
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer, { SentMessageInfo, Transporter } from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { SendMailInput } from "./entities";
@@ -15,12 +15,11 @@ export class MailService {
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
       logger: true,
-      debug: mailDebug.enabled
+      debug: mailDebug.enabled,
     };
 
     if (process.env.MAIL_PORT) {
-      const port = parseInt(process.env.MAIL_PORT);
-      options.port = port;
+      options.port = parseInt(process.env.MAIL_PORT);
 
       // This doesn't appear to work, at least against a server on port 587.
       // const isSecure = port !== 25;
@@ -30,7 +29,7 @@ export class MailService {
     if (process.env.MAIL_USER && process.env.MAIL_PASS) {
       options.auth = {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        pass: process.env.MAIL_PASS,
       };
     }
 
@@ -38,7 +37,7 @@ export class MailService {
     this.transporter = nodemailer.createTransport(options);
   }
 
-  sendMail(mailInput: SendMailInput) {
+  sendMail(mailInput: SendMailInput): Promise<SentMessageInfo> {
     if (!mailInput.from) {
       if (!process.env.MAIL_FROM) {
         throw Error("No MAIL_FROM configured");
@@ -51,7 +50,7 @@ export class MailService {
       from: mailInput.from,
       to: mailInput.to,
       subject: mailInput.subject,
-      text: mailInput.textContent
+      text: mailInput.textContent,
     };
 
     if (mailInput.htmlContent) {
@@ -62,8 +61,8 @@ export class MailService {
       options.attachments = [
         {
           filename: "CLS Results.pdf",
-          path: mailInput.attachmentPath
-        }
+          path: mailInput.attachmentPath,
+        },
       ];
     }
 

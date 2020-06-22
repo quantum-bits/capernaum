@@ -4,6 +4,6 @@ import { MailResolver } from "./mail.resolvers";
 
 @Module({
   providers: [MailService, MailResolver],
-  exports: [MailService]
+  exports: [MailService],
 })
 export class MailModule {}
