@@ -8,11 +8,11 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
-  SurveyResponse
+  SurveyResponse,
 } from "./survey/entities";
 import {
   PredictionTableEntry,
-  ScriptureEngagementPractice
+  ScriptureEngagementPractice,
 } from "./prediction/entities";
 import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
@@ -43,8 +43,8 @@ const options: ConnectionOptions = {
     Image,
     User,
     UserRole,
-    Machine
-  ]
+    Machine,
+  ],
 };
 
 export default options;

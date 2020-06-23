@@ -18,9 +18,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:load": "artillery run --output load-test.json test/load/load.yaml",
+    "test:load:dev": "artillery run --output load-test.json test/load/load-dev.yaml",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "profile": "tsc-watch -p tsconfig.build.json --onSuccess \"node --prof dist/main.js\""
   },
   "dependencies": {
     "@nestjs/common": "^7.1.3",

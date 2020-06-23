@@ -19,7 +19,7 @@ export function normalizeDateTime(dateIn: string): string {
 
 /** Sleep for `ms` milliseconds and resolve. */
 export function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /*
@@ -27,8 +27,8 @@ export function sleep(ms: number) {
  */
 
 export class ZipFileEntry {
-  fileName: string = "";
-  content: string = "";
+  fileName = "";
+  content = "";
 
   constructor(fileName: string) {
     this.fileName = fileName;
@@ -49,7 +49,7 @@ export function extractZipContent(inBuffer: Buffer): Promise<ZipFileEntry[]> {
       }
 
       const entries: ZipFileEntry[] = [];
-      zipFile.on("entry", entry => {
+      zipFile.on("entry", (entry) => {
         const currentEntry = new ZipFileEntry(entry.fileName);
         entries.push(currentEntry);
 
@@ -61,7 +61,7 @@ export function extractZipContent(inBuffer: Buffer): Promise<ZipFileEntry[]> {
             throw new Error("Bogus readStream");
           }
           const chunks: string[] = [];
-          readStream.on("data", chunk => {
+          readStream.on("data", (chunk) => {
             chunks.push(chunk.toString());
           });
           readStream.on("end", () => {

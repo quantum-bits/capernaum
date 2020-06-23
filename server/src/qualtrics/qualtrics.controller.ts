@@ -77,6 +77,8 @@ export class QualtricsController {
       qualtricsResponseId
     );
 
+    return Promise.resolve({ ok: true });
+
     // Find the survey
     const survey = await this.surveyService.findSurveyByQualtricsId(
       qualtricsSurveyId
