@@ -9,7 +9,12 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {}
   },
-  "exclude": ["node_modules", "dist", "etc"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "etc"
+  ]
 }
