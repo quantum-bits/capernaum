@@ -13,12 +13,14 @@ import { SurveyService } from "../survey/survey.service";
 import WriterService from "../writer/writer.service";
 import { MailService } from "../mail/mail.service";
 import { quillDeltaToHtml, quillHtmlToText } from "../helpers/quill";
+import { ReporterProducer } from "./reporter.producer";
 
 const qualtricsDebug = debug("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {
   constructor(
+    private readonly reporterProducer: ReporterProducer,
     private readonly eventService: EventService,
     private readonly qualtricsService: QualtricsService,
     private readonly surveyService: SurveyService,
@@ -64,6 +66,22 @@ export class QualtricsController {
     qualtricsDebug("partialResponse", body);
   }
 
+  @Post("completed-response-mock")
+  async completedResponseMock(@Headers() headers, @Body() body) {
+    const reply: WebHookCompletedResponse = body;
+    qualtricsDebug("completedResponseMock %O", reply);
+
+    const qualtricsSurveyId = reply.SurveyID;
+    const qualtricsResponseId = reply.ResponseID;
+    qualtricsDebug(
+      "qSurveyId %s - qResponseId %s",
+      qualtricsSurveyId,
+      qualtricsResponseId
+    );
+
+    this.reporterProducer.requestReport(qualtricsSurveyId, qualtricsResponseId);
+  }
+
   @Post("completed-response")
   async completedResponse(@Headers() headers, @Body() body) {
     const reply: WebHookCompletedResponse = body;
@@ -76,8 +94,6 @@ export class QualtricsController {
       qualtricsSurveyId,
       qualtricsResponseId
     );
-
-    return Promise.resolve({ ok: true });
 
     // Find the survey
     const survey = await this.surveyService.findSurveyByQualtricsId(

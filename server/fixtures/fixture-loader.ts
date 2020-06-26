@@ -1,4 +1,4 @@
-import typeOrmConfig from "../src/typeorm-config";
+import typeOrmConfig from "../apps/server/src/typeorm-config";
 import * as commander from "commander";
 import { createConnection, getManager, getRepository } from "typeorm";
 
@@ -7,7 +7,7 @@ import EntityMetadataRegistry from "./entity-metadata";
 import makeFakeSurvey from "./fake-survey";
 
 import Debug from "debug";
-import { AbstractEntity } from "../src/shared/abstract-entity";
+import { AbstractEntity } from "../apps/server/src/shared/abstract-entity";
 
 const debug = Debug("fixture-loader");
 
@@ -63,7 +63,7 @@ async function main(argv) {
 
   if (program.listFixtures) {
     // Show a list of fixtures with their unique names and exit.
-    for (let tableName of fixtureRegistry.allRegisteredTables()) {
+    for (const tableName of fixtureRegistry.allRegisteredTables()) {
       console.log(tableName);
     }
     process.exit(0);
@@ -104,10 +104,10 @@ async function main(argv) {
   const namesOfTablesToProcess = fixtureRegistry
     .allFixturesInOrder()
     .filter(
-      fixture =>
+      (fixture) =>
         program.allFixtures || tablesFromCommandLine.has(fixture.tableName)
     )
-    .map(fixture => fixture.tableName);
+    .map((fixture) => fixture.tableName);
 
   // Truncate tables, if requested. Do these all up front, rather than
   // during fixture loading, which could cause previous updates to be lost.
@@ -191,4 +191,4 @@ async function main(argv) {
 
 main(process.argv)
   .then(() => debug("Complete"))
-  .catch(err => console.error(err));
+  .catch((err) => console.error(err));

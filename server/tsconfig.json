@@ -10,11 +10,9 @@
     "baseUrl": "./",
     "incremental": true,
     "esModuleInterop": true,
-    "paths": {}
+    "paths": {
+      "@apps": ["apps"]
+    }
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "etc"
-  ]
+  "exclude": ["node_modules", "dist", "etc"]
 }

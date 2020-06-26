@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
-import { ReporterService } from "./reporter.service";
 import { BullModule } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "../../common.constants";
+import { ReporterConsumer } from "./reporter.consumer";
 
 @Module({
   imports: [
@@ -9,6 +9,6 @@ import { REPORTER_QUEUE_NAME } from "../../common.constants";
       name: REPORTER_QUEUE_NAME,
     }),
   ],
-  providers: [ReporterService],
+  providers: [ReporterConsumer],
 })
 export class ReporterModule {}

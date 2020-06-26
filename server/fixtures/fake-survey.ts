@@ -5,8 +5,8 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
-  SurveyResponse
-} from "../src/survey/entities";
+  SurveyResponse,
+} from "../apps/server/src/survey/entities";
 
 const NUM_DIMENSIONS = 3;
 const NUM_INDICES = 4;
@@ -25,7 +25,7 @@ async function makeFakeSurvey() {
     surveyRepo.create({
       qualtricsId: "Fake ID",
       qualtricsName: "My Fake Survey",
-      qualtricsModDate: "2019-12-24"
+      qualtricsModDate: "2019-12-24",
     })
   );
 
@@ -45,7 +45,7 @@ async function makeFakeSurvey() {
       finished: 1,
       recordedDate: "2019-12-24",
       latitude: "0",
-      longitude: "0"
+      longitude: "0",
     })
   );
 
@@ -55,7 +55,7 @@ async function makeFakeSurvey() {
       surveyDimensionRepo.create({
         survey: survey,
         title: `Survey Dimension ${dimIdx}`,
-        sequence: dimIdx
+        sequence: dimIdx,
       })
     );
 
@@ -66,7 +66,7 @@ async function makeFakeSurvey() {
           surveyDimension: surveyDimension,
           abbreviation: `Survey Index Abbrev ${indexIdx}`,
           title: `Survey Index ${indexIdx}`,
-          useForPredictions: true
+          useForPredictions: true,
         })
       );
 
@@ -80,7 +80,7 @@ async function makeFakeSurvey() {
             surveyIndex: surveyIndex,
             sequence: itemIdx,
             qualtricsId: qid,
-            qualtricsText: `Text for question ${qid}`
+            qualtricsText: `Text for question ${qid}`,
           })
         );
 
@@ -90,7 +90,7 @@ async function makeFakeSurvey() {
             surveyResponse: surveyResponse,
             surveyItem: surveyItem,
             value: value,
-            label: `Text label for value ${value}`
+            label: `Text label for value ${value}`,
           })
         );
       }
