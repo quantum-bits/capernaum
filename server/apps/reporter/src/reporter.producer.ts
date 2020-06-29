@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectQueue } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "../../../common.constants";
+import { REPORTER_QUEUE_NAME } from "../../common.constants";
 import { Job, Queue } from "bull";
 
 @Injectable()

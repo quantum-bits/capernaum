@@ -13,7 +13,7 @@ import { SurveyService } from "../survey/survey.service";
 import WriterService from "../writer/writer.service";
 import { MailService } from "../mail/mail.service";
 import { quillDeltaToHtml, quillHtmlToText } from "../helpers/quill";
-import { ReporterProducer } from "./reporter.producer";
+import { ReporterProducer } from "../../../reporter/src/reporter.producer";
 
 const qualtricsDebug = debug("qualtrics");
 

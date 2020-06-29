@@ -6,7 +6,7 @@ import { QualtricsController } from "./qualtrics.controller";
 import { EventModule } from "../events/event.module";
 import { MailModule } from "../mail/mail.module";
 import { WriterModule } from "../writer/writer.module";
-import { ReporterProducer } from "./reporter.producer";
+import { ReporterProducer } from "../../../reporter/src/reporter.producer";
 import { BullModule } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "../../../common.constants";
 
