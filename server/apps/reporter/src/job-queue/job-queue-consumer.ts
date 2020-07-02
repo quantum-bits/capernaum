@@ -18,12 +18,12 @@ import debug from "debug";
 const qualtricsDebug = debug("qualtrics");
 
 @Processor(REPORTER_QUEUE_NAME)
-export class ReporterConsumer {
-  private readonly logger = new Logger(ReporterConsumer.name);
+export class JobQueueConsumer {
+  private readonly logger = new Logger(JobQueueConsumer.name);
 
   constructor(
     private readonly eventService: EventService,
-    private qualtricsApiService: QualtricsApiService,
+    private readonly qualtricsApiService: QualtricsApiService,
     private readonly surveyService: SurveyService,
     private readonly writerService: WriterService,
     private readonly mailService: MailService
@@ -31,17 +31,11 @@ export class ReporterConsumer {
 
   @Process()
   async processReport(job: Job) {
-    this.logger.debug(`Processing ${JSON.stringify(job, null, 2)}`);
+    const qualtricsSurveyId = job.data.qualtricsSurveyId;
+    const qualtricsResponseId = job.data.qualtricsResponseId;
 
-    const reply: WebHookCompletedResponse = job.data;
-    qualtricsDebug("completedResponse %O", reply);
-
-    const qualtricsSurveyId = reply.SurveyID;
-    const qualtricsResponseId = reply.ResponseID;
-    qualtricsDebug(
-      "qSurveyId %s - qResponseId %s",
-      qualtricsSurveyId,
-      qualtricsResponseId
+    this.logger.debug(
+      `Processing response ${qualtricsResponseId} to survey ${qualtricsSurveyId}`
     );
 
     // Find the survey

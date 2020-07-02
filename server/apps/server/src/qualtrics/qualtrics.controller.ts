@@ -7,14 +7,14 @@ import {
 } from "@qapi/qualtrics-api/qualtrics-api.types";
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
-import { ReporterProducer } from "@apps/reporter/src/reporter.producer";
+import { JobQueueProducer } from "@apps/reporter/src/job-queue/job-queue.producer";
 
 const qualtricsDebug = debug("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {
   constructor(
-    private readonly reporterProducer: ReporterProducer,
+    private readonly reporterProducer: JobQueueProducer,
     private readonly eventService: EventService
   ) {}
 
@@ -61,14 +61,11 @@ export class QualtricsController {
   @Post("completed-response")
   async completedResponse(@Headers() headers, @Body() body) {
     const reply: WebHookCompletedResponse = body;
-    this.logger.debug(`completedResponse - ${JSON.stringify(reply, null, 2)}`);
 
     const qualtricsSurveyId = reply.SurveyID;
     const qualtricsResponseId = reply.ResponseID;
-    qualtricsDebug(
-      "qSurveyId %s - qResponseId %s",
-      qualtricsSurveyId,
-      qualtricsResponseId
+    this.logger.debug(
+      `Completed survey ${qualtricsSurveyId} response ${qualtricsResponseId}`
     );
 
     this.reporterProducer.requestReport(qualtricsSurveyId, qualtricsResponseId);

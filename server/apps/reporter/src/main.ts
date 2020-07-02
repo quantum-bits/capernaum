@@ -2,10 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { NestFactory } from "@nestjs/core";
-import { ReporterModule } from "./reporter.module";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
-  const app = await NestFactory.createApplicationContext(ReporterModule);
+  const app = await NestFactory.createApplicationContext(AppModule);
 }
 
 bootstrap();

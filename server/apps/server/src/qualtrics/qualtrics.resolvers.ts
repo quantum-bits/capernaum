@@ -16,7 +16,7 @@ import {
 @UseGuards(GqlAuthGuard)
 export class QualtricsResolver {
   constructor(
-    private readonly qualtricsService: QualtricsApiService,
+    private readonly qualtricsApiService: QualtricsApiService,
     private readonly surveyService: SurveyService
   ) {}
 
@@ -34,7 +34,7 @@ export class QualtricsResolver {
     let fetchMore = true;
     let offset: string = undefined;
     while (fetchMore) {
-      const response = await this.qualtricsService.listSurveys(offset);
+      const response = await this.qualtricsApiService.listSurveys(offset);
       const { elements, nextPage } = response;
 
       for (const element of elements) {
@@ -74,7 +74,9 @@ export class QualtricsResolver {
     @Args("updateOk") updateOk: boolean
   ) {
     // Fetch the survey with the given ID from the Qualtrics API.
-    const qualtricsSurvey = await this.qualtricsService.getSurvey(qualtricsId);
+    const qualtricsSurvey = await this.qualtricsApiService.getSurvey(
+      qualtricsId
+    );
 
     // Import survey into the database.
     return this.surveyService.importQualtricsSurvey(qualtricsSurvey, updateOk);
@@ -91,7 +93,7 @@ export class QualtricsResolver {
     );
 
     // Get from Qualtrics all responses to this survey.
-    const zipFileEntries = await this.qualtricsService.getResponses(
+    const zipFileEntries = await this.qualtricsApiService.getResponses(
       qualtricsId
     );
     const allResponses = JSON.parse(zipFileEntries[0].content).responses;
@@ -123,7 +125,7 @@ export class QualtricsResolver {
     })
     organizationId?: string
   ) {
-    return this.qualtricsService.getOrganization(organizationId);
+    return this.qualtricsApiService.getOrganization(organizationId);
   }
 
   @Mutation((returns) => QualtricsSubscription)
@@ -159,7 +161,7 @@ export class QualtricsResolver {
         );
     }
 
-    const returnValue = this.qualtricsService.createSubscription(
+    const returnValue = this.qualtricsApiService.createSubscription(
       `https://${createInput.hostName}/qualtrics/${finalSegment}`,
       eventType,
       surveyId
@@ -170,11 +172,11 @@ export class QualtricsResolver {
 
   @Query((returns) => [QualtricsSubscription])
   subscriptions() {
-    return this.qualtricsService.listSubscriptions();
+    return this.qualtricsApiService.listSubscriptions();
   }
 
   @Mutation((returns) => String)
   deleteSubscription(@Args("subscriptionId") subscriptionId: string) {
-    return this.qualtricsService.deleteSubscription(subscriptionId);
+    return this.qualtricsApiService.deleteSubscription(subscriptionId);
   }
 }

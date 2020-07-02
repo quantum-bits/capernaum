@@ -4,20 +4,19 @@ import { Module } from "@nestjs/common";
 import { SurveyModule } from "../survey/survey.module";
 import { QualtricsController } from "./qualtrics.controller";
 import { EventModule } from "../events/event.module";
-import { BullModule } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
-import { ReporterModule } from "@apps/reporter/src/reporter.module";
+import { AppModule } from "@apps/reporter/src/app.module";
+import { QualtricsApiModule } from "@qapi/qualtrics-api";
+import { JobQueueModule } from "@apps/reporter/src/job-queue/job-queue.module";
 
 @Module({
   imports: [
-    BullModule.registerQueue({
-      name: REPORTER_QUEUE_NAME,
-    }),
     EventModule,
-    ReporterModule,
+    AppModule,
     SurveyModule,
+    QualtricsApiModule,
+    JobQueueModule,
   ],
   controllers: [QualtricsController],
-  providers: [QualtricsResolver, QualtricsApiService],
+  providers: [QualtricsResolver],
 })
 export class QualtricsModule {}
