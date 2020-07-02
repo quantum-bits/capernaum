@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import WriterService from "./writer.service";
+import { WriterService } from "./writer.service";
 import { SurveyModule } from "../survey/survey.module";
 import { LetterModule } from "../letter/letter.module";
 import { ImageModule } from "../image/image.module";

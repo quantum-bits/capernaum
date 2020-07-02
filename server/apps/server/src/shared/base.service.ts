@@ -4,14 +4,14 @@ import {
   FindConditions,
   FindManyOptions,
   ObjectType,
-  Repository
 } from "typeorm";
 import { AbstractEntity } from "./abstract-entity";
 import { validate } from "class-validator";
-import { SurveyUpdateInput } from "../survey/entities";
+import { Inject } from "@nestjs/common";
 
 export class BaseService {
-  constructor(protected readonly entityManager: EntityManager) {}
+  @Inject()
+  protected readonly entityManager: EntityManager;
 
   create<Entity, CreateInput>(
     entityClass: ObjectType<Entity>,

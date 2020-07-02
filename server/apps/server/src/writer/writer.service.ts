@@ -75,7 +75,7 @@ export class LineBuffer {
 }
 
 @Injectable()
-export default class WriterService {
+export class WriterService {
   constructor(
     @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
     @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,

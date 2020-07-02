@@ -9,10 +9,10 @@ import { table } from "table";
 import {
   QualtricsSurveyList,
   QualtricsSurveyMetadata,
-} from "../qualtrics/qualtrics.types";
+} from "@qapi/qualtrics-api/qualtrics-api.types";
 import chalk from "chalk";
 import { DateTime } from "luxon";
-import { QualtricsService } from "../qualtrics/qualtrics.service";
+import { QualtricsApiService } from "@qapi/qualtrics-api/qualtrics-api.service";
 
 const program = new commander.Command();
 program
@@ -21,7 +21,7 @@ program
   .option("-e --end-date", "end date for responses")
   .option("-v --verbose", "produce verbose output");
 
-const qualtricsService = new QualtricsService();
+const qualtricsService = new QualtricsApiService();
 
 ///// Organization
 

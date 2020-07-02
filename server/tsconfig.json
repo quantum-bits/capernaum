@@ -11,8 +11,24 @@
     "incremental": true,
     "esModuleInterop": true,
     "paths": {
-      "@apps": ["apps"]
+      "@apps/*": [
+        "apps/*"
+      ],
+      "@server/*": [
+        "apps/server/*"
+      ],
+      "@qapi/qualtrics-api": [
+        "libs/qualtrics-api/src"
+      ],
+      "@qapi/qualtrics-api/*": [
+        "libs/qualtrics-api/src/*"
+      ]
     }
   },
-  "exclude": ["node_modules", "dist", "etc"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "etc"
+  ]
 }
+

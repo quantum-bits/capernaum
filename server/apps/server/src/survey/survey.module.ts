@@ -6,7 +6,7 @@ import {
   SurveyItemResolver,
   SurveyItemResponseResolver,
   SurveyResolver,
-  SurveyResponseResolver
+  SurveyResponseResolver,
 } from "./survey.resolvers";
 import { SurveyService } from "./survey.service";
 import {
@@ -15,7 +15,7 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
-  SurveyResponse
+  SurveyResponse,
 } from "./entities";
 import { registerEnumType } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
@@ -28,8 +28,8 @@ import { WhichItems } from "./survey.types";
       SurveyDimension,
       SurveyResponse,
       SurveyItemResponse,
-      SurveyItem
-    ])
+      SurveyItem,
+    ]),
   ],
   providers: [
     SurveyService,
@@ -38,16 +38,16 @@ import { WhichItems } from "./survey.types";
     SurveyResponseResolver,
     SurveyItemResponseResolver,
     SurveyIndexResolver,
-    SurveyItemResolver
+    SurveyItemResolver,
   ],
-  exports: [SurveyService]
+  exports: [SurveyService],
 })
 export class SurveyModule {
   constructor() {
     registerEnumType(WhichItems, {
       name: "WhichItems",
       description:
-        "Which items to retrieve: all, those with an index, those without an index"
+        "Which items to retrieve: all, those with an index, those without an index",
     });
   }
 }

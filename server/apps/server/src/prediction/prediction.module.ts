@@ -3,7 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { PredictionTableEntry, ScriptureEngagementPractice } from "./entities";
 import {
   PredictionTableEntryResolver,
-  ScriptureEngagementPracticeResolver
+  ScriptureEngagementPracticeResolver,
 } from "./prediction.resolvers";
 import { PredictionService } from "./prediction.service";
 
@@ -11,13 +11,13 @@ import { PredictionService } from "./prediction.service";
   imports: [
     TypeOrmModule.forFeature([
       PredictionTableEntry,
-      ScriptureEngagementPractice
-    ])
+      ScriptureEngagementPractice,
+    ]),
   ],
   providers: [
     PredictionService,
     PredictionTableEntryResolver,
-    ScriptureEngagementPracticeResolver
-  ]
+    ScriptureEngagementPracticeResolver,
+  ],
 })
 export class PredictionModule {}

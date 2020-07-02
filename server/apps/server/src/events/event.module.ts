@@ -11,11 +11,11 @@ import { PubSub } from "graphql-subscriptions";
   providers: [
     {
       provide: PUB_SUB_PROVIDER,
-      useValue: new PubSub()
+      useValue: new PubSub(),
     },
     EventResolver,
-    EventService
+    EventService,
   ],
-  exports: [EventService]
+  exports: [EventService],
 })
 export class EventModule {}

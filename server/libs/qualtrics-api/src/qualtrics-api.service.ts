@@ -15,12 +15,15 @@ import {
   QualtricsSurvey,
   QualtricsSurveyList,
   ResponseExportProgress,
-} from "./qualtrics.types";
+} from "@qapi/qualtrics-api/qualtrics-api.types";
 import { Injectable } from "@nestjs/common";
 
 import debug from "debug";
 import got, { Got, Options } from "got";
-import { QualtricsOrganization, QualtricsSubscription } from "./entities";
+import {
+  QualtricsOrganization,
+  QualtricsSubscription,
+} from "@server/src/qualtrics/entities";
 import tunnel from "tunnel";
 
 const qualtricsDebug = debug("qualtrics");
@@ -81,7 +84,7 @@ class WebhookEventFactory {
 }
 
 @Injectable()
-export class QualtricsService {
+export class QualtricsApiService {
   baseUrl = "";
   apiToken = "";
   client: Got;

@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import { NestFactory } from "@nestjs/core";
 import { ReporterModule } from "./reporter.module";
 

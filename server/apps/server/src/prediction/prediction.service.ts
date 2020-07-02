@@ -4,17 +4,15 @@ import {
   PredictionTableEntryReplaceInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
-  ScriptureEngagementPracticeUpdateInput
+  ScriptureEngagementPracticeUpdateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntityManager, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
-import { Letter } from "../letter/entities";
 
 @Injectable()
 export class PredictionService extends BaseService {
   constructor(
-    protected readonly entityManager: EntityManager,
     @InjectRepository(PredictionTableEntry)
     private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,
     @InjectRepository(ScriptureEngagementPractice)
@@ -22,20 +20,20 @@ export class PredictionService extends BaseService {
       ScriptureEngagementPractice
     >
   ) {
-    super(entityManager);
+    super();
   }
 
   replacePredictionTableEntries(
     replaceInput: PredictionTableEntryReplaceInput
-  ) {
-    return this.entityManager.transaction(async manager => {
+  ): Promise<PredictionTableEntry[]> {
+    return this.entityManager.transaction(async (manager) => {
       const predictionTableEntryRepo = manager.getRepository(
         PredictionTableEntry
       );
 
       // Remove all the old prediction table entries.
       await predictionTableEntryRepo.delete({
-        letterId: replaceInput.letterId
+        letterId: replaceInput.letterId,
       });
 
       // Insert the replacement entries.
@@ -43,7 +41,7 @@ export class PredictionService extends BaseService {
       for (const inputEntry of replaceInput.entries) {
         const entry = predictionTableEntryRepo.create({
           ...inputEntry,
-          letterId: replaceInput.letterId
+          letterId: replaceInput.letterId,
         });
         newEntries.push(await predictionTableEntryRepo.save(entry));
       }
@@ -54,7 +52,7 @@ export class PredictionService extends BaseService {
 
   async updateScriptureEngagementPractice(
     updateInput: ScriptureEngagementPracticeUpdateInput
-  ) {
+  ): Promise<ScriptureEngagementPractice> {
     const practice = await this.scriptureEngagementRepo.preload(updateInput);
     return this.scriptureEngagementRepo.save(practice);
   }

@@ -1,23 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
-import { EntityManager, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import {
   User,
   UserCreateInput,
   UserRole,
-  UserRoleCreateInput
+  UserRoleCreateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class UserService extends BaseService {
   constructor(
-    protected readonly entityManager: EntityManager,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserRole)
     private readonly userRoleRepo: Repository<UserRole>
   ) {
-    super(entityManager);
+    super();
   }
 
   async createUser(createInput: UserCreateInput) {

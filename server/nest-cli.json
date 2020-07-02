@@ -26,6 +26,24 @@
       "compilerOptions": {
         "tsConfigPath": "apps/reporter/tsconfig.app.json"
       }
+    },
+    "report-writer": {
+      "type": "library",
+      "root": "libs/report-writer",
+      "entryFile": "index",
+      "sourceRoot": "libs/report-writer/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/report-writer/tsconfig.lib.json"
+      }
+    },
+    "qualtrics-api": {
+      "type": "library",
+      "root": "libs/qualtrics-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/qualtrics-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/qualtrics-api/tsconfig.lib.json"
+      }
     }
   }
 }

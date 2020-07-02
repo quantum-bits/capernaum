@@ -29,15 +29,11 @@ import { PredictionTableEntry } from "../prediction/entities";
 import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
-import { EntityManager } from "typeorm";
 
 @Resolver((of) => Survey)
 @UseGuards(GqlAuthGuard)
 export class SurveyResolver {
-  constructor(
-    private readonly entityManager: EntityManager,
-    private readonly surveyService: SurveyService
-  ) {}
+  constructor(private readonly surveyService: SurveyService) {}
 
   @Mutation((returns) => Survey, {
     description: "Create a new survey.",

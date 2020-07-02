@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
-import { EntityManager, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { Image } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 
@@ -9,11 +9,10 @@ import { v4 } from "uuid";
 @Injectable()
 export class ImageService extends BaseService {
   constructor(
-    protected readonly entityManager: EntityManager,
     @InjectRepository(Image)
     protected readonly imageRepo: Repository<Image>
   ) {
-    super(entityManager);
+    super();
   }
 
   async createImage(originalName: string, mimeType: string) {
@@ -23,7 +22,7 @@ export class ImageService extends BaseService {
       this.imageRepo.create({
         originalName,
         mimeType,
-        uuid
+        uuid,
       })
     );
   }

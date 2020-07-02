@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { QualtricsService } from "./qualtrics.service";
-import { QualtricsSurveyListItem } from "./qualtrics.entities";
+import { QualtricsApiService } from "@qapi/qualtrics-api/qualtrics-api.service";
+import { QualtricsSurveyListItem } from "./entities/qualtrics-survey-list-item";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Survey } from "../survey/entities";
@@ -16,7 +16,7 @@ import {
 @UseGuards(GqlAuthGuard)
 export class QualtricsResolver {
   constructor(
-    private readonly qualtricsService: QualtricsService,
+    private readonly qualtricsService: QualtricsApiService,
     private readonly surveyService: SurveyService
   ) {}
 

@@ -4,10 +4,11 @@ import { Letter, LetterElement, LetterElementType } from "./entities";
 import {
   LetterElementResolver,
   LetterElementTypeResolver,
-  LetterResolver
+  LetterResolver,
 } from "./letter.resolvers";
 import { LetterService } from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
+import { SurveyModule } from "@server/src/survey/survey.module";
 
 @Module({
   imports: [
@@ -15,15 +16,16 @@ import { PredictionTableEntry } from "../prediction/entities";
       Letter,
       LetterElement,
       LetterElementType,
-      PredictionTableEntry
-    ])
+      PredictionTableEntry,
+    ]),
+    SurveyModule,
   ],
   providers: [
     LetterService,
     LetterResolver,
     LetterElementTypeResolver,
-    LetterElementResolver
+    LetterElementResolver,
   ],
-  exports: [LetterService]
+  exports: [LetterService],
 })
 export class LetterModule {}

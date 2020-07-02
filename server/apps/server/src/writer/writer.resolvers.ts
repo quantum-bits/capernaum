@@ -4,7 +4,7 @@ import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Letter } from "../letter/entities";
 import { LetterService } from "../letter/letter.service";
-import WriterService from "./writer.service";
+import { WriterService } from "./writer.service";
 import { SurveyService } from "../survey/survey.service";
 
 @Resolver((of) => Letter)

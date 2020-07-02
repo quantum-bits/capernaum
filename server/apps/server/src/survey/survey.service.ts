@@ -19,7 +19,7 @@ import {
   QualtricsQuestion,
   QualtricsSurvey,
   QualtricsSurveyResponse,
-} from "../qualtrics/qualtrics.types";
+} from "@qapi/qualtrics-api/qualtrics-api.types";
 import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
@@ -31,7 +31,6 @@ const surveyDebug = debug("survey");
 @Injectable()
 export class SurveyService extends BaseService {
   constructor(
-    protected readonly entityManager: EntityManager,
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
@@ -45,7 +44,7 @@ export class SurveyService extends BaseService {
     @InjectRepository(SurveyItemResponse)
     private readonly surveyItemResponseRepo: Repository<SurveyItemResponse>
   ) {
-    super(entityManager);
+    super();
   }
 
   createSurvey(createInput: SurveyCreateInput) {

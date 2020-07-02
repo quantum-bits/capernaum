@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectQueue } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "../../common.constants";
+import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
 import { Job, Queue } from "bull";
 
 @Injectable()
@@ -18,7 +18,7 @@ export class ReporterProducer {
       qualtricsResponseId,
     };
     const job = await this.reporterQueue.add(details);
-    this.logger.debug(`Requested report - ${JSON.stringify(details)}`);
+    this.logger.debug(`Requested report - ${JSON.stringify(job, null, 2)}`);
     return job;
   }
 }

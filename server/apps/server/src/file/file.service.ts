@@ -21,22 +21,22 @@ export class FileService {
     this.relDir = normalize(join(process.env.CAP_STATIC_REL_DIR, subDir));
     this.absDir = normalize(join(baseAbsDir, this.relDir));
 
-    access(this.absDir, err => {
+    access(this.absDir, (err) => {
       if (err) {
         throw Error(`Can't find a base directory at '${this.absDir}'`);
       }
     });
   }
 
-  absoluteDir() {
+  absoluteDir(): string {
     return this.absDir;
   }
 
-  relativePath(fileName: string) {
+  relativePath(fileName: string): string {
     return join(this.relDir, fileName);
   }
 
-  absolutePath(fileName: string) {
+  absolutePath(fileName: string): string {
     return join(this.absDir, fileName);
   }
 
@@ -58,7 +58,7 @@ export class FileService {
           fileSize = bytesWritten;
         });
 
-        close(fd, err => {
+        close(fd, (err) => {
           if (err) {
             reject(Error(`Failed to close '${fullPath}'`));
           }
@@ -66,18 +66,18 @@ export class FileService {
           resolve({
             fileName,
             fullPath,
-            fileSize
+            fileSize,
           });
         });
       });
     });
   }
 
-  deleteFile(fileName: string) {
+  deleteFile(fileName: string): Promise<unknown> {
     const fullPath = this.absolutePath(fileName);
 
     return new Promise((resolve, reject) => {
-      unlink(fullPath, err => {
+      unlink(fullPath, (err) => {
         if (err) {
           reject(err);
         }
