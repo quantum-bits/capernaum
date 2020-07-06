@@ -1,5 +1,5 @@
 import debug from "debug";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import nodemailer, { SentMessageInfo, Transporter } from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
@@ -10,11 +10,12 @@ const mailDebug = debug("mail");
 @Injectable()
 export class MailService {
   private transporter: Transporter;
+  private readonly logger = new Logger(MailService.name);
 
   constructor() {
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
-      logger: true,
+      // logger: true,
       debug: mailDebug.enabled,
     };
 
@@ -66,6 +67,7 @@ export class MailService {
       ];
     }
 
+    this.logger.debug(`Sending email to ${mailInput.to}`);
     mailDebug("sendMail options %O", options);
     return this.transporter.sendMail(options);
   }

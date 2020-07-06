@@ -4,8 +4,8 @@ import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
 import { Job, Queue } from "bull";
 
 @Injectable()
-export class JobQueueProducer {
-  private readonly logger = new Logger(JobQueueProducer.name);
+export class ReportQueueProducer {
+  private readonly logger = new Logger(ReportQueueProducer.name);
 
   constructor(@InjectQueue(REPORTER_QUEUE_NAME) private reporterQueue: Queue) {}
 

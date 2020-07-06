@@ -19,8 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/alpha-main/test/jest-e2e.json",
-    "test:load": "artillery run --output load-test.json test/load/load.yaml",
-    "test:load:dev": "artillery run --output load-test.json test/load/load-dev.yaml",
+    "test:load": "artillery run --output load-test.json apps/server/test/load/load.yaml",
+    "test:load:dev": "artillery run --output load-test.json apps/server/test/load/load-dev.yaml",
     "test:profile": "tsc-watch -p tsconfig.build.json --onSuccess \"node --prof dist/main.js\"",
     "load-fixtures": "ts-node fixtures/fixture-loader.ts --nuclear",
     "load-fake-survey": "ts-node fixtures/fixture-loader.ts --nuclear --fake-survey"

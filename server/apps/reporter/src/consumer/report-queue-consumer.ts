@@ -1,11 +1,8 @@
-import { Body, forwardRef, Headers, Inject, Logger } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import { Process, Processor } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
 import { Job } from "bull";
-import {
-  QualtricsSurveyResponse,
-  WebHookCompletedResponse,
-} from "@qapi/qualtrics-api/qualtrics-api.types";
+import { QualtricsSurveyResponse } from "@qapi/qualtrics-api/qualtrics-api.types";
 import { quillDeltaToHtml, quillHtmlToText } from "@server/src/helpers/quill";
 import { EventCreateInput } from "@server/src/events/entities";
 import { EventService } from "@server/src/events/event.service";
@@ -18,8 +15,8 @@ import debug from "debug";
 const qualtricsDebug = debug("qualtrics");
 
 @Processor(REPORTER_QUEUE_NAME)
-export class JobQueueConsumer {
-  private readonly logger = new Logger(JobQueueConsumer.name);
+export class ReportQueueConsumer {
+  private readonly logger = new Logger(ReportQueueConsumer.name);
 
   constructor(
     private readonly eventService: EventService,
@@ -56,6 +53,7 @@ export class JobQueueConsumer {
       survey.id,
       qualtricsResponse as QualtricsSurveyResponse
     );
+    this.logger.debug("Imported response");
     qualtricsDebug("importedResponse - %O", importedResponse);
 
     // Fetch the letter.
@@ -67,6 +65,7 @@ export class JobQueueConsumer {
       letter.id,
       importedResponse.surveyResponse.id
     );
+    this.logger.debug("Rendered letter");
     qualtricsDebug("writerOutput - %O", writerOutput);
 
     // Convert Quill deltas to HTML and text.
@@ -81,6 +80,7 @@ export class JobQueueConsumer {
       htmlContent,
       attachmentPath: writerOutput.pdfAbsolutePath,
     });
+    this.logger.debug("Sent email");
     qualtricsDebug("mailInfo - %O", mailInfo);
 
     // Create event.
