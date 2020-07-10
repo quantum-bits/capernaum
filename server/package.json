@@ -1,12 +1,12 @@
 {
   "name": "server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "author": "",
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "nest build",
+    "server:build": "nest build server",
+    "reporter:build": "nest build reporter",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "server": "nest start server",
     "server:dev": "nest start --watch server",
@@ -71,6 +71,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
+    "@nestjs/cli": "^7.4.1",
     "@nestjs/testing": "^7.1.3",
     "@types/bcrypt": "^3.0.0",
     "@types/bull": "^3.14.0",
