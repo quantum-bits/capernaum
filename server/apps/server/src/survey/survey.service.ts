@@ -120,7 +120,7 @@ export class SurveyService extends BaseService {
   }
 
   findSurveyByQualtricsId(qualtricsId: string) {
-    return this.surveyRepo.findOneOrFail(
+    return this.surveyRepo.findOne(
       { qualtricsId },
       { relations: ["surveyItems"] }
     );
