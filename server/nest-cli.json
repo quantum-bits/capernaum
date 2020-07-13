@@ -1,5 +1,40 @@
 {
   "language": "ts",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src"
+  "sourceRoot": "apps/server/src",
+  "monorepo": true,
+  "root": "apps/server",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/server/tsconfig.app.json"
+  },
+  "projects": {
+    "server": {
+      "type": "application",
+      "root": "apps/server",
+      "entryFile": "main",
+      "sourceRoot": "apps/server/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/server/tsconfig.app.json"
+      }
+    },
+    "reporter": {
+      "type": "application",
+      "root": "apps/reporter",
+      "entryFile": "main",
+      "sourceRoot": "apps/reporter/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/reporter/tsconfig.app.json"
+      }
+    },
+    "qualtrics-api": {
+      "type": "library",
+      "root": "libs/qualtrics-api",
+      "entryFile": "index",
+      "sourceRoot": "libs/qualtrics-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/qualtrics-api/tsconfig.lib.json"
+      }
+    }
+  }
 }

@@ -34,6 +34,7 @@
         - yarn
         - git
         - nodejs
+        - redis
         - nginx
         - postgresql
         - python3-psycopg2
@@ -129,10 +130,15 @@
         chdir: "{{ cap_ui_abs_dir }}"
         cmd: yarn build
 
+    - name: build production reporter
+      command:
+        chdir: "{{ cap_server_abs_dir }}"
+        cmd: yarn reporter:build
+
     - name: build production server
       command:
         chdir: "{{ cap_server_abs_dir }}"
-        cmd: yarn build
+        cmd: yarn server:build
 
 - name: provision process manager
   hosts: production, staging

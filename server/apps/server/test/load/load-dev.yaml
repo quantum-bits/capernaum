@@ -1,0 +1,13 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalCount: 1300
+scenarios:
+  - name: "Completed Responses"
+    flow:
+      - post:
+          url: "/qualtrics/completed-response"
+          form:
+            SurveyID: "SV_bab970X06VDBTql"
+            ResponseID: "R_2yj9imagoNODRpS"

@@ -149,10 +149,12 @@ import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import pluralize from "pluralize";
+
+// FIXME: This cross application include is an abomination.
 import {
   quillDeltaToHtml,
   quillHtmlToText,
-} from "../../../server/src/helpers/quill";
+} from "../../../server/apps/server/src/helpers/quill";
 
 interface ImportedSurvey {
   id: number;

@@ -260,7 +260,7 @@ type PredictionDetails {
 
 type PredictionSummary {
   practiceSummary: PracticeSummary!
-  predictionDetails: PredictionDetails!
+  predictionDetails: [PredictionDetails!]!
   predict: Boolean!
 }
 
