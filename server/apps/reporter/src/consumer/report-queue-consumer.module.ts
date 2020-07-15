@@ -9,6 +9,11 @@ import { BullModule } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import typeORMConfig from "@server/src/typeorm-config";
+import {
+  makeCounterProvider,
+  PrometheusModule,
+} from "@willsoto/nestjs-prometheus";
+import { PROM_METRIC_EMAILS_SENT } from "@apps/reporter/src/common";
 
 @Module({
   imports: [
@@ -24,8 +29,19 @@ import typeORMConfig from "@server/src/typeorm-config";
     WriterModule,
     MailModule,
     QualtricsApiModule,
+    PrometheusModule.register({
+      defaultMetrics: {
+        enabled: false,
+      },
+    }),
   ],
-  providers: [ReportQueueConsumer],
+  providers: [
+    ReportQueueConsumer,
+    makeCounterProvider({
+      name: PROM_METRIC_EMAILS_SENT,
+      help: "Number of emails sent",
+    }),
+  ],
   exports: [ReportQueueConsumer],
 })
 export class ReportQueueConsumerModule {}
