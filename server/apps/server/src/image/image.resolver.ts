@@ -4,7 +4,7 @@ import {
   Parent,
   Query,
   ResolveField,
-  Resolver
+  Resolver,
 } from "@nestjs/graphql";
 import { ImageService } from "./image.service";
 import { Int } from "@nestjs/graphql";
@@ -15,7 +15,7 @@ import { IMAGE_FILE_SERVICE } from "../file/file.module";
 import { Inject, UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
-@Resolver(of => Image)
+@Resolver((of) => Image)
 @UseGuards(GqlAuthGuard)
 export class ImageResolver {
   constructor(
@@ -25,39 +25,39 @@ export class ImageResolver {
 
   // No createImage as that is handled by the upload controller.
 
-  @Query(returns => [Image])
+  @Query((returns) => [Image])
   images() {
     return this.imageService.find(Image);
   }
 
-  @Query(returns => Image)
+  @Query((returns) => Image)
   image(@Args({ name: "id", type: () => Int }) id: number) {
     return this.imageService.findOne(Image, id);
   }
 
-  @Mutation(returns => Image)
+  @Mutation((returns) => Image)
   updateImage(@Args("updateInput") updateInput: ImageUpdateInput) {
     return this.imageService.update(Image, updateInput);
   }
 
-  @Mutation(returns => Int)
+  @Mutation((returns) => Int)
   async deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
     const imageDetails = await this.imageService.findOne(Image, id);
     await this.fileService.deleteFile(imageDetails.fileName());
     return this.imageService.delete(Image, id);
   }
 
-  @ResolveField(returns => String)
+  @ResolveField((returns) => String)
   url(@Parent() image: Image) {
     return `/images/${image.id}`;
   }
 
-  @ResolveField(returns => String)
+  @ResolveField((returns) => String)
   fullPath(@Parent() image: Image) {
     return this.fileService.absolutePath(image.fileName());
   }
 
-  @ResolveField("letterElements", type => [LetterElement])
+  @ResolveField("letterElements", (type) => [LetterElement])
   resolveLetterElements(@Parent() image: Image) {
     return this.imageService.find(LetterElement, { image });
   }

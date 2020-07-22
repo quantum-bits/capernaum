@@ -17,6 +17,7 @@ const loggingLink = new ApolloLink((operation, forward) => {
 if (!process.env.URL_WEBSOCKET) {
   throw Error("No URL configured for websocket connection");
 }
+
 if (!process.env.URL_HTTP) {
   throw Error("No URL configured for http connection");
 }
@@ -35,7 +36,6 @@ const authLink = setContext((_, { headers }) => {
       authorization: `Bearer ${store.state.accessToken}`,
     },
   };
-  // console.log("CONTEXT", context);
   return context;
 });
 
