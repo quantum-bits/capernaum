@@ -13,6 +13,7 @@ import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
 import { LetterService } from "../letter/letter.service";
 import { SurveyService } from "../survey/survey.service";
+import * as IsEmail from "isemail";
 
 import debug from "debug";
 const letterDebug = debug("letter");
@@ -35,6 +36,10 @@ function formatEnvironment(name: string, content: string) {
 
 function formatHref(url: string, text: string) {
   return `\\href{${url}}{\\underline{${text}}}`;
+}
+
+function formatVerbose(text: string) {
+  return `\\verb|${text}|`;
 }
 
 // Generate a hash digest for the file.
@@ -278,6 +283,14 @@ export class WriterService {
   private static renderResponseDetails(surveyResponse: SurveyResponse) {
     letterDebug("renderResponseDetails - %O", surveyResponse);
 
+    let validatedEmail = surveyResponse.email;
+    if (
+      !IsEmail.validate(surveyResponse.email) ||
+      surveyResponse.email.indexOf("|") >= 0
+    ) {
+      validatedEmail = "<invalid>";
+    }
+
     return [
       "\\vfill",
       formatEnvironment(
@@ -285,7 +298,7 @@ export class WriterService {
         [
           "\\scriptsize",
           `Response ID: ${surveyResponse.id}`,
-          `Email: ${surveyResponse.email}`,
+          `Email: ${formatVerbose(validatedEmail)}`,
           `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`,
         ].join("\n\n")
       ),
