@@ -7,7 +7,7 @@ import EntityMetadataRegistry from "./entity-metadata";
 import makeFakeSurvey from "./fake-survey";
 
 import Debug from "debug";
-import { AbstractEntity } from "../apps/server/src/shared/abstract-entity";
+import { AbstractEntity } from "@server/src/shared/abstract-entity";
 
 const debug = Debug("fixture-loader");
 

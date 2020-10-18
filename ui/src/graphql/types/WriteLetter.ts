@@ -52,7 +52,7 @@ export interface WriteLetter_writeLetter_responseSummary_predictionSummaries_pre
 
 export interface WriteLetter_writeLetter_responseSummary_predictionSummaries {
   practiceSummary: WriteLetter_writeLetter_responseSummary_predictionSummaries_practiceSummary;
-  predictionDetails: WriteLetter_writeLetter_responseSummary_predictionSummaries_predictionDetails;
+  predictionDetails: WriteLetter_writeLetter_responseSummary_predictionSummaries_predictionDetails[];
   predict: boolean;
 }
 

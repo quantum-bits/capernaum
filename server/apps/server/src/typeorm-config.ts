@@ -1,7 +1,14 @@
 import { config } from "dotenv";
 
 import { ConnectionOptions } from "typeorm";
-import { Letter, LetterElement, LetterElementType } from "./letter/entities";
+
+import {
+  Group,
+  Letter,
+  LetterElement,
+  LetterElementType,
+  LetterType,
+} from "./letter/entities";
 import {
   Survey,
   SurveyDimension,
@@ -29,8 +36,10 @@ const options: ConnectionOptions = {
   password: process.env.PG_PASSWORD,
   entities: [
     Event,
+    Group,
     Image,
     Letter,
+    LetterType,
     LetterElement,
     LetterElementType,
     Machine,

@@ -1,6 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Letter, LetterElement, LetterElementType } from "./entities";
+import {
+  Group,
+  GroupCreateInput,
+  GroupUpdateInput,
+  Letter,
+  LetterElement,
+  LetterElementType,
+} from "./entities";
 import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
@@ -52,5 +59,28 @@ export class LetterService extends BaseService {
       where: { letter },
       order: { sequence: "ASC" },
     });
+  }
+}
+
+@Injectable()
+export class GroupService extends BaseService {
+  constructor(
+    @InjectRepository(Group) private readonly groupRepo: Repository<Group>
+  ) {
+    super();
+  }
+
+  createGroup(createInput: GroupCreateInput) {
+    return this.groupRepo.save(this.groupRepo.create(createInput));
+  }
+
+  readGroups() {
+    return this.groupRepo.find();
+  }
+
+  updateGroup(updateInput: GroupUpdateInput) {
+    return this.groupRepo
+      .preload(updateInput)
+      .then((result) => this.groupRepo.save(result));
   }
 }

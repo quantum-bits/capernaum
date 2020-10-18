@@ -7,7 +7,7 @@ import {
   Column,
   Entity,
   JoinTable,
-  ManyToMany
+  ManyToMany,
 } from "typeorm";
 import { UserRole } from "./user-role";
 import { hashPassword } from "../../auth/crypto";
@@ -43,8 +43,8 @@ export class User extends AbstractEntity {
     }
   }
 
-  @Field(returns => [UserRole])
-  @ManyToMany(type => UserRole)
+  @Field((returns) => [UserRole])
+  @ManyToMany((type) => UserRole)
   @JoinTable()
   roles: UserRole[];
 }
@@ -55,21 +55,21 @@ export class UserCreateInput {
   @Field() firstName: string;
   @Field() lastName: string;
   @Field() password: string;
-  @Field(type => [Int]) userRoleIds: number[];
+  @Field((type) => [Int]) userRoleIds: number[];
 }
 
 @InputType()
 export class UserUpdateInput {
-  @Field(type => Int) id: number;
+  @Field((type) => Int) id: number;
   @Field({ nullable: true }) email?: string;
   @Field({ nullable: true }) firstName?: string;
   @Field({ nullable: true }) lastName?: string;
-  @Field(type => [Int], { nullable: true }) userRoleIds?: number[];
+  @Field((type) => [Int], { nullable: true }) userRoleIds?: number[];
 }
 
 @InputType()
 export class ChangePasswordInput {
-  @Field(type => Int) userId: number;
+  @Field((type) => Int) userId: number;
   @Field() currentPassword: string;
   @Field() newPassword: string;
 }
@@ -81,5 +81,5 @@ export class UserPayload {
   @Field() firstName: string;
   @Field() lastName: string;
   @Field() email: string;
-  @Field(type => [UserRole]) roles: UserRole[];
+  @Field((type) => [UserRole]) roles: UserRole[];
 }

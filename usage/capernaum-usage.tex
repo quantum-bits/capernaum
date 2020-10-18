@@ -1,0 +1,27 @@
+\documentclass{standalone}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepgfplotslibrary{dateplot}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \begin{axis}[
+    title=Capernaum Survey Processing,
+    xlabel=Survey Date,
+    ylabel=Email Count,
+    date coordinates in=x,
+    width=\textwidth,
+    xticklabel style={rotate=-90}
+    ]
+    \addplot table [col sep=comma] {by-date.csv};
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
