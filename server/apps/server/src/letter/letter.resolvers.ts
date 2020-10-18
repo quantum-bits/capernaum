@@ -13,9 +13,16 @@ import {
   LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
+  LetterType,
+  LetterTypeCreateInput,
+  LetterTypeUpdateInput,
   LetterUpdateInput,
 } from "./entities";
-import { GroupService, LetterService } from "./letter.service";
+import {
+  GroupService,
+  LetterService,
+  LetterTypeService,
+} from "./letter.service";
 import { Int } from "@nestjs/graphql";
 import { Survey, SurveyDimension } from "../survey/entities";
 import {
@@ -168,5 +175,30 @@ export class GroupResolver {
   @Mutation(() => Group)
   updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
     return this.groupService.updateGroup(updateInput);
+  }
+}
+
+@Resolver("LetterType")
+export class LetterTypeResolver {
+  constructor(private readonly lettertypeService: LetterTypeService) {}
+
+  @Mutation(() => LetterType)
+  createLetterType(@Args("createInput") createInput: LetterTypeCreateInput) {
+    return this.lettertypeService.createLetterType(createInput);
+  }
+
+  @Query(() => [LetterType])
+  readLetterTypes() {
+    return this.lettertypeService.readLetterTypes();
+  }
+
+  @Mutation(() => LetterType)
+  updateLetterType(@Args("updateInput") updateInput: LetterTypeUpdateInput) {
+    return this.lettertypeService.updateLetterType(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deleteLetterType(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.lettertypeService.deleteLetterType(id);
   }
 }

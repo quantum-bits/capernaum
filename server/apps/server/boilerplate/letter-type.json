@@ -1,0 +1,32 @@
+{
+  "entity": {
+    "name": "LetterType",
+    "pk": "id",
+    "attributes": [
+      {
+        "name": "key",
+        "type": "string",
+        "description": "Human readable key"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "description": "Description of this type"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "name": "letters",
+      "type": "oneToMany",
+      "to": "Letter",
+      "description": "Letters of this type"
+    },
+    {
+      "name": "letterElementTypes",
+      "type": "manyToMany",
+      "to": "LetterElementType",
+      "description": "Valid element types for this type of letter"
+    }
+  ]
+}

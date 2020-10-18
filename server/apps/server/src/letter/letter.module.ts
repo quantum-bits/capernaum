@@ -1,13 +1,24 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Group, Letter, LetterElement, LetterElementType } from "./entities";
+import {
+  Group,
+  Letter,
+  LetterElement,
+  LetterElementType,
+  LetterType,
+} from "./entities";
 import {
   GroupResolver,
   LetterElementResolver,
   LetterElementTypeResolver,
   LetterResolver,
+  LetterTypeResolver,
 } from "./letter.resolvers";
-import { GroupService, LetterService } from "./letter.service";
+import {
+  GroupService,
+  LetterService,
+  LetterTypeService,
+} from "./letter.service";
 import { PredictionTableEntry } from "../prediction/entities";
 import { SurveyModule } from "@server/src/survey/survey.module";
 
@@ -15,6 +26,7 @@ import { SurveyModule } from "@server/src/survey/survey.module";
   imports: [
     TypeOrmModule.forFeature([
       Letter,
+      LetterType,
       LetterElement,
       LetterElementType,
       PredictionTableEntry,
@@ -25,8 +37,11 @@ import { SurveyModule } from "@server/src/survey/survey.module";
   providers: [
     LetterService,
     LetterResolver,
+    LetterElementResolver,
     LetterElementTypeResolver,
     LetterElementResolver,
+    LetterTypeService,
+    LetterTypeResolver,
     GroupService,
     GroupResolver,
   ],

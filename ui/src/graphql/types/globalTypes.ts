@@ -31,6 +31,7 @@ export interface GroupCreateInput {
   adminLastName: string;
   adminEmail: string;
   codeWord: string;
+  surveyId: number;
 }
 
 export interface GroupUpdateInput {
@@ -43,6 +44,7 @@ export interface GroupUpdateInput {
   adminLastName?: string | null;
   adminEmail?: string | null;
   codeWord?: string | null;
+  surveyId?: number | null;
 }
 
 export interface ImageUpdateInput {

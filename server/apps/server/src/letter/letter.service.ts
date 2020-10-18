@@ -7,6 +7,9 @@ import {
   Letter,
   LetterElement,
   LetterElementType,
+  LetterType,
+  LetterTypeCreateInput,
+  LetterTypeUpdateInput,
 } from "./entities";
 import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
@@ -82,5 +85,33 @@ export class GroupService extends BaseService {
     return this.groupRepo
       .preload(updateInput)
       .then((result) => this.groupRepo.save(result));
+  }
+}
+
+@Injectable()
+export class LetterTypeService extends BaseService {
+  constructor(
+    @InjectRepository(LetterType)
+    private readonly lettertypeRepo: Repository<LetterType>
+  ) {
+    super();
+  }
+
+  createLetterType(createInput: LetterTypeCreateInput) {
+    return this.lettertypeRepo.save(this.lettertypeRepo.create(createInput));
+  }
+
+  readLetterTypes() {
+    return this.lettertypeRepo.find();
+  }
+
+  updateLetterType(updateInput: LetterTypeUpdateInput) {
+    return this.lettertypeRepo
+      .preload(updateInput)
+      .then((result) => this.lettertypeRepo.save(result));
+  }
+
+  deleteLetterType(id: number) {
+    return this.lettertypeRepo.delete(id).then((result) => result.affected);
   }
 }

@@ -38,10 +38,10 @@ export class Group extends AbstractEntity {
   @Column()
   codeWord: string;
 
-  @Field(() => Survey)
-  @ManyToOne(() => Survey, (survey) => survey.groups)
-  survey: Survey;
   @Column("integer") surveyId: number;
+  @ManyToOne(() => Survey, (survey) => survey.groups)
+  @Field(() => Survey)
+  survey: Survey;
 }
 
 @InputType()
@@ -64,6 +64,8 @@ export class GroupCreateInput {
   adminEmail: string;
 
   @Field({ description: "Survey code word used by group" }) codeWord: string;
+
+  @Field((type) => Int) surveyId: number;
 }
 
 @InputType()
@@ -91,4 +93,6 @@ export class GroupUpdateInput {
 
   @Field({ description: "Survey code word used by group", nullable: true })
   codeWord?: string;
+
+  @Field((type) => Int, { nullable: true }) surveyId?: number;
 }
