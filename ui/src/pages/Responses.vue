@@ -181,6 +181,7 @@ export default Vue.extend({
     surveyResponses: {
       query: ALL_RESPONSES_QUERY,
       update: (data) => data.surveyResponses,
+      fetchPolicy: "network-only",
     },
   },
 
