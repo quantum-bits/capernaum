@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { AbstractEntity } from "@server/src/shared/abstract-entity";
 import { Survey } from "../../survey/entities";
+import { AbstractEntity } from "../../shared/abstract-entity";
 
 @Entity()
 @ObjectType()

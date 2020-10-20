@@ -76,9 +76,9 @@ async function main(argv) {
 
   // Set up the database direct connection.
   const connectionOptions = { ...typeOrmConfig };
-  if (program.verbose) {
-    connectionOptions.logging = true;
-  }
+  // if (program.verbose) {
+  //   connectionOptions.logging = true;
+  // }
   const dbConnection = await createConnection(connectionOptions);
 
   const metadataRegistry = new EntityMetadataRegistry();
