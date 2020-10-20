@@ -135,11 +135,16 @@ export class QualtricsApiService {
    */
   private async qualtricsGet<T>(url: URL) {
     qualtricsDebug("qualtricsGet - URL %s", url);
-    const response = await this.client.get<QualtricsResponse<T>>(url.href, {
-      responseType: "json",
-    });
-    qualtricsDebug("qualtricsGet - response %O", response.body);
-    return response.body.result;
+    try {
+      const response = await this.client.get<QualtricsResponse<T>>(url.href, {
+        responseType: "json",
+      });
+      qualtricsDebug("qualtricsGet - response %O", response.body);
+      return response.body.result;
+    } catch (error) {
+      qualtricsDebug("qualtricsGet - error %O", error.response.statusCode);
+      throw error;
+    }
   }
 
   private async qualtricsGetArray<T>(url: URL) {

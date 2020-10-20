@@ -26,7 +26,7 @@ import { SurveyService } from "./survey.service";
 import { Int } from "@nestjs/graphql";
 import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
-import { Letter } from "../letter/entities";
+import { Group, Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
@@ -174,6 +174,13 @@ export class SurveyResolver {
   })
   resolveSurveyResponses(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyResponse, { survey });
+  }
+
+  @ResolveField("groups", (type) => [Group], {
+    description: "Groups using this survey",
+  })
+  resolveGroups(@Parent() survey: Survey) {
+    return this.surveyService.find(Group, { survey });
   }
 }
 

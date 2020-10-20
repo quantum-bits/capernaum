@@ -22,6 +22,31 @@ export interface ChangePasswordInput {
   newPassword: string;
 }
 
+export interface GroupCreateInput {
+  name: string;
+  type: string;
+  created: string;
+  closedAfter: string;
+  adminFirstName: string;
+  adminLastName: string;
+  adminEmail: string;
+  codeWord: string;
+  surveyId: number;
+}
+
+export interface GroupUpdateInput {
+  id: number;
+  name?: string | null;
+  type?: string | null;
+  created?: string | null;
+  closedAfter?: string | null;
+  adminFirstName?: string | null;
+  adminLastName?: string | null;
+  adminEmail?: string | null;
+  codeWord?: string | null;
+  surveyId?: number | null;
+}
+
 export interface ImageUpdateInput {
   id: number;
   title: string;

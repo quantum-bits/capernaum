@@ -13,8 +13,8 @@ export class PDFController {
     const filePath = this.pdfFileService.absolutePath(fileName);
     const options = {
       headers: {
-        "Content-Type": "application/pdf"
-      }
+        "Content-Type": "application/pdf",
+      },
     };
     res.sendFile(filePath, options);
   }

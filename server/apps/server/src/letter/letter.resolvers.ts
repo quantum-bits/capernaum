@@ -13,9 +13,16 @@ import {
   LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
+  LetterType,
+  LetterTypeCreateInput,
+  LetterTypeUpdateInput,
   LetterUpdateInput,
 } from "./entities";
-import { LetterService } from "./letter.service";
+import {
+  GroupService,
+  LetterService,
+  LetterTypeService,
+} from "./letter.service";
 import { Int } from "@nestjs/graphql";
 import { Survey, SurveyDimension } from "../survey/entities";
 import {
@@ -26,6 +33,7 @@ import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { SurveyService } from "@server/src/survey/survey.service";
+import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
 
 @Resolver((of) => Letter)
 @UseGuards(GqlAuthGuard)
@@ -147,5 +155,50 @@ export class LetterElementTypeResolver {
   @Query((returns) => [LetterElementType])
   letterElementTypes() {
     return this.letterService.letterElementTypes();
+  }
+}
+
+@Resolver("Group")
+export class GroupResolver {
+  constructor(private readonly groupService: GroupService) {}
+
+  @Mutation(() => Group)
+  createGroup(@Args("createInput") createInput: GroupCreateInput) {
+    return this.groupService.createGroup(createInput);
+  }
+
+  @Query(() => [Group])
+  readGroups() {
+    return this.groupService.readGroups();
+  }
+
+  @Mutation(() => Group)
+  updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
+    return this.groupService.updateGroup(updateInput);
+  }
+}
+
+@Resolver("LetterType")
+export class LetterTypeResolver {
+  constructor(private readonly lettertypeService: LetterTypeService) {}
+
+  @Mutation(() => LetterType)
+  createLetterType(@Args("createInput") createInput: LetterTypeCreateInput) {
+    return this.lettertypeService.createLetterType(createInput);
+  }
+
+  @Query(() => [LetterType])
+  readLetterTypes() {
+    return this.lettertypeService.readLetterTypes();
+  }
+
+  @Mutation(() => LetterType)
+  updateLetterType(@Args("updateInput") updateInput: LetterTypeUpdateInput) {
+    return this.lettertypeService.updateLetterType(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deleteLetterType(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.lettertypeService.deleteLetterType(id);
   }
 }

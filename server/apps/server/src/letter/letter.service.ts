@@ -1,6 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Letter, LetterElement, LetterElementType } from "./entities";
+import {
+  Group,
+  GroupCreateInput,
+  GroupUpdateInput,
+  Letter,
+  LetterElement,
+  LetterElementType,
+  LetterType,
+  LetterTypeCreateInput,
+  LetterTypeUpdateInput,
+} from "./entities";
 import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
@@ -52,5 +62,56 @@ export class LetterService extends BaseService {
       where: { letter },
       order: { sequence: "ASC" },
     });
+  }
+}
+
+@Injectable()
+export class GroupService extends BaseService {
+  constructor(
+    @InjectRepository(Group) private readonly groupRepo: Repository<Group>
+  ) {
+    super();
+  }
+
+  createGroup(createInput: GroupCreateInput) {
+    return this.groupRepo.save(this.groupRepo.create(createInput));
+  }
+
+  readGroups() {
+    return this.groupRepo.find();
+  }
+
+  updateGroup(updateInput: GroupUpdateInput) {
+    return this.groupRepo
+      .preload(updateInput)
+      .then((result) => this.groupRepo.save(result));
+  }
+}
+
+@Injectable()
+export class LetterTypeService extends BaseService {
+  constructor(
+    @InjectRepository(LetterType)
+    private readonly lettertypeRepo: Repository<LetterType>
+  ) {
+    super();
+  }
+
+  createLetterType(createInput: LetterTypeCreateInput) {
+    return this.lettertypeRepo.save(this.lettertypeRepo.create(createInput));
+  }
+
+  readLetterTypes() {
+    return this.lettertypeRepo.find();
+  }
+
+  updateLetterType(updateInput: LetterTypeUpdateInput) {
+    return this.lettertypeRepo
+      .preload(updateInput)
+      .then((result) => this.lettertypeRepo.save(result));
+  }
+
+  deleteLetterType(id: number) {
+    return this.lettertypeRepo.delete(id).then((result) => result.affected);
   }
 }

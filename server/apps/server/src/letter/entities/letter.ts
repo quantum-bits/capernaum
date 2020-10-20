@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
   OneToOne,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { LetterElement } from "./letter-element";
@@ -39,31 +39,22 @@ export class Letter extends AbstractEntity {
 
   @Field({ defaultValue: false })
   @Column()
-  isFrozen: boolean = false;
+  isFrozen: false;
 
-  @OneToOne(
-    type => Survey,
-    survey => survey.letter
-  )
+  @OneToOne((type) => Survey, (survey) => survey.letter)
   @JoinColumn()
-  @Field(type => Survey, { nullable: true })
+  @Field((type) => Survey, { nullable: true })
   survey?: Survey;
 
   @Column("int", { nullable: true })
   surveyId?: number;
 
-  @OneToMany(
-    type => LetterElement,
-    letterElement => letterElement.letter
-  )
-  @Field(type => [LetterElement])
+  @OneToMany((type) => LetterElement, (letterElement) => letterElement.letter)
+  @Field((type) => [LetterElement])
   letterElements: LetterElement[];
 
-  @OneToMany(
-    type => PredictionTableEntry,
-    entry => entry.letter
-  )
-  @Field(type => [PredictionTableEntry])
+  @OneToMany((type) => PredictionTableEntry, (entry) => entry.letter)
+  @Field((type) => [PredictionTableEntry])
   tableEntries: PredictionTableEntry[];
 }
 
@@ -73,15 +64,15 @@ export class LetterCreateInput {
   @Field() description: string;
   @Field() emailMessage: string;
   @Field({ nullable: true, defaultValue: false }) isFrozen?: boolean;
-  @Field(type => Int) surveyId: number;
+  @Field((type) => Int) surveyId: number;
 }
 
 @InputType()
 export class LetterUpdateInput {
-  @Field(type => Int) id: number;
+  @Field((type) => Int) id: number;
   @Field({ nullable: true }) title: string;
   @Field({ nullable: true }) description: string;
   @Field({ nullable: true }) emailMessage: string;
   @Field({ nullable: true }) isFrozen: boolean;
-  @Field(type => Int, { nullable: true }) surveyId: number;
+  @Field((type) => Int, { nullable: true }) surveyId: number;
 }

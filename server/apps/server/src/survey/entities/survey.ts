@@ -4,40 +4,32 @@ import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
-import { Letter } from "../../letter/entities";
+import { Group, Letter } from "../../letter/entities";
 import { SurveyResponse } from "./survey-response";
 
 @Entity()
 @ObjectType({
-  description: "All information about a survey imported from Qualtrics"
+  description: "All information about a survey imported from Qualtrics",
 })
 export class Survey extends AbstractEntity {
-  @OneToOne(
-    type => Letter,
-    letter => letter.survey
-  )
-  @Field(type => Letter, { nullable: true })
+  @OneToOne((type) => Letter, (letter) => letter.survey)
+  @Field((type) => Letter, { nullable: true })
   letter?: Letter;
 
-  @OneToMany(
-    type => SurveyItem,
-    item => item.survey
-  )
-  @Field(type => [SurveyItem])
+  @OneToMany((type) => SurveyItem, (item) => item.survey)
+  @Field((type) => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany(
-    type => SurveyDimension,
-    dimension => dimension.survey
-  )
-  @Field(type => [SurveyDimension])
+  @OneToMany((type) => Group, (item) => item.survey)
+  @Field((type) => [Group])
+  groups: Group[];
+
+  @OneToMany((type) => SurveyDimension, (dimension) => dimension.survey)
+  @Field((type) => [SurveyDimension])
   surveyDimensions: SurveyDimension[];
 
-  @OneToMany(
-    type => SurveyResponse,
-    response => response.survey
-  )
-  @Field(type => [SurveyResponse])
+  @OneToMany((type) => SurveyResponse, (response) => response.survey)
+  @Field((type) => [SurveyResponse])
   surveyResponses: SurveyResponse[];
 
   @Column()
@@ -50,24 +42,24 @@ export class Survey extends AbstractEntity {
 
   @Column()
   @Field({
-    description: "Date and time at which this survey was modified on Qualtrics"
+    description: "Date and time at which this survey was modified on Qualtrics",
   })
   qualtricsModDate: string;
 
   @Column({ default: "??" })
   @Field({
-    description: "Key of response value containing email address"
+    description: "Key of response value containing email address",
   })
   emailKey: string;
 
   @Column({ default: "??" })
   @Field({
-    description: "Key of response value containing group code"
+    description: "Key of response value containing group code",
   })
   groupCodeKey: string;
 
-  @Field(type => [ScriptureEngagementPractice], {
-    description: "Convenience property to retrieve SE practices"
+  @Field((type) => [ScriptureEngagementPractice], {
+    description: "Convenience property to retrieve SE practices",
   })
   scriptureEngagementPractices: ScriptureEngagementPractice[];
 
@@ -76,7 +68,7 @@ export class Survey extends AbstractEntity {
    * @param qualtricsId - qualtrics ID for item
    */
   findItem(qualtricsId: string) {
-    return this.surveyItems.find(item => item.qualtricsId === qualtricsId);
+    return this.surveyItems.find((item) => item.qualtricsId === qualtricsId);
   }
 
   /**
@@ -93,12 +85,13 @@ export class SurveyCreateInput {
   @Field() qualtricsId: string;
   @Field() qualtricsName: string;
   @Field() qualtricsModDate: string;
-  @Field(type => [SurveyItemCreateInput]) surveyItems: SurveyItemCreateInput[];
+  @Field((type) => [SurveyItemCreateInput])
+  surveyItems: SurveyItemCreateInput[];
 }
 
 @InputType()
 export class SurveyUpdateInput {
-  @Field(type => Int) id: number;
+  @Field((type) => Int) id: number;
   @Field({ nullable: true }) qualtricsId?: string;
   @Field({ nullable: true }) qualtricsName?: string;
   @Field({ nullable: true }) qualtricsModDate?: string;

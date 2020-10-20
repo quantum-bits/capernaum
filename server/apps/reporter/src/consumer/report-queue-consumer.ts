@@ -12,6 +12,9 @@ import { WriterService } from "@server/src/writer/writer.service";
 import { MailService } from "@server/src/mail/mail.service";
 
 import debug from "debug";
+import { PROM_METRIC_EMAILS_SENT } from "@apps/reporter/src/common";
+import { InjectMetric } from "@willsoto/nestjs-prometheus";
+import { Counter } from "prom-client";
 const qualtricsDebug = debug("qualtrics");
 
 @Processor(REPORTER_QUEUE_NAME)
@@ -23,7 +26,9 @@ export class ReportQueueConsumer {
     private readonly qualtricsApiService: QualtricsApiService,
     private readonly surveyService: SurveyService,
     private readonly writerService: WriterService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    @InjectMetric(PROM_METRIC_EMAILS_SENT)
+    private emails_sent_counter: Counter<string>
   ) {}
 
   @Process()
@@ -81,6 +86,7 @@ export class ReportQueueConsumer {
       attachmentPath: writerOutput.pdfAbsolutePath,
     });
     this.logger.debug("Sent email");
+    this.emails_sent_counter.inc();
     qualtricsDebug("mailInfo - %O", mailInfo);
 
     // Create event.

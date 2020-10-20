@@ -42,6 +42,92 @@ input EventCreateInput {
   details: String!
 }
 
+type Group {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Group name"""
+  name: String!
+
+  """Type of group"""
+  type: String!
+
+  """Date when survey created"""
+  created: String!
+
+  """Date when survey closes"""
+  closedAfter: String!
+
+  """Group administrator first name"""
+  adminFirstName: String!
+
+  """Group administrator last name"""
+  adminLastName: String!
+
+  """Group administrator email address"""
+  adminEmail: String!
+
+  """Survey code word used by group"""
+  codeWord: String!
+  survey: Survey!
+}
+
+input GroupCreateInput {
+  """Group name"""
+  name: String!
+
+  """Type of group"""
+  type: String!
+
+  """Date when survey created"""
+  created: String!
+
+  """Date when survey closes"""
+  closedAfter: String!
+
+  """Group administrator first name"""
+  adminFirstName: String!
+
+  """Group administrator last name"""
+  adminLastName: String!
+
+  """Group administrator email address"""
+  adminEmail: String!
+
+  """Survey code word used by group"""
+  codeWord: String!
+  surveyId: Int!
+}
+
+input GroupUpdateInput {
+  id: Int!
+
+  """Group name"""
+  name: String
+
+  """Type of group"""
+  type: String
+
+  """Date when survey created"""
+  created: String
+
+  """Date when survey closes"""
+  closedAfter: String
+
+  """Group administrator first name"""
+  adminFirstName: String
+
+  """Group administrator last name"""
+  adminLastName: String
+
+  """Group administrator email address"""
+  adminEmail: String
+
+  """Survey code word used by group"""
+  codeWord: String
+  surveyId: Int
+}
+
 type Image {
   """Unique ID for this entity"""
   id: Int!
@@ -126,6 +212,7 @@ type LetterElementType {
   id: Int!
   key: String!
   description: String!
+  letterTypes: [LetterType!]!
 }
 
 input LetterElementUpdateInput {
@@ -135,6 +222,32 @@ input LetterElementUpdateInput {
   imageId: Int
   letterElementTypeId: Int
   surveyDimensionId: Int
+}
+
+type LetterType {
+  """Unique ID for this entity"""
+  id: Int!
+  key: String!
+  description: String!
+  letterElementTypes: [LetterElementType!]!
+}
+
+input LetterTypeCreateInput {
+  """Human readable key"""
+  key: String!
+
+  """Description of this type"""
+  description: String!
+}
+
+input LetterTypeUpdateInput {
+  id: Int!
+
+  """Human readable key"""
+  key: String
+
+  """Description of this type"""
+  description: String
 }
 
 input LetterUpdateInput {
@@ -222,6 +335,11 @@ type Mutation {
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
   deleteLetter(id: Int!): Int!
   deleteLetterElement(id: Int!): Int!
+  createGroup(createInput: GroupCreateInput!): Group!
+  updateGroup(updateInput: GroupUpdateInput!): Group!
+  createLetterType(createInput: LetterTypeCreateInput!): LetterType!
+  updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
+  deleteLetterType(id: Int!): Int!
   updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
   writeLetter(writerInput: WriterInput!): WriterOutput!
@@ -347,6 +465,8 @@ type Query {
   letter(id: Int!): Letter!
   letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
+  readGroups: [Group!]!
+  readLetterTypes: [LetterType!]!
   images: [Image!]!
   image(id: Int!): Image!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
@@ -430,6 +550,9 @@ type Survey {
       Pass 'whichItems' to choose which to return (default 'All')
   """
   surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
+
+  """Groups using this survey"""
+  groups: [Group!]!
 
   """Dimensions for this survey; groups indices, which group items."""
   surveyDimensions: [SurveyDimension!]!

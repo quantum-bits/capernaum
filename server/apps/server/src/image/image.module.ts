@@ -10,6 +10,6 @@ import { PDFController } from "./pdf.controller";
 @Module({
   imports: [TypeOrmModule.forFeature([Image]), FileModule],
   controllers: [ImageController, PDFController],
-  providers: [ImageResolver, ImageService]
+  providers: [ImageResolver, ImageService],
 })
 export class ImageModule {}

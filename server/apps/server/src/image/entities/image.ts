@@ -33,13 +33,13 @@ export class Image extends AbstractEntity {
     return mimeType.replace(/\//g, ".");
   }
 
-  fileName() {
+  fileName(): string {
     return `${this.uuid}-${Image.extensionFromMimeType(this.mimeType)}`;
   }
 }
 
 @InputType()
 export class ImageUpdateInput {
-  @Field(type => Int) id: number;
+  @Field((type) => Int) id: number;
   @Field() title: string;
 }

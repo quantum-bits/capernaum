@@ -1,6 +1,7 @@
 import { Field, ObjectType } from "@nestjs/graphql";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { LetterType } from "@server/src/letter/entities/letter-type";
 
 @Entity()
 @ObjectType()
@@ -12,4 +13,12 @@ export class LetterElementType extends AbstractEntity {
   @Field()
   @Column()
   description: string;
+
+  @Field((returns) => [LetterType])
+  @ManyToMany(
+    (type) => LetterType,
+    (letterType) => letterType.letterElementTypes
+  )
+  @JoinTable()
+  letterTypes: LetterType[];
 }

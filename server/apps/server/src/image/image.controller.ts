@@ -9,7 +9,7 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "../file/file.service";
@@ -45,8 +45,8 @@ export class ImageController {
     );
     const options = {
       headers: {
-        "Content-Type": imageDetails.mimeType
-      }
+        "Content-Type": imageDetails.mimeType,
+      },
     };
     res.sendFile(imagePath, options);
   }
@@ -54,14 +54,14 @@ export class ImageController {
   @Delete()
   deleteImage(@Req() req) {
     getRawBody(req)
-      .then(async body => {
+      .then(async (body) => {
         const id = parseInt(body.toString());
         const imageDetails = await this.imageService.findOne(Image, id);
 
         await this.imageFileService.deleteFile(imageDetails.fileName());
         await this.imageService.delete(Image, id);
       })
-      .catch(err => {
+      .catch((err) => {
         throw err;
       });
   }
