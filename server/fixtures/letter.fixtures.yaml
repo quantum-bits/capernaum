@@ -5,6 +5,7 @@ fixtures:
         title: Abide Bible Letter
         description: Letter to send out to Abide Bible readers
         survey: ^survey.christian-life-survey
+        isFrozen: false
         created: 2018-01-10
         updated: 2018-03-25
   - table: letter_element

@@ -47,7 +47,7 @@ class EntityMetadata {
     throw new Error(
       `Can't find column '${columnName}' in ${
         this.entityName
-      }; tried ${candidates.map(candidate => `'${candidate}'`).join(", ")}`
+      }; tried ${candidates.map((candidate) => `'${candidate}'`).join(", ")}`
     );
   }
 
@@ -56,7 +56,7 @@ class EntityMetadata {
   }
 
   findColumn(columnName: string) {
-    return this.columns.find(column => column.name === columnName);
+    return this.columns.find((column) => column.name === columnName);
   }
 
   columnType(columnName: string) {
@@ -70,10 +70,10 @@ export default class EntityMetadataRegistry {
   constructor() {
     const connection = getConnection();
 
-    for (let entityMetadata of connection.entityMetadatas) {
+    for (const entityMetadata of connection.entityMetadatas) {
       const columnMetadata: ColumnMetadata[] = [];
 
-      for (let column of entityMetadata.columns) {
+      for (const column of entityMetadata.columns) {
         columnMetadata.push(
           new ColumnMetadata(
             column.propertyName,
@@ -105,7 +105,7 @@ export default class EntityMetadataRegistry {
     }
   }
 
-  findEntityMetadata(tableName: string) {
+  findEntityMetadata(tableName: string): EntityMetadata {
     return this.registry.get(tableName);
   }
 

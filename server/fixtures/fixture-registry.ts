@@ -16,7 +16,7 @@ export class ForeignKey {
     public readonly rowName: string
   ) {}
 
-  toString() {
+  toString(): string {
     return `ForeignKey<${this.tableName}.${this.rowName}>`;
   }
 }
@@ -58,14 +58,14 @@ class FixtureColumn {
 }
 
 class FixtureRow {
-  private _dbId: number = -1;
+  private _dbId = -1;
 
   constructor(public rowName: string, public columns: FixtureColumn[]) {}
 
   listForeignKeyDescriptors() {
     return this.columns
-      .filter(column => column.hasForeignKeyDescriptor())
-      .map(column => column.decodeForeignKeyDescriptor());
+      .filter((column) => column.hasForeignKeyDescriptor())
+      .map((column) => column.decodeForeignKeyDescriptor());
   }
 
   get databaseId() {
@@ -88,15 +88,15 @@ class Fixture {
   constructor(public tableName: string, public rows: FixtureRow[]) {}
 
   listForeignKeyDescriptors() {
-    return flatMap(this.rows, row => row.listForeignKeyDescriptors());
+    return flatMap(this.rows, (row) => row.listForeignKeyDescriptors());
   }
 
   listForeignTableNames() {
-    return uniq(this.listForeignKeyDescriptors().map(fk => fk.tableName));
+    return uniq(this.listForeignKeyDescriptors().map((fk) => fk.tableName));
   }
 
   findRow(rowName: string) {
-    const row = this.rows.find(row => row.rowName == rowName);
+    const row = this.rows.find((row) => row.rowName == rowName);
     if (!row) {
       throw new Error(
         `No row called '${rowName}' in '${this.tableName}' fixture `
@@ -112,9 +112,9 @@ export default class FixtureRegistry {
   constructor(baseDir) {
     const yamlFileNames = fs
       .readdirSync(baseDir)
-      .filter(name => name.endsWith(".fixtures.yaml"));
+      .filter((name) => name.endsWith(".fixtures.yaml"));
 
-    yamlFileNames.forEach(yamlFileName => {
+    yamlFileNames.forEach((yamlFileName) => {
       const doc = safeLoad(
         fs.readFileSync(path.join(baseDir, yamlFileName), "utf8")
       );
