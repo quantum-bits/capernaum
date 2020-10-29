@@ -1,9 +1,18 @@
 fixtures:
+  - table: letter_type
+    rows:
+      individual-letter:
+        key: INDIVIDUAL
+        description: Individual Letter
+      group-letter:
+        key: GROUP
+        description: Group Letter
   - table: letter
     rows:
       abide-letter:
         title: Abide Bible Letter
         description: Letter to send out to Abide Bible readers
+        letterType: ^letter_type.individual-letter
         survey: ^survey.christian-life-survey
         isFrozen: false
         created: 2018-01-10

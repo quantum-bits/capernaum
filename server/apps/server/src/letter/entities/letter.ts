@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   UpdateDateColumn,
@@ -13,6 +14,7 @@ import { LetterElement } from "./letter-element";
 import { PredictionTableEntry } from "../../prediction/entities";
 import { Survey } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
+import { LetterType } from "./letter-type";
 
 @Entity()
 @ObjectType()
@@ -48,6 +50,11 @@ export class Letter extends AbstractEntity {
 
   @Column("int", { nullable: true })
   surveyId?: number;
+
+  @Column("int") letterTypeId: number;
+  @ManyToOne((type) => LetterType)
+  @Field((type) => LetterType)
+  letterType: LetterType;
 
   @OneToMany((type) => LetterElement, (letterElement) => letterElement.letter)
   @Field((type) => [LetterElement])
