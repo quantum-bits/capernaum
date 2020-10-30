@@ -20,6 +20,8 @@ export class LetterService extends BaseService {
   constructor(
     @InjectRepository(Letter)
     private readonly letterRepo: Repository<Letter>,
+    @InjectRepository(LetterType)
+    private readonly letterTypeRepo: Repository<LetterType>,
     @InjectRepository(LetterElement)
     private readonly letterElementRepo: Repository<LetterElement>,
     @InjectRepository(LetterElementType)
@@ -36,7 +38,8 @@ export class LetterService extends BaseService {
       .leftJoinAndSelect("letter.letterElements", "letterElements")
       .leftJoinAndSelect("letterElements.letterElementType", "elementTypes")
       .leftJoinAndSelect("letterElements.image", "images")
-      .leftJoinAndSelect("letterElements.surveyDimension", "dimension")
+      .leftJoinAndSelect("letterElements.surveyDimension", `dimension`)
+      .leftJoinAndSelect("letter.letterType", "letterType")
       .where("letter.id = :id", { id })
       .orderBy("letterElements.sequence")
       .getOne();
