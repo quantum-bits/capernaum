@@ -121,6 +121,11 @@ export const ALL_LETTERS_QUERY = gql`
         description
         sequence
       }
+      letterType {
+        id
+        key
+        description
+      }
       tableEntries {
         id
         surveyIndex {
@@ -172,6 +177,16 @@ export const ALL_LETTERS_QUERY = gql`
           }
         }
       }
+    }
+  }
+`;
+
+export const ALL_LETTER_TYPES_QUERY = gql`
+  query ReadLetterTypes {
+    readLetterTypes {
+      id
+      key
+      description
     }
   }
 `;

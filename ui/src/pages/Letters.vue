@@ -29,6 +29,13 @@
             New Letter
           </v-btn>
         </span>
+        
+        <LetterTypeMenu
+          @click="addLetter($event)"
+          offset-y
+        />
+  
+
       </v-col>
     </v-row>
     <v-row>
@@ -108,6 +115,10 @@ import {
   AllSurveys_surveys as Survey,
 } from "@/graphql/types/AllSurveys";
 
+import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
+
+import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
+
 interface LetterInfo {
   title: string;
   isFrozen: boolean;
@@ -118,6 +129,9 @@ interface LetterInfo {
 }
 
 @Component({
+  components: {
+    LetterTypeMenu,
+  },
   apollo: {
     letterData: {
       query: ALL_LETTERS_QUERY,
@@ -199,6 +213,10 @@ export default class LettersPage extends Vue {
   newLetter(): void {
     console.log("create new letter");
     this.$router.push({ name: "compose" });
+  }
+
+  addLetter(readLetterType: ReadLetterTypes_readLetterTypes): void {
+    console.log('letter type: ', readLetterType);
   }
 
   viewAssociationTable(item: LetterInfo): void {
