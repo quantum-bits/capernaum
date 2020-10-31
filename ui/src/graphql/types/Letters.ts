@@ -17,6 +17,15 @@ export interface Letters_letters_scriptureEngagementPractices {
   sequence: number;
 }
 
+export interface Letters_letters_letterType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  key: string;
+  description: string;
+}
+
 export interface Letters_letters_tableEntries_surveyIndex_surveyItems {
   /**
    * Unique ID for this entity
@@ -175,6 +184,7 @@ export interface Letters_letters {
   updated: any;
   isFrozen: boolean;
   scriptureEngagementPractices: Letters_letters_scriptureEngagementPractices[];
+  letterType: Letters_letters_letterType;
   tableEntries: Letters_letters_tableEntries[];
   letterElements: Letters_letters_letterElements[];
   survey: Letters_letters_survey;

@@ -7,12 +7,22 @@
 // GraphQL query operation: AllSurveys
 // ====================================================
 
+export interface AllSurveys_surveys_letter_letterType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  key: string;
+  description: string;
+}
+
 export interface AllSurveys_surveys_letter {
   /**
    * Unique ID for this entity
    */
   id: number;
   title: string;
+  letterType: AllSurveys_surveys_letter_letterType;
 }
 
 export interface AllSurveys_surveys_surveyDimensions {
