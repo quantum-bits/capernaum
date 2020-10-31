@@ -126,12 +126,6 @@ export class SurveyService extends BaseService {
     );
   }
 
-  findLetter(surveyId: number) {
-    return this.entityManager.findOne(Letter, {
-      surveyId,
-    });
-  }
-
   findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
     const where = { survey };
 
