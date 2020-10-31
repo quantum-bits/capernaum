@@ -28,6 +28,11 @@ export const ALL_SURVEYS_QUERY = gql`
       letter {
         id
         title
+        letterType {
+          id
+          key
+          description
+        }
       }
       surveyDimensions {
         id

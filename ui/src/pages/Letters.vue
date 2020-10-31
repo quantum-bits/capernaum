@@ -47,6 +47,7 @@
               <!--<td class="text-xs-right">{{ item.description }}</td>-->
               <td class="text-xs-right">{{ item.surveyTitle }}</td>
               <td class="text-xs-right">{{ item.updated | dateAndTime }}</td>
+              <td class="text-xs-right">{{ item.letterType }}</td>
               <td class="text-xs-right">
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -164,6 +165,7 @@ export default class LettersPage extends Vue {
     },
     { text: "Survey", value: "surveyTitle" },
     { text: "Last Update", value: "lastUpdate" },
+    { text: "Type", value: "letterType" },
     { text: "Actions", sortable: false },
   ];
 
@@ -177,6 +179,7 @@ export default class LettersPage extends Vue {
       isFrozen: letter.isFrozen,
       surveyTitle: letter.survey.qualtricsName,
       updated: letter.updated,
+      letterType: letter.letterType.description,
       id: letter.id,
       canDelete: this.canDeleteLetter(letter),
     }));

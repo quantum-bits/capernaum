@@ -20,7 +20,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
+import { AllSurveys } from "@/graphql/types/AllSurveys";
 
 export default Vue.extend({
   name: "LetterTypeMenu",
@@ -29,11 +31,23 @@ export default Vue.extend({
     readLetterTypes: {
       query: ALL_LETTER_TYPES_QUERY,
     },
+    surveys: {
+      query: ALL_SURVEYS_QUERY,
+      update(data: AllSurveys) {
+        //this.allSurveysHaveLetters = data.surveys.every(
+        //  (survey) => survey.letter !== null
+        //);
+        console.log('surveys! ', data.surveys);
+        return data.surveys;
+      },
+      fetchPolicy: "network-only",
+    },
   },
 
   data() {
     return {
-      letterElementTypes: [],
+      //letterElementTypes: [],
+
     };
   },
 
