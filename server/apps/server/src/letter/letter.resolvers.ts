@@ -108,6 +108,11 @@ export class LetterResolver {
   resolveEntries(@Parent() letter: Letter) {
     return this.letterService.tableEntries(letter);
   }
+
+  @ResolveField("letterType", (type) => LetterType)
+  resolveLetterType(@Parent() letter: Letter) {
+    return this.letterService.findOneOrFail(LetterType, letter.letterTypeId);
+  }
 }
 
 @Resolver((of) => LetterElement)
