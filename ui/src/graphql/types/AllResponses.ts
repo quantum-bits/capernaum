@@ -7,7 +7,7 @@
 // GraphQL query operation: AllResponses
 // ====================================================
 
-export interface AllResponses_surveyResponses_survey_letter {
+export interface AllResponses_surveyResponses_survey_letters {
   /**
    * Unique ID for this entity
    */
@@ -27,9 +27,9 @@ export interface AllResponses_surveyResponses_survey {
    */
   qualtricsName: string;
   /**
-   * Fetch the (optional) letter for this survey
+   * Fetch the letters for this survey
    */
-  letter: AllResponses_surveyResponses_survey_letter | null;
+  letters: AllResponses_surveyResponses_survey_letters[];
 }
 
 export interface AllResponses_surveyResponses {

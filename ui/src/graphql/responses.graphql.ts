@@ -9,7 +9,7 @@ export const ALL_RESPONSES_QUERY = gql`
       survey {
         qualtricsId
         qualtricsName
-        letter {
+        letters {
           id
           title
           description

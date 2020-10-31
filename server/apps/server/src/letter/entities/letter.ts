@@ -43,13 +43,10 @@ export class Letter extends AbstractEntity {
   @Column()
   isFrozen: false;
 
-  @OneToOne((type) => Survey, (survey) => survey.letter)
-  @JoinColumn()
-  @Field((type) => Survey, { nullable: true })
+  @Column("int") surveyId?: number;
+  @ManyToOne((type) => Survey, (survey) => survey.letters)
+  @Field((type) => Survey)
   survey?: Survey;
-
-  @Column("int", { nullable: true })
-  surveyId?: number;
 
   @Column("int") letterTypeId: number;
   @ManyToOne((type) => LetterType)

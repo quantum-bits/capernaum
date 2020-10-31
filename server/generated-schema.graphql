@@ -542,8 +542,8 @@ type Survey {
   """Unique ID for this entity"""
   id: Int!
 
-  """Fetch the (optional) letter for this survey"""
-  letter: Letter
+  """Fetch the letters for this survey"""
+  letters: [Letter!]!
 
   """
   All the Qualtrics items for this survey; 

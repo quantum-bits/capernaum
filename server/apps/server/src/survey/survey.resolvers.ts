@@ -136,12 +136,11 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyResponse(id);
   }
 
-  @ResolveField("letter", (type) => Letter, {
-    nullable: true,
-    description: "Fetch the (optional) letter for this survey",
+  @ResolveField("letters", (type) => [Letter], {
+    description: "Fetch the letters for this survey",
   })
-  resolveLetter(@Parent() survey: Survey) {
-    return this.surveyService.findLetter(survey.id);
+  resolveLetters(@Parent() survey: Survey) {
+    return this.surveyService.find(Letter, { surveyId: survey.id });
   }
 
   @ResolveField("surveyItems", (type) => [SurveyItem], {

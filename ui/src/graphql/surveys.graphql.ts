@@ -25,7 +25,7 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsId
       qualtricsName
       qualtricsModDate
-      letter {
+      letters {
         id
         title
         letterType {
