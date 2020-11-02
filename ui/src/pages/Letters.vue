@@ -5,7 +5,7 @@
         <h1 class="headline">Letters</h1>
       </v-col>
       <v-col class="text-xs-right">
-        <span v-if="allSurveysHaveLetters">
+        <span v-if="!canCreateLetter">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">
@@ -23,19 +23,19 @@
         <span v-else>
           <v-btn
             color="primary"
-            :disabled="allSurveysHaveLetters"
+            :disabled="!canCreateLetter"
             @click="newLetter"
           >
             New Letter
           </v-btn>
         </span>
-        
+        <NewLetterButton @click="addLetter($event)" offset-y />
+        <!--
         <LetterTypeMenu
           @click="addLetter($event)"
           offset-y
         />
-  
-
+        -->
       </v-col>
     </v-row>
     <v-row>
@@ -119,6 +119,7 @@ import {
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 
 import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
+import NewLetterButton from "@/components/NewLetterButton.vue";
 
 interface LetterInfo {
   title: string;
@@ -132,6 +133,7 @@ interface LetterInfo {
 @Component({
   components: {
     LetterTypeMenu,
+    NewLetterButton,
   },
   apollo: {
     letterData: {
@@ -146,12 +148,12 @@ interface LetterInfo {
 
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      update(data: AllSurveys) {
-        this.allSurveysHaveLetters = data.surveys.every(
-          (survey) => survey.letter !== null
-        );
-        return data.surveys;
-      },
+      //update(data: AllSurveys) {
+      //  this.allSurveysHaveLetters = data.surveys.every(
+      //    (survey) => survey.letter !== null
+      //  );
+      //  return data.surveys;
+      //},
       fetchPolicy: "network-only",
     },
   },
@@ -171,7 +173,7 @@ export default class LettersPage extends Vue {
 
   letterData: Letters_letters[] = [];
   surveys: Survey[] = [];
-  allSurveysHaveLetters = false;
+  //allSurveysHaveLetters = false;
 
   get letters(): LetterInfo[] {
     return this.letterData.map((letter: Letters_letters) => ({
@@ -183,6 +185,10 @@ export default class LettersPage extends Vue {
       id: letter.id,
       canDelete: this.canDeleteLetter(letter),
     }));
+  }
+
+  get canCreateLetter(): boolean {
+    return false;
   }
 
   canDeleteLetter(letter: Letters_letters): boolean {
@@ -218,8 +224,9 @@ export default class LettersPage extends Vue {
     this.$router.push({ name: "compose" });
   }
 
-  addLetter(readLetterType: ReadLetterTypes_readLetterTypes): void {
-    console.log('letter type: ', readLetterType);
+  addLetter(event: string): void {
+    console.log("create new letter!", event);
+    this.$router.push({ name: "compose" });
   }
 
   viewAssociationTable(item: LetterInfo): void {
