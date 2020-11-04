@@ -17,6 +17,15 @@ export interface OneLetter_letter_scriptureEngagementPractices {
   sequence: number;
 }
 
+export interface OneLetter_letter_letterType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  key: string;
+  description: string;
+}
+
 export interface OneLetter_letter_tableEntries_surveyIndex_surveyItems {
   /**
    * Qualtrics identifier for this question
@@ -190,6 +199,7 @@ export interface OneLetter_letter {
   isFrozen: boolean;
   emailMessage: string;
   scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[];
+  letterType: OneLetter_letter_letterType;
   tableEntries: OneLetter_letter_tableEntries[];
   letterElements: OneLetter_letter_letterElements[];
   survey: OneLetter_letter_survey;

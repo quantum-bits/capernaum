@@ -45,6 +45,11 @@ export const ONE_LETTER_QUERY = gql`
         description
         sequence
       }
+      letterType {
+        id
+        key
+        description
+      }
       tableEntries {
         surveyIndex {
           id

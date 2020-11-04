@@ -5,7 +5,7 @@
     </v-flex>
     <v-flex xs12 sm6 offset-sm2>
       <v-form ref="form" v-model="valid" lazy-validation>
-        <LetterTypeMenu @click="addLetter($event)" offset-y />
+        <LetterTypeMenu v-if="isNew" @click="addLetter($event)" offset-y />
         <v-text-field
           v-model="title"
           :counter="80"
@@ -40,6 +40,10 @@
     </v-flex>
     <v-flex v-if="!isNew" xs12 sm11 offset-sm1>
       <h2 class="title font-weight-regular mb-1 mt-6">
+        Letter Type:
+        <span class="font-weight-light">{{ letterTypeDescription }}</span>
+      </h2>
+      <h2 class="title font-weight-regular mb-1 mt-1">
         Survey:
         <span class="font-weight-light">{{ surveyTitle }}</span>
       </h2>
@@ -92,6 +96,7 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) id!: number;
   @Prop({ default: null }) initialTitle!: string;
   @Prop({ default: null }) initialDescription!: string;
+  @Prop({ default: null }) letterTypeDescription!: string;
   @Prop({ default: -Infinity }) surveyId!: number; // no id will be -Infinity, so this is presumably safe
   //@Prop({ default: null })
   //initialBooleanAssociation!: BooleanAssociationBriefType | null;
@@ -161,6 +166,7 @@ export default class LetterInfoForm extends Vue {
                 description: this.description,
                 isFrozen: false,
                 surveyId: this.surveySelect.value,
+                letterTypeId: this.letterTypeSelect.id,
                 emailMessage: JSON.stringify({
                   ops: [],
                 }),
@@ -224,7 +230,7 @@ export default class LetterInfoForm extends Vue {
   // https://github.com/kaorun343/vue-property-decorator/issues/85
   // .filter(...).map(...) might not be the fastest approach (https://stackoverflow.com/questions/34398279/map-and-filter-an-array-at-the-same-time)
   get selections(): SurveySelection[] {
-    let surveyOptions: {text: string, value: number}[] = [];
+    let surveyOptions: { text: string; value: number }[] = [];
     this.surveys.forEach((survey) => {
       let includeSurvey = true;
       survey.letters.forEach((letter) => {

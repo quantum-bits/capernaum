@@ -9,7 +9,7 @@
         </span>
       </template>
       <span
-        >All imported surveys already have a letter. To create another letter,
+        >All imported surveys already have letters of all types. To create another letter,
         please import a survey first.</span
       >
     </v-tooltip>

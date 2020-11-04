@@ -5,6 +5,7 @@
         <h1 class="headline">Letters</h1>
       </v-col>
       <v-col class="text-xs-right">
+        <!--
         <span v-if="!canCreateLetter">
           <v-tooltip bottom>
             <template v-slot:activator="{ on }">
@@ -29,13 +30,8 @@
             New Letter
           </v-btn>
         </span>
-        <NewLetterButton @click="addLetter($event)" offset-y />
-        <!--
-        <LetterTypeMenu
-          @click="addLetter($event)"
-          offset-y
-        />
         -->
+        <NewLetterButton @click="addLetter($event)" offset-y />
       </v-col>
     </v-row>
     <v-row>

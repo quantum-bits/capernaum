@@ -100,6 +100,10 @@
             <span class="font-weight-light">{{ letter.description }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
+            Letter Type:
+            <span class="font-weight-light">{{ letter.letterType.description }}</span>
+          </h2>
+          <h2 class="title font-weight-regular mb-1">
             Survey:
             <span class="font-weight-light">
               {{ theLetter.survey.qualtricsName }}
@@ -125,6 +129,7 @@
         :surveyId="letter.survey.id"
         :initialTitle="letter.title"
         :initialDescription="letter.description"
+        :letterTypeDescription="letter.letterType.description"
         :isNew="isNew"
         v-on:letter-info-updated="letterInfoUpdated"
       >
