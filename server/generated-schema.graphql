@@ -186,6 +186,7 @@ input LetterCreateInput {
   emailMessage: String!
   isFrozen: Boolean = false
   surveyId: Int!
+  letterTypeId: Int!
 }
 
 type LetterElement {
@@ -258,6 +259,7 @@ input LetterUpdateInput {
   emailMessage: String
   isFrozen: Boolean
   surveyId: Int
+  letterTypeId: Int
 }
 
 input LoginCredentials {

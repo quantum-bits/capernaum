@@ -58,6 +58,7 @@ export interface LetterCreateInput {
   emailMessage: string;
   isFrozen?: boolean | null;
   surveyId: number;
+  letterTypeId: number;
 }
 
 export interface LetterElementCreateInput {
@@ -85,6 +86,7 @@ export interface LetterUpdateInput {
   emailMessage?: string | null;
   isFrozen?: boolean | null;
   surveyId?: number | null;
+  letterTypeId?: number | null;
 }
 
 export interface LoginCredentials {

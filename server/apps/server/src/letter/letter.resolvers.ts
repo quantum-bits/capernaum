@@ -96,7 +96,6 @@ export class LetterResolver {
 
   @ResolveField("survey", (type) => Survey)
   resolveSurvey(@Parent() letter: Letter) {
-    console.log("RESOLVE SURVEY FOR LETTER", letter);
     return this.surveyService.findOne(Survey, letter.surveyId);
   }
 
