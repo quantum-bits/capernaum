@@ -5,6 +5,7 @@
     </v-flex>
     <v-flex xs12 sm6 offset-sm2>
       <v-form ref="form" v-model="valid" lazy-validation>
+        <LetterTypeMenu @click="addLetter($event)" offset-y />
         <v-text-field
           v-model="title"
           :counter="80"
@@ -24,6 +25,7 @@
           v-model="surveySelect"
           :items="selections"
           :rules="surveySelectionRules"
+          :disabled="!letterTypeSelected"
           label="Survey"
           required
           persistent-hint
@@ -52,6 +54,10 @@ import { Component, Emit, Prop, Vue } from "vue-property-decorator";
 //import gql from "graphql-tag";
 
 //import { BooleanAssociationBriefType } from "@/types/association-table.types";
+import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
+
+import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
+
 import { SurveySelection } from "@/pages/survey.types";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
@@ -71,6 +77,9 @@ import {
 //   [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
 // }
 @Component({
+  components: {
+    LetterTypeMenu,
+  },
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY,
@@ -99,6 +108,12 @@ export default class LetterInfoForm extends Vue {
     value: -Infinity,
   };
 
+  letterTypeSelect: ReadLetterTypes_readLetterTypes = {
+    description: "",
+    id: -Infinity,
+    key: "",
+  };
+
   valid = true;
   //name: string = "";
   titleRules = [
@@ -116,6 +131,12 @@ export default class LetterInfoForm extends Vue {
       (v && v.value !== -Infinity) ||
       "Survey is required.  Note that only one letter may be associated with each imported survey, so if no surveys show up in the above list, it may mean that all surveys already have a letter.",
   ];
+
+  addLetter(letterType: ReadLetterTypes_readLetterTypes): void {
+    console.log("letter type chosen!", letterType);
+    this.letterTypeSelect = letterType;
+    console.log(this.letterTypeSelect);
+  }
 
   submit(): void {
     // TODO:
@@ -203,12 +224,32 @@ export default class LetterInfoForm extends Vue {
   // https://github.com/kaorun343/vue-property-decorator/issues/85
   // .filter(...).map(...) might not be the fastest approach (https://stackoverflow.com/questions/34398279/map-and-filter-an-array-at-the-same-time)
   get selections(): SurveySelection[] {
-    return this.surveys
-      .filter((survey) => !survey.letter)
-      .map((survey) => ({
-        text: survey.qualtricsName,
-        value: survey.id,
-      }));
+    let surveyOptions: {text: string, value: number}[] = [];
+    this.surveys.forEach((survey) => {
+      let includeSurvey = true;
+      survey.letters.forEach((letter) => {
+        if (letter.letterType.id === this.letterTypeSelect.id) {
+          includeSurvey = false;
+        }
+      });
+      if (includeSurvey) {
+        surveyOptions.push({
+          text: survey.qualtricsName,
+          value: survey.id,
+        });
+      }
+    });
+    return surveyOptions;
+    //return this.surveys
+    //  .filter((survey) => !survey.letter)
+    //  .map((survey) => ({
+    //    text: survey.qualtricsName,
+    //    value: survey.id,
+    //  }));
+  }
+
+  get letterTypeSelected(): boolean {
+    return !(this.letterTypeSelect.id === -Infinity);
   }
 
   get surveyTitle(): string {

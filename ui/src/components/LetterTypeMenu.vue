@@ -1,31 +1,17 @@
 <template>
-  <v-tooltip bottom>
-    <template v-slot:activator="{ on }">
-      <span v-on="on">
-        <v-menu>
-          <template v-slot:activator="{ on }">
-            <v-btn color="primary" dark v-on="on">
-              Add Letter
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item
-              v-for="item in letterTypes"
-              :key="item.key"
-              :disabled="!item.allowAddLetter"
-              @click="emitLetterType(item)"
-            >
-              <v-list-item-title>{{ item.description }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </span>
-    </template>
-    <span
-      >All imported surveys already have a letter. To create another letter,
-      please import a survey first.</span
-    >
-  </v-tooltip>
+  <v-select
+    v-model="letterTypeSelect"
+    :items="letterTypes"
+    :rules="letterTypeSelectionRules"
+    label="Type of Letter"
+    item-text="description"
+    item-value="id"
+    required
+    persistent-hint
+    return-object
+    single-line
+    @change="emitLetterType()"
+  />
 </template>
 
 <script lang="ts">
@@ -67,17 +53,29 @@ export default Vue.extend({
     return {
       readLetterTypes: [] as ReadLetterTypes_readLetterTypes[],
       surveys: [] as AllSurveys_surveys[],
+      letterTypeSelect: {
+        description: "",
+        id: -Infinity,
+        key: "",
+      } as ReadLetterTypes_readLetterTypes,
+      letterTypeSelectionRules: [
+        (v: LetterType): string | boolean =>
+        (v && v.id !== -Infinity) ||
+        "Type of letter is required.  Note that only one letter of each type may be associated with each imported survey, so if no letter types show up in the above list, it may mean that all surveys already have a letter of all possible types.",
+      ],
     };
   },
 
   computed: {
     letterTypes(): LetterType[] {
       // https://stackoverflow.com/questions/38922998/add-property-to-an-array-of-objects
-      let letterTypeArray: LetterType[] = this.readLetterTypes.map((obj) => ({
-        ...obj,
-        allowAddLetter: true,
-      }));
-      letterTypeArray.forEach((letterType: LetterType) => {
+      //let letterTypeArray: LetterType[] = this.readLetterTypes.map((obj) => ({
+      //  ...obj,
+      //  allowAddLetter: true,
+      //}));
+      let allowedLetterTypes: ReadLetterTypes_readLetterTypes[] = [];
+
+      this.readLetterTypes.forEach((letterType: ReadLetterTypes_readLetterTypes) => {
         let allowAddLetter = false;
 
         this.surveys.forEach((survey) => {
@@ -91,16 +89,24 @@ export default Vue.extend({
             allowAddLetter = true;
           }
         });
-        letterType.allowAddLetter = allowAddLetter;
+        //letterType.allowAddLetter = allowAddLetter;
+        if (allowAddLetter) {
+          allowedLetterTypes.push(letterType);
+        }
       });
-      console.log("computed letter type array:", letterTypeArray);
-      return letterTypeArray;
+      //console.log("computed letter type array:", letterTypeArray);
+      console.log("allowed letter types: ", allowedLetterTypes);
+
+      return allowedLetterTypes;
     },
   },
 
   methods: {
-    emitLetterType(readLetterType: ReadLetterTypes_readLetterTypes) {
-      this.$emit("click", readLetterType);
+    //emitLetterType(readLetterType: ReadLetterTypes_readLetterTypes) {
+    //  this.$emit("click", this.letterTypeSelect);
+    //},
+    emitLetterType() {
+      this.$emit("click", this.letterTypeSelect);
     },
   },
 });
