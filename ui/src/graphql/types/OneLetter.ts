@@ -17,6 +17,15 @@ export interface OneLetter_letter_scriptureEngagementPractices {
   sequence: number;
 }
 
+export interface OneLetter_letter_letterType_letterElementTypes {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  key: string;
+  description: string;
+}
+
 export interface OneLetter_letter_letterType {
   /**
    * Unique ID for this entity
@@ -24,6 +33,7 @@ export interface OneLetter_letter_letterType {
   id: number;
   key: string;
   description: string;
+  letterElementTypes: OneLetter_letter_letterType_letterElementTypes[];
 }
 
 export interface OneLetter_letter_tableEntries_surveyIndex_surveyItems {

@@ -49,6 +49,11 @@ export const ONE_LETTER_QUERY = gql`
         id
         key
         description
+        letterElementTypes {
+          id
+          key
+          description
+        }
       }
       tableEntries {
         surveyIndex {
@@ -130,6 +135,11 @@ export const ALL_LETTERS_QUERY = gql`
         id
         key
         description
+        letterElementTypes {
+          id
+          key
+          description
+        }
       }
       tableEntries {
         id
