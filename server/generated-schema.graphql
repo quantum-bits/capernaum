@@ -13,19 +13,20 @@ type ScriptureEngagementPractice {
   predictionTableEntries: [PredictionTableEntry!]!
 }
 
-type LetterElementType {
-  """Unique ID for this entity"""
-  id: Int!
-  key: String!
-  description: String!
-}
-
 type LetterType {
   """Unique ID for this entity"""
   id: Int!
   key: String!
   description: String!
   letterElementTypes: [LetterElementType!]!
+}
+
+type LetterElementType {
+  """Unique ID for this entity"""
+  id: Int!
+  key: String!
+  description: String!
+  letterTypes: [LetterType!]!
 }
 
 type Letter {
