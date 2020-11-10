@@ -19,6 +19,5 @@ export class LetterElementType extends AbstractEntity {
     (type) => LetterType,
     (letterType) => letterType.letterElementTypes
   )
-  @JoinTable()
   letterTypes: LetterType[];
 }

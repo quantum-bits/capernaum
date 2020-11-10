@@ -34,6 +34,7 @@ const options: ConnectionOptions = {
   database: process.env.PG_DATABASE,
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
+  logging: true,
   entities: [
     Event,
     Group,

@@ -15,6 +15,9 @@ import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
 
+import Debug from "debug";
+const debug = Debug("letter:service");
+
 @Injectable()
 export class LetterService extends BaseService {
   constructor(
@@ -33,19 +36,20 @@ export class LetterService extends BaseService {
   }
 
   letter(id: number) {
-    return this.letterRepo
-      .createQueryBuilder("letter")
-      .leftJoinAndSelect("letter.letterElements", "letterElements")
-      .leftJoinAndSelect("letterElements.letterElementType", "elementTypes")
-      .leftJoinAndSelect("letterElements.image", "images")
-      .leftJoinAndSelect("letterElements.surveyDimension", `dimension`)
-      .leftJoinAndSelect("letter.letterType", "letterType")
-      .where("letter.id = :id", { id })
-      .orderBy("letterElements.sequence")
-      .getOne();
+    return this.letterRepo.findOneOrFail(id, {
+      relations: [
+        "letterType",
+        "letterType.letterElementTypes",
+        "letterElements",
+        "letterElements.letterElementType",
+        "letterElements.image",
+        "letterElements.surveyDimension",
+      ],
+    });
   }
 
   letterElementTypes() {
+    debug("Called letterElementTypes");
     return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
   }
 
@@ -54,6 +58,7 @@ export class LetterService extends BaseService {
    * @param letter
    */
   letterElements(letter: Letter) {
+    debug("Called letterElements");
     return this.letterElementRepo.find({
       where: { letter },
       order: { sequence: "ASC" },
@@ -95,26 +100,57 @@ export class GroupService extends BaseService {
 export class LetterTypeService extends BaseService {
   constructor(
     @InjectRepository(LetterType)
-    private readonly lettertypeRepo: Repository<LetterType>
+    private readonly letterTypeRepo: Repository<LetterType>,
+    @InjectRepository(LetterElementType)
+    private readonly letterElementTypeRepo: Repository<LetterElementType>
   ) {
     super();
   }
 
   createLetterType(createInput: LetterTypeCreateInput) {
-    return this.lettertypeRepo.save(this.lettertypeRepo.create(createInput));
+    return this.letterTypeRepo.save(this.letterTypeRepo.create(createInput));
   }
 
   readLetterTypes() {
-    return this.lettertypeRepo.find();
+    debug("readLetterTypes");
+    return this.letterTypeRepo.find({ relations: ["letterElementTypes"] });
+  }
+
+  readLetterElementTypes(letterType: LetterType) {
+    debug("readLetterElementTypes(%O)", letterType);
+    return this.letterElementTypeRepo
+      .createQueryBuilder("letterElementType")
+      .leftJoinAndSelect("letterElementType.letterTypes", "letterType")
+      .where("letterType.id = :id", { id: letterType.id })
+      .getMany();
   }
 
   updateLetterType(updateInput: LetterTypeUpdateInput) {
-    return this.lettertypeRepo
+    return this.letterTypeRepo
       .preload(updateInput)
-      .then((result) => this.lettertypeRepo.save(result));
+      .then((result) => this.letterTypeRepo.save(result));
   }
 
   deleteLetterType(id: number) {
-    return this.lettertypeRepo.delete(id).then((result) => result.affected);
+    return this.letterTypeRepo.delete(id).then((result) => result.affected);
+  }
+}
+
+@Injectable()
+export class LetterElementTypeService extends BaseService {
+  constructor(
+    @InjectRepository(LetterType)
+    private readonly letterTypeRepo: Repository<LetterType>
+  ) {
+    super();
+  }
+
+  readLetterTypes(letterElementType: LetterElementType) {
+    debug("readLetterTypes(%O)", letterElementType);
+    return this.letterTypeRepo
+      .createQueryBuilder("letterType")
+      .leftJoinAndSelect("letterType.letterElementTypes", "letterElementType")
+      .where("letterElementType.id = :id", { id: letterElementType.id })
+      .getMany();
   }
 }

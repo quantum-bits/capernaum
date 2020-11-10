@@ -16,6 +16,7 @@ import {
 } from "./letter.resolvers";
 import {
   GroupService,
+  LetterElementTypeService,
   LetterService,
   LetterTypeService,
 } from "./letter.service";
@@ -44,6 +45,7 @@ import { SurveyModule } from "@server/src/survey/survey.module";
     LetterTypeResolver,
     GroupService,
     GroupResolver,
+    LetterElementTypeService,
   ],
   exports: [LetterService],
 })

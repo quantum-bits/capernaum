@@ -20,6 +20,7 @@ import {
 } from "./entities";
 import {
   GroupService,
+  LetterElementTypeService,
   LetterService,
   LetterTypeService,
 } from "./letter.service";
@@ -34,6 +35,9 @@ import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
+
+import Debug from "debug";
+const debug = Debug("letter:resolver");
 
 @Resolver((of) => Letter)
 @UseGuards(GqlAuthGuard)
@@ -111,6 +115,7 @@ export class LetterResolver {
 
   @ResolveField("letterType", (type) => LetterType)
   resolveLetterType(@Parent() letter: Letter) {
+    debug("resolveLetterType(%O)", letter);
     return this.letterService.findOneOrFail(LetterType, letter.letterTypeId);
   }
 }
@@ -155,15 +160,25 @@ export class LetterElementResolver {
 @Resolver((of) => LetterElementType)
 @UseGuards(GqlAuthGuard)
 export class LetterElementTypeResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    private readonly letterService: LetterService,
+    private readonly letterElementTypeService: LetterElementTypeService
+  ) {}
 
   @Query((returns) => [LetterElementType])
   letterElementTypes() {
     return this.letterService.letterElementTypes();
   }
+
+  @ResolveField("letterTypes", (returns) => [LetterType])
+  resolveLetterTypes(@Parent() letterElementType: LetterElementType) {
+    debug("resolveLetterTypes(%O)", letterElementType);
+    return this.letterElementTypeService.readLetterTypes(letterElementType);
+  }
 }
 
 @Resolver("Group")
+@UseGuards(GqlAuthGuard)
 export class GroupResolver {
   constructor(private readonly groupService: GroupService) {}
 
@@ -183,27 +198,34 @@ export class GroupResolver {
   }
 }
 
-@Resolver("LetterType")
+@Resolver((of) => LetterType)
+@UseGuards(GqlAuthGuard)
 export class LetterTypeResolver {
-  constructor(private readonly lettertypeService: LetterTypeService) {}
+  constructor(private readonly letterTypeService: LetterTypeService) {}
 
   @Mutation(() => LetterType)
   createLetterType(@Args("createInput") createInput: LetterTypeCreateInput) {
-    return this.lettertypeService.createLetterType(createInput);
+    return this.letterTypeService.createLetterType(createInput);
   }
 
   @Query(() => [LetterType])
   readLetterTypes() {
-    return this.lettertypeService.readLetterTypes();
+    return this.letterTypeService.readLetterTypes();
   }
 
   @Mutation(() => LetterType)
   updateLetterType(@Args("updateInput") updateInput: LetterTypeUpdateInput) {
-    return this.lettertypeService.updateLetterType(updateInput);
+    return this.letterTypeService.updateLetterType(updateInput);
   }
 
   @Mutation(() => Int)
   deleteLetterType(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.lettertypeService.deleteLetterType(id);
+    return this.letterTypeService.deleteLetterType(id);
+  }
+
+  @ResolveField("letterElementTypes", (returns) => [LetterElementType])
+  resolveLetterElementTypes(@Parent() letterType: LetterType) {
+    debug("resolveLetterElementTypes(%O)", letterType);
+    return this.letterTypeService.readLetterElementTypes(letterType);
   }
 }

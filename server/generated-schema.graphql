@@ -2,15 +2,47 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input ChangePasswordInput {
-  userId: Int!
-  currentPassword: String!
-  newPassword: String!
+"""Scripture engagement practice"""
+type ScriptureEngagementPractice {
+  """Unique ID for this entity"""
+  id: Int!
+  title: String!
+  description: String!
+  moreInfoUrl: String!
+  sequence: Int!
+  predictionTableEntries: [PredictionTableEntry!]!
 }
 
-type ChartEntry {
+type LetterType {
+  """Unique ID for this entity"""
+  id: Int!
+  key: String!
+  description: String!
+  letterElementTypes: [LetterElementType!]!
+}
+
+type LetterElementType {
+  """Unique ID for this entity"""
+  id: Int!
+  key: String!
+  description: String!
+  letterTypes: [LetterType!]!
+}
+
+type Letter {
+  """Unique ID for this entity"""
+  id: Int!
   title: String!
-  value: Int!
+  description: String!
+  emailMessage: String!
+  created: DateTime!
+  updated: DateTime!
+  isFrozen: Boolean!
+  survey: Survey!
+  letterType: LetterType!
+  letterElements: [LetterElement!]!
+  tableEntries: [PredictionTableEntry!]!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
 """
@@ -18,28 +50,29 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type DimensionSummary {
-  id: Int!
-  title: String!
-  indexSummaries: [IndexSummary!]!
-}
-
-type Envelope {
-  from: String!
-  to: [String!]!
-}
-
-type Event {
+type Image {
   """Unique ID for this entity"""
   id: Int!
-  date: String!
-  type: String!
-  details: String!
+  originalName: String!
+  mimeType: String!
+  uuid: String!
+  title: String!
+  created: DateTime!
+  updated: DateTime!
+  url: String!
+  fullPath: String!
+  letterElements: [LetterElement!]!
 }
 
-input EventCreateInput {
-  type: String!
-  details: String!
+type LetterElement {
+  """Unique ID for this entity"""
+  id: Int!
+  sequence: Int!
+  textDelta: String
+  image: Image
+  letter: Letter!
+  letterElementType: LetterElementType!
+  surveyDimension: SurveyDimension
 }
 
 type Group {
@@ -72,87 +105,184 @@ type Group {
   survey: Survey!
 }
 
-input GroupCreateInput {
-  """Group name"""
-  name: String!
-
-  """Type of group"""
-  type: String!
-
-  """Date when survey created"""
-  created: String!
-
-  """Date when survey closes"""
-  closedAfter: String!
-
-  """Group administrator first name"""
-  adminFirstName: String!
-
-  """Group administrator last name"""
-  adminLastName: String!
-
-  """Group administrator email address"""
-  adminEmail: String!
-
-  """Survey code word used by group"""
-  codeWord: String!
-  surveyId: Int!
-}
-
-input GroupUpdateInput {
-  id: Int!
-
-  """Group name"""
-  name: String
-
-  """Type of group"""
-  type: String
-
-  """Date when survey created"""
-  created: String
-
-  """Date when survey closes"""
-  closedAfter: String
-
-  """Group administrator first name"""
-  adminFirstName: String
-
-  """Group administrator last name"""
-  adminLastName: String
-
-  """Group administrator email address"""
-  adminEmail: String
-
-  """Survey code word used by group"""
-  codeWord: String
-  surveyId: Int
-}
-
-type Image {
+"""One entry in a prediction table"""
+type PredictionTableEntry {
   """Unique ID for this entity"""
   id: Int!
-  originalName: String!
-  mimeType: String!
-  uuid: String!
-  title: String!
-  created: DateTime!
-  updated: DateTime!
-  url: String!
-  fullPath: String!
-  letterElements: [LetterElement!]!
+  letter: Letter!
+  surveyIndex: SurveyIndex!
+  practice: ScriptureEngagementPractice!
+  sequence: Int!
 }
 
-input ImageUpdateInput {
-  id: Int!
+type ChartEntry {
   title: String!
+  value: Int!
 }
 
-type IndexSummary {
-  id: Int!
+type PredictionDetails {
   title: String!
   abbreviation: String!
   meanResponse: Float!
-  itemSummaries: [ItemSummary!]!
+}
+
+type QualtricsResponseImportStats {
+  importCount: Int!
+  duplicateCount: Int!
+  surveyResponses: [SurveyResponse!]!
+}
+
+"""Top-level grouping of questions in Capernaum; contains indices"""
+type SurveyDimension {
+  """Unique ID for this entity"""
+  id: Int!
+  survey: Survey
+  surveyIndices: [SurveyIndex!]!
+
+  """Title of this dimension (e.g., 'Focus on Prayer')"""
+  title: String!
+
+  """Sequence number; dimension are displayed in this order."""
+  sequence: Int!
+}
+
+type SurveyDimensionDeleteOutput {
+  """ID of deleted dimension"""
+  deletedDimensionId: Int!
+
+  """IDs of all deleted indices"""
+  deletedIndexIds: [Int!]!
+
+  """IDs of all items no longer associated with any deleted index"""
+  deletedItemIds: [Int!]!
+}
+
+"""Collection of survey items, grouped for analysis"""
+type SurveyIndex {
+  """Unique ID for this entity"""
+  id: Int!
+  surveyDimension: SurveyDimension!
+
+  """Use this index in prediction tables?"""
+  useForPredictions: Boolean!
+  surveyItems: [SurveyItem!]!
+  predictionTableEntries: [PredictionTableEntry!]!
+
+  """Abbreviation for this index (e.g., 'FOG')"""
+  abbreviation: String!
+
+  """Title of this index"""
+  title: String!
+}
+
+type SurveyIndexDeleteOutput {
+  """ID of deleted index"""
+  deletedIndexId: Int!
+
+  """IDs of items removed from the deleted index"""
+  deletedItemIds: [Int!]!
+}
+
+"""One user's response to a survey"""
+type SurveyResponse {
+  """Unique ID for this entity"""
+  id: Int!
+  survey: Survey!
+  surveyItemResponses: [SurveyItemResponse!]!
+  email: String!
+  groupCode: String!
+  qualtricsResponseId: String!
+  startDate: String!
+  endDate: String!
+  recordedDate: String!
+  status: Int!
+  progress: Int!
+  duration: Int!
+  finished: Int!
+  ipAddress: String!
+  latitude: String!
+  longitude: String!
+}
+
+"""One user's response to a single survey question"""
+type SurveyItemResponse {
+  """Unique ID for this entity"""
+  id: Int!
+  surveyResponse: SurveyResponse!
+  surveyItem: SurveyItem!
+  label: String!
+  value: Int!
+}
+
+"""One item (question) from a survey"""
+type SurveyItem {
+  """Unique ID for this entity"""
+  id: Int!
+  survey: Survey!
+  surveyIndex: SurveyIndex
+  surveyItemResponses: [SurveyItemResponse!]!
+
+  """Sequence number; items will be displayed in this order"""
+  sequence: Int!
+
+  """Qualtrics identifier for this question"""
+  qualtricsId: String!
+
+  """Text of this question from Qualtrics"""
+  qualtricsText: String!
+  surveyItemResponse(responseId: Int!): SurveyItemResponse
+}
+
+"""All information about a survey imported from Qualtrics"""
+type Survey {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Fetch the letters for this survey"""
+  letters: [Letter!]!
+
+  """
+  All the Qualtrics items for this survey; 
+      for groupings, see survey dimension and index.
+      Pass 'whichItems' to choose which to return (default 'All')
+  """
+  surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
+
+  """Groups using this survey"""
+  groups: [Group!]!
+
+  """Dimensions for this survey; groups indices, which group items."""
+  surveyDimensions: [SurveyDimension!]!
+
+  """Responses for this survey"""
+  surveyResponses: [SurveyResponse!]!
+
+  """Unique identifier for this survey on Qualtrics"""
+  qualtricsId: String!
+
+  """Name of this survey on Qualtrics"""
+  qualtricsName: String!
+
+  """Date and time at which this survey was modified on Qualtrics"""
+  qualtricsModDate: String!
+
+  """Key of response value containing email address"""
+  emailKey: String!
+
+  """Key of response value containing group code"""
+  groupCodeKey: String!
+
+  """Convenience property to retrieve SE practices"""
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+}
+
+"""
+Which items to retrieve: all, those with an index, those without an index
+"""
+enum WhichItems {
+  All
+  WithIndex
+  WithoutIndex
 }
 
 type ItemSummary {
@@ -164,112 +294,100 @@ type ItemSummary {
   responseValue: Float!
 }
 
-type Letter {
-  """Unique ID for this entity"""
+type IndexSummary {
+  id: Int!
+  title: String!
+  abbreviation: String!
+  meanResponse: Float!
+  itemSummaries: [ItemSummary!]!
+}
+
+type DimensionSummary {
+  id: Int!
+  title: String!
+  indexSummaries: [IndexSummary!]!
+}
+
+type SurveySummary {
+  id: Int!
+  title: String!
+  qualtricsId: String!
+  qualtricsName: String!
+}
+
+type PracticeSummary {
   id: Int!
   title: String!
   description: String!
-  emailMessage: String!
-  created: DateTime!
-  updated: DateTime!
-  isFrozen: Boolean!
-  survey: Survey!
-  letterType: LetterType!
-  letterElements: [LetterElement!]!
-  tableEntries: [PredictionTableEntry!]!
-  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
 
-input LetterCreateInput {
-  title: String!
-  description: String!
-  emailMessage: String!
-  isFrozen: Boolean = false
-  surveyId: Int!
-  letterTypeId: Int!
+type PredictionSummary {
+  practiceSummary: PracticeSummary!
+  predictionDetails: [PredictionDetails!]!
+  predict: Boolean!
 }
 
-type LetterElement {
-  """Unique ID for this entity"""
+type ResponseSummary {
   id: Int!
-  sequence: Int!
-  textDelta: String
-  image: Image
-  letter: Letter!
-  letterElementType: LetterElementType!
-  surveyDimension: SurveyDimension
-}
-
-input LetterElementCreateInput {
-  sequence: Int!
-  textDelta: String
-  imageId: Int
-  letterId: Int!
-  letterElementTypeId: Int!
-  surveyDimensionId: Int
-}
-
-type LetterElementType {
-  """Unique ID for this entity"""
-  id: Int!
-  key: String!
-  description: String!
-  letterTypes: [LetterType!]!
-}
-
-input LetterElementUpdateInput {
-  id: Int!
-  sequence: Int
-  textDelta: String
-  imageId: Int
-  letterElementTypeId: Int
-  surveyDimensionId: Int
-}
-
-type LetterType {
-  """Unique ID for this entity"""
-  id: Int!
-  key: String!
-  description: String!
-  letterElementTypes: [LetterElementType!]!
-}
-
-input LetterTypeCreateInput {
-  """Human readable key"""
-  key: String!
-
-  """Description of this type"""
-  description: String!
-}
-
-input LetterTypeUpdateInput {
-  id: Int!
-
-  """Human readable key"""
-  key: String
-
-  """Description of this type"""
-  description: String
-}
-
-input LetterUpdateInput {
-  id: Int!
-  title: String
-  description: String
-  emailMessage: String
-  isFrozen: Boolean
-  surveyId: Int
-  letterTypeId: Int
-}
-
-input LoginCredentials {
+  qualtricsResponseId: String!
   email: String!
-  password: String!
+  date: String!
+  surveySummary: SurveySummary!
+  dimensionSummaries: [DimensionSummary!]!
+  predictionSummaries: [PredictionSummary!]!
+}
+
+type UserRole {
+  """Unique ID for this entity"""
+  id: Int!
+  name: String!
+  description: String!
+}
+
+type User {
+  """Unique ID for this entity"""
+  id: Int!
+  email: String!
+  firstName: String!
+  lastName: String!
+  roles: [UserRole!]!
+}
+
+type UserPayload {
+  id: Float!
+  firstName: String!
+  lastName: String!
+  email: String!
+  roles: [UserRole!]!
 }
 
 type LoginResponse {
   accessToken: String!
   user: UserPayload!
+}
+
+type Envelope {
+  from: String!
+  to: [String!]!
+}
+
+type SendMailResponse {
+  accepted: [String!]!
+  rejected: [String!]!
+  envelopeTime: Float!
+  messageTime: Float!
+  messageSize: Float!
+  response: String!
+  envelope: Envelope!
+  messageId: String!
+}
+
+type Event {
+  """Unique ID for this entity"""
+  id: Int!
+  date: String!
+  type: String!
+  details: String!
 }
 
 type Machine {
@@ -280,10 +398,83 @@ type Machine {
   active: Boolean!
 }
 
-input MachineCreateInput {
+type WriterOutput {
+  ok: Boolean!
+
+  """Message to UI"""
+  message: String!
+
+  """Name of PDF file (e.g., 'abc.pdf')"""
+  pdfFileName: String!
+
+  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
+  pdfRelativePath: String!
+
+  """
+  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
+  """
+  pdfAbsolutePath: String!
+  responseSummary: ResponseSummary
+}
+
+type QualtricsSurveyListItem {
+  qualtricsId: String!
+  qualtricsName: String!
+  qualtricsOwnerId: String!
+  qualtricsModDate: String!
+  qualtricsCreationDate: String!
+  qualtricsIsActive: Boolean!
+  importedToCapernaum: Boolean!
+}
+
+type QualtricsOrganization {
+  id: String!
   name: String!
-  hostName: String!
-  active: Boolean!
+  baseUrl: String!
+  type: String!
+  status: String!
+  creationDate: String!
+  expirationDate: String!
+}
+
+type QualtricsSubscription {
+  id: String!
+  scope: String!
+  topics: String!
+  publicationUrl: String!
+  encrypted: Boolean!
+  successfulCalls: Int!
+}
+
+type Query {
+  survey(id: Int!): Survey!
+  surveys: [Survey!]!
+  surveyDimensions: [SurveyDimension!]!
+  surveyIndices: [SurveyIndex!]!
+
+  """Retrieve all survey items"""
+  surveyItems: [SurveyItem!]!
+  surveyResponse(id: Int!): SurveyResponse!
+  surveyResponses: [SurveyResponse!]!
+  surveyDimension(id: Int!): SurveyDimension!
+  updateSurveyDimension: SurveyDimension!
+  scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
+  user(id: Int!): User!
+  users: [User!]!
+  userRoles: [UserRole!]!
+  letter(id: Int!): Letter!
+  letters: [Letter!]!
+  letterElementTypes: [LetterElementType!]!
+  readGroups: [Group!]!
+  readLetterTypes: [LetterType!]!
+  images: [Image!]!
+  image(id: Int!): Image!
+  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
+  organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
+  subscriptions: [QualtricsSubscription!]!
+  events: [Event!]!
+  machines: [Machine!]!
 }
 
 type Mutation {
@@ -361,227 +552,6 @@ type Mutation {
   deleteMachine(id: Int!): Int!
 }
 
-input PartialPredictionTableEntry {
-  surveyIndexId: Int!
-  practiceId: Int!
-  sequence: Int!
-}
-
-type PracticeSummary {
-  id: Int!
-  title: String!
-  description: String!
-}
-
-type PredictionDetails {
-  title: String!
-  abbreviation: String!
-  meanResponse: Float!
-}
-
-type PredictionSummary {
-  practiceSummary: PracticeSummary!
-  predictionDetails: [PredictionDetails!]!
-  predict: Boolean!
-}
-
-"""One entry in a prediction table"""
-type PredictionTableEntry {
-  """Unique ID for this entity"""
-  id: Int!
-  letter: Letter!
-  surveyIndex: SurveyIndex!
-  practice: ScriptureEngagementPractice!
-  sequence: Int!
-}
-
-input PredictionTableEntryCreateInput {
-  surveyIndexId: Int!
-  practiceId: Int!
-  sequence: Int!
-  letterId: Int!
-}
-
-input PredictionTableEntryReplaceInput {
-  letterId: Int!
-  entries: [PartialPredictionTableEntry!]!
-}
-
-type QualtricsOrganization {
-  id: String!
-  name: String!
-  baseUrl: String!
-  type: String!
-  status: String!
-  creationDate: String!
-  expirationDate: String!
-}
-
-type QualtricsResponseImportStats {
-  importCount: Int!
-  duplicateCount: Int!
-  surveyResponses: [SurveyResponse!]!
-}
-
-type QualtricsSubscription {
-  id: String!
-  scope: String!
-  topics: String!
-  publicationUrl: String!
-  encrypted: Boolean!
-  successfulCalls: Int!
-}
-
-input QualtricsSubscriptionCreateInput {
-  hostName: String!
-  subscriptionType: String!
-  surveyId: String
-}
-
-type QualtricsSurveyListItem {
-  qualtricsId: String!
-  qualtricsName: String!
-  qualtricsOwnerId: String!
-  qualtricsModDate: String!
-  qualtricsCreationDate: String!
-  qualtricsIsActive: Boolean!
-  importedToCapernaum: Boolean!
-}
-
-type Query {
-  survey(id: Int!): Survey!
-  surveys: [Survey!]!
-  surveyDimensions: [SurveyDimension!]!
-  surveyIndices: [SurveyIndex!]!
-
-  """Retrieve all survey items"""
-  surveyItems: [SurveyItem!]!
-  surveyResponse(id: Int!): SurveyResponse!
-  surveyResponses: [SurveyResponse!]!
-  surveyDimension(id: Int!): SurveyDimension!
-  updateSurveyDimension: SurveyDimension!
-  scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
-  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
-  user(id: Int!): User!
-  users: [User!]!
-  userRoles: [UserRole!]!
-  letter(id: Int!): Letter!
-  letters: [Letter!]!
-  letterElementTypes: [LetterElementType!]!
-  readGroups: [Group!]!
-  readLetterTypes: [LetterType!]!
-  images: [Image!]!
-  image(id: Int!): Image!
-  qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
-  subscriptions: [QualtricsSubscription!]!
-  events: [Event!]!
-  machines: [Machine!]!
-}
-
-type ResponseSummary {
-  id: Int!
-  qualtricsResponseId: String!
-  email: String!
-  date: String!
-  surveySummary: SurveySummary!
-  dimensionSummaries: [DimensionSummary!]!
-  predictionSummaries: [PredictionSummary!]!
-}
-
-"""Scripture engagement practice"""
-type ScriptureEngagementPractice {
-  """Unique ID for this entity"""
-  id: Int!
-  title: String!
-  description: String!
-  moreInfoUrl: String!
-  sequence: Int!
-  predictionTableEntries: [PredictionTableEntry!]!
-}
-
-input ScriptureEngagementPracticeCreateInput {
-  title: String!
-  description: String!
-  moreInfoUrl: String!
-  sequence: Int!
-}
-
-input ScriptureEngagementPracticeUpdateInput {
-  id: Int!
-  title: String
-  description: String
-  moreInfoUrl: String
-  sequence: Int
-}
-
-input SendMailInput {
-  from: String
-  to: String!
-  subject: String!
-  textContent: String!
-  htmlContent: String
-  attachmentPath: String
-}
-
-type SendMailResponse {
-  accepted: [String!]!
-  rejected: [String!]!
-  envelopeTime: Float!
-  messageTime: Float!
-  messageSize: Float!
-  response: String!
-  envelope: Envelope!
-  messageId: String!
-}
-
-type Subscription {
-  newEvent: Event!
-}
-
-"""All information about a survey imported from Qualtrics"""
-type Survey {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Fetch the letters for this survey"""
-  letters: [Letter!]!
-
-  """
-  All the Qualtrics items for this survey; 
-      for groupings, see survey dimension and index.
-      Pass 'whichItems' to choose which to return (default 'All')
-  """
-  surveyItems(whichItems: WhichItems = All): [SurveyItem!]!
-
-  """Groups using this survey"""
-  groups: [Group!]!
-
-  """Dimensions for this survey; groups indices, which group items."""
-  surveyDimensions: [SurveyDimension!]!
-
-  """Responses for this survey"""
-  surveyResponses: [SurveyResponse!]!
-
-  """Unique identifier for this survey on Qualtrics"""
-  qualtricsId: String!
-
-  """Name of this survey on Qualtrics"""
-  qualtricsName: String!
-
-  """Date and time at which this survey was modified on Qualtrics"""
-  qualtricsModDate: String!
-
-  """Key of response value containing email address"""
-  emailKey: String!
-
-  """Key of response value containing group code"""
-  groupCodeKey: String!
-
-  """Convenience property to retrieve SE practices"""
-  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
-}
-
 input SurveyCreateInput {
   qualtricsId: String!
   qualtricsName: String!
@@ -589,18 +559,10 @@ input SurveyCreateInput {
   surveyItems: [SurveyItemCreateInput!]!
 }
 
-"""Top-level grouping of questions in Capernaum; contains indices"""
-type SurveyDimension {
-  """Unique ID for this entity"""
-  id: Int!
-  survey: Survey
-  surveyIndices: [SurveyIndex!]!
-
-  """Title of this dimension (e.g., 'Focus on Prayer')"""
-  title: String!
-
-  """Sequence number; dimension are displayed in this order."""
-  sequence: Int!
+input SurveyItemCreateInput {
+  sequence: Int = -1
+  qualtricsId: String!
+  qualtricsText: String!
 }
 
 """
@@ -610,41 +572,6 @@ input SurveyDimensionCreateInput {
   surveyId: Int!
   title: String!
   sequence: Int!
-}
-
-type SurveyDimensionDeleteOutput {
-  """ID of deleted dimension"""
-  deletedDimensionId: Int!
-
-  """IDs of all deleted indices"""
-  deletedIndexIds: [Int!]!
-
-  """IDs of all items no longer associated with any deleted index"""
-  deletedItemIds: [Int!]!
-}
-
-input SurveyDimensionUpdateInput {
-  id: Int!
-  title: String
-  sequence: Int
-}
-
-"""Collection of survey items, grouped for analysis"""
-type SurveyIndex {
-  """Unique ID for this entity"""
-  id: Int!
-  surveyDimension: SurveyDimension!
-
-  """Use this index in prediction tables?"""
-  useForPredictions: Boolean!
-  surveyItems: [SurveyItem!]!
-  predictionTableEntries: [PredictionTableEntry!]!
-
-  """Abbreviation for this index (e.g., 'FOG')"""
-  abbreviation: String!
-
-  """Title of this index"""
-  title: String!
 }
 
 input SurveyIndexCreateInput {
@@ -664,12 +591,17 @@ input SurveyIndexCreateInput {
   useForPredictions: Boolean!
 }
 
-type SurveyIndexDeleteOutput {
-  """ID of deleted index"""
-  deletedIndexId: Int!
+input SurveyUpdateInput {
+  id: Int!
+  qualtricsId: String
+  qualtricsName: String
+  qualtricsModDate: String
+}
 
-  """IDs of items removed from the deleted index"""
-  deletedItemIds: [Int!]!
+input SurveyDimensionUpdateInput {
+  id: Int!
+  title: String
+  sequence: Int
 }
 
 input SurveyIndexUpdateInput {
@@ -680,83 +612,37 @@ input SurveyIndexUpdateInput {
   useForPredictions: Boolean
 }
 
-"""One item (question) from a survey"""
-type SurveyItem {
-  """Unique ID for this entity"""
-  id: Int!
-  survey: Survey!
-  surveyIndex: SurveyIndex
-  surveyItemResponses: [SurveyItemResponse!]!
-
-  """Sequence number; items will be displayed in this order"""
+input PredictionTableEntryCreateInput {
+  surveyIndexId: Int!
+  practiceId: Int!
   sequence: Int!
-
-  """Qualtrics identifier for this question"""
-  qualtricsId: String!
-
-  """Text of this question from Qualtrics"""
-  qualtricsText: String!
-  surveyItemResponse(responseId: Int!): SurveyItemResponse
+  letterId: Int!
 }
 
-input SurveyItemCreateInput {
-  sequence: Int = -1
-  qualtricsId: String!
-  qualtricsText: String!
+input PredictionTableEntryReplaceInput {
+  letterId: Int!
+  entries: [PartialPredictionTableEntry!]!
 }
 
-"""One user's response to a single survey question"""
-type SurveyItemResponse {
-  """Unique ID for this entity"""
-  id: Int!
-  surveyResponse: SurveyResponse!
-  surveyItem: SurveyItem!
-  label: String!
-  value: Int!
+input PartialPredictionTableEntry {
+  surveyIndexId: Int!
+  practiceId: Int!
+  sequence: Int!
 }
 
-"""One user's response to a survey"""
-type SurveyResponse {
-  """Unique ID for this entity"""
-  id: Int!
-  survey: Survey!
-  surveyItemResponses: [SurveyItemResponse!]!
-  email: String!
-  groupCode: String!
-  qualtricsResponseId: String!
-  startDate: String!
-  endDate: String!
-  recordedDate: String!
-  status: Int!
-  progress: Int!
-  duration: Int!
-  finished: Int!
-  ipAddress: String!
-  latitude: String!
-  longitude: String!
-}
-
-type SurveySummary {
-  id: Int!
+input ScriptureEngagementPracticeCreateInput {
   title: String!
-  qualtricsId: String!
-  qualtricsName: String!
+  description: String!
+  moreInfoUrl: String!
+  sequence: Int!
 }
 
-input SurveyUpdateInput {
+input ScriptureEngagementPracticeUpdateInput {
   id: Int!
-  qualtricsId: String
-  qualtricsName: String
-  qualtricsModDate: String
-}
-
-type User {
-  """Unique ID for this entity"""
-  id: Int!
-  email: String!
-  firstName: String!
-  lastName: String!
-  roles: [UserRole!]!
+  title: String
+  description: String
+  moreInfoUrl: String
+  sequence: Int
 }
 
 input UserCreateInput {
@@ -767,26 +653,6 @@ input UserCreateInput {
   userRoleIds: [Int!]!
 }
 
-type UserPayload {
-  id: Float!
-  firstName: String!
-  lastName: String!
-  email: String!
-  roles: [UserRole!]!
-}
-
-type UserRole {
-  """Unique ID for this entity"""
-  id: Int!
-  name: String!
-  description: String!
-}
-
-input UserRoleCreateInput {
-  name: String!
-  description: String!
-}
-
 input UserUpdateInput {
   id: Int!
   email: String
@@ -795,13 +661,145 @@ input UserUpdateInput {
   userRoleIds: [Int!]
 }
 
-"""
-Which items to retrieve: all, those with an index, those without an index
-"""
-enum WhichItems {
-  All
-  WithIndex
-  WithoutIndex
+input ChangePasswordInput {
+  userId: Int!
+  currentPassword: String!
+  newPassword: String!
+}
+
+input UserRoleCreateInput {
+  name: String!
+  description: String!
+}
+
+input LoginCredentials {
+  email: String!
+  password: String!
+}
+
+input SendMailInput {
+  from: String
+  to: String!
+  subject: String!
+  textContent: String!
+  htmlContent: String
+  attachmentPath: String
+}
+
+input LetterCreateInput {
+  title: String!
+  description: String!
+  emailMessage: String!
+  isFrozen: Boolean = false
+  surveyId: Int!
+  letterTypeId: Int!
+}
+
+input LetterElementCreateInput {
+  sequence: Int!
+  textDelta: String
+  imageId: Int
+  letterId: Int!
+  letterElementTypeId: Int!
+  surveyDimensionId: Int
+}
+
+input LetterUpdateInput {
+  id: Int!
+  title: String
+  description: String
+  emailMessage: String
+  isFrozen: Boolean
+  surveyId: Int
+  letterTypeId: Int
+}
+
+input LetterElementUpdateInput {
+  id: Int!
+  sequence: Int
+  textDelta: String
+  imageId: Int
+  letterElementTypeId: Int
+  surveyDimensionId: Int
+}
+
+input GroupCreateInput {
+  """Group name"""
+  name: String!
+
+  """Type of group"""
+  type: String!
+
+  """Date when survey created"""
+  created: String!
+
+  """Date when survey closes"""
+  closedAfter: String!
+
+  """Group administrator first name"""
+  adminFirstName: String!
+
+  """Group administrator last name"""
+  adminLastName: String!
+
+  """Group administrator email address"""
+  adminEmail: String!
+
+  """Survey code word used by group"""
+  codeWord: String!
+  surveyId: Int!
+}
+
+input GroupUpdateInput {
+  id: Int!
+
+  """Group name"""
+  name: String
+
+  """Type of group"""
+  type: String
+
+  """Date when survey created"""
+  created: String
+
+  """Date when survey closes"""
+  closedAfter: String
+
+  """Group administrator first name"""
+  adminFirstName: String
+
+  """Group administrator last name"""
+  adminLastName: String
+
+  """Group administrator email address"""
+  adminEmail: String
+
+  """Survey code word used by group"""
+  codeWord: String
+  surveyId: Int
+}
+
+input LetterTypeCreateInput {
+  """Human readable key"""
+  key: String!
+
+  """Description of this type"""
+  description: String!
+}
+
+input LetterTypeUpdateInput {
+  id: Int!
+
+  """Human readable key"""
+  key: String
+
+  """Description of this type"""
+  description: String
+}
+
+input ImageUpdateInput {
+  id: Int!
+  title: String!
 }
 
 input WriterInput {
@@ -809,21 +807,23 @@ input WriterInput {
   surveyResponseId: Int!
 }
 
-type WriterOutput {
-  ok: Boolean!
+input QualtricsSubscriptionCreateInput {
+  hostName: String!
+  subscriptionType: String!
+  surveyId: String
+}
 
-  """Message to UI"""
-  message: String!
+input EventCreateInput {
+  type: String!
+  details: String!
+}
 
-  """Name of PDF file (e.g., 'abc.pdf')"""
-  pdfFileName: String!
+input MachineCreateInput {
+  name: String!
+  hostName: String!
+  active: Boolean!
+}
 
-  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
-  pdfRelativePath: String!
-
-  """
-  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
-  """
-  pdfAbsolutePath: String!
-  responseSummary: ResponseSummary
+type Subscription {
+  newEvent: Event!
 }
