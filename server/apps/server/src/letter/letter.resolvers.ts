@@ -20,6 +20,7 @@ import {
 } from "./entities";
 import {
   GroupService,
+  LetterElementTypeService,
   LetterService,
   LetterTypeService,
 } from "./letter.service";
@@ -159,11 +160,20 @@ export class LetterElementResolver {
 @Resolver((of) => LetterElementType)
 @UseGuards(GqlAuthGuard)
 export class LetterElementTypeResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(
+    private readonly letterService: LetterService,
+    private readonly letterElementTypeService: LetterElementTypeService
+  ) {}
 
   @Query((returns) => [LetterElementType])
   letterElementTypes() {
     return this.letterService.letterElementTypes();
+  }
+
+  @ResolveField("letterTypes", (returns) => [LetterType])
+  resolveLetterTypes(@Parent() letterElementType: LetterElementType) {
+    debug("resolveLetterTypes(%O)", letterElementType);
+    return this.letterElementTypeService.readLetterTypes(letterElementType);
   }
 }
 

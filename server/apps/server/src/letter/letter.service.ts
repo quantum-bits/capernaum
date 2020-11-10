@@ -35,32 +35,21 @@ export class LetterService extends BaseService {
     super();
   }
 
-  // FIXME: This is causing a lot of confusion.
-  // letter(id: number) {
-  //   debug("letter(%d)", id);
-  //   const rtn = this.letterRepo
-  //     .createQueryBuilder("letter")
-  //     .leftJoinAndSelect("letter.letterElements", "letterElements")
-  //     .leftJoinAndSelect(
-  //       "letterElements.letterElementType",
-  //       "letterElementType"
-  //     )
-  //     .leftJoinAndSelect("letterElements.image", "images")
-  //     .leftJoinAndSelect("letterElements.surveyDimension", `dimension`)
-  //     .leftJoinAndSelect("letter.letterType", "letterType")
-  //     .leftJoinAndSelect("letterType.letterElementTypes", "letterElementTypes")
-  //     .where("letter.id = :id", { id })
-  //     .orderBy("letterElements.sequence")
-  //     .getOne();
-  //   debug("LETTER %O", rtn);
-  //   return rtn;
-  // }
-
   letter(id: number) {
-    return this.findOneOrFail(Letter, id);
+    return this.letterRepo.findOneOrFail(id, {
+      relations: [
+        "letterType",
+        "letterType.letterElementTypes",
+        "letterElements",
+        "letterElements.letterElementType",
+        "letterElements.image",
+        "letterElements.surveyDimension",
+      ],
+    });
   }
 
   letterElementTypes() {
+    debug("Called letterElementTypes");
     return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
   }
 
@@ -69,6 +58,7 @@ export class LetterService extends BaseService {
    * @param letter
    */
   letterElements(letter: Letter) {
+    debug("Called letterElements");
     return this.letterElementRepo.find({
       where: { letter },
       order: { sequence: "ASC" },
@@ -143,5 +133,24 @@ export class LetterTypeService extends BaseService {
 
   deleteLetterType(id: number) {
     return this.letterTypeRepo.delete(id).then((result) => result.affected);
+  }
+}
+
+@Injectable()
+export class LetterElementTypeService extends BaseService {
+  constructor(
+    @InjectRepository(LetterType)
+    private readonly letterTypeRepo: Repository<LetterType>
+  ) {
+    super();
+  }
+
+  readLetterTypes(letterElementType: LetterElementType) {
+    debug("readLetterTypes(%O)", letterElementType);
+    return this.letterTypeRepo
+      .createQueryBuilder("letterType")
+      .leftJoinAndSelect("letterType.letterElementTypes", "letterElementType")
+      .where("letterElementType.id = :id", { id: letterElementType.id })
+      .getMany();
   }
 }
