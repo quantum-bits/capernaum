@@ -15,6 +15,9 @@ import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
 
+import Debug from "debug";
+const debug = Debug("letter:service");
+
 @Injectable()
 export class LetterService extends BaseService {
   constructor(
@@ -33,16 +36,23 @@ export class LetterService extends BaseService {
   }
 
   letter(id: number) {
-    return this.letterRepo
+    debug("letter(%d)", id);
+    const rtn = this.letterRepo
       .createQueryBuilder("letter")
       .leftJoinAndSelect("letter.letterElements", "letterElements")
-      .leftJoinAndSelect("letterElements.letterElementType", "elementTypes")
+      .leftJoinAndSelect(
+        "letterElements.letterElementType",
+        "letterElementType"
+      )
       .leftJoinAndSelect("letterElements.image", "images")
       .leftJoinAndSelect("letterElements.surveyDimension", `dimension`)
       .leftJoinAndSelect("letter.letterType", "letterType")
+      .leftJoinAndSelect("letterType.letterElementTypes", "letterElementTypes")
       .where("letter.id = :id", { id })
       .orderBy("letterElements.sequence")
       .getOne();
+    debug("LETTER %O", rtn);
+    return rtn;
   }
 
   letterElementTypes() {
@@ -95,26 +105,35 @@ export class GroupService extends BaseService {
 export class LetterTypeService extends BaseService {
   constructor(
     @InjectRepository(LetterType)
-    private readonly lettertypeRepo: Repository<LetterType>
+    private readonly letterTypeRepo: Repository<LetterType>,
+    @InjectRepository(LetterElementType)
+    private readonly letterElementTypeRepo: Repository<LetterElementType>
   ) {
     super();
   }
 
   createLetterType(createInput: LetterTypeCreateInput) {
-    return this.lettertypeRepo.save(this.lettertypeRepo.create(createInput));
+    return this.letterTypeRepo.save(this.letterTypeRepo.create(createInput));
   }
 
   readLetterTypes() {
-    return this.lettertypeRepo.find();
+    return this.letterTypeRepo.find();
+  }
+
+  readLetterElementTypes(letterType: LetterType) {
+    debug("readLetterElementTypes(%O)", letterType);
+    return this.letterTypeRepo.find({
+      relations: ["letterElementTypes"],
+    });
   }
 
   updateLetterType(updateInput: LetterTypeUpdateInput) {
-    return this.lettertypeRepo
+    return this.letterTypeRepo
       .preload(updateInput)
-      .then((result) => this.lettertypeRepo.save(result));
+      .then((result) => this.letterTypeRepo.save(result));
   }
 
   deleteLetterType(id: number) {
-    return this.lettertypeRepo.delete(id).then((result) => result.affected);
+    return this.letterTypeRepo.delete(id).then((result) => result.affected);
   }
 }
