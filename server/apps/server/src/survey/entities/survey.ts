@@ -4,7 +4,8 @@ import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
-import { Group, Letter } from "../../letter/entities";
+import { Letter } from "../../letter/entities";
+import { Group } from "../../letter/entities/group";
 import { SurveyResponse } from "./survey-response";
 
 @Entity()

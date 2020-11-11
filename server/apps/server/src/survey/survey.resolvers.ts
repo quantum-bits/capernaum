@@ -31,7 +31,7 @@ import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
 @Resolver((of) => Survey)
-@UseGuards(GqlAuthGuard)
+// @UseGuards(GqlAuthGuard)
 export class SurveyResolver {
   constructor(private readonly surveyService: SurveyService) {}
 

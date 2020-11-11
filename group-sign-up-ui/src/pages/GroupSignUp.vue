@@ -121,11 +121,6 @@
   </v-container>
 </template>
 
-
-
-
-
-
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
@@ -137,12 +132,12 @@ import { ALL_SURVEYS_QUERY } from "../graphql/surveys.graphql";
   apollo: {
     allSurveys: {
       query: ALL_SURVEYS_QUERY,
-      update: data => {
+      update: (data) => {
         console.log("surveys! ", data);
         return data.surveys;
-      }
-    }
-  }
+      },
+    },
+  },
 })
 export default class GroupSignUp extends Vue {
   //@Prop() private msg!: string;
@@ -172,7 +167,7 @@ export default class GroupSignUp extends Vue {
     email: (value: string): boolean | string => {
       const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return pattern.test(value) || "Invalid e-mail.";
-    }
+    },
   };
 
   submit() {
