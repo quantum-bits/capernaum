@@ -57,4 +57,5 @@ export enum LetterElementEnum {
   CHART = "chart",
   BOOLEAN_CALCULATION_RESULTS = "boolean-calculation-results",
   IMAGE = "image",
+  DEMOGRAPHICS_CHART = "demographics-chart",
 }

@@ -193,6 +193,7 @@
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
           v-if="!surveyLetterIsFrozen"
+          :letterType="letter.letterType"
           @click="addElement($event)"
           offset-y
         />
