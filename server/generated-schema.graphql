@@ -272,6 +272,12 @@ type Survey {
   """Key of response value containing group code"""
   groupCodeKey: String!
 
+  """Make this survey available to groups?"""
+  okayForGroup: Boolean!
+
+  """Detailed description of this survey; mostly for group use"""
+  detailedDescription: String!
+
   """Convenience property to retrieve SE practices"""
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 }
@@ -556,6 +562,10 @@ input SurveyCreateInput {
   qualtricsId: String!
   qualtricsName: String!
   qualtricsModDate: String!
+  emailKey: String!
+  groupCodeKey: String!
+  okForGroup: Boolean!
+  detailedDescription: String!
   surveyItems: [SurveyItemCreateInput!]!
 }
 
@@ -596,6 +606,10 @@ input SurveyUpdateInput {
   qualtricsId: String
   qualtricsName: String
   qualtricsModDate: String
+  emailKey: String
+  groupCodeKey: String
+  okForGroup: Boolean
+  detailedDescription: String
 }
 
 input SurveyDimensionUpdateInput {
@@ -730,9 +744,6 @@ input GroupCreateInput {
   """Type of group"""
   type: String!
 
-  """Date when survey created"""
-  created: String!
-
   """Date when survey closes"""
   closedAfter: String!
 
@@ -758,9 +769,6 @@ input GroupUpdateInput {
 
   """Type of group"""
   type: String
-
-  """Date when survey created"""
-  created: String
 
   """Date when survey closes"""
   closedAfter: String
