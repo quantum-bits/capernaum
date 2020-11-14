@@ -58,6 +58,18 @@ export class Survey extends AbstractEntity {
   })
   groupCodeKey: string;
 
+  @Column({ default: false })
+  @Field({
+    description: "Make this survey available to groups?",
+  })
+  okayForGroup: boolean;
+
+  @Column({ default: "" })
+  @Field({
+    description: "Detailed description of this survey; mostly for group use",
+  })
+  detailedDescription: string;
+
   @Field((type) => [ScriptureEngagementPractice], {
     description: "Convenience property to retrieve SE practices",
   })
@@ -85,6 +97,10 @@ export class SurveyCreateInput {
   @Field() qualtricsId: string;
   @Field() qualtricsName: string;
   @Field() qualtricsModDate: string;
+  @Field() emailKey: string;
+  @Field() groupCodeKey: string;
+  @Field() okForGroup: boolean;
+  @Field() detailedDescription: string;
   @Field((type) => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
 }
@@ -95,4 +111,8 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) qualtricsId?: string;
   @Field({ nullable: true }) qualtricsName?: string;
   @Field({ nullable: true }) qualtricsModDate?: string;
+  @Field({ nullable: true }) emailKey?: string;
+  @Field({ nullable: true }) groupCodeKey?: string;
+  @Field({ nullable: true }) okForGroup?: boolean;
+  @Field({ nullable: true }) detailedDescription?: string;
 }
