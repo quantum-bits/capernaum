@@ -86,7 +86,7 @@ export class GroupService extends BaseService {
   }
 
   readGroups() {
-    return this.groupRepo.find();
+    return this.groupRepo.find({ relations: ["survey"] });
   }
 
   updateGroup(updateInput: GroupUpdateInput) {

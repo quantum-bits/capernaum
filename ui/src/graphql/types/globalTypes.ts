@@ -25,7 +25,6 @@ export interface ChangePasswordInput {
 export interface GroupCreateInput {
   name: string;
   type: string;
-  created: string;
   closedAfter: string;
   adminFirstName: string;
   adminLastName: string;
@@ -38,7 +37,6 @@ export interface GroupUpdateInput {
   id: number;
   name?: string | null;
   type?: string | null;
-  created?: string | null;
   closedAfter?: string | null;
   adminFirstName?: string | null;
   adminLastName?: string | null;

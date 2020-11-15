@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Survey } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -15,7 +15,7 @@ export class Group extends AbstractEntity {
   type: string;
 
   @Field({ description: "Date when survey created" })
-  @Column()
+  @CreateDateColumn()
   created: string;
 
   @Field({ description: "Date when survey closes" })
@@ -50,8 +50,6 @@ export class GroupCreateInput {
 
   @Field({ description: "Type of group" }) type: string;
 
-  @Field({ description: "Date when survey created" }) created: string;
-
   @Field({ description: "Date when survey closes" }) closedAfter: string;
 
   @Field({ description: "Group administrator first name" })
@@ -75,9 +73,6 @@ export class GroupUpdateInput {
   @Field({ description: "Group name", nullable: true }) name?: string;
 
   @Field({ description: "Type of group", nullable: true }) type?: string;
-
-  @Field({ description: "Date when survey created", nullable: true })
-  created?: string;
 
   @Field({ description: "Date when survey closes", nullable: true })
   closedAfter?: string;
