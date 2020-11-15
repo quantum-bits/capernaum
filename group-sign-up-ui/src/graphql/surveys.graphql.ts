@@ -11,19 +11,6 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsId
       qualtricsName
       qualtricsModDate
-      letters {
-        id
-        title
-      }
-      surveyDimensions {
-        id
-      }
-      surveyItems {
-        id
-      }
-      surveyResponses {
-        id
-      }
     }
   }
 `;

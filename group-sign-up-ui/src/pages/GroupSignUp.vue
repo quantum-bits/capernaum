@@ -108,6 +108,36 @@
                   </v-card-text>
           <v-card-actions>-->
               <v-spacer />
+
+              <h2>Active Surveys</h2>
+              <p>You may choose from the following survey(s):</p>
+
+              <div v-for="survey in allSurveys" :key="survey.id">
+                <h4>{{ survey.qualtricsName }}</h4>
+                <!--<p>{{survey.detailedDescription}}</p>-->
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut.
+                </p>
+              </div>
+
+              <v-select
+                v-model="selectedSurvey"
+                :items="allSurveys"
+                item-text="qualtricsName"
+                item-value="id"
+                persistent-hint
+                return-object
+                filled
+                label="Survey"
+                :rules="[rules.required]"
+                required
+              ></v-select>
+
+              <v-spacer />
+
               <v-btn @click="submit" color="primary" :disabled="!isValid"
                 >Submit</v-btn
               >
@@ -127,6 +157,14 @@ import { Component, Vue } from "vue-property-decorator";
 import { ALL_SURVEYS_QUERY } from "../graphql/surveys.graphql";
 //import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
 
+// TODO: use yarn gen:types to generate this automatically
+interface SelectedSurvey {
+  id: number;
+  qualtricsId: string;
+  qualtricsName: string;
+  qualtricsModDate: string;
+}
+
 @Component({
   components: {},
   apollo: {
@@ -145,6 +183,17 @@ export default class GroupSignUp extends Vue {
   // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
   //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
+  selectedSurvey: SelectedSurvey | null = null;
+  //https://stackoverflow.com/questions/64116145/vuetify-multiple-v-select-required-rules-dont-work
+  //surveySelectRules = {
+  //  required: [(v) => !!v || "Please choose a survey."]
+  //};
+  /*{
+    id: -Infinity,
+    qualtricsId: "",
+    qualtricsName: "",
+    qualtricsModDate: "",
+  };*/
   email: string = "";
   typeOfGroup: string = "";
   descriptionOfGroup: string = "";
