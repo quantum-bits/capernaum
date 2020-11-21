@@ -26,9 +26,9 @@
           </v-toolbar>
           <v-card-text>-->
         <!-- https://medium.com/js-dojo/form-validation-with-vuetify-in-a-vue-app-d72e3d9b65db -->
-        <v-form v-model="isValid">
+        <v-form ref="form" v-model="isValid">
           <v-row justify="center">
-            <v-col sm="12" md="8">
+            <v-col sm="12" md="10">
               <v-text-field
                 v-model="email"
                 label="Your Email"
@@ -56,25 +56,28 @@
                 :rules="[rules.required]"
                 required
               />
-              <p class="text-left">
-                Type of Group:
-              </p>
+              <p class="text-left">Type of Group:</p>
               <v-radio-group class="pl-4" v-model="typeOfGroup" column>
                 <v-radio
                   label="Spiritual growth group (e.g., small group, Sunday school class)"
                   color="indigo darken-3"
                   value="SPIRITUAL_GROWTH_GROUP"
                 ></v-radio>
-                <v-radio label="College spiritual life assessment" color="indigo darken-3" value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"></v-radio>
+                <v-radio
+                  label="College spiritual life assessment"
+                  color="indigo darken-3"
+                  value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"
+                ></v-radio>
                 <v-radio
                   label="Other"
                   color="indigo darken-3"
                   value="OTHER"
                 ></v-radio>
-
               </v-radio-group>
 
-              <v-text-field class="pl-10 mt-n5" v-show="typeOfGroup==='OTHER'"
+              <v-text-field
+                class="pl-10 mt-n5"
+                v-show="typeOfGroup === 'OTHER'"
                 v-model="typeOfGroupFreeFormText"
                 label="Pleae Specify Other Type"
                 name="typeOfGroup"
@@ -105,8 +108,9 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
+                    class="mt-10"
                     v-model="closingDate"
-                    label="Survey Closing Date"
+                    label="Survey Closing Date (this is the day when the group access will end and your group results will be sent to you)"
                     prepend-icon="mdi-calendar-range"
                     hint="Recommended 4-6 wks"
                     persistent-hint
@@ -137,17 +141,14 @@
           <v-card-actions>-->
               <v-spacer />
 
-              <h2>Active Surveys</h2>
+              <h2>Choose a Survey</h2>
               <p>You may choose from the following survey(s):</p>
 
               <div v-for="survey in allSurveys" :key="survey.id">
                 <h4>{{ survey.qualtricsName }}</h4>
                 <!--<p>{{survey.detailedDescription}}</p>-->
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut.
+                  {{ survey.detailedDescription }}
                 </p>
               </div>
 
@@ -182,15 +183,22 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
-import { ALL_SURVEYS_QUERY } from "../graphql/surveys.graphql";
+import {
+  ALL_SURVEYS_QUERY,
+  ADD_GROUP_MUTATION,
+} from "../graphql/surveys.graphql";
 //import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
 
-// TODO: use yarn gen:types to generate this automatically
+// TODO: use the automatically generated type AllSurveys_surveys (generated using yarn gen:types);
+// for some reason if I change the selectedSurvey type from SelectedSurvey to AllSurveys_surveys, I get a compilation error
+// (error: 'AllSurveys_surveys' is defined but never used  no-unused-vars)
 interface SelectedSurvey {
   id: number;
   qualtricsId: string;
   qualtricsName: string;
   qualtricsModDate: string;
+  okayForGroup: boolean;
+  detailedDescription: string;
 }
 
 @Component({
@@ -200,7 +208,9 @@ interface SelectedSurvey {
       query: ALL_SURVEYS_QUERY,
       update: (data) => {
         console.log("surveys! ", data);
-        return data.surveys;
+        return data.surveys.filter(
+          (survey: SelectedSurvey) => survey.okayForGroup
+        );
       },
     },
   },
@@ -251,15 +261,54 @@ export default class GroupSignUp extends Vue {
 
   submit() {
     console.log("submit! ", this.email, this.closingDate);
+
     // typeOfGroup gets mapped to Group.type; if typeOfGroup==="OTHER", then use the value of typeOfGroupFreeFormText instead(!)
     // descriptionOfGroup gets mapped to Group.name
     // need to add in the codeWord and use first name/last name for admin
+
+    if (
+      (this.$refs.form as Vue & {
+        validate: () => boolean;
+      }).validate() && (this.selectedSurvey !== null)
+    ) {
+      this.$apollo
+        .mutate({
+          mutation: ADD_GROUP_MUTATION,
+          variables: {
+            createInput: {
+              name: this.descriptionOfGroup,
+              type:
+                this.typeOfGroup === "OTHER"
+                  ? this.typeOfGroupFreeFormText
+                  : this.typeOfGroup,
+              closedAfter: this.closingDate,
+              adminFirstName: this.adminFirstName,
+              adminLastName: this.adminLastName,
+              adminEmail: this.email,
+              codeWord: "asdfadsf", //TODO: this should not be part of createInput (should be created by the server)....
+              surveyId: this.selectedSurvey.id,
+            },
+          },
+        })
+        .then(({ data }) => {
+          console.log("done!", data);
+          //this.$emit("letter-created", data.createLetter.id);
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+          //this.errorMessage =
+          //  "Sorry, there appears to have been an error.  Please tray again later.";
+        });
+    }
   }
 
   mounted(): void {
     console.log("inside mounted");
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setDate
     // https://stackoverflow.com/questions/563406/add-days-to-javascript-date
+    let closingDateObject = new Date();
+    closingDateObject.setDate(closingDateObject.getDate() + 28); // set the default closing date to be four weeks from now
+    this.closingDate = closingDateObject.toISOString().substr(0, 10);
     this.maxClosingDate.setDate(this.maxClosingDate.getDate() + 42); // sets the max closing date to be six weeks from now
     this.maxClosingDateString = this.maxClosingDate.toISOString();
     console.log("max date: ", this.maxClosingDateString);

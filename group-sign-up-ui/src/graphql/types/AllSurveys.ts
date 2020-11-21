@@ -24,6 +24,14 @@ export interface AllSurveys_surveys {
    * Date and time at which this survey was modified on Qualtrics
    */
   qualtricsModDate: string;
+  /**
+   * Make this survey available to groups?
+   */
+  okayForGroup: boolean;
+  /**
+   * Detailed description of this survey; mostly for group use
+   */
+  detailedDescription: string;
 }
 
 export interface AllSurveys {
