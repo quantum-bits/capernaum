@@ -73,3 +73,7 @@ fixtures:
       image:
         key: image
         description: Image
+      demographics-chart:
+        key: demographics-chart
+        description: Demographics Chart
+  

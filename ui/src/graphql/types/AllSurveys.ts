@@ -64,6 +64,14 @@ export interface AllSurveys_surveys {
    */
   qualtricsModDate: string;
   /**
+   * Make this survey available to groups?
+   */
+  okayForGroup: boolean;
+  /**
+   * Detailed description of this survey; mostly for group use
+   */
+  detailedDescription: string;
+  /**
    * Fetch the letters for this survey
    */
   letters: AllSurveys_surveys_letters[];

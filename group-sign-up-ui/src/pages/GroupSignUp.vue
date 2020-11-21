@@ -39,19 +39,47 @@
                 required
               />
               <v-text-field
-                v-model="adminName"
-                label="Your Name"
-                name="adminName"
+                v-model="adminFirstName"
+                label="Your First Name"
+                name="adminFirstName"
                 prepend-icon="mdi-pencil"
                 type="text"
+                :rules="[rules.required]"
+                required
               />
               <v-text-field
-                v-model="typeOfGroup"
-                label="Type of Group"
+                v-model="adminLastName"
+                label="Your Last Name"
+                name="adminLastName"
+                prepend-icon="mdi-pencil"
+                type="text"
+                :rules="[rules.required]"
+                required
+              />
+              <p class="text-left">
+                Type of Group:
+              </p>
+              <v-radio-group class="pl-4" v-model="typeOfGroup" column>
+                <v-radio
+                  label="Spiritual growth group (e.g., small group, Sunday school class)"
+                  color="indigo darken-3"
+                  value="SPIRITUAL_GROWTH_GROUP"
+                ></v-radio>
+                <v-radio label="College spiritual life assessment" color="indigo darken-3" value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"></v-radio>
+                <v-radio
+                  label="Other"
+                  color="indigo darken-3"
+                  value="OTHER"
+                ></v-radio>
+
+              </v-radio-group>
+
+              <v-text-field class="pl-10 mt-n5" v-show="typeOfGroup==='OTHER'"
+                v-model="typeOfGroupFreeFormText"
+                label="Pleae Specify Other Type"
                 name="typeOfGroup"
                 prepend-icon="mdi-pencil"
                 type="text"
-                hint="E.g., church, youth group, college"
               />
 
               <v-text-field
@@ -60,7 +88,7 @@
                 name="descriptionOfGroup"
                 prepend-icon="mdi-pencil"
                 type="text"
-                hint="E.g., First Baptist Youth Group (your respondents will see this description)"
+                hint="E.g., First Baptist Youth Group (your participants will see this description)"
                 persistent-hint
                 :rules="[rules.required]"
                 required
@@ -196,8 +224,10 @@ export default class GroupSignUp extends Vue {
   };*/
   email: string = "";
   typeOfGroup: string = "";
+  typeOfGroupFreeFormText: string = "";
   descriptionOfGroup: string = "";
-  adminName: string = "";
+  adminFirstName: string = "";
+  adminLastName: string = "";
 
   isValid: boolean = true;
 
@@ -221,6 +251,9 @@ export default class GroupSignUp extends Vue {
 
   submit() {
     console.log("submit! ", this.email, this.closingDate);
+    // typeOfGroup gets mapped to Group.type; if typeOfGroup==="OTHER", then use the value of typeOfGroupFreeFormText instead(!)
+    // descriptionOfGroup gets mapped to Group.name
+    // need to add in the codeWord and use first name/last name for admin
   }
 
   mounted(): void {

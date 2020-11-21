@@ -25,6 +25,8 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsId
       qualtricsName
       qualtricsModDate
+      okayForGroup
+      detailedDescription
       letters {
         id
         title

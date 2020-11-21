@@ -8,7 +8,6 @@
         <v-switch v-model="showAllSurveys" label="Show All" />
       </v-col>
     </v-row>
-
     <v-row>
       <v-col>
         <v-data-iterator
@@ -137,6 +136,8 @@
                     </v-menu>
                   </v-toolbar>
 
+                  
+                  <v-divider v-show="item.isImported"/>
                   <v-list dense>
                     <v-list-item v-show="item.isImported">
                       <v-list-item-content>Letters</v-list-item-content>
@@ -177,7 +178,20 @@
                         {{ item.qualtricsModDate | dateAndTime }}
                       </v-list-item-content>
                     </v-list-item>
+                    <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Groups OK?</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.okayForGroup }}
+                      </v-list-item-content>
+                    </v-list-item>
                   </v-list>
+
+                  <v-divider v-show="item.isImported" />
+                  <v-card-text v-show="item.isImported">
+                    <strong>Detailed Description: </strong>
+                    {{item.detailedDescription}}
+                  </v-card-text>
+
                 </v-card>
               </v-col>
             </v-row>
@@ -215,6 +229,8 @@ interface CombinedSurvey {
   qualtricsName: string;
   qualtricsModDate: string;
   qualtricsIsActive: boolean;
+  okayForGroup: boolean;
+  detailedDescription: string;
 
   capId: number | null;
   isImported: boolean;
@@ -242,7 +258,10 @@ export default Vue.extend({
   apollo: {
     surveys: {
       query: ALL_SURVEYS_QUERY,
-      update: (data) => data.surveys,
+      update: (data) => {
+        console.log('surveys!', data.surveys);
+        return data.surveys
+      },
       fetchPolicy: "network-only",
     },
 
@@ -306,8 +325,12 @@ export default Vue.extend({
 
       for (let capSurvey of this.surveys) {
         const combinedSurvey = getCombinedSurvey(capSurvey.qualtricsId);
+        console.log('here is the combined survey: ', combinedSurvey);
         combinedSurvey.capId = capSurvey.id;
         combinedSurvey.isImported = true;
+        console.log('okay for group?', capSurvey.okayForGroup);
+        combinedSurvey.okayForGroup = capSurvey.okayForGroup;
+        combinedSurvey.detailedDescription = capSurvey.detailedDescription;
 
         // Does this survey have a reference from a letter-related entity?
         // Note that we do not check for survey items because these are
@@ -327,6 +350,7 @@ export default Vue.extend({
             combinedSurvey.responseCount >
           0;
       }
+      console.log('surveys: ', this.surveys);
 
       for (let qualtricsSurvey of this.qualtricsSurveys) {
         const combinedSurvey = getCombinedSurvey(qualtricsSurvey.qualtricsId);
