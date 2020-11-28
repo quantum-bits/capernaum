@@ -12,6 +12,22 @@ export const ALL_GROUPS = gql`
   query AllGroups {
     allGroups: readGroups {
       id
+      name
+      type
+      created
+      closedAfter
+      adminFirstName
+      adminLastName
+      adminEmail
+      codeWord
+      survey {
+        id
+        qualtricsId
+        qualtricsName
+        emailKey
+        groupCodeKey
+        okayForGroup
+      }
     }
   }
 `;

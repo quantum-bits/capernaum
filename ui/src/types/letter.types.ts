@@ -59,3 +59,11 @@ export enum LetterElementEnum {
   IMAGE = "image",
   DEMOGRAPHICS_CHART = "demographics-chart",
 }
+
+/**
+ * enum for type of letter
+ */
+export enum LetterTypeEnum {
+  INDIVIDUAL = "INDIVIDUAL",
+  GROUP = "GROUP",
+}

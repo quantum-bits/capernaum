@@ -1,11 +1,31 @@
 <template>
   <v-container>
     <v-row class="align-baseline">
-      <v-col>
+      <v-col cols="3">
         <h1 class="headline">Responses</h1>
       </v-col>
-      <v-col>
+      <v-col cols="8">
         <v-row class="align-baseline">
+          <v-col>
+            <v-select
+              class="mr-2"
+              v-model="chosenLetterType"
+              :items="letterTypes"
+              item-text="description"
+              item-value="id"
+              return-object
+              label="Letter Type"
+          /></v-col>
+          <v-col v-if="isGroupLetter">
+            <v-select
+              class="mr-2"
+              v-model="chosenGroup"
+              :items="groups"
+              item-text="name"
+              item-value="id"
+              return-object
+              label="Choose Group"
+          /></v-col>
           <v-col>
             <v-select
               class="mr-2"
@@ -26,6 +46,25 @@
       </v-col>
       <v-col cols="1">
         <v-progress-circular v-if="spinnerVisible" indeterminate />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="groupSelected"> 
+      <v-col>
+        <v-card>
+          <v-card-title>
+            {{chosenGroup.name}}
+          </v-card-title>
+          <v-card-subtitle>
+            {{chosenGroup.type}}
+          </v-card-subtitle>
+          <v-card-text>
+            <p><strong>Admin:</strong>  {{chosenGroup.adminFirstName}} {{chosenGroup.adminLastName}} (email: {{chosenGroup.adminEmail}})</p>
+            <p><strong>Code Word: </strong> {{chosenGroup.codeWord}}</p>
+            <p><strong>Closed After: </strong> {{chosenGroup.closeAfter}}</p>
+            <p><strong>Created: </strong> {{chosenGroup.created}}</p>
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
 
@@ -137,6 +176,11 @@ import {
   ALL_SURVEYS_QUERY,
   DELETE_SURVEY_RESPONSE,
 } from "@/graphql/surveys.graphql";
+
+import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
+
+import { ALL_GROUPS } from "@/graphql/groups.graphql";
+
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { AllResponses_surveyResponses as SurveyResponse } from "@/graphql/types/AllResponses";
 import {
@@ -148,7 +192,10 @@ import MailDialog from "@/components/dialogs/MailDialog.vue";
 import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
+import { AllGroups_allGroups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
+import { LetterTypeEnum } from "../types/letter.types";
+import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 
 // FIXME: This cross application include is an abomination.
 import {
@@ -173,21 +220,17 @@ export default Vue.extend({
     ResponseSummary,
   },
 
-  apollo: {
-    surveys: {
-      query: ALL_SURVEYS_QUERY,
-    },
-
-    surveyResponses: {
-      query: ALL_RESPONSES_QUERY,
-      update: (data) => data.surveyResponses,
-      fetchPolicy: "network-only",
-    },
-  },
-
   data() {
     return {
       surveys: [] as ImportedSurvey[],
+      groups: [] as AllGroups_allGroups[],
+      letterTypes: [] as ReadLetterTypes_readLetterTypes[],
+      chosenLetterType: {
+        id: -Infinity,
+        key: "",
+        description: ""
+      } as ReadLetterTypes_readLetterTypes,
+      chosenGroup: null as AllGroups_allGroups | null,
       selectedQualtricsId: "",
       responseSearch: "",
       selectedResponses: [],
@@ -232,7 +275,56 @@ export default Vue.extend({
     };
   },
 
+  apollo: {
+    surveys: {
+      query: ALL_SURVEYS_QUERY,
+    },
+
+    groups: {
+      query: ALL_GROUPS,
+      update: (data) => {
+        console.log("groups: ", data);
+        return data.allGroups;
+      }
+    },
+
+    letterTypes: {
+      query: ALL_LETTER_TYPES_QUERY,
+      update: (data) => {
+        console.log("letter types: ", data);
+        console.log(this.chosenLetterType);
+        /*data.readLetterTypes.forEach((letterType: ReadLetterTypes_readLetterTypes) => {
+          if (letterType.key === LetterTypeEnum.INDIVIDUAL) {
+            this.chosenLetterType = {
+              id: letterType.id,
+              key: letterType.key,
+              description: letterType.description
+            }
+          }
+        });
+        */
+        return data.readLetterTypes;
+      }
+    },
+
+    surveyResponses: {
+      query: ALL_RESPONSES_QUERY,
+      update: (data) => data.surveyResponses,
+      fetchPolicy: "network-only",
+    },
+  },
+
+  
+
   computed: {
+    isGroupLetter(): boolean {
+      return this.chosenLetterType.key === LetterTypeEnum.GROUP;
+    },
+
+    groupSelected(): boolean {
+      return (this.chosenLetterType.key === LetterTypeEnum.GROUP) && (this.chosenGroup !== null);
+    },
+
     availableSurveys(): Array<Record<string, string>> {
       return this.surveys.map((survey) => ({
         text: survey.qualtricsName,
@@ -397,6 +489,10 @@ export default Vue.extend({
           this.spinnerVisible = false;
         });
     },
+  },
+  mounted(): void {
+    console.log("mounted....");
+    //this.refetchSEPracticeData();
   },
 });
 </script>
