@@ -101,7 +101,9 @@
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Letter Type:
-            <span class="font-weight-light">{{ letter.letterType.description }}</span>
+            <span class="font-weight-light">{{
+              letter.letterType.description
+            }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
@@ -117,9 +119,7 @@
           </h2>
         </v-flex>
         <v-flex v-if="!surveyLetterIsFrozen" xs3 class="text-xs-right">
-          <v-btn color="primary" dark @click="toggleEditMode">
-            Edit
-          </v-btn>
+          <v-btn color="primary" dark @click="toggleEditMode"> Edit </v-btn>
         </v-flex>
       </v-layout>
     </div>
@@ -226,10 +226,10 @@
           />
         </div>
       </v-flex>
-
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
           v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
+          :letterType="letter.letterType"
           @click="addElement($event)"
           offset-y
         />

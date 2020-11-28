@@ -49,26 +49,59 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="groupSelected"> 
+    <v-row v-if="!isGroupLetter && !isIndividualLetter">
       <v-col>
-        <v-card>
-          <v-card-title>
-            {{chosenGroup.name}}
-          </v-card-title>
-          <v-card-subtitle>
-            {{chosenGroup.type}}
-          </v-card-subtitle>
+        <v-card class="mx-auto" max-width="500">
           <v-card-text>
-            <p><strong>Admin:</strong>  {{chosenGroup.adminFirstName}} {{chosenGroup.adminLastName}} (email: {{chosenGroup.adminEmail}})</p>
-            <p><strong>Code Word: </strong> {{chosenGroup.codeWord}}</p>
-            <p><strong>Closed After: </strong> {{chosenGroup.closeAfter}}</p>
-            <p><strong>Created: </strong> {{chosenGroup.created}}</p>
+            Please select a Letter Type to get started.
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="isGroupLetter && !groupSelected">
+      <v-col>
+        <v-card class="mx-auto" max-width="500">
+          <v-card-text>
+            Please select a Group to get started.
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="groupSelected">
+      <v-col>
+        <v-card class="mx-auto" max-width="500">
+          <v-card-title>
+            {{ chosenGroup.name }}
+          </v-card-title>
+          <v-card-subtitle>
+            {{ chosenGroup.type }}
+          </v-card-subtitle>
+          <v-card-text>
+            <p>
+              <strong>Admin:</strong> {{ chosenGroup.adminFirstName }}
+              {{ chosenGroup.adminLastName }} (email:
+              {{ chosenGroup.adminEmail }})
+            </p>
+            <p><strong>Code Word: </strong> {{ chosenGroup.codeWord }}</p>
+            <p><strong>Closed After: </strong> {{ chosenGroup.closedAfter }}</p>
+            <p><strong>Created: </strong> {{ chosenGroup.created }}</p>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-email</v-icon>
+            </v-btn>
+            <v-btn icon>
+              <v-icon>mdi-adobe-acrobat</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="(isGroupLetter & groupSelected) || isIndividualLetter">
       <v-col>
         <v-card>
           <v-card-title>
@@ -228,7 +261,7 @@ export default Vue.extend({
       chosenLetterType: {
         id: -Infinity,
         key: "",
-        description: ""
+        description: "",
       } as ReadLetterTypes_readLetterTypes,
       chosenGroup: null as AllGroups_allGroups | null,
       selectedQualtricsId: "",
@@ -285,14 +318,14 @@ export default Vue.extend({
       update: (data) => {
         console.log("groups: ", data);
         return data.allGroups;
-      }
+      },
     },
 
     letterTypes: {
       query: ALL_LETTER_TYPES_QUERY,
       update: (data) => {
         console.log("letter types: ", data);
-        console.log(this.chosenLetterType);
+        //console.log(this.chosenLetterType);
         /*data.readLetterTypes.forEach((letterType: ReadLetterTypes_readLetterTypes) => {
           if (letterType.key === LetterTypeEnum.INDIVIDUAL) {
             this.chosenLetterType = {
@@ -304,17 +337,18 @@ export default Vue.extend({
         });
         */
         return data.readLetterTypes;
-      }
+      },
     },
 
     surveyResponses: {
       query: ALL_RESPONSES_QUERY,
-      update: (data) => data.surveyResponses,
+      update: (data) => {
+        console.log("survey responses: ", data.surveyResponses);
+        return data.surveyResponses;
+      },
       fetchPolicy: "network-only",
     },
   },
-
-  
 
   computed: {
     isGroupLetter(): boolean {
@@ -322,7 +356,14 @@ export default Vue.extend({
     },
 
     groupSelected(): boolean {
-      return (this.chosenLetterType.key === LetterTypeEnum.GROUP) && (this.chosenGroup !== null);
+      return (
+        this.chosenLetterType.key === LetterTypeEnum.GROUP &&
+        this.chosenGroup !== null
+      );
+    },
+
+    isIndividualLetter(): boolean {
+      return this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL;
     },
 
     availableSurveys(): Array<Record<string, string>> {
@@ -454,11 +495,22 @@ export default Vue.extend({
     },
 
     letterTitle(item: SurveyResponse) {
-      if (item.survey.letter) {
-        return item.survey.letter.title;
-      } else {
-        return "No letter";
+      let letterTitle = "No letter";// default
+      if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
+        console.log("individual letter!", item);
+        item.survey.letters.forEach( (letter) => {
+          if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+            letterTitle = letter.title;
+          }
+        });
+      } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
+        item.survey.letters.forEach( (letter) => {
+          if (letter.letterType.key === LetterTypeEnum.GROUP) {
+            letterTitle = letter.title;
+          }
+        });
       }
+      return letterTitle;
     },
 
     fetchFromQualtrics() {

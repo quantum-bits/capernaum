@@ -14,6 +14,11 @@ export const ALL_RESPONSES_QUERY = gql`
           title
           description
           emailMessage
+          letterType {
+            id
+            key
+            description
+          }
         }
       }
       startDate
