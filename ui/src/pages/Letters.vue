@@ -45,7 +45,7 @@
               <td class="text-xs-right">{{ item.updated | dateAndTime }}</td>
               <td class="text-xs-right">{{ item.letterType }}</td>
               <td class="text-xs-right">
-                <v-tooltip top>
+                <v-tooltip v-if="!item.isGroupLetter" top>
                   <template v-slot:activator="{ on }">
                     <a @click="viewAssociationTable(item)" v-on="on">
                       <v-icon>
@@ -56,6 +56,14 @@
                   <span
                     >View/edit boolean association table for this letter.</span
                   >
+                </v-tooltip>
+                <v-tooltip v-else top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon v-on="on" class="grey--text text--lighten-1">
+                      {{ "mdi-table" }}
+                    </v-icon>
+                  </template>
+                  <span>No boolean association table because this is a group letter.</span>
                 </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -116,6 +124,7 @@ import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes
 
 import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
 import NewLetterButton from "@/components/NewLetterButton.vue";
+import { LetterTypeEnum } from "../types/letter.types";
 
 interface LetterInfo {
   title: string;
@@ -124,6 +133,7 @@ interface LetterInfo {
   updated: string;
   id: number;
   canDelete: boolean;
+  isGroupLetter: boolean;
 }
 
 @Component({
@@ -180,6 +190,7 @@ export default class LettersPage extends Vue {
       letterType: letter.letterType.description,
       id: letter.id,
       canDelete: this.canDeleteLetter(letter),
+      isGroupLetter: letter.letterType.key === LetterTypeEnum.GROUP,
     }));
   }
 

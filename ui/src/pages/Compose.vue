@@ -143,7 +143,7 @@
       </LetterInfoForm>
     </div>
     <div v-if="letterExists">
-      <v-layout row wrap>
+      <v-layout v-if="letterExistsAndIsNotGroup" row wrap>
         <v-flex xs7 offset-xs1>
           <h2 class="title font-weight-regular mb-1">
             Boolean Association Table:
@@ -176,7 +176,7 @@
           <LetterTextArea
             :letterId="letter.id"
             :initialTextDelta="letter.emailMessage"
-            :description="'Email message to respondent'"
+            :description="emailDescription"
             :parentIsFrozen="surveyLetterIsFrozen"
             :isEmailText="'true'"
             v-on:edit-mode-on="setEmailEditModeOn()"
@@ -188,7 +188,7 @@
 
     <v-layout v-if="letterExists" row wrap>
       <v-flex xs10 offset-xs1>
-        <h2 class="title font-weight-regular mb-3 mt-5">Content of Letter:</h2>
+        <h2 class="title font-weight-regular mb-3 mt-5">{{letterContentHeading}}:</h2>
       </v-flex>
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
@@ -259,7 +259,7 @@ import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
 
-import { LetterElementEnum } from "../types/letter.types";
+import { LetterElementEnum, LetterTypeEnum } from "../types/letter.types";
 
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 
@@ -455,6 +455,31 @@ export default class Compose extends Vue {
       return false;
     }
     // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
+  }
+
+  get letterExistsAndIsNotGroup(): boolean {
+    if (this.letterExists) {
+      return this.theLetter.letterType.key !== LetterTypeEnum.GROUP;
+    } else {
+      return false;
+    }
+    // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
+  }
+
+  get emailDescription(): string {
+    if (this.letterExists) {
+      return this.theLetter.letterType.key === LetterTypeEnum.GROUP ? "Email message to Group Admin" : "Email message to respondent";
+    } else {
+      return "Email message to respondent";
+    }
+  }
+
+  get letterContentHeading(): string {
+    if (this.letterExists) {
+      return this.theLetter.letterType.key === LetterTypeEnum.GROUP ? "Content of Group Letter" : "Content of Individual Letter";
+    } else {
+      return "Content of Letter";
+    }
   }
 
   get letterExistsAndEditModeOff(): boolean {

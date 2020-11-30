@@ -42,6 +42,7 @@
 import { Component, Vue } from "vue-property-decorator";
 
 import AssociationTable from "../components/AssociationTable.vue";
+import { LetterTypeEnum } from "../types/letter.types";
 
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 
