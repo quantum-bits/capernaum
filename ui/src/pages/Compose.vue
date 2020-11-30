@@ -546,10 +546,11 @@ export default class Compose extends Vue {
   // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   cancelChartSelection(): void {
     if (this.$refs.chartForm) {
+      console.log("canceling chart selection....");
       (this.$refs.chartForm as Vue & {
         resetValidation: () => boolean;
       }).resetValidation();
-      (this.$refs.form as Vue & {
+      (this.$refs.chartForm as Vue & {
         reset: () => boolean;
       }).reset();
     } else {
@@ -582,7 +583,7 @@ export default class Compose extends Vue {
   // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   submitChartSelection(): void {
     //console.log("selected survey dimension: ", this.selectedSurveyDimension);
-    //console.log("chart form: ", this.$refs.chartForm);
+    console.log("chart form: ", this.$refs.chartForm);
     if (
       (this.$refs.chartForm as Vue & { validate: () => boolean }).validate()
     ) {
