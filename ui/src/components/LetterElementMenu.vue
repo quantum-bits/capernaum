@@ -1,9 +1,7 @@
 <template>
   <v-menu>
     <template v-slot:activator="{ on }">
-      <v-btn color="primary" dark v-on="on">
-        Add Letter Element
-      </v-btn>
+      <v-btn color="primary" dark v-on="on"> Add Letter Element </v-btn>
     </template>
     <v-list>
       <v-list-item
@@ -20,7 +18,11 @@
 <script lang="ts">
 import Vue from "vue";
 //import { ALL_LETTER_ELEMENT_TYPES_QUERY } from "@/graphql/letters.graphql";
-import { OneLetter_letter_letterType, OneLetter_letter_letterType_letterElementTypes,OneLetter_letter_letterElements_letterElementType } from "@/graphql/types/OneLetter";
+import {
+  OneLetter_letter_letterType,
+  OneLetter_letter_letterType_letterElementTypes,
+  OneLetter_letter_letterElements_letterElementType,
+} from "@/graphql/types/OneLetter";
 
 export default Vue.extend({
   name: "ComposeMenu",
@@ -34,21 +36,21 @@ export default Vue.extend({
   */
 
   props: {
-    letterType: OneLetter_letter_letterType,
+    letterType: Object as () => OneLetter_letter_letterType,
   },
 
   computed: {
     filteredLetterElementTypes(): OneLetter_letter_letterType_letterElementTypes[] {
-      console.log('inside computed!', this.letterType);
-      let returnArray: OneLetter_letter_letterType_letterElementTypes;
+      console.log("inside computed!", this.letterType);
+      //let returnArray: OneLetter_letter_letterType_letterElementTypes;
       if (this.letterType === undefined) {
-        console.log('no letter type yet!');
+        console.log("no letter type yet!");
         return [];
       } else {
-        console.log('we got letters!');
+        console.log("we got letters!");
         return this.letterType.letterElementTypes;
       }
-    }
+    },
   },
 
   data() {
@@ -56,16 +58,6 @@ export default Vue.extend({
       letterElementTypes: [],
     };
   },
-
-  /*
-  computed: {
-    filteredletterElementTypes(): OneLetter_letter_letterElements_letterElementType[] {
-      this.letterElementTypes.filter()
-
-      return allowedLetterTypes;
-    },
-  },
-  */
 
   methods: {
     emitLetterElementType(
@@ -76,8 +68,7 @@ export default Vue.extend({
   },
 
   mounted: function () {
-    console.log('mounted!', this.letterType);
-  }
-  
+    console.log("mounted!", this.letterType);
+  },
 });
 </script>

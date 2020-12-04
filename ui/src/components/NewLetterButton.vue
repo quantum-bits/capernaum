@@ -3,14 +3,12 @@
     <v-tooltip bottom>
       <template v-slot:activator="{ on }">
         <span v-on="on">
-          <v-btn color="primary" disabled>
-            New Letter
-          </v-btn>
+          <v-btn color="primary" disabled> New Letter </v-btn>
         </span>
       </template>
       <span
-        >All imported surveys already have letters of all types. To create another letter,
-        please import a survey first.</span
+        >All imported surveys already have letters of all types. To create
+        another letter, please import a survey first.</span
       >
     </v-tooltip>
   </span>
@@ -31,11 +29,9 @@ import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 import {
-  AllSurveys,
   AllSurveys_surveys,
   AllSurveys_surveys_letters,
 } from "@/graphql/types/AllSurveys";
-
 
 export default Vue.extend({
   name: "NewLetterButton",
@@ -47,9 +43,9 @@ export default Vue.extend({
     surveys: {
       query: ALL_SURVEYS_QUERY,
       //update(data: AllSurveys) {
-        //this.allSurveysHaveLetters = data.surveys.every(
-        //  (survey) => survey.letter !== null
-        //);
+      //this.allSurveysHaveLetters = data.surveys.every(
+      //  (survey) => survey.letter !== null
+      //);
       //  console.log("surveys! ", data.surveys);
       //  return data.surveys;
       //},
@@ -72,29 +68,36 @@ export default Vue.extend({
       //  allowAddLetter: true,
       //}));
       let allowAddLetter = false;
-      this.readLetterTypes.forEach((letterType: ReadLetterTypes_readLetterTypes) => {
-        //let allowAddLetter = false;
-        this.surveys.forEach((survey) => {
-          let hasThisType = false;
-          survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
-            if (letter.letterType.key === letterType.key) {
-              hasThisType = true;
-              console.log('this survey has this type of letter!', letter.letterType.key);
+      this.readLetterTypes.forEach(
+        (letterType: ReadLetterTypes_readLetterTypes) => {
+          //let allowAddLetter = false;
+          this.surveys.forEach((survey) => {
+            let hasThisType = false;
+            survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
+              if (letter.letterType.key === letterType.key) {
+                hasThisType = true;
+                console.log(
+                  "this survey has this type of letter!",
+                  letter.letterType.key
+                );
+              }
+            });
+            if (!hasThisType) {
+              allowAddLetter = true;
+              console.log(
+                "one or more surveys do not yet have letters of all types!"
+              );
             }
           });
-          if (!hasThisType) {
-            allowAddLetter = true;
-            console.log('one or more surveys do not yet have letters of all types!');
-          }
-        });
-      });
+        }
+      );
       return allowAddLetter;
     },
   },
 
   methods: {
     emitAddLetter() {
-      this.$emit("click", 'new letter!');
+      this.$emit("click", "new letter!");
     },
   },
 });

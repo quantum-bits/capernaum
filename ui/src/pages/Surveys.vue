@@ -123,9 +123,7 @@
                               :disabled="disableRemove(item)"
                               @click="deleteSurvey(item.capId)"
                             >
-                              <v-list-item-title>
-                                Remove
-                              </v-list-item-title>
+                              <v-list-item-title> Remove </v-list-item-title>
                             </v-list-item>
                           </template>
                           <span>
@@ -136,13 +134,18 @@
                     </v-menu>
                   </v-toolbar>
 
-                  
-                  <v-divider v-show="item.isImported"/>
+                  <v-divider v-show="item.isImported" />
                   <v-list dense>
-                    <v-list-item v-show="item.isImported">
-                      <v-list-item-content>Letters</v-list-item-content>
+                    <v-list-item
+                      v-for="letterCount in item.letterCounts"
+                      :key="letterCount.id"
+                      v-show="item.isImported"
+                    >
+                      <v-list-item-content>{{
+                        letterCount.letterTypeDescription
+                      }}</v-list-item-content>
                       <v-list-item-content class="align-end">
-                        {{ item.letterCount }}
+                        {{ letterCount.count }}
                       </v-list-item-content>
                     </v-list-item>
                     <v-list-item v-show="item.isImported">
@@ -189,9 +192,8 @@
                   <v-divider v-show="item.isImported" />
                   <v-card-text v-show="item.isImported">
                     <strong>Detailed Description: </strong>
-                    {{item.detailedDescription}}
+                    {{ item.detailedDescription }}
                   </v-card-text>
-
                 </v-card>
               </v-col>
             </v-row>
@@ -224,6 +226,12 @@
 <script lang="ts">
 import Vue from "vue";
 
+interface LetterCount {
+  count: number;
+  letterTypeDescription: string;
+  id: number;
+}
+
 interface CombinedSurvey {
   qualtricsId: string;
   qualtricsName: string;
@@ -237,10 +245,12 @@ interface CombinedSurvey {
 
   // Stats on other entities that have this one as a FK.
   hasReference: boolean;
-  letterCount: number;
+  letterCounts: LetterCount[];
   dimensionCount: number;
   responseCount: number;
 }
+
+import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
 
 import {
   ALL_QUALTRICS_SURVEYS_QUERY,
@@ -250,6 +260,7 @@ import {
 } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 import { QualtricsSurveys_qualtricsSurveys as QualtricsSurvey } from "@/graphql/types/QualtricsSurveys";
+import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 import pluralize from "pluralize";
 
 export default Vue.extend({
@@ -259,12 +270,14 @@ export default Vue.extend({
     surveys: {
       query: ALL_SURVEYS_QUERY,
       update: (data) => {
-        console.log('surveys!', data.surveys);
-        return data.surveys
+        console.log("surveys!", data.surveys);
+        return data.surveys;
       },
       fetchPolicy: "network-only",
     },
-
+    readLetterTypes: {
+      query: ALL_LETTER_TYPES_QUERY,
+    },
     qualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
       variables: {
@@ -278,6 +291,7 @@ export default Vue.extend({
   data() {
     return {
       surveys: [] as Survey[],
+      readLetterTypes: [] as ReadLetterTypes_readLetterTypes[],
       qualtricsSurveys: [] as QualtricsSurvey[],
       showAllSurveys: false,
 
@@ -325,10 +339,10 @@ export default Vue.extend({
 
       for (let capSurvey of this.surveys) {
         const combinedSurvey = getCombinedSurvey(capSurvey.qualtricsId);
-        console.log('here is the combined survey: ', combinedSurvey);
+        console.log("here is the combined survey: ", combinedSurvey);
         combinedSurvey.capId = capSurvey.id;
         combinedSurvey.isImported = true;
-        console.log('okay for group?', capSurvey.okayForGroup);
+        console.log("okay for group?", capSurvey.okayForGroup);
         combinedSurvey.okayForGroup = capSurvey.okayForGroup;
         combinedSurvey.detailedDescription = capSurvey.detailedDescription;
 
@@ -336,7 +350,30 @@ export default Vue.extend({
         // Note that we do not check for survey items because these are
         // owned by the survey itself and are not added when creating a letter,
         // adding survey dimensions, etc.
-        combinedSurvey.letterCount = capSurvey.letter ? 1 : 0;
+        //combinedSurvey.letterCount = capSurvey.letter ? 1 : 0;
+
+        combinedSurvey.letterCounts = [];
+        let totalNumberLettersThisSurvey = 0;
+        this.readLetterTypes.forEach((letterType) => {
+          let numberLettersThisType = 0;
+          capSurvey.letters.forEach((letter) => {
+            console.log("letter", letter);
+            if (letter.letterType.key === letterType.key) {
+              numberLettersThisType += 1;
+              totalNumberLettersThisSurvey += 1;
+            }
+          });
+          combinedSurvey.letterCounts.push({
+            count: numberLettersThisType,
+            letterTypeDescription: letterType.description + "s",
+            id: letterType.id,
+          });
+        });
+        console.log("letter counts this survey: ", combinedSurvey.letterCounts);
+        console.log(
+          "total number of letters for this survey: ",
+          totalNumberLettersThisSurvey
+        );
         combinedSurvey.dimensionCount = capSurvey.surveyDimensions
           ? capSurvey.surveyDimensions.length
           : 0;
@@ -345,12 +382,12 @@ export default Vue.extend({
           : 0;
 
         combinedSurvey.hasReference =
-          combinedSurvey.letterCount +
+          totalNumberLettersThisSurvey +
             combinedSurvey.dimensionCount +
             combinedSurvey.responseCount >
           0;
       }
-      console.log('surveys: ', this.surveys);
+      console.log("surveys: ", this.surveys);
 
       for (let qualtricsSurvey of this.qualtricsSurveys) {
         const combinedSurvey = getCombinedSurvey(qualtricsSurvey.qualtricsId);
@@ -416,9 +453,16 @@ export default Vue.extend({
 
     showReason(item: CombinedSurvey) {
       const details = [];
-      if (item.letterCount > 0) {
+      let totalNumberLetters = 0;
+      item.letterCounts.forEach((letterCount) => {
+        totalNumberLetters += letterCount.count;
+      });
+      if (totalNumberLetters > 0) {
         details.push(
-          `${item.letterCount} related ${pluralize("letter", item.letterCount)}`
+          `${totalNumberLetters} related ${pluralize(
+            "letter",
+            totalNumberLetters
+          )}`
         );
       }
       if (item.dimensionCount > 0) {

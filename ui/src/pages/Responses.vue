@@ -62,9 +62,7 @@
     <v-row v-if="isGroupLetter && !groupSelected">
       <v-col>
         <v-card class="mx-auto" max-width="500">
-          <v-card-text>
-            Please select a Group to get started.
-          </v-card-text>
+          <v-card-text> Please select a Group to get started. </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -101,7 +99,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="(isGroupLetter & groupSelected) || isIndividualLetter">
+    <v-row v-if="isGroupLetter & groupSelected || isIndividualLetter">
       <v-col>
         <v-card>
           <v-card-title>
@@ -137,12 +135,15 @@
               {{ item.endDate | sensibleDate }}
             </template>
             <template v-slot:item.action="{ item }">
-              <v-icon :disabled="!hasLetter(item)" @click="sendEmail(item)">
+              <v-icon
+                :disabled="!hasIndividualLetter(item)"
+                @click="sendEmail(item)"
+              >
                 mdi-email
               </v-icon>
               <v-icon
                 class="ml-2"
-                :disabled="!hasLetter(item)"
+                :disabled="!hasIndividualLetter(item)"
                 @click="generatePDF(item)"
               >
                 mdi-adobe-acrobat
@@ -398,11 +399,19 @@ export default Vue.extend({
     },
 
     sendEmail(surveyResponse: SurveyResponse) {
+      let numIndividualLetters = 0;
       let htmlContent = "<p>Survey results</p>";
-      if (surveyResponse.survey.letter) {
-        htmlContent = quillDeltaToHtml(
-          surveyResponse.survey.letter.emailMessage
-        );
+      surveyResponse.survey.letters.forEach((letter) => {
+        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+          htmlContent = quillDeltaToHtml(letter.emailMessage);
+          numIndividualLetters += 1;
+        }
+      });
+
+      if (numIndividualLetters === 0) {
+        throw Error("Survey has no individual letter");
+      } else if (numIndividualLetters > 1) {
+        throw Error("Survey has more than one individual letter");
       }
 
       this.mailDialog.respondentEmail = surveyResponse.email;
@@ -414,8 +423,18 @@ export default Vue.extend({
     },
 
     generatePDF(surveyResponse: SurveyResponse) {
-      if (!surveyResponse.survey.letter) {
-        throw Error("Survey has no letter");
+      let numIndividualLetters = 0;
+      let letterId = -Infinity;
+      surveyResponse.survey.letters.forEach((letter) => {
+        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+          letterId = letter.id;
+          numIndividualLetters += 1;
+        }
+      });
+      if (numIndividualLetters === 0) {
+        throw Error("Survey has no individual letter");
+      } else if (numIndividualLetters > 1) {
+        throw Error("Survey has more than one individual letter");
       }
 
       this.clearLetterWriterOutput();
@@ -426,7 +445,7 @@ export default Vue.extend({
           mutation: WRITE_LETTER_MUTATION,
           variables: {
             writerInput: {
-              letterId: surveyResponse.survey.letter.id,
+              letterId: letterId,
               surveyResponseId: surveyResponse.id,
             },
           },
@@ -450,8 +469,14 @@ export default Vue.extend({
         });
     },
 
-    hasLetter(item: SurveyResponse) {
-      return item.survey.letter !== null;
+    hasIndividualLetter(item: SurveyResponse) {
+      let hasIndivLetter = false;
+      item.survey.letters.forEach((letter) => {
+        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+          hasIndivLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
+        }
+      });
+      return hasIndivLetter;
     },
 
     confirmDelete(item: SurveyResponse) {
@@ -495,16 +520,16 @@ export default Vue.extend({
     },
 
     letterTitle(item: SurveyResponse) {
-      let letterTitle = "No letter";// default
+      let letterTitle = "No letter"; // default
       if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
         console.log("individual letter!", item);
-        item.survey.letters.forEach( (letter) => {
+        item.survey.letters.forEach((letter) => {
           if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
             letterTitle = letter.title;
           }
         });
       } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
-        item.survey.letters.forEach( (letter) => {
+        item.survey.letters.forEach((letter) => {
           if (letter.letterType.key === LetterTypeEnum.GROUP) {
             letterTitle = letter.title;
           }

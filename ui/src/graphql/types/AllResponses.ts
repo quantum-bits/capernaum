@@ -7,6 +7,15 @@
 // GraphQL query operation: AllResponses
 // ====================================================
 
+export interface AllResponses_surveyResponses_survey_letters_letterType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  key: string;
+  description: string;
+}
+
 export interface AllResponses_surveyResponses_survey_letters {
   /**
    * Unique ID for this entity
@@ -15,6 +24,7 @@ export interface AllResponses_surveyResponses_survey_letters {
   title: string;
   description: string;
   emailMessage: string;
+  letterType: AllResponses_surveyResponses_survey_letters_letterType;
 }
 
 export interface AllResponses_surveyResponses_survey {

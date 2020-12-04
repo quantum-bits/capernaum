@@ -188,7 +188,9 @@
 
     <v-layout v-if="letterExists" row wrap>
       <v-flex xs10 offset-xs1>
-        <h2 class="title font-weight-regular mb-3 mt-5">{{letterContentHeading}}:</h2>
+        <h2 class="title font-weight-regular mb-3 mt-5">
+          {{ letterContentHeading }}:
+        </h2>
       </v-flex>
       <v-flex xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
@@ -386,6 +388,12 @@ export default class Compose extends Vue {
     emailMessage: JSON.stringify({
       ops: [],
     }),
+    letterType: {
+      id: -1,
+      key: "",
+      description: "",
+      letterElementTypes: [],
+    },
     survey: {
       id: -1,
       qualtricsId: "",
@@ -468,7 +476,9 @@ export default class Compose extends Vue {
 
   get emailDescription(): string {
     if (this.letterExists) {
-      return this.theLetter.letterType.key === LetterTypeEnum.GROUP ? "Email message to Group Admin" : "Email message to respondent";
+      return this.theLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Email message to Group Admin"
+        : "Email message to respondent";
     } else {
       return "Email message to respondent";
     }
@@ -476,7 +486,9 @@ export default class Compose extends Vue {
 
   get letterContentHeading(): string {
     if (this.letterExists) {
-      return this.theLetter.letterType.key === LetterTypeEnum.GROUP ? "Content of Group Letter" : "Content of Individual Letter";
+      return this.theLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Content of Group Letter"
+        : "Content of Individual Letter";
     } else {
       return "Content of Letter";
     }

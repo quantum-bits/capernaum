@@ -112,7 +112,10 @@ export default class StaticLetterElement extends Vue {
   }
 
   get displayChart(): boolean {
-    return this.letterElementKey === LetterElementEnum.CHART || this.letterElementKey === LetterElementEnum.DEMOGRAPHICS_CHART;
+    return (
+      this.letterElementKey === LetterElementEnum.CHART ||
+      this.letterElementKey === LetterElementEnum.DEMOGRAPHICS_CHART
+    );
   }
 
   get displaySEStrategies(): boolean {

@@ -25,9 +25,9 @@ import {
   AllSurveys_surveys_letters,
 } from "@/graphql/types/AllSurveys";
 
-interface LetterType extends ReadLetterTypes_readLetterTypes {
-  allowAddLetter: boolean;
-}
+//interface LetterType extends ReadLetterTypes_readLetterTypes {
+//  allowAddLetter: boolean;
+//}
 
 export default Vue.extend({
   name: "LetterTypeMenu",
@@ -59,15 +59,15 @@ export default Vue.extend({
         key: "",
       } as ReadLetterTypes_readLetterTypes,
       letterTypeSelectionRules: [
-        (v: LetterType): string | boolean =>
-        (v && v.id !== -Infinity) ||
-        "Type of letter is required.  Note that only one letter of each type may be associated with each imported survey, so if no letter types show up in the above list, it may mean that all surveys already have a letter of all possible types.",
+        (v: ReadLetterTypes_readLetterTypes): string | boolean =>
+          (v && v.id !== -Infinity) ||
+          "Type of letter is required.  Note that only one letter of each type may be associated with each imported survey, so if no letter types show up in the above list, it may mean that all surveys already have a letter of all possible types.",
       ],
     };
   },
 
   computed: {
-    letterTypes(): LetterType[] {
+    letterTypes(): ReadLetterTypes_readLetterTypes[] {
       // https://stackoverflow.com/questions/38922998/add-property-to-an-array-of-objects
       //let letterTypeArray: LetterType[] = this.readLetterTypes.map((obj) => ({
       //  ...obj,
@@ -75,25 +75,27 @@ export default Vue.extend({
       //}));
       let allowedLetterTypes: ReadLetterTypes_readLetterTypes[] = [];
 
-      this.readLetterTypes.forEach((letterType: ReadLetterTypes_readLetterTypes) => {
-        let allowAddLetter = false;
+      this.readLetterTypes.forEach(
+        (letterType: ReadLetterTypes_readLetterTypes) => {
+          let allowAddLetter = false;
 
-        this.surveys.forEach((survey) => {
-          let hasThisType = false;
-          survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
-            if (letter.letterType.key === letterType.key) {
-              hasThisType = true;
+          this.surveys.forEach((survey) => {
+            let hasThisType = false;
+            survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
+              if (letter.letterType.key === letterType.key) {
+                hasThisType = true;
+              }
+            });
+            if (!hasThisType) {
+              allowAddLetter = true;
             }
           });
-          if (!hasThisType) {
-            allowAddLetter = true;
+          //letterType.allowAddLetter = allowAddLetter;
+          if (allowAddLetter) {
+            allowedLetterTypes.push(letterType);
           }
-        });
-        //letterType.allowAddLetter = allowAddLetter;
-        if (allowAddLetter) {
-          allowedLetterTypes.push(letterType);
         }
-      });
+      );
       //console.log("computed letter type array:", letterTypeArray);
       console.log("allowed letter types: ", allowedLetterTypes);
 

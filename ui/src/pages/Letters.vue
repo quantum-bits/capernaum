@@ -63,7 +63,10 @@
                       {{ "mdi-table" }}
                     </v-icon>
                   </template>
-                  <span>No boolean association table because this is a group letter.</span>
+                  <span
+                    >No boolean association table because this is a group
+                    letter.</span
+                  >
                 </v-tooltip>
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
@@ -115,12 +118,9 @@ import {
 
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { Letters, Letters_letters } from "@/graphql/types/Letters";
-import {
-  AllSurveys,
-  AllSurveys_surveys as Survey,
-} from "@/graphql/types/AllSurveys";
+import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 
-import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
+//import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 
 import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
 import NewLetterButton from "@/components/NewLetterButton.vue";
