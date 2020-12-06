@@ -170,6 +170,17 @@ export interface SurveyIndexUpdateInput {
   useForPredictions?: boolean | null;
 }
 
+export interface SurveyUpdateInput {
+  id: number;
+  qualtricsId?: string | null;
+  qualtricsName?: string | null;
+  qualtricsModDate?: string | null;
+  emailKey?: string | null;
+  groupCodeKey?: string | null;
+  okayForGroup?: boolean | null;
+  detailedDescription?: string | null;
+}
+
 export interface UserUpdateInput {
   id: number;
   email?: string | null;

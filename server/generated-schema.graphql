@@ -564,7 +564,7 @@ input SurveyCreateInput {
   qualtricsModDate: String!
   emailKey: String!
   groupCodeKey: String!
-  okForGroup: Boolean!
+  okayForGroup: Boolean!
   detailedDescription: String!
   surveyItems: [SurveyItemCreateInput!]!
 }
@@ -608,7 +608,7 @@ input SurveyUpdateInput {
   qualtricsModDate: String
   emailKey: String
   groupCodeKey: String
-  okForGroup: Boolean
+  okayForGroup: Boolean
   detailedDescription: String
 }
 

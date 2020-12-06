@@ -100,7 +100,7 @@ export class SurveyCreateInput {
   @Field() qualtricsModDate: string;
   @Field() emailKey: string;
   @Field() groupCodeKey: string;
-  @Field() okForGroup: boolean;
+  @Field() okayForGroup: boolean;
   @Field() detailedDescription: string;
   @Field((type) => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
@@ -114,6 +114,6 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) qualtricsModDate?: string;
   @Field({ nullable: true }) emailKey?: string;
   @Field({ nullable: true }) groupCodeKey?: string;
-  @Field({ nullable: true }) okForGroup?: boolean;
+  @Field({ nullable: true }) okayForGroup?: boolean;
   @Field({ nullable: true }) detailedDescription?: string;
 }

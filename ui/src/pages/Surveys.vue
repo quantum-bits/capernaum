@@ -115,7 +115,18 @@
                           </template>
                           <span>Update from Qualtrics</span>
                         </v-tooltip>
-
+                        <v-tooltip left :disabled="disableEdit(item)">
+                          <template v-slot:activator="{ on }">
+                            <v-list-item
+                              v-on="on"
+                              :disabled="disableEdit(item)"
+                              @click="launchEditSurveyDialog(item)"
+                            >
+                              <v-list-item-title> Edit </v-list-item-title>
+                            </v-list-item>
+                          </template>
+                          <span> Edit survey properties </span>
+                        </v-tooltip>
                         <v-tooltip left :disabled="disableRemove(item)">
                           <template v-slot:activator="{ on }">
                             <v-list-item
@@ -202,6 +213,15 @@
       </v-col>
     </v-row>
 
+    <survey-dialog
+      v-model="editSurveyDialog.visible"
+      dialog-title="Edit Survey Properties"
+      :detailed-description="editSurveyDialog.detailedDescription"
+      :qualtrics-name="editSurveyDialog.qualtricsName"
+      :okay-for-group="editSurveyDialog.okayForGroup"
+      @ready="editSurvey"
+    />
+
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
       <v-btn text @click="snackbar.visible = false">Close</v-btn>
@@ -257,14 +277,22 @@ import {
   ALL_SURVEYS_QUERY,
   DELETE_SURVEY,
   IMPORT_QUALTRICS_SURVEY,
+  UPDATE_SURVEY_MUTATION,
 } from "@/graphql/surveys.graphql";
 import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
 import { QualtricsSurveys_qualtricsSurveys as QualtricsSurvey } from "@/graphql/types/QualtricsSurveys";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
+import SurveyDialog from "../components/dialogs/SurveyDialog.vue";
+import { SurveyDialogResponse } from "@/components/dialogs/dialog.types";
+
 import pluralize from "pluralize";
 
 export default Vue.extend({
   name: "Surveys",
+
+  components: {
+    SurveyDialog,
+  },
 
   apollo: {
     surveys: {
@@ -318,6 +346,13 @@ export default Vue.extend({
       bottomSheet: {
         content: "",
         visible: false,
+      },
+      editSurveyDialog: {
+        visible: false,
+        detailedDescription: "",
+        qualtricsName: "",
+        okayForGroup: false,
+        id: -Infinity,
       },
     };
   },
@@ -426,10 +461,49 @@ export default Vue.extend({
         .catch((error) => this.showSnackbar(error));
     },
 
+    launchEditSurveyDialog(item: CombinedSurvey) {
+      if (item.capId !== null) {
+        console.log("edit this survey: ", item);
+        this.editSurveyDialog.detailedDescription = item.detailedDescription;
+        this.editSurveyDialog.qualtricsName = item.qualtricsName;
+        this.editSurveyDialog.okayForGroup = item.okayForGroup;
+        this.editSurveyDialog.id = item.capId;
+        this.editSurveyDialog.visible = true;
+      } else {
+        console.log("the survey id is not a number!");
+      }
+    },
+
+    editSurvey(dialogResponse: SurveyDialogResponse) {
+      console.log("response from dialog:", dialogResponse);
+      this.$apollo
+        .mutate({
+          mutation: UPDATE_SURVEY_MUTATION,
+          variables: {
+            updateInput: {
+              id: this.editSurveyDialog.id,
+              detailedDescription: dialogResponse.detailedDescription,
+              okayForGroup: dialogResponse.okayForGroup,
+            },
+          },
+        })
+        .then((response) => {
+          console.log("response after the update: ", response);
+          this.editSurveyDialog.visible = false;
+          //this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
     disableImport(item: CombinedSurvey) {
       return item.isImported;
     },
     disableUpdate(item: CombinedSurvey) {
+      return !item.isImported;
+    },
+    disableEdit(item: CombinedSurvey) {
       return !item.isImported;
     },
     disableRemove(item: CombinedSurvey) {

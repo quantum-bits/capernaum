@@ -127,6 +127,37 @@ export const UPDATE_INDEX_MUTATION = gql`
   }
 `;
 
+export const UPDATE_SURVEY_MUTATION = gql`
+  mutation UpdateSurvey($updateInput: SurveyUpdateInput!) {
+    updateSurvey(updateInput: $updateInput) {
+      id
+      qualtricsId
+      qualtricsName
+      qualtricsModDate
+      okayForGroup
+      detailedDescription
+      letters {
+        id
+        title
+        letterType {
+          id
+          key
+          description
+        }
+      }
+      surveyDimensions {
+        id
+      }
+      surveyItems {
+        id
+      }
+      surveyResponses {
+        id
+      }
+    }
+  }
+`;
+
 export const ONE_SURVEY_QUERY = gql`
   query OneSurvey($surveyId: Int!, $which: WhichItems = All) {
     survey(id: $surveyId) {
