@@ -4,8 +4,14 @@
       Request Group Administration of the Christian Life Survey
     </h2>
     <v-form ref="form" v-model="isValid">
-      <v-stepper v-model="e6" vertical>
-        <v-stepper-step :complete="e6 > 1" step="1" color="#4e2b4d" class="white--text">
+      <v-stepper v-model="e6" vertical non-linear>
+        <v-stepper-step
+          editable
+          :complete="e6 > 1"
+          step="1"
+          color="#4e2b4d"
+          class="white--text"
+        >
           Overview
           <!--<small>Summarize if needed</small>-->
         </v-stepper-step>
@@ -30,10 +36,18 @@
               as....
             </p>
           </v-card>
-          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 2"> Continue </v-btn>
+          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 2">
+            Continue
+          </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 2" step="2" color="#4e2b4d" class="white--text">
+        <v-stepper-step
+          :editable="stepTwoValid()"
+          :complete="e6 > 2"
+          step="2"
+          color="#4e2b4d"
+          class="white--text"
+        >
           Your information
         </v-stepper-step>
 
@@ -42,6 +56,7 @@
             <!-- add ref to the element: https://forum.vuejs.org/t/how-do-you-access-this-refs-form-validate-in-a-form-inside-of-a-menu/79406/5 -->
             <v-col sm="12" md="10">
               <v-text-field
+                color="#4e2b4d"
                 v-model="email"
                 ref="email"
                 label="Your Email"
@@ -53,6 +68,7 @@
               />
               <!-- https://stackoverflow.com/questions/56642635/how-to-add-password-matching-validation-in-vuetify/56642723 -->
               <v-text-field
+                color="#4e2b4d"
                 v-model="email2"
                 label="Confirm Your Email"
                 ref="email2"
@@ -63,6 +79,7 @@
                 required
               />
               <v-text-field
+                color="#4e2b4d"
                 v-model="adminFirstName"
                 label="Your First Name"
                 ref="adminFirstName"
@@ -73,6 +90,7 @@
                 required
               />
               <v-text-field
+                color="#4e2b4d"
                 v-model="adminLastName"
                 label="Your Last Name"
                 ref="adminLastName"
@@ -84,13 +102,24 @@
               />
             </v-col>
           </v-card>
-          <v-btn color="#4e2b4d" class="white--text" :disabled="!stepTwoValid()" @click="e6 = 3">
+          <v-btn
+            color="#4e2b4d"
+            class="white--text"
+            :disabled="!stepTwoValid()"
+            @click="e6 = 3"
+          >
             Continue
           </v-btn>
           <v-btn text @click="e6 = 1"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 3" step="3" color="#4e2b4d" class="white--text">
+        <v-stepper-step
+          :editable="stepThreeValid()"
+          :complete="e6 > 3"
+          step="3"
+          color="#4e2b4d"
+          class="white--text"
+        >
           Information about your group
         </v-stepper-step>
 
@@ -101,22 +130,19 @@
               <v-radio-group class="pl-4" v-model="typeOfGroup" column>
                 <v-radio
                   label="Spiritual growth group (e.g., small group, Sunday school class)"
-                  color="indigo darken-3"
+                  color="#4e2b4d"
                   value="SPIRITUAL_GROWTH_GROUP"
                 ></v-radio>
                 <v-radio
                   label="College spiritual life assessment"
-                  color="indigo darken-3"
+                  color="#4e2b4d"
                   value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"
                 ></v-radio>
-                <v-radio
-                  label="Other"
-                  color="indigo darken-3"
-                  value="OTHER"
-                ></v-radio>
+                <v-radio label="Other" color="#4e2b4d" value="OTHER"></v-radio>
               </v-radio-group>
 
               <v-text-field
+                color="#4e2b4d"
                 class="pl-10 mt-n5"
                 v-show="typeOfGroup === 'OTHER'"
                 v-model="typeOfGroupFreeFormText"
@@ -127,6 +153,7 @@
               />
 
               <v-text-field
+                color="#4e2b4d"
                 v-model="descriptionOfGroup"
                 label="Description of Group"
                 ref="descriptionOfGroup"
@@ -140,13 +167,24 @@
               />
             </v-col>
           </v-card>
-          <v-btn color="#4e2b4d" class="white--text" :disabled="!stepThreeValid()" @click="e6 = 4">
+          <v-btn
+            color="#4e2b4d"
+            class="white--text"
+            :disabled="!stepThreeValid()"
+            @click="e6 = 4"
+          >
             Continue
           </v-btn>
           <v-btn text @click="e6 = 2"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 4" step="4" color="#4e2b4d" class="white--text">
+        <v-stepper-step
+          :editable="stepTwoValid() && stepThreeValid()"
+          :complete="e6 > 4"
+          step="4"
+          color="#4e2b4d"
+          class="white--text"
+        >
           Closing date for the survey
           <small
             >This is the day when your group's access will end and your group
@@ -157,6 +195,7 @@
           <v-card class="mb-6 pa-6">
             <v-col sm="12" md="10">
               <v-dialog
+                color="#4e2b4d"
                 ref="dialog"
                 v-model="modal"
                 :return-value.sync="closingDate"
@@ -166,6 +205,7 @@
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
+                    color="#4e2b4d"
                     v-model="closingDate"
                     label="Survey Closing Date"
                     prepend-icon="mdi-calendar-range"
@@ -177,18 +217,19 @@
                   ></v-text-field>
                 </template>
                 <v-date-picker
+                  color="#4e2b4d"
                   v-model="closingDate"
                   :max="maxClosingDateString"
                   :min="minClosingDateString"
                   scrollable
                 >
                   <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="modal = false"
+                  <v-btn text color="#4e2b4d" @click="modal = false"
                     >Cancel</v-btn
                   >
                   <v-btn
                     text
-                    color="primary"
+                    color="#4e2b4d"
                     @click="$refs.dialog.save(closingDate)"
                     >OK</v-btn
                   >
@@ -197,18 +238,29 @@
             </v-col>
           </v-card>
 
-          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 5"> Continue </v-btn>
+          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 5">
+            Continue
+          </v-btn>
           <v-btn text @click="e6 = 3"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step step="5" color="#4e2b4d" class="white--text"> Select a survey 
+        <v-stepper-step
+          :editable="stepTwoValid() && stepThreeValid()"
+          step="5"
+          color="#4e2b4d"
+          class="white--text"
+        >
+          Select a survey
           <small>Choose from one of the following available surveys</small>
         </v-stepper-step>
         <v-stepper-content step="5">
           <v-card class="mb-6 pa-6">
             <v-col sm="12">
-          
-              <div v-for="survey in allSurveys" :key="survey.id" class="grey lighten-3 mt-2 mb-2 pa-2" >
+              <div
+                v-for="survey in allSurveys"
+                :key="survey.id"
+                class="grey lighten-3 mt-2 mb-2 pa-2"
+              >
                 <h4>{{ survey.qualtricsName }}</h4>
                 <!--<p>{{survey.detailedDescription}}</p>-->
                 <p>
@@ -216,9 +268,13 @@
                 </p>
               </div>
 
-              <p class="mt-5"> Does one of the above work?  If so, select it from the list below. </p>
+              <p class="mt-5">
+                Does one of the above work? If so, select it from the list
+                below.
+              </p>
 
               <v-select
+                color="#4e2b4d"
                 v-model="selectedSurvey"
                 :items="allSurveys"
                 item-text="qualtricsName"
@@ -233,14 +289,17 @@
             </v-col>
           </v-card>
 
-          <v-btn @click="submit" color="#4e2b4d" class="white--text" :disabled="!isValid"
+          <v-btn
+            @click="submit"
+            color="#4e2b4d"
+            class="white--text"
+            :disabled="!isValid"
             >Submit</v-btn
           >
           <v-btn text @click="e6 = 4"> Back </v-btn>
         </v-stepper-content>
       </v-stepper>
     </v-form>
-
   </v-container>
 </template>
 
@@ -449,5 +508,4 @@ a {
 .button-colour {
   color: #4e2b4d;
 }
-
 </style>
