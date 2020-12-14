@@ -390,19 +390,13 @@ export default class GroupSignUp extends Vue {
 
   stepTwoValid(): boolean {
     console.log("this.$refs: ", this.$refs);
-    if (
-      this.$refs.email &&
-      this.$refs.email2 &&
-      this.$refs.adminFirstName &&
-      this.$refs.adminLastName
-    ) {
+    if ((this.$refs.email) && (this.$refs.email2) && (this.$refs.adminFirstName) && (this.$refs.adminLastName)) {
       console.log("admin info refs seem to exist....");
-      return (
-        this.$refs.email.valid &&
-        this.$refs.email2.valid &&
-        this.$refs.adminFirstName.valid &&
-        this.$refs.adminLastName.valid
-      );
+      return this.$refs.email.valid && this.$refs.email2.valid && this.$refs.adminFirstName.valid && this.$refs.adminLastName.valid;
+        //(this.$refs.email as Vue & { valid: () => boolean }).valid &&
+        //(this.$refs.email2 as Vue & { valid: () => boolean }).valid &&
+        //(this.$refs.adminFirstName as Vue & { valid: () => boolean }).valid &&
+        //(this.$refs.adminLastName as Vue & { valid: () => boolean }).valid;
     } else {
       console.log("admin info refs do not seem to exist....");
       return false;
