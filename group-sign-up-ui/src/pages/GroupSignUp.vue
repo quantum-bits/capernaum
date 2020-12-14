@@ -5,7 +5,7 @@
     </h2>
     <v-form ref="form" v-model="isValid">
       <v-stepper v-model="e6" vertical>
-        <v-stepper-step :complete="e6 > 1" step="1">
+        <v-stepper-step :complete="e6 > 1" step="1" color="#4e2b4d" class="white--text">
           Overview
           <!--<small>Summarize if needed</small>-->
         </v-stepper-step>
@@ -30,10 +30,10 @@
               as....
             </p>
           </v-card>
-          <v-btn color="primary" @click="e6 = 2"> Continue </v-btn>
+          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 2"> Continue </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 2" step="2">
+        <v-stepper-step :complete="e6 > 2" step="2" color="#4e2b4d" class="white--text">
           Your information
         </v-stepper-step>
 
@@ -84,13 +84,13 @@
               />
             </v-col>
           </v-card>
-          <v-btn color="primary" :disabled="!stepTwoValid()" @click="e6 = 3">
+          <v-btn color="#4e2b4d" class="white--text" :disabled="!stepTwoValid()" @click="e6 = 3">
             Continue
           </v-btn>
           <v-btn text @click="e6 = 1"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 3" step="3">
+        <v-stepper-step :complete="e6 > 3" step="3" color="#4e2b4d" class="white--text">
           Information about your group
         </v-stepper-step>
 
@@ -140,13 +140,13 @@
               />
             </v-col>
           </v-card>
-          <v-btn color="primary" :disabled="!stepThreeValid()" @click="e6 = 4">
+          <v-btn color="#4e2b4d" class="white--text" :disabled="!stepThreeValid()" @click="e6 = 4">
             Continue
           </v-btn>
           <v-btn text @click="e6 = 2"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step :complete="e6 > 4" step="4">
+        <v-stepper-step :complete="e6 > 4" step="4" color="#4e2b4d" class="white--text">
           Closing date for the survey
           <small
             >This is the day when your group's access will end and your group
@@ -197,16 +197,16 @@
             </v-col>
           </v-card>
 
-          <v-btn color="primary" @click="e6 = 5"> Continue </v-btn>
+          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 5"> Continue </v-btn>
           <v-btn text @click="e6 = 3"> Back </v-btn>
         </v-stepper-content>
 
-        <v-stepper-step step="5"> Select a survey 
+        <v-stepper-step step="5" color="#4e2b4d" class="white--text"> Select a survey 
           <small>Choose from one of the following available surveys</small>
         </v-stepper-step>
         <v-stepper-content step="5">
           <v-card class="mb-6 pa-6">
-            <v-col sm="12" md="10">
+            <v-col sm="12">
           
               <div v-for="survey in allSurveys" :key="survey.id" class="grey lighten-3 mt-2 mb-2 pa-2" >
                 <h4>{{ survey.qualtricsName }}</h4>
@@ -233,7 +233,7 @@
             </v-col>
           </v-card>
 
-          <v-btn @click="submit" color="primary" :disabled="!isValid"
+          <v-btn @click="submit" color="#4e2b4d" class="white--text" :disabled="!isValid"
             >Submit</v-btn
           >
           <v-btn text @click="e6 = 4"> Back </v-btn>
@@ -241,183 +241,6 @@
       </v-stepper>
     </v-form>
 
-    <v-row align="center" justify="center">
-      <v-col cols="12" sm="12" md="12">
-        <!--<v-card>-->
-        <!--<v-toolbar color="primary" dark flat>
-            <v-toolbar-title
-              >-->
-        <h2>Request Group Administration of the Christian Life Survey</h2>
-        <p>
-          This form allows you to request an administration of the Christian
-          Life Survey for your group. Upon submission of this form you will
-          receive an email with instructions that you can forward to members of
-          your group. This email will include a <strong>group code</strong> that
-          members of your group will need to enter before they start the survey.
-        </p>
-
-        <p>
-          After completion of the survey, members of your group will each
-          receive an individualized response by email, suggesting which
-          scripture engagement practices might be helpful for them. In addition,
-          after the closing date of the survey, you as a group administrator
-          will receive a summary of group characteristics such as....
-        </p>
-        <!--</v-toolbar-title>
-          </v-toolbar>
-          <v-card-text>-->
-        <!-- https://medium.com/js-dojo/form-validation-with-vuetify-in-a-vue-app-d72e3d9b65db -->
-        <v-form ref="formm" v-model="isValid">
-          <v-row justify="center">
-            <v-col sm="12" md="10">
-              <v-text-field
-                v-model="email"
-                label="Your Email"
-                name="email"
-                prepend-icon="mdi-email"
-                type="text"
-                :rules="[rules.required, rules.email]"
-                required
-              />
-              <v-text-field
-                v-model="adminFirstName"
-                label="Your First Name"
-                name="adminFirstName"
-                prepend-icon="mdi-pencil"
-                type="text"
-                :rules="[rules.required]"
-                required
-              />
-              <v-text-field
-                v-model="adminLastName"
-                label="Your Last Name"
-                name="adminLastName"
-                prepend-icon="mdi-pencil"
-                type="text"
-                :rules="[rules.required]"
-                required
-              />
-              <p class="text-left">Type of Group:</p>
-              <v-radio-group class="pl-4" v-model="typeOfGroup" column>
-                <v-radio
-                  label="Spiritual growth group (e.g., small group, Sunday school class)"
-                  color="indigo darken-3"
-                  value="SPIRITUAL_GROWTH_GROUP"
-                ></v-radio>
-                <v-radio
-                  label="College spiritual life assessment"
-                  color="indigo darken-3"
-                  value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"
-                ></v-radio>
-                <v-radio
-                  label="Other"
-                  color="indigo darken-3"
-                  value="OTHER"
-                ></v-radio>
-              </v-radio-group>
-
-              <v-text-field
-                class="pl-10 mt-n5"
-                v-show="typeOfGroup === 'OTHER'"
-                v-model="typeOfGroupFreeFormText"
-                label="Please Specify Other Type"
-                name="typeOfGroup"
-                prepend-icon="mdi-pencil"
-                type="text"
-              />
-
-              <v-text-field
-                v-model="descriptionOfGroup"
-                label="Description of Group"
-                name="descriptionOfGroup"
-                prepend-icon="mdi-pencil"
-                type="text"
-                hint="E.g., First Baptist Youth Group (your participants will see this description)"
-                persistent-hint
-                :rules="[rules.required]"
-                required
-              />
-
-              <!--<v-col cols="12" sm="6" md="4">-->
-              <v-dialog
-                ref="dialog"
-                v-model="modal"
-                :return-value.sync="closingDate"
-                persistent
-                width="290px"
-                required
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                    class="mt-10"
-                    v-model="closingDate"
-                    label="Survey Closing Date (this is the day when the group access will end and your group results will be sent to you)"
-                    prepend-icon="mdi-calendar-range"
-                    hint="Recommended 4-6 wks"
-                    persistent-hint
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                  v-model="closingDate"
-                  :max="maxClosingDateString"
-                  :min="minClosingDateString"
-                  scrollable
-                >
-                  <v-spacer></v-spacer>
-                  <v-btn text color="primary" @click="modal = false"
-                    >Cancel</v-btn
-                  >
-                  <v-btn
-                    text
-                    color="primary"
-                    @click="$refs.dialog.save(closingDate)"
-                    >OK</v-btn
-                  >
-                </v-date-picker> </v-dialog
-              ><!--
-                  </v-card-text>
-          <v-card-actions>-->
-              <v-spacer />
-
-              <h2>Choose a Survey</h2>
-              <p>You may choose from the following survey(s):</p>
-
-              <div v-for="survey in allSurveys" :key="survey.id">
-                <h4>{{ survey.qualtricsName }}</h4>
-                <!--<p>{{survey.detailedDescription}}</p>-->
-                <p>
-                  {{ survey.detailedDescription }}
-                </p>
-              </div>
-
-              <v-select
-                v-model="selectedSurvey"
-                :items="allSurveys"
-                item-text="qualtricsName"
-                item-value="id"
-                persistent-hint
-                return-object
-                filled
-                label="Survey"
-                :rules="[rules.required]"
-                required
-              ></v-select>
-
-              <v-spacer />
-
-              <v-btn @click="submit" color="primary" :disabled="!isValid"
-                >Submit</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-form>
-        <!--</v-card-actions>
-        </v-card>-->
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 
@@ -622,4 +445,9 @@ li {
 a {
   color: #42b983;
 }
+
+.button-colour {
+  color: #4e2b4d;
+}
+
 </style>
