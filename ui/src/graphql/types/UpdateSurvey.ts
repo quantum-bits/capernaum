@@ -70,6 +70,10 @@ export interface UpdateSurvey_updateSurvey {
    */
   okayForGroup: boolean;
   /**
+   * Public name for survey (e.g., in group sign-up)
+   */
+  publicName: string;
+  /**
    * Detailed description of this survey; mostly for group use
    */
   detailedDescription: string;

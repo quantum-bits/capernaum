@@ -178,6 +178,7 @@ export interface SurveyUpdateInput {
   emailKey?: string | null;
   groupCodeKey?: string | null;
   okayForGroup?: boolean | null;
+  publicName?: string | null;
   detailedDescription?: string | null;
 }
 

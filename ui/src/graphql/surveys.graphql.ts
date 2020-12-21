@@ -26,6 +26,7 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsName
       qualtricsModDate
       okayForGroup
+      publicName
       detailedDescription
       letters {
         id
@@ -135,6 +136,7 @@ export const UPDATE_SURVEY_MUTATION = gql`
       qualtricsName
       qualtricsModDate
       okayForGroup
+      publicName
       detailedDescription
       letters {
         id

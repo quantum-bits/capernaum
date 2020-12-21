@@ -7,6 +7,17 @@
 // START Enums and Input Objects
 //==============================================================
 
+export interface GroupCreateInput {
+  name: string;
+  type: string;
+  closedAfter: string;
+  adminFirstName: string;
+  adminLastName: string;
+  adminEmail: string;
+  codeWord: string;
+  surveyId: number;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

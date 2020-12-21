@@ -6,6 +6,14 @@
       <v-form ref="surveyForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
+            v-model="dialogState.publicName"
+            label="Public Name for this Survey"
+            hint="This is the name for this survey that will be displayed publicly"
+            :rules="rules.required"
+            outlined
+            persistent-hint
+          />
+          <v-text-field
             v-model="dialogState.description"
             label="Description"
             hint="Short description that someone signing up a group will see"
@@ -53,6 +61,7 @@ export default Vue.extend({
     detailedDescription: { type: String, required: true },
     qualtricsName: { type: String, required: true },
     okayForGroup: { type: Boolean, required: true },
+    publicName: { type: String, required: true },
   },
 
   data() {
@@ -65,6 +74,7 @@ export default Vue.extend({
       dialogState: {
         description: "",
         okayForGroup: false,
+        publicName: "",
       },
     };
   },
@@ -74,6 +84,7 @@ export default Vue.extend({
       const response: SurveyDialogResponse = {
         detailedDescription: this.dialogState.description,
         okayForGroup: this.dialogState.okayForGroup,
+        publicName: this.dialogState.publicName,
       };
       this.$emit("ready", response);
       this.$emit("action", false);
@@ -87,6 +98,7 @@ export default Vue.extend({
         if (newValue) {
           this.dialogState.description = this.detailedDescription;
           this.dialogState.okayForGroup = this.okayForGroup;
+          this.dialogState.publicName = this.publicName;
           console.log("dialog state: ", this.dialogState);
           if (this.$refs.surveyForm) {
             (this.$refs.surveyForm as Vue & {

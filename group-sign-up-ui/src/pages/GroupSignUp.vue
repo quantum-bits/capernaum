@@ -261,7 +261,7 @@
                 :key="survey.id"
                 class="grey lighten-3 mt-2 mb-2 pa-2"
               >
-                <h4>{{ survey.qualtricsName }}</h4>
+                <h4>{{ survey.publicName }}</h4>
                 <!--<p>{{survey.detailedDescription}}</p>-->
                 <p>
                   {{ survey.detailedDescription }}
@@ -277,7 +277,7 @@
                 color="#4e2b4d"
                 v-model="selectedSurvey"
                 :items="allSurveys"
-                item-text="qualtricsName"
+                item-text="publicName"
                 item-value="id"
                 persistent-hint
                 return-object
@@ -321,6 +321,7 @@ interface SelectedSurvey {
   qualtricsName: string;
   qualtricsModDate: string;
   okayForGroup: boolean;
+  publicName: string;
   detailedDescription: string;
 }
 

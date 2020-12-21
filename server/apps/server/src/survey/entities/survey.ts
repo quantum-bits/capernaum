@@ -66,6 +66,10 @@ export class Survey extends AbstractEntity {
   okayForGroup: boolean;
 
   @Column({ default: "" })
+  @Field({ description: "Public name for survey (e.g., in group sign-up)" })
+  publicName: string;
+
+  @Column({ default: "" })
   @Field({
     description: "Detailed description of this survey; mostly for group use",
   })
@@ -80,7 +84,7 @@ export class Survey extends AbstractEntity {
    * Find a Capernaum item (corresponds to Qualtrics question) by Qualtrics ID
    * @param qualtricsId - qualtrics ID for item
    */
-  findItem(qualtricsId: string) {
+  findItem(qualtricsId: string): SurveyItem {
     return this.surveyItems.find((item) => item.qualtricsId === qualtricsId);
   }
 
@@ -88,7 +92,7 @@ export class Survey extends AbstractEntity {
    * Check whether the survey has a qualtrics item with the given ID.
    * @param qualtricsId - Id of item (Qualtrics question) to check
    */
-  hasItem(qualtricsId: string) {
+  hasItem(qualtricsId: string): boolean {
     return !!this.findItem(qualtricsId);
   }
 }
@@ -101,6 +105,7 @@ export class SurveyCreateInput {
   @Field() emailKey: string;
   @Field() groupCodeKey: string;
   @Field() okayForGroup: boolean;
+  @Field() publicName: string;
   @Field() detailedDescription: string;
   @Field((type) => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
@@ -115,5 +120,6 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) emailKey?: string;
   @Field({ nullable: true }) groupCodeKey?: string;
   @Field({ nullable: true }) okayForGroup?: boolean;
+  @Field({ nullable: true }) publicName?: string;
   @Field({ nullable: true }) detailedDescription?: string;
 }

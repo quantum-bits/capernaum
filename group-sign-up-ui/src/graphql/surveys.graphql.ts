@@ -12,6 +12,7 @@ export const ALL_SURVEYS_QUERY = gql`
       qualtricsName
       qualtricsModDate
       okayForGroup
+      publicName
       detailedDescription
     }
   }
@@ -25,8 +26,9 @@ export const ADD_GROUP_MUTATION = gql`
       type
       codeWord
       survey {
-       qualtricsName
-       detailedDescription 
+        publicName
+        qualtricsName
+        detailedDescription 
       }
     }
   }

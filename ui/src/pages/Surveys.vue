@@ -175,6 +175,12 @@
                     <v-divider v-show="item.isImported" />
 
                     <v-list-item v-show="item.isImported">
+                      <v-list-item-content>Public Name</v-list-item-content>
+                      <v-list-item-content class="align-end">
+                        {{ item.publicName }}
+                      </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item v-show="item.isImported">
                       <v-list-item-content>Capernaum ID</v-list-item-content>
                       <v-list-item-content class="align-end">
                         {{ item.capId }}
@@ -219,6 +225,7 @@
       :detailed-description="editSurveyDialog.detailedDescription"
       :qualtrics-name="editSurveyDialog.qualtricsName"
       :okay-for-group="editSurveyDialog.okayForGroup"
+      :public-name="editSurveyDialog.publicName"
       @ready="editSurvey"
     />
 
@@ -258,6 +265,7 @@ interface CombinedSurvey {
   qualtricsModDate: string;
   qualtricsIsActive: boolean;
   okayForGroup: boolean;
+  publicName: string;
   detailedDescription: string;
 
   capId: number | null;
@@ -352,6 +360,7 @@ export default Vue.extend({
         detailedDescription: "",
         qualtricsName: "",
         okayForGroup: false,
+        publicName: "",
         id: -Infinity,
       },
     };
@@ -379,6 +388,7 @@ export default Vue.extend({
         combinedSurvey.isImported = true;
         console.log("okay for group?", capSurvey.okayForGroup);
         combinedSurvey.okayForGroup = capSurvey.okayForGroup;
+        combinedSurvey.publicName = capSurvey.publicName;
         combinedSurvey.detailedDescription = capSurvey.detailedDescription;
 
         // Does this survey have a reference from a letter-related entity?
@@ -467,6 +477,7 @@ export default Vue.extend({
         this.editSurveyDialog.detailedDescription = item.detailedDescription;
         this.editSurveyDialog.qualtricsName = item.qualtricsName;
         this.editSurveyDialog.okayForGroup = item.okayForGroup;
+        this.editSurveyDialog.publicName = item.publicName;
         this.editSurveyDialog.id = item.capId;
         this.editSurveyDialog.visible = true;
       } else {
@@ -484,6 +495,7 @@ export default Vue.extend({
               id: this.editSurveyDialog.id,
               detailedDescription: dialogResponse.detailedDescription,
               okayForGroup: dialogResponse.okayForGroup,
+              publicName: dialogResponse.publicName,
             },
           },
         })
