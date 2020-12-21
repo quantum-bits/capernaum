@@ -4,10 +4,10 @@
       Request Group Administration of the Christian Life Survey
     </h2>
     <v-form ref="form" v-model="isValid">
-      <v-stepper v-model="e6" vertical non-linear>
+      <v-stepper v-model="formStep" vertical non-linear>
         <v-stepper-step
           editable
-          :complete="e6 > 1"
+          :complete="formStep > 1"
           step="1"
           color="#4e2b4d"
           class="white--text"
@@ -36,14 +36,14 @@
               as....
             </p>
           </v-card>
-          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 2">
+          <v-btn color="#4e2b4d" class="white--text" @click="formStep = 2">
             Continue
           </v-btn>
         </v-stepper-content>
 
         <v-stepper-step
           :editable="stepTwoValid()"
-          :complete="e6 > 2"
+          :complete="formStep > 2"
           step="2"
           color="#4e2b4d"
           class="white--text"
@@ -106,16 +106,16 @@
             color="#4e2b4d"
             class="white--text"
             :disabled="!stepTwoValid()"
-            @click="e6 = 3"
+            @click="formStep = 3"
           >
             Continue
           </v-btn>
-          <v-btn text @click="e6 = 1"> Back </v-btn>
+          <v-btn text @click="formStep = 1"> Back </v-btn>
         </v-stepper-content>
 
         <v-stepper-step
           :editable="stepThreeValid()"
-          :complete="e6 > 3"
+          :complete="formStep > 3"
           step="3"
           color="#4e2b4d"
           class="white--text"
@@ -171,16 +171,16 @@
             color="#4e2b4d"
             class="white--text"
             :disabled="!stepThreeValid()"
-            @click="e6 = 4"
+            @click="formStep = 4"
           >
             Continue
           </v-btn>
-          <v-btn text @click="e6 = 2"> Back </v-btn>
+          <v-btn text @click="formStep = 2"> Back </v-btn>
         </v-stepper-content>
 
         <v-stepper-step
-          :editable="stepTwoValid() && stepThreeValid()"
-          :complete="e6 > 4"
+          :editable="stepThreeValid() && stepThreeValid()"
+          :complete="formStep > 4"
           step="4"
           color="#4e2b4d"
           class="white--text"
@@ -238,10 +238,10 @@
             </v-col>
           </v-card>
 
-          <v-btn color="#4e2b4d" class="white--text" @click="e6 = 5">
+          <v-btn color="#4e2b4d" class="white--text" @click="formStep = 5">
             Continue
           </v-btn>
-          <v-btn text @click="e6 = 3"> Back </v-btn>
+          <v-btn text @click="formStep = 3"> Back </v-btn>
         </v-stepper-content>
 
         <v-stepper-step
@@ -296,7 +296,7 @@
             :disabled="!isValid"
             >Submit</v-btn
           >
-          <v-btn text @click="e6 = 4"> Back </v-btn>
+          <v-btn text @click="formStep = 4"> Back </v-btn>
         </v-stepper-content>
       </v-stepper>
     </v-form>
@@ -324,6 +324,10 @@ interface SelectedSurvey {
   detailedDescription: string;
 }
 
+interface InputFieldValidationHack extends Vue {
+  valid: boolean;
+}
+
 @Component({
   components: {},
   apollo: {
@@ -344,7 +348,7 @@ export default class GroupSignUp extends Vue {
   // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
   //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
-  e6 = 1;
+  formStep = 1;
   selectedSurvey: SelectedSurvey | null = null;
   //https://stackoverflow.com/questions/64116145/vuetify-multiple-v-select-required-rules-dont-work
   //surveySelectRules = {
@@ -365,6 +369,8 @@ export default class GroupSignUp extends Vue {
   adminLastName: string = "";
 
   isValid: boolean = true;
+  adminInfoFormIsValid: boolean = false;
+  groupInfoFormIsValid: boolean = false;
 
   closingDate: string = new Date().toISOString().substr(0, 10);
 
@@ -390,13 +396,19 @@ export default class GroupSignUp extends Vue {
 
   stepTwoValid(): boolean {
     console.log("this.$refs: ", this.$refs);
-    if ((this.$refs.email) && (this.$refs.email2) && (this.$refs.adminFirstName) && (this.$refs.adminLastName)) {
+    if (
+      this.$refs.email &&
+      this.$refs.email2 &&
+      this.$refs.adminFirstName &&
+      this.$refs.adminLastName
+    ) {
       console.log("admin info refs seem to exist....");
-      return this.$refs.email.valid && this.$refs.email2.valid && this.$refs.adminFirstName.valid && this.$refs.adminLastName.valid;
-        //(this.$refs.email as Vue & { valid: () => boolean }).valid &&
-        //(this.$refs.email2 as Vue & { valid: () => boolean }).valid &&
-        //(this.$refs.adminFirstName as Vue & { valid: () => boolean }).valid &&
-        //(this.$refs.adminLastName as Vue & { valid: () => boolean }).valid;
+      return (
+        (this.$refs.email as InputFieldValidationHack).valid &&
+        (this.$refs.email2 as InputFieldValidationHack).valid &&
+        (this.$refs.adminFirstName as InputFieldValidationHack).valid &&
+        (this.$refs.adminLastName as InputFieldValidationHack).valid
+      );
     } else {
       console.log("admin info refs do not seem to exist....");
       return false;
@@ -407,7 +419,7 @@ export default class GroupSignUp extends Vue {
     console.log("this.$refs: ", this.$refs);
     if (this.$refs.descriptionOfGroup) {
       console.log("group info ref seems to exist....");
-      return this.$refs.descriptionOfGroup.valid;
+      return (this.$refs.descriptionOfGroup as InputFieldValidationHack).valid;
     } else {
       console.log("group info ref does not seem to exist....");
       return false;

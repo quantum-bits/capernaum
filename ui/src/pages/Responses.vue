@@ -99,6 +99,39 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="isGroupLetter">
+      <v-col>
+        <v-card>
+          <v-card-title>
+            <v-btn
+              color="warning"
+              :disabled="!selectedResponses.length"
+              @click="deleteDialog.visible = true"
+            >
+              Delete Selected
+            </v-btn>
+            <v-spacer />
+            <v-text-field
+              v-model="responseSearch"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+              clearable
+            />
+          </v-card-title>
+          <v-data-table
+            :headers="groupHeaders"
+            :items="groups"
+            :search="responseSearch"
+            v-model="selectedGroup"
+            show-select
+            class="elevation-1"
+          >
+          </v-data-table> </v-card
+      ></v-col>
+    </v-row>
+
     <v-row v-if="isGroupLetter & groupSelected || isIndividualLetter">
       <v-col>
         <v-card>
@@ -276,6 +309,16 @@ export default Vue.extend({
         { text: "Letter", value: "letter" },
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
+        { text: "Action", value: "action", sortable: false },
+      ],
+
+      groupHeaders: [
+        { text: "Admin First Name", value: "adminFirstName" },
+        { text: "Admin Last Name", value: "adminLastName" },
+        { text: "Date", value: "date" },
+        { text: "Survey", value: "survey.qualtricsName" },
+        { text: "Email", value: "adminEmail" },
+        { text: "Group Name", value: "name" },
         { text: "Action", value: "action", sortable: false },
       ],
 
