@@ -275,6 +275,9 @@ type Survey {
   """Make this survey available to groups?"""
   okayForGroup: Boolean!
 
+  """Public name for survey (e.g., in group sign-up)"""
+  publicName: String!
+
   """Detailed description of this survey; mostly for group use"""
   detailedDescription: String!
 
@@ -565,6 +568,7 @@ input SurveyCreateInput {
   emailKey: String!
   groupCodeKey: String!
   okForGroup: Boolean!
+  publicName: String!
   detailedDescription: String!
   surveyItems: [SurveyItemCreateInput!]!
 }
@@ -609,6 +613,7 @@ input SurveyUpdateInput {
   emailKey: String
   groupCodeKey: String
   okForGroup: Boolean
+  publicName: Boolean
   detailedDescription: String
 }
 
