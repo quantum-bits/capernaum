@@ -8,7 +8,7 @@ import { LoginCredentials, LoginResponse } from "./entities";
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(returns => LoginResponse)
+  @Mutation((returns) => LoginResponse)
   login(@Args("loginCredentials") loginCredentials: LoginCredentials) {
     return this.authService.login(loginCredentials);
   }

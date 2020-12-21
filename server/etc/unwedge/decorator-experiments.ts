@@ -26,7 +26,7 @@ function AccessorDecorator(...args: any[]) {
 }
 
 function GenericDecorator(type: string) {
-  return function(...args: any[]) {
+  return function (...args: any[]) {
     console.log("\n", type.toLocaleUpperCase());
     args.forEach((arg, idx) => {
       if (typeof arg === "object") {

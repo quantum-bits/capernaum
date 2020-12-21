@@ -8,6 +8,7 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
 import debug from "debug";
+import { Group } from "@server/src/group/entities/group";
 
 const surveyDebug = debug("survey");
 
@@ -48,7 +49,11 @@ class ScriptureEngagementPracticePrediction {
 @Entity()
 @ObjectType({ description: "One user's response to a survey" })
 export class SurveyResponse extends AbstractEntity {
-  @Column("int") surveyId;
+  @Column("int") groupId: number;
+  @ManyToOne((type) => Group, (group) => group.surveyResponses)
+  group: Group;
+
+  @Column("int") surveyId: number;
   @ManyToOne((type) => Survey, (survey) => survey.surveyItems)
   @Field((type) => Survey)
   survey: Survey;
@@ -61,7 +66,7 @@ export class SurveyResponse extends AbstractEntity {
   surveyItemResponses: SurveyItemResponse[];
 
   @Column() @Field() email: string;
-  @Column() @Field() groupCode: string;
+  @Column() @Field() codeWord: string;
   @Column() @Field() qualtricsResponseId: string;
   @Column() @Field() startDate: string;
   @Column() @Field() endDate: string;

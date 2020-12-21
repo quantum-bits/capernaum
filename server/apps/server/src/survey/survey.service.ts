@@ -425,7 +425,7 @@ export class SurveyService extends BaseService {
         surveyResponseRepo.create({
           survey,
           email: createInput.values[survey.emailKey] || "??",
-          groupCode: createInput.values[survey.groupCodeKey] || "??",
+          codeWord: createInput.values[survey.groupCodeKey] || "??",
           qualtricsResponseId: createInput.responseId || "??",
           startDate: createInput.values["startDate"] || "??",
           endDate: createInput.values["endDate"] || "??",

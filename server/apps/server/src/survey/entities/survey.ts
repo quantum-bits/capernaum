@@ -5,7 +5,7 @@ import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
-import { Group } from "../../letter/entities/group";
+import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
 
 @Entity()
@@ -21,7 +21,7 @@ export class Survey extends AbstractEntity {
   @Field((type) => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany((type) => Group, (item) => item.survey)
+  @OneToMany((type) => Group, (group) => group.survey)
   @Field((type) => [Group])
   groups: Group[];
 
@@ -120,6 +120,6 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) emailKey?: string;
   @Field({ nullable: true }) groupCodeKey?: string;
   @Field({ nullable: true }) okForGroup?: boolean;
-  @Field({ nullable: true }) publicName?: boolean;
+  @Field({ nullable: true }) publicName?: string;
   @Field({ nullable: true }) detailedDescription?: string;
 }

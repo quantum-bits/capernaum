@@ -26,9 +26,11 @@ import { SurveyService } from "./survey.service";
 import { Int } from "@nestjs/graphql";
 import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
-import { Group, Letter } from "../letter/entities";
+import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { Group } from "@server/src/group/entities/group";
+import { FindConditions } from "typeorm";
 
 @Resolver((of) => Survey)
 // @UseGuards(GqlAuthGuard)
@@ -193,8 +195,16 @@ export class SurveyResponseResolver {
   }
 
   @Query((returns) => [SurveyResponse])
-  surveyResponses() {
-    return this.surveyService.find(SurveyResponse);
+  surveyResponses(
+    @Args("groupId", { type: () => Int, nullable: true })
+    groupId?: number
+  ) {
+    const conditions: FindConditions<SurveyResponse> = {};
+    if (groupId) {
+      conditions.groupId = groupId;
+    }
+
+    return this.surveyService.find(SurveyResponse, conditions);
   }
 
   @ResolveField("survey", (type) => Survey)

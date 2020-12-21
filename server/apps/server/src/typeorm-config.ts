@@ -3,7 +3,6 @@ import { config } from "dotenv";
 import { ConnectionOptions } from "typeorm";
 
 import {
-  Group,
   Letter,
   LetterElement,
   LetterElementType,
@@ -25,6 +24,7 @@ import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
+import { Group } from "@server/src/group/entities/group";
 
 config();
 

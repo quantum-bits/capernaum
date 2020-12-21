@@ -27,13 +27,13 @@ export class AuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          roles: user.roles
+          roles: user.roles,
         };
         const token = this.jwtService.sign(userPayload);
 
         return {
           user: userPayload,
-          accessToken: token
+          accessToken: token,
         };
       }
     }

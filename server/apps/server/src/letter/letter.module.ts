@@ -1,21 +1,18 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
-  Group,
   Letter,
   LetterElement,
   LetterElementType,
   LetterType,
 } from "./entities";
 import {
-  GroupResolver,
   LetterElementResolver,
   LetterElementTypeResolver,
   LetterResolver,
   LetterTypeResolver,
 } from "./letter.resolvers";
 import {
-  GroupService,
   LetterElementTypeService,
   LetterService,
   LetterTypeService,
@@ -31,7 +28,6 @@ import { SurveyModule } from "@server/src/survey/survey.module";
       LetterElement,
       LetterElementType,
       PredictionTableEntry,
-      Group,
     ]),
     SurveyModule,
   ],
@@ -43,8 +39,6 @@ import { SurveyModule } from "@server/src/survey/survey.module";
     LetterElementResolver,
     LetterTypeService,
     LetterTypeResolver,
-    GroupService,
-    GroupResolver,
     LetterElementTypeService,
   ],
   exports: [LetterService],
