@@ -196,7 +196,11 @@ export class SurveyResponseResolver {
 
   @Query((returns) => [SurveyResponse])
   surveyResponses(
-    @Args("groupId", { type: () => Int, nullable: true })
+    @Args("groupId", {
+      type: () => Int,
+      nullable: true,
+      description: "Limit to one group",
+    })
     groupId?: number
   ) {
     const conditions: FindConditions<SurveyResponse> = {};
