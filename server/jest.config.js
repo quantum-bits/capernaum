@@ -1,6 +1,11 @@
 module.exports = {
-  preset: "ts-jest",
+  moduleFileExtensions: ["js", "json", "ts"],
+  roots: ["apps/server", "apps/reporter"],
+  testRegex: ".*\\.spec\\.ts$",
+  transform: {
+    "^.+\\.(t|j)s$": "ts-jest",
+  },
+  collectCoverageFrom: ["**/*.(t|j)s"],
+  coverageDirectory: "../coverage",
   testEnvironment: "node",
-  testMatch: ["**/__test__/*.spec.ts", "**/test/*.e2e-spec.ts"],
-  testPathIgnorePatterns: ["<rootDir>/build/", "<rootDir>/node_modules/"]
 };

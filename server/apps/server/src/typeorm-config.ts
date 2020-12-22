@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+config();
 
 import { ConnectionOptions } from "typeorm";
 
@@ -25,8 +26,6 @@ import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
 import { Group } from "@server/src/group/entities/group";
-
-config();
 
 const options: ConnectionOptions = {
   type: "postgres",
