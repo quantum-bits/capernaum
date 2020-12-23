@@ -1,24 +1,39 @@
-import { Command } from "@oclif/command";
-const schemaFile = require("../../generated-schema.json");
-const schema = schemaFile.__schema;
+import Command from "@oclif/command";
+import inquirer from "inquirer";
 import * as _ from "lodash";
-
-interface Field {
-  name: string;
-  description: string;
-}
+import { inspect } from "util";
+import { loadSchema } from "../graphql-schema";
 
 export default class Query extends Command {
-  static description = "run a GraphQL Query";
+  private schema = loadSchema("generated-schema.json");
+
+  static description = "run a GraphQL query";
 
   async run() {
-    const allQueries: Field[] = _.find(
-      schema.types,
-      (t) => t.name === schema.queryType.name
-    ).fields;
+    const queryType = _.find(
+      this.schema.types,
+      (t) => t.name === this.schema.queryType.name
+    );
+    if (!queryType) {
+      throw new Error("Can't find top-level query type");
+    }
+    const sortedQueries = _.sortBy(queryType.fields, (f) => f.name);
 
-    _(allQueries)
-      .sortBy((q) => q.name)
-      .forEach((q) => this.log(q.name, q.description || ""));
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "query",
+          message: "Choose a query to execute",
+          choices: _.map(sortedQueries, (q) => ({
+            name: q.name,
+            value: q,
+          })),
+          pageSize: _.min([sortedQueries.length, 30]),
+        },
+      ])
+      .then((answers) => {
+        this.log(inspect(answers.query, { depth: Infinity }));
+      });
   }
 }
