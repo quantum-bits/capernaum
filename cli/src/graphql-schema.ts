@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-use-before-define,no-console */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { readFileSync } from "fs";
 import { inspect } from "util";
 import { ensureType, ensureValue } from "./helpers";
@@ -13,7 +13,7 @@ export interface ConcreteTypeInfo {
   name: string;
   kind: string;
   detail: string;
-  value?: string; // Filled in later.
+  value?: string; // Filled in later by the user.
 }
 
 // Section numbering from the GraphQL spec, June 2018 edition.

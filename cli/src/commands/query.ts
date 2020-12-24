@@ -1,13 +1,14 @@
 import Command from "@oclif/command";
 import inquirer from "inquirer";
-import * as _ from "lodash";
 import { inspect } from "util";
 import { ConcreteTypeInfo, Field, Schema, TypeObject } from "../graphql-schema";
 import { gql } from "@apollo/client/core";
 import { graphqlClient } from "../graphql-client";
-import debugFactory from "debug";
 import { TypeKind } from "graphql";
 
+require("pretty-error").start();
+
+import debugFactory from "debug";
 const debug = debugFactory("query");
 
 export default class Query extends Command {
@@ -29,10 +30,7 @@ export default class Query extends Command {
       },
     ]);
     const queryField = answers.selection;
-
-    this.log(inspect(queryField, { depth: Infinity }));
-    this.log("-".repeat(30));
-    this.log(queryField.toString());
+    debug("queryField %O", queryField);
 
     const queryResultType = queryField.concreteType();
     debug("queryResultType %O", queryResultType);
