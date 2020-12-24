@@ -2,22 +2,31 @@ import Command from "@oclif/command";
 import inquirer from "inquirer";
 import * as _ from "lodash";
 import { inspect } from "util";
-import { loadSchema } from "../graphql-schema";
+import { Field, Schema, TypeObject } from "../graphql-schema";
+import { ensureType } from "../helpers";
+import fetch from "cross-fetch";
+import {
+  ApolloClient,
+  gql,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client/core";
 
 export default class Query extends Command {
-  private schema = loadSchema("generated-schema.json");
+  private schema = new Schema("generated-schema.json");
 
   static description = "run a GraphQL query";
 
   async run() {
-    const queryType = _.find(
-      this.schema.types,
-      (t) => t.name === this.schema.queryType.name
+    const sortedQueries = _.sortBy(
+      ensureType(this.schema.queryType, TypeObject).fields,
+      (f) => f.name
     );
-    if (!queryType) {
-      throw new Error("Can't find top-level query type");
-    }
-    const sortedQueries = _.sortBy(queryType.fields, (f) => f.name);
+
+    const client = new ApolloClient({
+      link: new HttpLink({ uri: "http://localhost:3000/graphql", fetch }),
+      cache: new InMemoryCache(),
+    });
 
     inquirer
       .prompt([
@@ -26,14 +35,32 @@ export default class Query extends Command {
           name: "query",
           message: "Choose a query to execute",
           choices: _.map(sortedQueries, (q) => ({
-            name: q.name,
+            name: q.toString(),
             value: q,
           })),
-          pageSize: _.min([sortedQueries.length, 30]),
+          pageSize: 30,
         },
       ])
-      .then((answers) => {
-        this.log(inspect(answers.query, { depth: Infinity }));
+      .then((answers) => answers.query)
+      .then((field: Field) => {
+        this.log(inspect(field, { depth: Infinity }));
+        this.log("-".repeat(30));
+        this.log(field.toString());
+
+        const queryString = `
+          query {
+            ${field.name} {
+              id
+            }
+          }
+        `;
+        this.log("QUERY", queryString);
+
+        client
+          .query({
+            query: gql(queryString),
+          })
+          .then((response) => this.log(inspect(response, { depth: Infinity })));
       });
   }
 }
