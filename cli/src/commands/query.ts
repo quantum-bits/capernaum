@@ -2,15 +2,13 @@ import Command from "@oclif/command";
 import inquirer from "inquirer";
 import * as _ from "lodash";
 import { inspect } from "util";
-import { Field, Schema, TypeObject } from "../graphql-schema";
-import { ensureType } from "../helpers";
-import fetch from "cross-fetch";
-import {
-  ApolloClient,
-  gql,
-  HttpLink,
-  InMemoryCache,
-} from "@apollo/client/core";
+import { ConcreteTypeInfo, Field, Schema, TypeObject } from "../graphql-schema";
+import { gql } from "@apollo/client/core";
+import { graphqlClient } from "../graphql-client";
+import debugFactory from "debug";
+import { TypeKind } from "graphql";
+
+const debug = debugFactory("query");
 
 export default class Query extends Command {
   private schema = new Schema("generated-schema.json");
@@ -18,49 +16,82 @@ export default class Query extends Command {
   static description = "run a GraphQL query";
 
   async run() {
-    const sortedQueries = _.sortBy(
-      ensureType(this.schema.queryType, TypeObject).fields,
-      (f) => f.name
-    );
+    const answers = await inquirer.prompt<{ selection: Field }>([
+      {
+        type: "list",
+        name: "selection",
+        message: "Choose a query to execute",
+        choices: this.schema.getQueries().map((q) => ({
+          name: q.toString(),
+          value: q,
+        })),
+        pageSize: 30,
+      },
+    ]);
+    const queryField = answers.selection;
 
-    const client = new ApolloClient({
-      link: new HttpLink({ uri: "http://localhost:3000/graphql", fetch }),
-      cache: new InMemoryCache(),
-    });
+    this.log(inspect(queryField, { depth: Infinity }));
+    this.log("-".repeat(30));
+    this.log(queryField.toString());
 
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          name: "query",
-          message: "Choose a query to execute",
-          choices: _.map(sortedQueries, (q) => ({
-            name: q.toString(),
-            value: q,
-          })),
-          pageSize: 30,
-        },
-      ])
-      .then((answers) => answers.query)
-      .then((field: Field) => {
-        this.log(inspect(field, { depth: Infinity }));
-        this.log("-".repeat(30));
-        this.log(field.toString());
+    const queryResultType = queryField.concreteType();
+    debug("queryResultType %O", queryResultType);
 
-        const queryString = `
-          query {
-            ${field.name} {
-              id
-            }
-          }
-        `;
-        this.log("QUERY", queryString);
+    const concreteArgs = queryField.concreteArgs();
+    if (concreteArgs.length > 0) {
+      const questions = concreteArgs.map((arg) => ({
+        type: "input",
+        name: arg.name,
+        message: `Value for '${arg.name}'`,
+      }));
 
-        client
-          .query({
-            query: gql(queryString),
-          })
-          .then((response) => this.log(inspect(response, { depth: Infinity })));
+      const answers = await inquirer.prompt(questions);
+
+      concreteArgs.forEach((arg) => {
+        arg.value = answers[arg.name];
       });
+    }
+    debug("concreteArgs %O", concreteArgs);
+
+    const queryResultDetails = this.schema.getType(queryResultType.name);
+    debug("queryResultDetails %O", queryResultDetails);
+
+    if (!(queryResultDetails instanceof TypeObject)) {
+      throw new TypeError(
+        `Don't handle result with kind ${queryResultDetails.kind}`
+      );
+    }
+
+    const concreteTypes = queryResultDetails.concreteTypes();
+    debug("concreteTypes %O", concreteTypes);
+
+    const fields = concreteTypes
+      .filter((ct) => ct.kind === TypeKind.SCALAR)
+      .map((ct) => ct.name)
+      .join(" ");
+
+    function formatArgs(args: ConcreteTypeInfo[]) {
+      if (args.length > 0) {
+        const formattedArgs = args
+          .map((ca) => `${ca.name}: ${ca.value}`)
+          .join(", ");
+        return `(${formattedArgs})`;
+      }
+      return "";
+    }
+
+    const queryString = [
+      "query {",
+      queryField.name,
+      formatArgs(concreteArgs),
+      `{ ${fields} } }`,
+    ].join(" ");
+    debug("queryString %O", queryString);
+
+    graphqlClient()
+      .query({
+        query: gql(queryString),
+      })
+      .then((response) => this.log(inspect(response, { depth: Infinity })));
   }
 }

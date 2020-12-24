@@ -1,28 +1,36 @@
 /* eslint-disable @typescript-eslint/no-use-before-define,no-console */
 import { readFileSync } from "fs";
 import { inspect } from "util";
-import { ensureValue } from "./helpers";
+import { ensureType, ensureValue } from "./helpers";
 import chalk from "chalk";
+import * as _ from "lodash";
 
 interface SchemaFile {
   __schema: Schema;
+}
+
+export interface ConcreteTypeInfo {
+  name: string;
+  kind: string;
+  detail: string;
+  value?: string; // Filled in later.
 }
 
 // Section numbering from the GraphQL spec, June 2018 edition.
 
 // 4.5.1 The __Type Type
 
-interface KitchenSinkType {
-  kind: TypeKind;
-  name: string;
-  description: string;
-  fields: Field[];
-  interfaces: Type[];
-  possibleTypes: Type[];
-  enumValues: EnumValue[];
-  inputFields: InputValue[];
-  ofType: Type;
-}
+// interface KitchenSinkType {
+//   kind: TypeKind;
+//   name: string;
+//   description: string;
+//   fields: Field[];
+//   interfaces: Type[];
+//   possibleTypes: Type[];
+//   enumValues: EnumValue[];
+//   inputFields: InputValue[];
+//   ofType: Type;
+// }
 
 type Type =
   | TypeScalar
@@ -35,13 +43,20 @@ type Type =
   | TypeNonNull;
 
 abstract class BaseType {
+  kind: TypeKind;
+
   name: string;
 
   description: string;
 
   constructor(json: BaseType) {
+    this.kind = json.kind;
     this.name = json.name;
     this.description = json.description;
+  }
+
+  concreteType(): Type {
+    throw new TypeError("This class has no concreteType() method");
   }
 
   toString() {
@@ -50,6 +65,27 @@ abstract class BaseType {
       segments.push(chalk.italic.underline.yellow(this.description));
     }
     return segments.join(" ");
+  }
+}
+
+abstract class ContainerType extends BaseType {
+  protected static concreteTypeHelper(tPtr: Type) {
+    while (tPtr instanceof TypeNonNull || tPtr instanceof TypeList) {
+      tPtr = tPtr.ofType;
+    }
+    return tPtr;
+  }
+
+  protected static concreteTypeInfo(
+    name: string,
+    tPtr: Type
+  ): ConcreteTypeInfo {
+    const concreteType = ContainerType.concreteTypeHelper(tPtr);
+    return {
+      name,
+      kind: concreteType.kind,
+      detail: concreteType.name,
+    };
   }
 }
 
@@ -69,7 +105,7 @@ enum TypeKind {
 class TypeScalar extends BaseType {}
 
 // 4.5.2.2
-export class TypeObject extends BaseType {
+export class TypeObject extends ContainerType {
   fields: Field[] = [];
 
   interfaces: Type[] = [];
@@ -82,6 +118,12 @@ export class TypeObject extends BaseType {
     if (json.interfaces) {
       this.interfaces = json.interfaces.map((i) => typeFactory(i));
     }
+  }
+
+  concreteTypes(): ConcreteTypeInfo[] {
+    return this.fields.map((field) =>
+      Field.concreteTypeInfo(field.name, field.type)
+    );
   }
 }
 
@@ -164,7 +206,7 @@ class TypeNonNull extends BaseType {
 }
 
 // 4.5.3 Type __Field Type
-export class Field extends BaseType {
+export class Field extends ContainerType {
   args: InputValue[];
 
   type: Type;
@@ -181,6 +223,14 @@ export class Field extends BaseType {
     this.type = typeFactory(json.type);
     this.isDeprecated = json.isDeprecated;
     this.deprecationReason = json.deprecationReason;
+  }
+
+  concreteArgs(): ConcreteTypeInfo[] {
+    return this.args.map((arg) => Field.concreteTypeInfo(arg.name, arg.type));
+  }
+
+  concreteType() {
+    return Field.concreteTypeHelper(this.type);
   }
 
   toString() {
@@ -325,6 +375,24 @@ export class Schema {
       this.types.find((t) => t.name === json.subscriptionType.name),
       "No top-level subscription type"
     );
+  }
+
+  private static _getTopLevel(topLevelType: Type) {
+    return _.sortBy(ensureType(topLevelType, TypeObject).fields, (f) => f.name);
+  }
+
+  getQueries = () => Schema._getTopLevel(this.queryType);
+
+  getMutations = () => Schema._getTopLevel(this.mutationType);
+
+  getSubscriptions = () => Schema._getTopLevel(this.subscriptionType);
+
+  getType(typeName: string): Type {
+    const result = this.types.find((t) => t.name === typeName);
+    if (result) {
+      return result;
+    }
+    throw new TypeError(`No type named '${typeName}'`);
   }
 
   toString() {
