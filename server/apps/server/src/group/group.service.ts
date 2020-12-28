@@ -1,12 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { BaseService } from "@server/src/shared/base.service";
+import { BaseService } from "../shared/base.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import {
-  Group,
-  GroupCreateInput,
-  GroupUpdateInput,
-} from "@server/src/group/entities/group";
+import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
 
 @Injectable()
 export class GroupService extends BaseService {

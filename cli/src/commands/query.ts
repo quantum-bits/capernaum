@@ -1,10 +1,10 @@
 import Command from "@oclif/command";
 import inquirer from "inquirer";
-import { inspect } from "util";
 import { ConcreteTypeInfo, Field, Schema, TypeObject } from "../graphql-schema";
 import { gql } from "@apollo/client/core";
 import { graphqlClient } from "../graphql-client";
 import { TypeKind } from "graphql";
+import prettyFormat from "pretty-format";
 
 require("pretty-error").start();
 
@@ -29,12 +29,16 @@ export default class Query extends Command {
         pageSize: 30,
       },
     ]);
+    // Field element from within Query.
     const queryField = answers.selection;
     debug("queryField %O", queryField);
 
+    // Type of result returned by the query.
     const queryResultType = queryField.concreteType();
     debug("queryResultType %O", queryResultType);
 
+    // If the query takes arguments, create an inquirer prompt
+    // to ask for the values from the user.
     const concreteArgs = queryField.concreteArgs();
     if (concreteArgs.length > 0) {
       const questions = concreteArgs.map((arg) => ({
@@ -51,6 +55,7 @@ export default class Query extends Command {
     }
     debug("concreteArgs %O", concreteArgs);
 
+    // Retrieve the top of the query's results.
     const queryResultDetails = this.schema.getType(queryResultType.name);
     debug("queryResultDetails %O", queryResultDetails);
 
@@ -60,14 +65,17 @@ export default class Query extends Command {
       );
     }
 
+    // Grab the concrete types for each of the result fields.
     const concreteTypes = queryResultDetails.concreteTypes();
     debug("concreteTypes %O", concreteTypes);
 
+    // Construct the list of names of result values.
     const fields = concreteTypes
       .filter((ct) => ct.kind === TypeKind.SCALAR)
       .map((ct) => ct.name)
       .join(" ");
 
+    // Format the arguments to pass to the query.
     function formatArgs(args: ConcreteTypeInfo[]) {
       if (args.length > 0) {
         const formattedArgs = args
@@ -78,6 +86,7 @@ export default class Query extends Command {
       return "";
     }
 
+    // Build the GraphQL query string.
     const queryString = [
       "query {",
       queryField.name,
@@ -86,10 +95,11 @@ export default class Query extends Command {
     ].join(" ");
     debug("queryString %O", queryString);
 
+    // Hit the GraphQL server and show the results.
     graphqlClient()
       .query({
         query: gql(queryString),
       })
-      .then((response) => this.log(inspect(response, { depth: Infinity })));
+      .then((response) => this.log(prettyFormat(response)));
   }
 }
