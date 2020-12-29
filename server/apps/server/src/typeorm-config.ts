@@ -27,33 +27,33 @@ import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
 import { Group } from "@server/src/group/entities/group";
 
-const options: ConnectionOptions = {
+export const entities = [
+  Event,
+  Group,
+  Image,
+  Letter,
+  LetterType,
+  LetterElement,
+  LetterElementType,
+  Machine,
+  PredictionTableEntry,
+  ScriptureEngagementPractice,
+  Survey,
+  SurveyDimension,
+  SurveyIndex,
+  SurveyItem,
+  SurveyItemResponse,
+  SurveyResponse,
+  User,
+  UserRole,
+];
+
+export const options: ConnectionOptions = {
   type: "postgres",
   host: process.env.PG_HOST,
   database: process.env.PG_DATABASE,
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
+  entities,
   logging: true,
-  entities: [
-    Event,
-    Group,
-    Image,
-    Letter,
-    LetterType,
-    LetterElement,
-    LetterElementType,
-    Machine,
-    PredictionTableEntry,
-    ScriptureEngagementPractice,
-    Survey,
-    SurveyDimension,
-    SurveyIndex,
-    SurveyItem,
-    SurveyItemResponse,
-    SurveyResponse,
-    User,
-    UserRole,
-  ],
 };
-
-export default options;

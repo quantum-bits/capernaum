@@ -7,6 +7,7 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
 import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
+import faker from "faker";
 
 @Entity()
 @ObjectType({
@@ -109,6 +110,18 @@ export class SurveyCreateInput {
   @Field() detailedDescription: string;
   @Field((type) => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
+
+  static fabricate = (): SurveyCreateInput => ({
+    qualtricsId: `QID-${faker.random.number({ min: 100000, max: 999999 })}`,
+    qualtricsName: faker.lorem.word(2),
+    qualtricsModDate: faker.date.past(1).toISOString(),
+    emailKey: "EMAIL",
+    groupCodeKey: "GROUP_CODE",
+    okForGroup: true,
+    publicName: `Survey ${faker.lorem.word(3)}`,
+    detailedDescription: faker.lorem.paragraph(),
+    surveyItems: [],
+  });
 }
 
 @InputType()

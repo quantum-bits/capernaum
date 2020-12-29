@@ -11,3 +11,4 @@ private.yaml
 /ansible/host_vars/
 /pm2/
 .graphqlconfig
+coverage/

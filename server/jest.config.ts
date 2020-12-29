@@ -8,12 +8,10 @@ module.exports = {
     "^.+\\.(t|j)s$": "ts-jest",
   },
   collectCoverageFrom: ["**/*.(t|j)s"],
-  coverageDirectory: "../coverage",
+  coverageDirectory: "./coverage",
   testEnvironment: "node",
   moduleNameMapper: {
     "^@server/(.*)$": "<rootDir>/apps/server/$1",
     "^@reporter/(.*)$": "<rootDir>/apps/reporter/$1",
   },
 };
-
-console.log("EXPORTS", module.exports);

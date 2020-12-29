@@ -8,6 +8,7 @@ import {
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Survey, SurveyResponse } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import faker from "faker";
 
 @Entity()
 @ObjectType()
@@ -79,6 +80,44 @@ export class GroupCreateInput {
 
   @Field((type) => Int)
   surveyId: number;
+
+  static fabricate = (surveyId: number): GroupCreateInput => ({
+    name: faker.company.companyName(),
+    type: faker.random.arrayElement([
+      "Sunday School",
+      "Small Group",
+      "Bible Study",
+    ]),
+    closedAfter: faker.date.soon(14).toISOString(),
+    adminFirstName: faker.name.firstName(),
+    adminLastName: faker.name.lastName(),
+    adminEmail: faker.internet.email(),
+    codeWord: GroupCode.create(),
+    surveyId: surveyId,
+  });
+}
+
+class GroupCode {
+  private static readonly CONSONANTS = "bcdfghjklmnpqrstvwxz".split("");
+  private static readonly VOWELS = "aeiouy".split("");
+  private static readonly NUM_PAIRS = 4;
+
+  static randomConsonant() {
+    return faker.random.arrayElement(GroupCode.CONSONANTS);
+  }
+
+  static randomVowel() {
+    return faker.random.arrayElement(GroupCode.VOWELS);
+  }
+
+  static create() {
+    const letters = [];
+    for (let i = 0; i < GroupCode.NUM_PAIRS; i++) {
+      letters.push(GroupCode.randomConsonant());
+      letters.push(GroupCode.randomVowel());
+    }
+    return letters.join("");
+  }
 }
 
 @InputType()
