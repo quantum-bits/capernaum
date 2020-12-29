@@ -8,7 +8,7 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
 import debug from "debug";
-import { Group } from "@server/src/group/entities/group";
+import { Group } from "../../group/entities";
 
 const surveyDebug = debug("survey");
 

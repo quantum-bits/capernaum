@@ -11,7 +11,7 @@ import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { inDevelopmentMode } from "./shared/helpers";
 import { MachineModule } from "./machine/machine.module";
-import { GroupModule } from './group/group.module';
+import { GroupModule } from "./group/group.module";
 
 @Module({
   imports: [

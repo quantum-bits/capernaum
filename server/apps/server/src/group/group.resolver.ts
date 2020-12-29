@@ -1,12 +1,12 @@
 import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
-import { GqlAuthGuard } from "@server/src/auth/graphql-auth.guard";
 import { GroupService } from "@server/src/group/group.service";
+import { GqlAuthGuard } from "@server/src/auth/graphql-auth.guard";
 import {
   Group,
   GroupCreateInput,
   GroupUpdateInput,
-} from "@server/src/group/entities/group";
+} from "@server/src/group/entities";
 import { SurveyResponse } from "@server/src/survey/entities";
 
 @Resolver("Group")

@@ -6,14 +6,14 @@ import { EventModule } from "@server/src/events/event.module";
 import { WriterModule } from "@server/src/writer/writer.module";
 import { QualtricsApiModule } from "@qapi/qualtrics-api";
 import { BullModule } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
+import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import typeORMConfig from "@server/src/typeorm-config";
 import {
   makeCounterProvider,
   PrometheusModule,
 } from "@willsoto/nestjs-prometheus";
-import { PROM_METRIC_EMAILS_SENT } from "@apps/reporter/src/common";
+import { PROM_METRIC_EMAILS_SENT } from "@reporter/src/common";
 
 @Module({
   imports: [

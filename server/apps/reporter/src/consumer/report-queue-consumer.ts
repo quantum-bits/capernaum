@@ -1,6 +1,6 @@
 import { Logger } from "@nestjs/common";
 import { Process, Processor } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
+import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { Job } from "bull";
 import { QualtricsSurveyResponse } from "@qapi/qualtrics-api/qualtrics-api.types";
 import { quillDeltaToHtml, quillHtmlToText } from "@server/src/helpers/quill";
@@ -12,7 +12,7 @@ import { WriterService } from "@server/src/writer/writer.service";
 import { MailService } from "@server/src/mail/mail.service";
 
 import debug from "debug";
-import { PROM_METRIC_EMAILS_SENT } from "@apps/reporter/src/common";
+import { PROM_METRIC_EMAILS_SENT } from "@reporter/src/common";
 import { InjectMetric } from "@willsoto/nestjs-prometheus";
 import { Counter } from "prom-client";
 const qualtricsDebug = debug("qualtrics");
