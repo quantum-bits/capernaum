@@ -190,20 +190,47 @@ type Group {
 type SurveyResponse {
   """Unique ID for this entity"""
   id: Int!
+
+  """Group for this response (if any)"""
+  group: Group
   survey: Survey!
   surveyItemResponses: [SurveyItemResponse!]!
+
+  """Respondent's email address"""
   email: String!
+
+  """Group code word"""
   codeWord: String!
   qualtricsResponseId: String!
+
+  """When survey was started"""
   startDate: String!
+
+  """When survey was completed"""
   endDate: String!
+
+  """When survey was recorded"""
   recordedDate: String!
+
+  """Type of response"""
   status: Int!
+
+  """Percent complete"""
   progress: Int!
+
+  """Time to complete (seconds)"""
   duration: Int!
+
+  """1 = Survey complete and submitted, 0 = otherwise"""
   finished: Int!
+
+  """Respondent's IP address"""
   ipAddress: String!
+
+  """Respondent's latitude"""
   latitude: String!
+
+  """Respondent's longitude"""
   longitude: String!
 }
 

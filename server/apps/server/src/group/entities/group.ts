@@ -81,40 +81,26 @@ export class GroupCreateInput {
   @Field((type) => Int)
   surveyId: number;
 
-  static fabricate = (surveyId: number): GroupCreateInput => ({
-    name: faker.company.companyName(),
-    type: faker.random.arrayElement([
-      "Sunday School",
-      "Small Group",
-      "Bible Study",
-    ]),
-    closedAfter: faker.date.soon(14).toISOString(),
-    adminFirstName: faker.name.firstName(),
-    adminLastName: faker.name.lastName(),
-    adminEmail: faker.internet.email(),
-    codeWord: GroupCode.create(),
-    surveyId: surveyId,
-  });
 }
 
-class GroupCode {
+export class CodeWord {
   private static readonly CONSONANTS = "bcdfghjklmnpqrstvwxz".split("");
   private static readonly VOWELS = "aeiouy".split("");
   private static readonly NUM_PAIRS = 4;
 
-  static randomConsonant() {
-    return faker.random.arrayElement(GroupCode.CONSONANTS);
+  static randomConsonant(): string {
+    return faker.random.arrayElement(CodeWord.CONSONANTS);
   }
 
-  static randomVowel() {
-    return faker.random.arrayElement(GroupCode.VOWELS);
+  static randomVowel(): string {
+    return faker.random.arrayElement(CodeWord.VOWELS);
   }
 
-  static create() {
+  static generate(): string {
     const letters = [];
-    for (let i = 0; i < GroupCode.NUM_PAIRS; i++) {
-      letters.push(GroupCode.randomConsonant());
-      letters.push(GroupCode.randomVowel());
+    for (let i = 0; i < CodeWord.NUM_PAIRS; i++) {
+      letters.push(CodeWord.randomConsonant());
+      letters.push(CodeWord.randomVowel());
     }
     return letters.join("");
   }

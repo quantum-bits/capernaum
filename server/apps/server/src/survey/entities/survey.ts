@@ -105,23 +105,11 @@ export class SurveyCreateInput {
   @Field() qualtricsModDate: string;
   @Field() emailKey: string;
   @Field() groupCodeKey: string;
-  @Field() okForGroup: boolean;
+  @Field() okayForGroup: boolean;
   @Field() publicName: string;
   @Field() detailedDescription: string;
   @Field((type) => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
-
-  static fabricate = (): SurveyCreateInput => ({
-    qualtricsId: `QID-${faker.random.number({ min: 100000, max: 999999 })}`,
-    qualtricsName: faker.lorem.word(2),
-    qualtricsModDate: faker.date.past(1).toISOString(),
-    emailKey: "EMAIL",
-    groupCodeKey: "GROUP_CODE",
-    okForGroup: true,
-    publicName: `Survey ${faker.lorem.word(3)}`,
-    detailedDescription: faker.lorem.paragraph(),
-    surveyItems: [],
-  });
 }
 
 @InputType()
@@ -132,7 +120,7 @@ export class SurveyUpdateInput {
   @Field({ nullable: true }) qualtricsModDate?: string;
   @Field({ nullable: true }) emailKey?: string;
   @Field({ nullable: true }) groupCodeKey?: string;
-  @Field({ nullable: true }) okForGroup?: boolean;
+  @Field({ nullable: true }) okayForGroup?: boolean;
   @Field({ nullable: true }) publicName?: string;
   @Field({ nullable: true }) detailedDescription?: string;
 }
