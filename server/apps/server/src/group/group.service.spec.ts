@@ -7,6 +7,9 @@ import { GroupModule } from "./group.module";
 import { SurveyModule } from "@server/src/survey/survey.module";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { FabricatorModule } from "@server/src/fabricator/fabricator.module";
+import { MultiTimer } from "@server/src/fabricator/MultiTimer";
+
+const mt = new MultiTimer();
 
 describe("GroupService", () => {
   let entityMgr: EntityManager;
@@ -14,6 +17,7 @@ describe("GroupService", () => {
   let surveyService: SurveyService;
 
   beforeAll(async () => {
+    mt.record("beforeAll");
     const module: TestingModule = await Test.createTestingModule({
       imports: [FabricatorModule, GroupModule, SurveyModule],
     }).compile();
@@ -24,22 +28,27 @@ describe("GroupService", () => {
   });
 
   beforeEach(() => {
+    mt.record("beforeEach");
     return Promise.all([entityMgr.clear(Group), entityMgr.clear(Survey)]);
   });
 
+  afterAll(() => {
+    console.log(mt.report());
+  });
+
   it("should be defined", () => {
+    mt.record("Service defined");
     expect(groupService).toBeDefined();
   });
 
   it("can create a group", () => {
+    mt.record("Create a group");
     const fakeSurvey = SurveyCreateInput.fabricate();
-    console.log(fakeSurvey);
 
     return surveyService
       .createSurvey(fakeSurvey)
       .then((newSurvey) => {
         const fakeGroup = GroupCreateInput.fabricate(newSurvey.id);
-        console.log(fakeGroup);
         return groupService.createGroup(fakeGroup);
       })
       .then((newGroup) => entityMgr.count(Group))
