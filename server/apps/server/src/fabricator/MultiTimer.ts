@@ -1,20 +1,38 @@
+/**
+ * Support for multiple time stamps.
+ */
+
 import { DateTime, DurationUnit } from "luxon";
 import _ from "lodash";
 import { table } from "table";
 
-class TimeStamp {
+/**
+ * A distinct, labeled moment in time.
+ */
+export class TimeStamp {
   public dt: DateTime;
 
+  /**
+   * Create a new `TimeStamp`.
+   * @param label String label for this time stamp; used for reporting.
+   * @param flags Number of "flag" characters to be output with this time stamp.
+   */
   constructor(public label: string, public flags = 0) {
     this.dt = DateTime.local();
   }
 
-  elapsed(ts: TimeStamp, unit: DurationUnit = "milliseconds") {
+  /**
+   * Calculate the elapsed time from _this_ time stamp to the
+   * supplied time stamp.
+   * @param ts The time stamp _from which_ to calculate the elapsed time.
+   * @param unit Unit to return (defaults to `milliseconds`)
+   */
+  elapsed(ts: TimeStamp, unit: DurationUnit = "milliseconds"): number {
     const diff = ts.dt.diff(this.dt).toObject();
     return diff[unit];
   }
 
-  toString() {
+  toString(): string {
     return `${this.label} ${this.dt.toISOTime()} ${this.flags}`;
   }
 }
@@ -26,12 +44,14 @@ export class MultiTimer {
     this.record("[START]");
   }
 
+  /**
+   * Record time time by creating a new {@link `TimeStamp`} entry.
+   * @param label String label to associated with time stamp.
+   * @param flags Number of "flag" characters to include in the output;
+   * makes it easier to find particular entries in the output.
+   */
   record(label: string, flags = 0): void {
     this.timeStamps.push(new TimeStamp(label, flags));
-  }
-
-  private maxLabelWidth(): number {
-    return _.max(this.timeStamps.map((ts) => ts.label.length));
   }
 
   private totalTime(): number {
@@ -42,6 +62,10 @@ export class MultiTimer {
     return this.timeStamps.some((ts) => ts.flags > 0);
   }
 
+  /**
+   * Provide read access to the underlying list of time stamps.
+   * @deprecated Was meant only for debugging.
+   */
   get rawData(): TimeStamp[] {
     return this.timeStamps;
   }
@@ -50,6 +74,15 @@ export class MultiTimer {
     return Number(val).toFixed(2);
   }
 
+  /**
+   * Conclude recording of times for a `MultiTimer`.
+   * Add a "stop" entry to the time stamp array, and
+   * generate a tabular report of all time stamps.
+   * @param prefix Optional prefix to place in front of each line of output;
+   * intended to make it easier to read complex output, especially from
+   * multiple threads/processes.
+   * @return Tabular report of time stamps.
+   */
   report(prefix = null): string {
     this.record("[STOP]");
     const recordCount = this.timeStamps.length;

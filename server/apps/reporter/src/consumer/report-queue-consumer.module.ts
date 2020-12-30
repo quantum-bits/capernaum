@@ -8,7 +8,7 @@ import { QualtricsApiModule } from "@qapi/qualtrics-api";
 import { BullModule } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import typeORMConfig from "@server/src/typeorm-config";
+import { options as typeORMConfig } from "@server/src/typeorm-config";
 import {
   makeCounterProvider,
   PrometheusModule,

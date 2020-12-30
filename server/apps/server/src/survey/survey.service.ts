@@ -24,6 +24,7 @@ import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
 import debug from "debug";
+import { Letter } from "@server/src/letter/entities";
 
 const surveyDebug = debug("survey");
 
@@ -118,14 +119,23 @@ export class SurveyService extends BaseService {
     });
   }
 
-  findSurveyByQualtricsId(qualtricsId: string) {
+  findSurveyByQualtricsId(qualtricsId: string): Promise<Survey> {
     return this.surveyRepo.findOne(
       { qualtricsId },
       { relations: ["surveyItems"] }
     );
   }
 
-  findItemsForSurvey(survey: Survey, whichItems: WhichItems) {
+  findLetter(surveyId: number): Promise<Letter> {
+    return this.entityManager.findOne(Letter, {
+      surveyId,
+    });
+  }
+
+  findItemsForSurvey(
+    survey: Survey,
+    whichItems: WhichItems
+  ): Promise<SurveyItem[]> {
     const where = { survey };
 
     switch (whichItems) {
@@ -146,7 +156,7 @@ export class SurveyService extends BaseService {
     });
   }
 
-  updateSurveyIndex(updateInput: SurveyIndexUpdateInput) {
+  updateSurveyIndex(updateInput: SurveyIndexUpdateInput): Promise<SurveyIndex> {
     return this.entityManager.transaction(async (manager) => {
       // N.B., can also use the manager directly.
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
@@ -195,8 +205,8 @@ export class SurveyService extends BaseService {
     });
   }
 
-  // This is a helper method to avoid nested transactions; do not call directly.
-  private async _deleteSurveyIndex(
+  // Helper method to avoid nested transactions; do not call directly.
+  private static async _deleteSurveyIndex(
     manager: EntityManager,
     id: number
   ): Promise<SurveyIndexDeleteOutput> {
@@ -220,7 +230,7 @@ export class SurveyService extends BaseService {
 
   async deleteSurveyIndex(id: number) {
     return this.entityManager.transaction(async (manager) =>
-      this._deleteSurveyIndex(manager, id)
+      SurveyService._deleteSurveyIndex(manager, id)
     );
   }
 
@@ -241,7 +251,7 @@ export class SurveyService extends BaseService {
       };
 
       for (const index of dimension.surveyIndices) {
-        const indexDeleteOutput = await this._deleteSurveyIndex(
+        const indexDeleteOutput = await SurveyService._deleteSurveyIndex(
           manager,
           index.id
         );
@@ -294,10 +304,17 @@ export class SurveyService extends BaseService {
     });
   }
 
+  /**
+   * Import details from a Qualtrics survey into Capernaum. Normally called
+   * from `importQualtricsSurvey` in the Qualtrics resolver.
+   *
+   * @param qualtricsSurvey Data fetched from Qualtrics.
+   * @param updateOk Is it all right to update a previously imported survey?
+   */
   async importQualtricsSurvey(
     qualtricsSurvey: QualtricsSurvey,
     updateOk: boolean
-  ) {
+  ): Promise<Survey> {
     // surveyDebug("QualtricsSurvey %O", qualtricsSurvey);
 
     return this.entityManager.transaction(async (manager) => {

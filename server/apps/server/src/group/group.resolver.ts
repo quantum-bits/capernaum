@@ -7,7 +7,6 @@ import {
   GroupCreateInput,
   GroupUpdateInput,
 } from "@server/src/group/entities";
-import { SurveyResponse } from "@server/src/survey/entities";
 
 @Resolver("Group")
 @UseGuards(GqlAuthGuard)

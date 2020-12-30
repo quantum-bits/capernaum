@@ -8,13 +8,16 @@ import { SurveyItem } from "./survey-item";
 @ObjectType({ description: "One user's response to a single survey question" })
 export class SurveyItemResponse extends AbstractEntity {
   @Column("integer") surveyResponseId: number;
-  @ManyToOne(type => SurveyResponse, survey => survey.surveyItemResponses)
-  @Field(type => SurveyResponse)
+  @ManyToOne((type) => SurveyResponse, (survey) => survey.surveyItemResponses)
+  @Field((type) => SurveyResponse)
   surveyResponse: SurveyResponse;
 
   @Column("integer") surveyItemId: number;
-  @ManyToOne(type => SurveyItem, surveyItem => surveyItem.surveyItemResponses)
-  @Field(type => SurveyItem)
+  @ManyToOne(
+    (type) => SurveyItem,
+    (surveyItem) => surveyItem.surveyItemResponses
+  )
+  @Field((type) => SurveyItem)
   surveyItem: SurveyItem;
 
   @Column()
@@ -22,6 +25,6 @@ export class SurveyItemResponse extends AbstractEntity {
   label: string;
 
   @Column("int")
-  @Field(type => Int)
+  @Field((type) => Int)
   value: number;
 }

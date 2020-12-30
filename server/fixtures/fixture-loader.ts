@@ -1,4 +1,4 @@
-import typeOrmConfig from "../apps/server/src/typeorm-config";
+import { options as typeOrmConfig } from "../apps/server/src/typeorm-config";
 import * as commander from "commander";
 import { createConnection, getManager, getRepository } from "typeorm";
 

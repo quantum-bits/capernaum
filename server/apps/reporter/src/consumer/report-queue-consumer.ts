@@ -63,7 +63,7 @@ export class ReportQueueConsumer {
 
     // Fetch the letter.
     // TODO: Sort out how to pass stuff to `renderLetter`.
-    const letter = await this.surveyService.findLetters(survey.id);
+    const letter = await this.surveyService.findLetter(survey.id);
 
     // Write a letter.
     const writerOutput = await this.writerService.renderLetter(
