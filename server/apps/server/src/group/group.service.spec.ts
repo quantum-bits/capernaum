@@ -1,23 +1,15 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { GroupService } from "./group.service";
-import { EntityManager, Repository } from "typeorm";
+import { EntityManager } from "typeorm";
 import { Group, GroupCreateInput } from "@server/src/group/entities";
-import {
-  Survey,
-  SurveyCreateInput,
-  SurveyResponse,
-} from "@server/src/survey/entities";
+import { Survey, SurveyResponse } from "@server/src/survey/entities";
 import { GroupModule } from "./group.module";
 import { SurveyModule } from "@server/src/survey/survey.module";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { FabricatorModule } from "@server/src/fabricator/fabricator.module";
-import { MultiTimer } from "@server/src/helpers/MultiTimer";
-import { Chance } from "chance";
 import { GroupFabricatorService } from "@server/src/fabricator/group-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
-
-const mt = new MultiTimer();
-const chance = new Chance();
+import * as faker from "faker";
 
 describe("GroupService", () => {
   let entityMgr: EntityManager;
@@ -27,7 +19,6 @@ describe("GroupService", () => {
   let surveyFabricatorService: SurveyFabricatorService;
 
   beforeAll(async () => {
-    mt.record("beforeAll");
     const module: TestingModule = await Test.createTestingModule({
       imports: [FabricatorModule, GroupModule, SurveyModule],
     }).compile();
@@ -44,71 +35,42 @@ describe("GroupService", () => {
   });
 
   beforeEach(() => {
-    mt.record("beforeEach");
     return Promise.all([entityMgr.clear(Group), entityMgr.clear(Survey)]);
   });
 
-  afterAll(() => {
-    console.log(mt.report());
-  });
-
   it("should be defined", () => {
-    mt.record("Service defined");
     expect(groupService).toBeDefined();
   });
 
-  it("can create a group", () => {
-    mt.record("Create a group");
-    return groupFabricatorService
-      .create(12)
-      .then((newGroup) => entityMgr.count(Group))
-      .then((count) => expect(count).toEqual(1));
-  });
+  it("can fetch all groups", async () => {
+    const howMany = faker.random.number({ min: 2, max: 8 });
+    await groupFabricatorService.create(howMany);
 
-  it.skip("can fetch all groups", async () => {
-    const groupRepo = entityMgr.getRepository(Group);
-    const surveyRepo = entityMgr.getRepository(Survey);
-
-    const survey = await surveyRepo.save(
-      surveyRepo.create(surveyFabricatorService.fabricateSurvey())
-    );
-
-    const howMany = chance.integer({ min: 1, max: 10 });
-    for (let i = 0; i < howMany; i++) {
-      const group = await groupRepo.save(
-        groupRepo.create(groupFabricatorService.fabricateGroup(survey.id))
-      );
-    }
     return groupService
       .readGroups()
-      .then((groups) => expect(groups.length).toEqual(howMany));
+      .then((groups) => expect(groups).toHaveLength(howMany));
   });
 
-  it.todo("can fetch one group");
+  it("can create a group", async () => {
+    const survey = await surveyFabricatorService.createSurvey();
+    const groupData = groupFabricatorService.fabricateGroup(survey.id);
 
-  it.skip("can create a group survey and responses", async () => {
-    const groupRepo = entityMgr.getRepository(Group);
-    const surveyRepo = entityMgr.getRepository(Survey);
-    const surveyResponseRepo = entityMgr.getRepository(SurveyResponse);
-
-    const survey = await surveyRepo.save(
-      surveyRepo.create(surveyFabricatorService.fabricateSurvey())
-    );
-
-    const group = await groupRepo.save(
-      groupRepo.create(groupFabricatorService.fabricateGroup(survey.id))
-    );
-
-    for (let i = 0; i < 8; i++) {
-      const response = await surveyResponseRepo.save(
-        surveyResponseRepo.create(
-          surveyFabricatorService.fabricateSurveyResponse(survey.id, group.id)
-        )
-      );
-    }
-
-    const groups = await groupService.readGroups();
-    console.log(groups);
-    expect(groups.length).toEqual(1);
+    return groupService
+      .createGroup(groupData)
+      .then((group) => expect(groupData.name).toBe(group.name));
   });
+
+  it("can fetch one group", async () => {
+    const howMany = faker.random.number({ min: 2, max: 8 });
+    const groups = await groupFabricatorService.create(howMany);
+    const targetGroup = faker.random.arrayElement(groups);
+
+    return groupService.readGroup(targetGroup.id).then((group) => {
+      expect(group.name).toBe(targetGroup.name);
+      expect(group.survey.id).toBe(targetGroup.surveyId);
+      expect(group.survey.qualtricsName).toBe(targetGroup.survey.qualtricsName);
+    });
+  });
+
+  it.todo("can fetch all responses for a group");
 });

@@ -12,8 +12,6 @@ import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { MachineModule } from "./machine/machine.module";
 import { GroupModule } from "./group/group.module";
 import { FabricatorModule } from "./fabricator/fabricator.module";
-import { Fabricator.GroupService } from './fabricator.group/fabricator.group.service';
-import { Fabricator.GroupService } from './fabricator.group/fabricator.group.service';
 
 @Module({
   imports: [
@@ -36,6 +34,5 @@ import { Fabricator.GroupService } from './fabricator.group/fabricator.group.ser
     GroupModule,
     FabricatorModule,
   ],
-  providers: [Fabricator.GroupService],
 })
 export class AppModule {}

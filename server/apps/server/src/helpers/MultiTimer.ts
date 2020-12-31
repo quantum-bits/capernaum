@@ -78,9 +78,11 @@ export class MultiTimer {
    * Conclude recording of times for a `MultiTimer`.
    * Add a "stop" entry to the time stamp array, and
    * generate a tabular report of all time stamps.
+   *
    * @param prefix Optional prefix to place in front of each line of output;
    * intended to make it easier to read complex output, especially from
    * multiple threads/processes.
+   *
    * @return Tabular report of time stamps.
    */
   report(prefix = null): string {

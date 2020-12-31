@@ -20,6 +20,10 @@ export class GroupService extends BaseService {
     return this.groupRepo.find({ relations: ["survey"] });
   }
 
+  readGroup(id: number): Promise<Group> {
+    return this.groupRepo.findOne(id, { relations: ["survey"] });
+  }
+
   updateGroup(updateInput: GroupUpdateInput): Promise<Group> {
     return this.groupRepo
       .preload(updateInput)

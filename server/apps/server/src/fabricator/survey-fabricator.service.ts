@@ -56,6 +56,11 @@ export class SurveyFabricatorService extends AbstractFabricatorService {
     return fields;
   }
 
+  createSurvey(): Promise<Survey> {
+    const survey = this.entityMgr.create(Survey, this.fabricateSurvey());
+    return this.entityMgr.save(survey);
+  }
+
   async create(options: SurveyFabricatorOptions): Promise<void> {
     for (let s = 0; s < options.numSurveys; s++) {
       const survey = await this.entityMgr.save(
