@@ -27,7 +27,7 @@ export class SurveyFabricatorService extends AbstractFabricatorService {
       detailedDescription: faker.lorem.paragraph(),
       // surveyItems: [],
     };
-    this.verifyColumns(Survey, fields);
+    this.verifyFabricatedData(Survey, fields);
     return fields;
   }
 
@@ -52,7 +52,7 @@ export class SurveyFabricatorService extends AbstractFabricatorService {
     if (groupId) {
       fields.groupId = groupId;
     }
-    this.verifyColumns(SurveyResponse, fields);
+    this.verifyFabricatedData(SurveyResponse, fields);
     return fields;
   }
 

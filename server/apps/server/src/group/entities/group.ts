@@ -80,7 +80,6 @@ export class GroupCreateInput {
 
   @Field((type) => Int)
   surveyId: number;
-
 }
 
 export class CodeWord {
