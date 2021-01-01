@@ -1,18 +1,15 @@
 import { Inject, Injectable } from "@nestjs/common";
 import faker from "faker";
 import { CodeWord, Group, GroupCreateInput } from "@server/src/group/entities";
+import { AbstractFabricatorService } from "@server/src/fabricator/abstract-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
-import {
-  AbstractFabricatorService,
-  FabricatedData,
-} from "@server/src/fabricator/abstract-fabricator.service";
 
 @Injectable()
 export class GroupFabricatorService extends AbstractFabricatorService {
   @Inject(SurveyFabricatorService)
   private readonly surveyFabricatorService: SurveyFabricatorService;
 
-  fabricateGroup(): FabricatedData {
+  fabricateGroup(): GroupCreateInput {
     return this.verifyFabricatedData(Group, {
       name: faker.company.companyName(),
       type: faker.random.arrayElement([
@@ -33,10 +30,7 @@ export class GroupFabricatorService extends AbstractFabricatorService {
     const groups: Group[] = [];
     for (let i = 0; i < count; i++) {
       const survey = await this.surveyFabricatorService.createSurvey();
-      const group = this.entityMgr.create(
-        Group,
-        this.fabricateGroup()
-      );
+      const group = this.entityMgr.create(Group, this.fabricateGroup());
       group.survey = survey;
       groups.push(await this.entityMgr.save(group));
     }

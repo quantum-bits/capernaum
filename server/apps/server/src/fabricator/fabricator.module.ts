@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { GroupFabricatorService } from "./group-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
 import { GroupModule } from "@server/src/group/group.module";
+import { SurveyModule } from "@server/src/survey/survey.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { GroupModule } from "@server/src/group/group.module";
       entities,
     }),
     GroupModule,
+    SurveyModule,
   ],
   providers: [GroupFabricatorService, SurveyFabricatorService],
   exports: [TypeOrmModule],

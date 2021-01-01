@@ -56,7 +56,7 @@ export class Group extends AbstractEntity {
 }
 
 @InputType()
-export class GroupCreateInput {
+export class GroupCreateInput implements Partial<Group> {
   @Field({ description: "Group name" })
   name: string;
 
@@ -106,7 +106,7 @@ export class CodeWord {
 }
 
 @InputType()
-export class GroupUpdateInput {
+export class GroupUpdateInput implements Partial<Group> {
   @Field(() => Int)
   id: number;
 

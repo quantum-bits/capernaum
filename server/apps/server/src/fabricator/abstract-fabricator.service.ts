@@ -3,6 +3,9 @@ import _ from "lodash";
 import { EntityManager } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import pluralize from "pluralize";
+import Debug from "debug";
+
+const debug = Debug("test:abstract");
 
 export type FabricatedData = { [key: string]: string | number | boolean };
 
@@ -21,7 +24,7 @@ export abstract class AbstractFabricatorService {
   verifyFabricatedData<Entity>(
     target: EntityTarget<Entity>,
     data: FabricatedData
-  ): FabricatedData {
+  ): Entity {
     const columnNames = _.chain(
       this.entityMgr.getRepository(target).metadata.ownColumns
     )
@@ -37,6 +40,14 @@ export abstract class AbstractFabricatorService {
 
     const extraColumnNames = _.difference(columnNames, dataNames);
     const extraDataNames = _.difference(dataNames, columnNames);
+    debug("verifyFabricatedData %O", {
+      target,
+      data,
+      columnNames,
+      dataNames,
+      extraColumnNames,
+      extraDataNames,
+    });
 
     function makeMessage(message: string, names: string[]): string {
       const fields = pluralize("field", names.length);
@@ -56,6 +67,6 @@ export abstract class AbstractFabricatorService {
       throw new ReferenceError(messages.join("\n"));
     }
 
-    return data;
+    return (data as unknown) as Entity;
   }
 }

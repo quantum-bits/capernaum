@@ -50,7 +50,7 @@ describe("GroupService", () => {
     groupData.surveyId = survey.id;
 
     return groupService
-      .createGroup((groupData as unknown) as GroupCreateInput)
+      .createGroup(groupData)
       .then((group) => expect(groupData.name).toBe(group.name));
   });
 

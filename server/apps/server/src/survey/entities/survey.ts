@@ -1,5 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Column, Entity, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, OneToMany} from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -7,7 +7,6 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
 import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
-import faker from "faker";
 
 @Entity()
 @ObjectType({
