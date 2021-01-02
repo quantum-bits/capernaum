@@ -21,7 +21,9 @@ export class GroupService extends BaseService {
   }
 
   readGroup(id: number): Promise<Group> {
-    return this.groupRepo.findOne(id, { relations: ["survey"] });
+    return this.groupRepo.findOne(id, {
+      relations: ["survey", "surveyResponses"],
+    });
   }
 
   updateGroup(updateInput: GroupUpdateInput): Promise<Group> {

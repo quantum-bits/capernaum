@@ -25,6 +25,9 @@ export abstract class AbstractFabricatorService {
     target: EntityTarget<Entity>,
     data: FabricatedData
   ): Entity {
+    if (!this.entityMgr.connection.hasMetadata(target)) {
+      throw Error(`There's no database entity '${target}'`);
+    }
     const columnNames = _.chain(
       this.entityMgr.getRepository(target).metadata.ownColumns
     )

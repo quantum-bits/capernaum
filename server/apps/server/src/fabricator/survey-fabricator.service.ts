@@ -1,19 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import faker from "faker";
 import { AbstractFabricatorService } from "./abstract-fabricator.service";
-import { CodeWord } from "@server/src/group/entities";
-import {
-  Survey,
-  SurveyCreateInput,
-  SurveyResponse,
-} from "@server/src/survey/entities";
+import { Survey, SurveyResponse } from "@server/src/survey/entities";
+import { CodeWord } from "@server/src/group/code-word";
 
 @Injectable()
 export class SurveyFabricatorService extends AbstractFabricatorService {
-  fabricateSurvey(): SurveyCreateInput {
+  fabricateSurvey(): Survey {
     return this.verifyFabricatedData(Survey, {
       qualtricsId: `QID-${faker.random.number({ min: 100000, max: 999999 })}`,
-      qualtricsName: faker.lorem.word(2),
+      qualtricsName: faker.lorem.word(4),
       qualtricsModDate: faker.date.past(1).toISOString(),
       emailKey: "EMAIL",
       groupCodeKey: "GROUP_CODE",
@@ -41,7 +37,7 @@ export class SurveyFabricatorService extends AbstractFabricatorService {
     });
   }
 
-  createSurvey(): Promise<Survey> {
+  dbCreateSurvey(): Promise<Survey> {
     const survey = this.entityMgr.create(Survey, this.fabricateSurvey());
     return this.entityMgr.save(survey);
   }

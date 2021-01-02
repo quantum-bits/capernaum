@@ -56,7 +56,7 @@ export class Group extends AbstractEntity {
 }
 
 @InputType()
-export class GroupCreateInput implements Partial<Group> {
+export class GroupCreateInput {
   @Field({ description: "Group name" })
   name: string;
 
@@ -80,29 +80,6 @@ export class GroupCreateInput implements Partial<Group> {
 
   @Field((type) => Int)
   surveyId: number;
-}
-
-export class CodeWord {
-  private static readonly CONSONANTS = "bcdfghjklmnpqrstvwxz".split("");
-  private static readonly VOWELS = "aeiouy".split("");
-  private static readonly NUM_PAIRS = 4;
-
-  static randomConsonant(): string {
-    return faker.random.arrayElement(CodeWord.CONSONANTS);
-  }
-
-  static randomVowel(): string {
-    return faker.random.arrayElement(CodeWord.VOWELS);
-  }
-
-  static generate(): string {
-    const letters = [];
-    for (let i = 0; i < CodeWord.NUM_PAIRS; i++) {
-      letters.push(CodeWord.randomConsonant());
-      letters.push(CodeWord.randomVowel());
-    }
-    return letters.join("");
-  }
 }
 
 @InputType()

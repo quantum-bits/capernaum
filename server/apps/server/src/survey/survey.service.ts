@@ -14,7 +14,13 @@ import {
   SurveyResponse,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntityManager, IsNull, Not, Repository } from "typeorm";
+import {
+  EntityManager,
+  FindConditions,
+  IsNull,
+  Not,
+  Repository,
+} from "typeorm";
 import {
   QualtricsQuestion,
   QualtricsSurvey,
@@ -110,6 +116,15 @@ export class SurveyService extends BaseService {
 
   surveyResponse(id: number) {
     return this.surveyResponseRepo.findOne(id);
+  }
+
+  readSurveyResponses(groupId?: number) {
+    const conditions: FindConditions<SurveyResponse> = {};
+    if (groupId) {
+      conditions.groupId = groupId;
+    }
+
+    return this.surveyResponseRepo.find(conditions);
   }
 
   findItemResponse(surveyItem: SurveyItem, responseId: number) {

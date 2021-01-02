@@ -1,15 +1,25 @@
 import { Inject, Injectable } from "@nestjs/common";
 import faker from "faker";
-import { CodeWord, Group, GroupCreateInput } from "@server/src/group/entities";
+import { Group } from "@server/src/group/entities";
 import { AbstractFabricatorService } from "@server/src/fabricator/abstract-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
+import { CodeWord } from "@server/src/group/code-word";
+import { Survey, SurveyResponse } from "@server/src/survey/entities";
+import Chance from "chance";
+const chance = new Chance();
+
+export interface GroupWithSurveysFixture {
+  group: Group;
+  survey: Survey;
+  surveyResponses: SurveyResponse[];
+}
 
 @Injectable()
 export class GroupFabricatorService extends AbstractFabricatorService {
   @Inject(SurveyFabricatorService)
   private readonly surveyFabricatorService: SurveyFabricatorService;
 
-  fabricateGroup(): GroupCreateInput {
+  fabricateGroup(): Group {
     return this.verifyFabricatedData(Group, {
       name: faker.company.companyName(),
       type: faker.random.arrayElement([
@@ -26,10 +36,10 @@ export class GroupFabricatorService extends AbstractFabricatorService {
   }
 
   // This works, but just seems so awful.
-  async create(count = 1): Promise<Group[]> {
+  async dbCreate(count = 1): Promise<Group[]> {
     const groups: Group[] = [];
     for (let i = 0; i < count; i++) {
-      const survey = await this.surveyFabricatorService.createSurvey();
+      const survey = await this.surveyFabricatorService.dbCreateSurvey();
       const group = this.entityMgr.create(Group, this.fabricateGroup());
       group.survey = survey;
       groups.push(await this.entityMgr.save(group));
@@ -37,20 +47,29 @@ export class GroupFabricatorService extends AbstractFabricatorService {
     return groups;
   }
 
-  /* This version using async.js works, but the type declaration for `times` seems wrong.
-     Question posted to https://stackoverflow.com/questions/65516225/incorrect-typing-for-times-function
+  async prepareGroupWithSurveysFixture(): Promise<GroupWithSurveysFixture> {
+    const survey = await this.surveyFabricatorService.dbCreateSurvey();
+    const groupData = this.fabricateGroup();
+    groupData.survey = survey;
+    const group = await this.entityMgr.save(Group, groupData);
 
-  create(count = 1) {
-    return times<Group>(count, (n, next) =>
-      this.surveyFabricatorService
-        .createSurvey()
-        .then((survey) =>
-          this.entityMgr.save<Group>(
-            this.entityMgr.create(Group, this.fabricateGroup(survey.id))
-          )
-        )
-        .then((group) => next(null, group))
-    );
+    const numResponses = chance.natural({ min: 10, max: 20 });
+    const surveyResponses: SurveyResponse[] = [];
+    for (let i = 0; i < numResponses; i++) {
+      const surveyResponseData = this.surveyFabricatorService.fabricateSurveyResponse();
+      surveyResponseData.survey = survey;
+      surveyResponseData.group = group;
+      const surveyResponse = await this.entityMgr.save(
+        SurveyResponse,
+        surveyResponseData
+      );
+      surveyResponses.push(surveyResponse);
+    }
+
+    return {
+      group,
+      survey,
+      surveyResponses,
+    };
   }
-  */
 }

@@ -1,12 +1,13 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { GroupService } from "./group.service";
 import { EntityManager, QueryFailedError } from "typeorm";
-import { Group, GroupCreateInput } from "@server/src/group/entities";
-import { Survey } from "@server/src/survey/entities";
+import { Group } from "@server/src/group/entities";
+import { Survey, SurveyResponse } from "@server/src/survey/entities";
 import { FabricatorModule } from "@server/src/fabricator/fabricator.module";
 import { GroupFabricatorService } from "@server/src/fabricator/group-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
 import Chance from "chance";
+import _ from "lodash";
 
 const chance = new Chance();
 
@@ -37,7 +38,7 @@ describe("GroupService", () => {
 
   it("can fetch all groups", async () => {
     const howMany = chance.natural({ min: 2, max: 8 });
-    await groupFabricatorService.create(howMany);
+    await groupFabricatorService.dbCreate(howMany);
 
     return groupService
       .readGroups()
@@ -46,7 +47,7 @@ describe("GroupService", () => {
 
   it("can create a group with a related survey", async () => {
     const groupData = groupFabricatorService.fabricateGroup();
-    const survey = await surveyFabricatorService.createSurvey();
+    const survey = await surveyFabricatorService.dbCreateSurvey();
     groupData.surveyId = survey.id;
 
     return groupService
@@ -57,14 +58,14 @@ describe("GroupService", () => {
   it("can't create a group without a survey", async () => {
     const groupData = groupFabricatorService.fabricateGroup();
 
-    return expect(
-      groupService.createGroup((groupData as unknown) as GroupCreateInput)
-    ).rejects.toThrowError(QueryFailedError);
+    return expect(groupService.createGroup(groupData)).rejects.toThrowError(
+      QueryFailedError
+    );
   });
 
   it("can fetch one group", async () => {
     const howMany = chance.natural({ min: 2, max: 8 });
-    const groups = await groupFabricatorService.create(howMany);
+    const groups = await groupFabricatorService.dbCreate(howMany);
     const targetGroup = chance.pickone(groups);
 
     return groupService.readGroup(targetGroup.id).then((group) => {
@@ -74,5 +75,22 @@ describe("GroupService", () => {
     });
   });
 
-  it.todo("can fetch all responses for a group");
+  it("can fetch all responses for a group", async () => {
+    const fixture = await groupFabricatorService.prepareGroupWithSurveysFixture();
+    const numResponses = fixture.surveyResponses.length;
+
+    return groupService.readGroup(fixture.group.id).then((g) => {
+      expect(g.survey.qualtricsName).toEqual(
+        fixture.group.survey.qualtricsName
+      );
+      expect(g.surveyResponses).toHaveLength(numResponses);
+      _.every(
+        _.times(numResponses, (idx) =>
+          expect(g.surveyResponses[idx].email).toEqual(
+            fixture.surveyResponses[idx].email
+          )
+        )
+      );
+    });
+  });
 });
