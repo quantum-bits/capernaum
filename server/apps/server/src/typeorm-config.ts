@@ -55,5 +55,5 @@ export const options: ConnectionOptions = {
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
   entities,
-  logging: true,
+  logging: false,
 };

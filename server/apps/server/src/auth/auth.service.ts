@@ -5,6 +5,11 @@ import { validatePassword } from "./crypto";
 import { LoginCredentials } from "./entities";
 import { UserPayload } from "../user/entities";
 
+interface LoginConfirmation {
+  user: UserPayload;
+  accessToken: string;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  async login(loginCredentials: LoginCredentials) {
+  async login(loginCredentials: LoginCredentials): Promise<LoginConfirmation> {
     const user = await this.userService.findUserByEmail(loginCredentials.email);
 
     if (user) {

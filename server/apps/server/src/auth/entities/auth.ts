@@ -10,5 +10,5 @@ export class LoginCredentials {
 @ObjectType()
 export class LoginResponse {
   @Field() accessToken: string;
-  @Field(type => UserPayload) user: UserPayload;
+  @Field(() => UserPayload) user: UserPayload;
 }

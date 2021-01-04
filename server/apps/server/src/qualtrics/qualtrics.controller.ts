@@ -4,7 +4,7 @@ import { Body, Controller, Post, Headers, Logger } from "@nestjs/common";
 import {
   WebHookActivateDeactivateSurvey,
   WebHookCompletedResponse,
-} from "@qapi/qualtrics-api/qualtrics-api.types";
+} from "@qapi/qualtrics-api.types";
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
 import { ReportQueueProducer } from "@reporter/src/producer/report-queue-producer";

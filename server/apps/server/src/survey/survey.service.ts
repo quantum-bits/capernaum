@@ -25,7 +25,7 @@ import {
   QualtricsQuestion,
   QualtricsSurvey,
   QualtricsSurveyResponse,
-} from "@qapi/qualtrics-api/qualtrics-api.types";
+} from "@qapi/qualtrics-api.types";
 import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";

@@ -1,5 +1,5 @@
 import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { QualtricsApiService } from "@qapi/qualtrics-api/qualtrics-api.service";
+import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import { QualtricsSurveyListItem } from "./entities/qualtrics-survey-list-item";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";

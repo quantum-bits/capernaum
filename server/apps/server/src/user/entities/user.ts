@@ -11,6 +11,8 @@ import {
 } from "typeorm";
 import { UserRole } from "./user-role";
 import { hashPassword } from "../../auth/crypto";
+import Debug from "debug";
+const debug = Debug("user");
 
 @Entity()
 @ObjectType()
@@ -25,18 +27,18 @@ export class User extends AbstractEntity {
   @AfterLoad()
   private loadTempPassword() {
     this.tempPassword = this.password;
-    console.log("AFTER LOAD", this.tempPassword);
+    debug("AFTER LOAD '%s'", this.tempPassword);
   }
 
   @BeforeInsert()
   private async encryptOnAdd() {
     this.password = await hashPassword(this.password);
-    console.log("BEFORE INSERT", this);
+    debug("BEFORE INSERT %O", this);
   }
 
   @BeforeUpdate()
   private async encryptonUpdate() {
-    console.log("BEFORE UPDATE", this.tempPassword, this.password);
+    debug("BEFORE UPDATE '%s', '%s'", this.tempPassword, this.password);
     if (this.tempPassword !== this.password) {
       this.password = await hashPassword(this.password);
       this.loadTempPassword();

@@ -7,11 +7,10 @@ import { SurveyIndex } from "./survey-index";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
-import { CodeWord, Group } from "../../group/entities";
-
+import { Group } from "../../group/entities";
 import debug from "debug";
 import { SurveyDimension } from "@server/src/survey/entities/survey-dimension";
-import * as faker from "faker";
+
 const surveyDebug = debug("survey");
 
 class ScriptureEngagementPracticePrediction {
@@ -128,7 +127,6 @@ export class SurveyResponse extends AbstractEntity {
   @Column()
   @Field({ description: "Respondent's longitude" })
   longitude: string;
-
 
   summarize = (): ResponseSummary => ({
     id: this.id,

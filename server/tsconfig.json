@@ -15,8 +15,7 @@
       "@server/*": ["apps/server/*"],
       "@reporter/*": ["apps/reporter/*"],
       "@common/*": ["apps/*"],
-      "@qapi/qualtrics-api": ["libs/qualtrics-api/src"],
-      "@qapi/qualtrics-api/*": ["libs/qualtrics-api/src/*"]
+      "@qapi/*": ["libs/qualtrics-api/src/*"]
     }
   },
   "exclude": ["node_modules", "dist", "etc"]

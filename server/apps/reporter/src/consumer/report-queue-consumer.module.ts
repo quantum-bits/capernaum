@@ -4,7 +4,7 @@ import { SurveyModule } from "@server/src/survey/survey.module";
 import { MailModule } from "@server/src/mail/mail.module";
 import { EventModule } from "@server/src/events/event.module";
 import { WriterModule } from "@server/src/writer/writer.module";
-import { QualtricsApiModule } from "@qapi/qualtrics-api";
+import { QualtricsApiModule } from "@qapi/qualtrics-api.module";
 import { BullModule } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { TypeOrmModule } from "@nestjs/typeorm";

@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { SubscriptionType } from "@qapi/qualtrics-api/qualtrics-api.types";
+import { SubscriptionType } from "@qapi/qualtrics-api.types";
 
 @ObjectType()
 export class QualtricsSubscription {
