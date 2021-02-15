@@ -24,26 +24,27 @@ import {
 } from "./entities";
 import { SurveyService } from "./survey.service";
 import { Int } from "@nestjs/graphql";
-import { QualtricsResponseImportStats, WhichItems } from "./survey.types";
+import { WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
-import { Group, Letter } from "../letter/entities";
-import { UseGuards } from "@nestjs/common";
-import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { Letter } from "../letter/entities";
+import { Group } from "@server/src/group/entities/group";
 
-@Resolver((of) => Survey)
+@Resolver(() => Survey)
 // @UseGuards(GqlAuthGuard)
 export class SurveyResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @Mutation((returns) => Survey, {
+  @Mutation(() => Survey, {
     description: "Create a new survey.",
     deprecationReason: "Should only create surveys from Qualtrics",
   })
-  createSurvey(@Args("createInput") createInput: SurveyCreateInput) {
+  createSurvey(
+    @Args("createInput") createInput: SurveyCreateInput
+  ): Promise<Survey> {
     return this.surveyService.createSurvey(createInput);
   }
 
-  @Mutation((returns) => SurveyDimension, {
+  @Mutation(() => SurveyDimension, {
     description: "Create a survey dimension.",
   })
   createSurveyDimension(
@@ -52,7 +53,7 @@ export class SurveyResolver {
     return this.surveyService.createDimension(createInput);
   }
 
-  @Mutation((returns) => SurveyIndex, {
+  @Mutation(() => SurveyIndex, {
     description:
       "Create a survey index. Can add survey items directly by item ID.",
   })
@@ -60,46 +61,46 @@ export class SurveyResolver {
     return this.surveyService.createIndex(createInput);
   }
 
-  @Query((returns) => Survey)
+  @Query(() => Survey)
   survey(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.findOne(Survey, id);
   }
 
-  @Query((returns) => [Survey])
+  @Query(() => [Survey])
   surveys() {
     return this.surveyService.find(Survey);
   }
 
-  @Query((returns) => [SurveyDimension])
+  @Query(() => [SurveyDimension])
   surveyDimensions() {
     return this.surveyService.find(SurveyDimension);
   }
 
-  @Query((returns) => [SurveyIndex])
+  @Query(() => [SurveyIndex])
   surveyIndices() {
     return this.surveyService.find(SurveyIndex);
   }
 
-  @Query((returns) => [SurveyItem], {
+  @Query(() => [SurveyItem], {
     description: "Retrieve all survey items",
   })
   surveyItems() {
     return this.surveyService.find(SurveyItem);
   }
 
-  @Mutation((returns) => Survey)
+  @Mutation(() => Survey)
   updateSurvey(@Args("updateInput") updateInput: SurveyUpdateInput) {
     return this.surveyService.update(Survey, updateInput);
   }
 
-  @Mutation((returns) => SurveyDimension)
+  @Mutation(() => SurveyDimension)
   updateSurveyDimension(
     @Args("updateInput") updateInput: SurveyDimensionUpdateInput
   ) {
     return this.surveyService.update(SurveyDimension, updateInput);
   }
 
-  @Mutation((returns) => SurveyIndex, {
+  @Mutation(() => SurveyIndex, {
     description: `Update an index. Field values will replaces existing values in the object.
       (e.g., if you give a value for itemIds, it will replace the current list.`,
   })
@@ -107,12 +108,12 @@ export class SurveyResolver {
     return this.surveyService.updateSurveyIndex(updateInput);
   }
 
-  @Mutation((returns) => Int)
+  @Mutation(() => Int)
   deleteSurvey(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.deleteSurvey(id);
   }
 
-  @Mutation((returns) => SurveyDimensionDeleteOutput, {
+  @Mutation(() => SurveyDimensionDeleteOutput, {
     description: `Delete a dimension. Also deletes indices associated with this dimension.
     Each index is removed using the equivalent of deleteSurveyIndex.
     Returns details of everything that was deleted.`,
@@ -121,7 +122,7 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyDimension(id);
   }
 
-  @Mutation((returns) => SurveyIndexDeleteOutput, {
+  @Mutation(() => SurveyIndexDeleteOutput, {
     description:
       "Delete an index. Also removes associations with items; the items are not removed.",
   })
@@ -129,21 +130,21 @@ export class SurveyResolver {
     return this.surveyService.deleteSurveyIndex(id);
   }
 
-  @Mutation((returns) => Int, {
+  @Mutation(() => Int, {
     description: "Delete a survey response",
   })
   deleteSurveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.deleteSurveyResponse(id);
   }
 
-  @ResolveField("letters", (type) => [Letter], {
+  @ResolveField("letters", () => [Letter], {
     description: "Fetch the letters for this survey",
   })
   resolveLetters(@Parent() survey: Survey) {
     return this.surveyService.find(Letter, { surveyId: survey.id });
   }
 
-  @ResolveField("surveyItems", (type) => [SurveyItem], {
+  @ResolveField("surveyItems", () => [SurveyItem], {
     description: `All the Qualtrics items for this survey; 
     for groupings, see survey dimension and index.
     Pass 'whichItems' to choose which to return (default 'All')`,
@@ -160,7 +161,7 @@ export class SurveyResolver {
     return this.surveyService.findItemsForSurvey(survey, whichItems);
   }
 
-  @ResolveField("surveyDimensions", (type) => [SurveyDimension], {
+  @ResolveField("surveyDimensions", () => [SurveyDimension], {
     description:
       "Dimensions for this survey; groups indices, which group items.",
   })
@@ -168,14 +169,14 @@ export class SurveyResolver {
     return this.surveyService.find(SurveyDimension, { survey });
   }
 
-  @ResolveField("surveyResponses", (type) => [SurveyResponse], {
+  @ResolveField("surveyResponses", () => [SurveyResponse], {
     description: "Responses for this survey",
   })
   resolveSurveyResponses(@Parent() survey: Survey) {
     return this.surveyService.find(SurveyResponse, { survey });
   }
 
-  @ResolveField("groups", (type) => [Group], {
+  @ResolveField("groups", () => [Group], {
     description: "Groups using this survey",
   })
   resolveGroups(@Parent() survey: Survey) {
@@ -183,36 +184,43 @@ export class SurveyResolver {
   }
 }
 
-@Resolver((of) => SurveyResponse)
+@Resolver(() => SurveyResponse)
 export class SurveyResponseResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @Query((returns) => SurveyResponse)
+  @Query(() => SurveyResponse)
   surveyResponse(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.surveyResponse(id);
   }
 
-  @Query((returns) => [SurveyResponse])
-  surveyResponses() {
-    return this.surveyService.find(SurveyResponse);
+  @Query(() => [SurveyResponse])
+  surveyResponses(
+    @Args("groupId", {
+      type: () => Int,
+      nullable: true,
+      description: "Limit to one group",
+    })
+    groupId?: number
+  ) {
+    return this.surveyService.readSurveyResponses(groupId);
   }
 
-  @ResolveField("survey", (type) => Survey)
+  @ResolveField("survey", () => Survey)
   resolveSurvey(@Parent() surveyResponse: SurveyResponse) {
     return this.surveyService.findOneOrFail(Survey, surveyResponse.surveyId);
   }
 
-  @ResolveField("surveyItemResponses", (type) => [SurveyItemResponse])
+  @ResolveField("surveyItemResponses", () => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyResponse: SurveyResponse) {
     return this.surveyService.find(SurveyItemResponse, { surveyResponse });
   }
 }
 
-@Resolver((of) => SurveyItemResponse)
+@Resolver(() => SurveyItemResponse)
 export class SurveyItemResponseResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveField("surveyItem", (type) => SurveyItem)
+  @ResolveField("surveyItem", () => SurveyItem)
   resolveSurveyItem(@Parent() surveyItemResponse: SurveyItemResponse) {
     return this.surveyService.findOneOrFail(
       SurveyItem,
@@ -221,31 +229,31 @@ export class SurveyItemResponseResolver {
   }
 }
 
-@Resolver((of) => SurveyDimension)
+@Resolver(() => SurveyDimension)
 export class SurveyDimensionResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @Query((returns) => [SurveyDimension])
+  @Query(() => [SurveyDimension])
   surveyDimensions() {
     return this.surveyService.find(SurveyDimension);
   }
 
-  @Query((returns) => SurveyDimension)
+  @Query(() => SurveyDimension)
   surveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyService.findOne(SurveyDimension, id);
   }
 
-  @Query((returns) => SurveyDimension)
+  @Query(() => SurveyDimension)
   updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
     return this.surveyService.update(SurveyDimension, updateInput);
   }
 
-  @ResolveField((type) => Survey)
+  @ResolveField(() => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
     return this.surveyService.findOne(Survey, surveyDimension.surveyId);
   }
 
-  @ResolveField((type) => [SurveyIndex], {
+  @ResolveField(() => [SurveyIndex], {
     description: "List of survey index entries for this dimension.",
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
@@ -253,18 +261,18 @@ export class SurveyDimensionResolver {
   }
 }
 
-@Resolver((of) => SurveyIndex)
+@Resolver(() => SurveyIndex)
 export class SurveyIndexResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveField((type) => [SurveyItem], {
+  @ResolveField(() => [SurveyItem], {
     description: "List of survey items for this index",
   })
   surveyItems(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.find(SurveyItem, { surveyIndex });
   }
 
-  @ResolveField((type) => SurveyDimension)
+  @ResolveField(() => SurveyDimension)
   surveyDimension(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.findOne(
       SurveyDimension,
@@ -272,17 +280,17 @@ export class SurveyIndexResolver {
     );
   }
 
-  @ResolveField((type) => [PredictionTableEntry])
+  @ResolveField(() => [PredictionTableEntry])
   predictionTableEntries(@Parent() surveyIndex: SurveyIndex) {
     return this.surveyService.find(PredictionTableEntry, { surveyIndex });
   }
 }
 
-@Resolver((of) => SurveyItem)
+@Resolver(() => SurveyItem)
 export class SurveyItemResolver {
   constructor(private readonly surveyService: SurveyService) {}
 
-  @ResolveField((type) => SurveyIndex, {
+  @ResolveField(() => SurveyIndex, {
     description: "Index associated with this item (if any)",
   })
   surveyIndex(@Parent() surveyItem: SurveyItem) {
@@ -293,12 +301,12 @@ export class SurveyItemResolver {
     }
   }
 
-  @ResolveField("surveyItemResponses", (type) => [SurveyItemResponse])
+  @ResolveField("surveyItemResponses", () => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
     return this.surveyService.find(SurveyItemResponse, { surveyItem });
   }
 
-  @ResolveField("surveyItemResponse", (type) => SurveyItemResponse, {
+  @ResolveField("surveyItemResponse", () => SurveyItemResponse, {
     nullable: true,
   })
   resolveSurveyItemResponse(

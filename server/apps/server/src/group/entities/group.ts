@@ -1,7 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToOne } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Survey } from "../../survey/entities";
+import { Survey, SurveyResponse } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import faker from "faker";
 
 @Entity()
 @ObjectType()
@@ -42,15 +49,22 @@ export class Group extends AbstractEntity {
   @ManyToOne(() => Survey, (survey) => survey.groups)
   @Field(() => Survey)
   survey: Survey;
+
+  @OneToMany((type) => SurveyResponse, (sr) => sr.group)
+  @Field(() => [SurveyResponse], { description: "Responses by this group" })
+  surveyResponses: SurveyResponse[];
 }
 
 @InputType()
 export class GroupCreateInput {
-  @Field({ description: "Group name" }) name: string;
+  @Field({ description: "Group name" })
+  name: string;
 
-  @Field({ description: "Type of group" }) type: string;
+  @Field({ description: "Type of group" })
+  type: string;
 
-  @Field({ description: "Date when survey closes" }) closedAfter: string;
+  @Field({ description: "Date when survey closes" })
+  closedAfter: string;
 
   @Field({ description: "Group administrator first name" })
   adminFirstName: string;
@@ -61,18 +75,23 @@ export class GroupCreateInput {
   @Field({ description: "Group administrator email address" })
   adminEmail: string;
 
-  @Field({ description: "Survey code word used by group" }) codeWord: string;
+  @Field({ description: "Survey code word used by group" })
+  codeWord: string;
 
-  @Field((type) => Int) surveyId: number;
+  @Field((type) => Int)
+  surveyId: number;
 }
 
 @InputType()
-export class GroupUpdateInput {
-  @Field(() => Int) id: number;
+export class GroupUpdateInput implements Partial<Group> {
+  @Field(() => Int)
+  id: number;
 
-  @Field({ description: "Group name", nullable: true }) name?: string;
+  @Field({ description: "Group name", nullable: true })
+  name?: string;
 
-  @Field({ description: "Type of group", nullable: true }) type?: string;
+  @Field({ description: "Type of group", nullable: true })
+  type?: string;
 
   @Field({ description: "Date when survey closes", nullable: true })
   closedAfter?: string;
@@ -89,5 +108,6 @@ export class GroupUpdateInput {
   @Field({ description: "Survey code word used by group", nullable: true })
   codeWord?: string;
 
-  @Field((type) => Int, { nullable: true }) surveyId?: number;
+  @Field((type) => Int, { nullable: true })
+  surveyId?: number;
 }

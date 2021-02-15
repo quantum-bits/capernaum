@@ -9,7 +9,7 @@ program
   .command("hash-password <password>")
   .description("hash a password")
   .action((password: string) => {
-    hashPassword(password).then(hash => console.log(hash));
+    hashPassword(password).then((hash) => console.log(hash));
   });
 
 program.parse(process.argv);

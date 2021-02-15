@@ -1,4 +1,5 @@
 .env
+.*.env
 .idea/
 auto/
 dist/
@@ -11,3 +12,4 @@ private.yaml
 /ansible/host_vars/
 /pm2/
 .graphqlconfig
+coverage/

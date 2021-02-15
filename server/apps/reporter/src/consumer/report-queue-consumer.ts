@@ -1,18 +1,18 @@
 import { Logger } from "@nestjs/common";
 import { Process, Processor } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
+import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { Job } from "bull";
-import { QualtricsSurveyResponse } from "@qapi/qualtrics-api/qualtrics-api.types";
+import { QualtricsSurveyResponse } from "@qapi/qualtrics-api.types";
 import { quillDeltaToHtml, quillHtmlToText } from "@server/src/helpers/quill";
 import { EventCreateInput } from "@server/src/events/entities";
 import { EventService } from "@server/src/events/event.service";
-import { QualtricsApiService } from "@qapi/qualtrics-api/qualtrics-api.service";
+import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { WriterService } from "@server/src/writer/writer.service";
 import { MailService } from "@server/src/mail/mail.service";
 
 import debug from "debug";
-import { PROM_METRIC_EMAILS_SENT } from "@apps/reporter/src/common";
+import { PROM_METRIC_EMAILS_SENT } from "@reporter/src/common";
 import { InjectMetric } from "@willsoto/nestjs-prometheus";
 import { Counter } from "prom-client";
 const qualtricsDebug = debug("qualtrics");
@@ -63,7 +63,7 @@ export class ReportQueueConsumer {
 
     // Fetch the letter.
     // TODO: Sort out how to pass stuff to `renderLetter`.
-    const letter = await this.surveyService.findLetters(survey.id);
+    const letter = await this.surveyService.findLetter(survey.id);
 
     // Write a letter.
     const writerOutput = await this.writerService.renderLetter(

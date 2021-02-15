@@ -34,7 +34,7 @@ async function makeFakeSurvey() {
     surveyResponseRepo.create({
       survey: survey,
       email: "alpha@beta.com",
-      groupCode: "Groupie",
+      codeWord: "Groupie",
       qualtricsResponseId: "Qualtrics Response ID",
       startDate: "2019-12-24",
       endDate: "2019-12-24",

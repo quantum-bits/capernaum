@@ -11,9 +11,9 @@ import { AuthResolver } from "./auth.resolvers";
   imports: [
     UserModule,
     PassportModule,
-    JwtModule.register({ secret: jwtConstants.secret })
+    JwtModule.register({ secret: jwtConstants.secret }),
   ],
   providers: [AuthService, JwtStrategy, AuthResolver],
-  exports: [AuthService]
+  exports: [AuthService],
 })
 export class AuthModule {}

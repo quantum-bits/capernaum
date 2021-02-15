@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ReportQueueProducer } from "./report-queue-producer";
 import { BullModule } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@apps/common.constants";
+import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 
 @Module({
   imports: [

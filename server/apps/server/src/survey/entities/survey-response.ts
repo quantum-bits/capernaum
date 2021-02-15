@@ -7,7 +7,9 @@ import { SurveyIndex } from "./survey-index";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
+import { Group } from "../../group/entities";
 import debug from "debug";
+import { SurveyDimension } from "@server/src/survey/entities/survey-dimension";
 
 const surveyDebug = debug("survey");
 
@@ -48,89 +50,138 @@ class ScriptureEngagementPracticePrediction {
 @Entity()
 @ObjectType({ description: "One user's response to a survey" })
 export class SurveyResponse extends AbstractEntity {
-  @Column("int") surveyId;
-  @ManyToOne((type) => Survey, (survey) => survey.surveyItems)
-  @Field((type) => Survey)
+  @Column("int", { nullable: true }) groupId?: number;
+  @ManyToOne(() => Group, (group) => group.surveyResponses)
+  @Field(() => Group, {
+    nullable: true,
+    description: "Group for this response (if any)",
+  })
+  group: Group;
+
+  @Column("int") surveyId: number;
+  @ManyToOne(() => Survey, (survey) => survey.surveyItems)
+  @Field(() => Survey, {
+    description: "Survey for which this is a response",
+  })
   survey: Survey;
 
   @OneToMany(
-    (type) => SurveyItemResponse,
+    () => SurveyItemResponse,
     (surveyItemResponse) => surveyItemResponse.surveyResponse
   )
-  @Field((type) => [SurveyItemResponse])
+  @Field(() => [SurveyItemResponse], {
+    description: "Responses to individual items in the survey",
+  })
   surveyItemResponses: SurveyItemResponse[];
 
-  @Column() @Field() email: string;
-  @Column() @Field() groupCode: string;
-  @Column() @Field() qualtricsResponseId: string;
-  @Column() @Field() startDate: string;
-  @Column() @Field() endDate: string;
-  @Column() @Field() recordedDate: string;
-  @Column("int") @Field((type) => Int) status: number;
-  @Column("int") @Field((type) => Int) progress: number;
-  @Column("int") @Field((type) => Int) duration: number;
-  @Column("int") @Field((type) => Int) finished: number;
-  @Column() @Field() ipAddress: string;
-  @Column() @Field() latitude: string;
-  @Column() @Field() longitude: string;
+  @Column()
+  @Field({ description: "Respondent's email address" })
+  email: string;
 
-  public summarize(): ResponseSummary {
-    return {
-      id: this.id,
-      qualtricsResponseId: this.qualtricsResponseId,
-      email: this.email,
-      date: this.endDate,
-      surveySummary: {
-        id: this.survey.id,
-        title: this.survey.qualtricsName,
-        qualtricsId: this.survey.qualtricsId,
-        qualtricsName: this.survey.qualtricsName,
-      },
-      dimensionSummaries: this.survey.surveyDimensions.map((dimension) => ({
-        id: dimension.id,
-        title: dimension.title,
-        indexSummaries: dimension.surveyIndices.map((index) => ({
-          id: index.id,
-          title: index.title,
-          abbreviation: index.abbreviation,
-          meanResponse: index.meanResponse(),
-          itemSummaries: index.surveyItems.map((item) => {
-            const itemResponse = item.surveyItemResponse();
-            return {
-              id: item.id,
-              qualtricsId: item.qualtricsId,
-              qualtricsText: item.qualtricsText,
-              responseId: itemResponse.id,
-              responseLabel: itemResponse.label,
-              responseValue: itemResponse.value,
-            };
-          }),
-        })),
-      })),
-      predictionSummaries: this.predictScriptureEngagement().map(
-        (prediction) => {
-          const practice = prediction.practice;
+  @Column()
+  @Field({ description: "Group code word" })
+  codeWord: string;
+
+  @Column()
+  @Field()
+  qualtricsResponseId: string;
+
+  @Column()
+  @Field({ description: "When survey was started" })
+  startDate: string;
+
+  @Column()
+  @Field({ description: "When survey was completed" })
+  endDate: string;
+
+  @Column()
+  @Field({ description: "When survey was recorded" })
+  recordedDate: string;
+
+  @Column("int")
+  @Field(() => Int, { description: "Type of response" })
+  status: number;
+
+  @Column("int")
+  @Field(() => Int, { description: "Percent complete" })
+  progress: number;
+
+  @Column("int")
+  @Field(() => Int, { description: "Time to complete (seconds)" })
+  duration: number;
+
+  @Column("int")
+  @Field(() => Int, {
+    description: "1 = Survey complete and submitted, 0 = otherwise",
+  })
+  finished: number;
+
+  @Column()
+  @Field({ description: "Respondent's IP address" })
+  ipAddress: string;
+
+  @Column()
+  @Field({ description: "Respondent's latitude" })
+  latitude: string;
+
+  @Column()
+  @Field({ description: "Respondent's longitude" })
+  longitude: string;
+
+  summarize = (): ResponseSummary => ({
+    id: this.id,
+    qualtricsResponseId: this.qualtricsResponseId,
+    email: this.email,
+    date: this.endDate,
+
+    surveySummary: {
+      id: this.survey.id,
+      title: this.survey.qualtricsName,
+      qualtricsId: this.survey.qualtricsId,
+      qualtricsName: this.survey.qualtricsName,
+    },
+
+    dimensionSummaries: this.survey.surveyDimensions.map((dimension) => ({
+      id: dimension.id,
+      title: dimension.title,
+      indexSummaries: dimension.surveyIndices.map((index) => ({
+        id: index.id,
+        title: index.title,
+        abbreviation: index.abbreviation,
+        meanResponse: index.meanResponse(),
+        itemSummaries: index.surveyItems.map((item) => {
+          const itemResponse = item.surveyItemResponse();
           return {
-            practiceSummary: {
-              id: practice.id,
-              title: practice.title,
-              description: practice.description,
-            },
-            predictionDetails: prediction.details,
-            predict: prediction.predict,
+            id: item.id,
+            qualtricsId: item.qualtricsId,
+            qualtricsText: item.qualtricsText,
+            responseId: itemResponse.id,
+            responseLabel: itemResponse.label,
+            responseValue: itemResponse.value,
           };
-        }
-      ),
-    };
-  }
+        }),
+      })),
+    })),
+    predictionSummaries: this.predictScriptureEngagement().map((prediction) => {
+      const practice = prediction.practice;
+      return {
+        practiceSummary: {
+          id: practice.id,
+          title: practice.title,
+          description: practice.description,
+        },
+        predictionDetails: prediction.details,
+        predict: prediction.predict,
+      };
+    }),
+  });
 
-  public findDimensionById(dimensionId: number) {
-    return this.survey.surveyDimensions.find(
+  findDimensionById = (dimensionId: number): SurveyDimension =>
+    this.survey.surveyDimensions.find(
       (dimension) => dimension.id === dimensionId
     );
-  }
 
-  public predictScriptureEngagement() {
+  public predictScriptureEngagement(): Prediction[] {
     const predictionMap: Map<
       number, // Practice ID
       ScriptureEngagementPracticePrediction
@@ -168,11 +219,10 @@ export class SurveyResponse extends AbstractEntity {
     return predictions;
   }
 
-  private static tab(n: number, msge: string) {
-    return "|  ".repeat(n) + msge;
-  }
+  static tab = (n: number, message: string): string =>
+    "|  ".repeat(n) + message;
 
-  public dump() {
+  public dump(): void {
     console.log("RESPONSE", this.id);
 
     for (const dim of this.survey.surveyDimensions) {
@@ -199,7 +249,8 @@ export class SurveyResponse extends AbstractEntity {
           );
         }
 
-        if (false) {
+        const showResponses = false;
+        if (showResponses) {
           for (const item of index.surveyItems) {
             console.log(
               SurveyResponse.tab(

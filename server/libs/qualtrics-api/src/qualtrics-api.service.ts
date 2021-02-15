@@ -15,7 +15,7 @@ import {
   QualtricsSurvey,
   QualtricsSurveyList,
   ResponseExportProgress,
-} from "@qapi/qualtrics-api/qualtrics-api.types";
+} from "@qapi/qualtrics-api.types";
 import { Injectable } from "@nestjs/common";
 
 import debug from "debug";

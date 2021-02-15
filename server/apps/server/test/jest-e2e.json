@@ -1,9 +1,15 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "../../..",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@server/(.*)$": "<rootDir>/apps/server/$1",
+    "^@reporter/(.*)$": "<rootDir>/apps/reporter/$1",
+    "^@common/(.*)$": "<rootDir>/apps/$1",
+    "^@qapi/(.*)$": "<rootDir>/libs/qualtrics-api/src/$1"
   }
 }

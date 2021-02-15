@@ -75,36 +75,6 @@ type LetterElement {
   surveyDimension: SurveyDimension
 }
 
-type Group {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Group name"""
-  name: String!
-
-  """Type of group"""
-  type: String!
-
-  """Date when survey created"""
-  created: String!
-
-  """Date when survey closes"""
-  closedAfter: String!
-
-  """Group administrator first name"""
-  adminFirstName: String!
-
-  """Group administrator last name"""
-  adminLastName: String!
-
-  """Group administrator email address"""
-  adminEmail: String!
-
-  """Survey code word used by group"""
-  codeWord: String!
-  survey: Survey!
-}
-
 """One entry in a prediction table"""
 type PredictionTableEntry {
   """Unique ID for this entity"""
@@ -183,24 +153,84 @@ type SurveyIndexDeleteOutput {
   deletedItemIds: [Int!]!
 }
 
+type Group {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Group name"""
+  name: String!
+
+  """Type of group"""
+  type: String!
+
+  """Date when survey created"""
+  created: String!
+
+  """Date when survey closes"""
+  closedAfter: String!
+
+  """Group administrator first name"""
+  adminFirstName: String!
+
+  """Group administrator last name"""
+  adminLastName: String!
+
+  """Group administrator email address"""
+  adminEmail: String!
+
+  """Survey code word used by group"""
+  codeWord: String!
+  survey: Survey!
+
+  """Responses by this group"""
+  surveyResponses: [SurveyResponse!]!
+}
+
 """One user's response to a survey"""
 type SurveyResponse {
   """Unique ID for this entity"""
   id: Int!
+
+  """Group for this response (if any)"""
+  group: Group
   survey: Survey!
   surveyItemResponses: [SurveyItemResponse!]!
+
+  """Respondent's email address"""
   email: String!
-  groupCode: String!
+
+  """Group code word"""
+  codeWord: String!
   qualtricsResponseId: String!
+
+  """When survey was started"""
   startDate: String!
+
+  """When survey was completed"""
   endDate: String!
+
+  """When survey was recorded"""
   recordedDate: String!
+
+  """Type of response"""
   status: Int!
+
+  """Percent complete"""
   progress: Int!
+
+  """Time to complete (seconds)"""
   duration: Int!
+
+  """1 = Survey complete and submitted, 0 = otherwise"""
   finished: Int!
+
+  """Respondent's IP address"""
   ipAddress: String!
+
+  """Respondent's latitude"""
   latitude: String!
+
+  """Respondent's longitude"""
   longitude: String!
 }
 
@@ -464,7 +494,10 @@ type Query {
   """Retrieve all survey items"""
   surveyItems: [SurveyItem!]!
   surveyResponse(id: Int!): SurveyResponse!
-  surveyResponses: [SurveyResponse!]!
+  surveyResponses(
+    """Limit to one group"""
+    groupId: Int
+  ): [SurveyResponse!]!
   surveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
@@ -475,7 +508,6 @@ type Query {
   letter(id: Int!): Letter!
   letters: [Letter!]!
   letterElementTypes: [LetterElementType!]!
-  readGroups: [Group!]!
   readLetterTypes: [LetterType!]!
   images: [Image!]!
   image(id: Int!): Image!
@@ -484,6 +516,7 @@ type Query {
   subscriptions: [QualtricsSubscription!]!
   events: [Event!]!
   machines: [Machine!]!
+  readGroups: [Group!]!
 }
 
 type Mutation {
@@ -538,8 +571,6 @@ type Mutation {
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
   deleteLetter(id: Int!): Int!
   deleteLetterElement(id: Int!): Int!
-  createGroup(createInput: GroupCreateInput!): Group!
-  updateGroup(updateInput: GroupUpdateInput!): Group!
   createLetterType(createInput: LetterTypeCreateInput!): LetterType!
   updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
   deleteLetterType(id: Int!): Int!
@@ -559,6 +590,8 @@ type Mutation {
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
+  createGroup(createInput: GroupCreateInput!): Group!
+  updateGroup(updateInput: GroupUpdateInput!): Group!
 }
 
 input SurveyCreateInput {
@@ -742,6 +775,51 @@ input LetterElementUpdateInput {
   surveyDimensionId: Int
 }
 
+input LetterTypeCreateInput {
+  """Human readable key"""
+  key: String!
+
+  """Description of this type"""
+  description: String!
+}
+
+input LetterTypeUpdateInput {
+  id: Int!
+
+  """Human readable key"""
+  key: String
+
+  """Description of this type"""
+  description: String
+}
+
+input ImageUpdateInput {
+  id: Int!
+  title: String!
+}
+
+input WriterInput {
+  letterId: Int!
+  surveyResponseId: Int!
+}
+
+input QualtricsSubscriptionCreateInput {
+  hostName: String!
+  subscriptionType: String!
+  surveyId: String
+}
+
+input EventCreateInput {
+  type: String!
+  details: String!
+}
+
+input MachineCreateInput {
+  name: String!
+  hostName: String!
+  active: Boolean!
+}
+
 input GroupCreateInput {
   """Group name"""
   name: String!
@@ -790,51 +868,6 @@ input GroupUpdateInput {
   """Survey code word used by group"""
   codeWord: String
   surveyId: Int
-}
-
-input LetterTypeCreateInput {
-  """Human readable key"""
-  key: String!
-
-  """Description of this type"""
-  description: String!
-}
-
-input LetterTypeUpdateInput {
-  id: Int!
-
-  """Human readable key"""
-  key: String
-
-  """Description of this type"""
-  description: String
-}
-
-input ImageUpdateInput {
-  id: Int!
-  title: String!
-}
-
-input WriterInput {
-  letterId: Int!
-  surveyResponseId: Int!
-}
-
-input QualtricsSubscriptionCreateInput {
-  hostName: String!
-  subscriptionType: String!
-  surveyId: String
-}
-
-input EventCreateInput {
-  type: String!
-  details: String!
-}
-
-input MachineCreateInput {
-  name: String!
-  hostName: String!
-  active: Boolean!
 }
 
 type Subscription {

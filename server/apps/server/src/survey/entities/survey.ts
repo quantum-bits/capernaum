@@ -1,11 +1,11 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Column, Entity, OneToMany, OneToOne } from "typeorm";
+import { Column, Entity, OneToMany} from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
-import { Group } from "../../letter/entities/group";
+import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
 
 @Entity()
@@ -21,7 +21,7 @@ export class Survey extends AbstractEntity {
   @Field((type) => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany((type) => Group, (item) => item.survey)
+  @OneToMany((type) => Group, (group) => group.survey)
   @Field((type) => [Group])
   groups: Group[];
 

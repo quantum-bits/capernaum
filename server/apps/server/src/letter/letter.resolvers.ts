@@ -19,7 +19,6 @@ import {
   LetterUpdateInput,
 } from "./entities";
 import {
-  GroupService,
   LetterElementTypeService,
   LetterService,
   LetterTypeService,
@@ -34,7 +33,6 @@ import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { SurveyService } from "@server/src/survey/survey.service";
-import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
 
 import Debug from "debug";
 const debug = Debug("letter:resolver");
@@ -174,27 +172,6 @@ export class LetterElementTypeResolver {
   resolveLetterTypes(@Parent() letterElementType: LetterElementType) {
     debug("resolveLetterTypes(%O)", letterElementType);
     return this.letterElementTypeService.readLetterTypes(letterElementType);
-  }
-}
-
-@Resolver("Group")
-@UseGuards(GqlAuthGuard)
-export class GroupResolver {
-  constructor(private readonly groupService: GroupService) {}
-
-  @Mutation(() => Group)
-  createGroup(@Args("createInput") createInput: GroupCreateInput) {
-    return this.groupService.createGroup(createInput);
-  }
-
-  @Query(() => [Group])
-  readGroups() {
-    return this.groupService.readGroups();
-  }
-
-  @Mutation(() => Group)
-  updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
-    return this.groupService.updateGroup(updateInput);
   }
 }
 

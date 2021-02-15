@@ -1,9 +1,9 @@
 import { config } from "dotenv";
+config();
 
 import { ConnectionOptions } from "typeorm";
 
 import {
-  Group,
   Letter,
   LetterElement,
   LetterElementType,
@@ -25,36 +25,35 @@ import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
+import { Group } from "@server/src/group/entities/group";
 
-config();
+export const entities = [
+  Event,
+  Group,
+  Image,
+  Letter,
+  LetterType,
+  LetterElement,
+  LetterElementType,
+  Machine,
+  PredictionTableEntry,
+  ScriptureEngagementPractice,
+  Survey,
+  SurveyDimension,
+  SurveyIndex,
+  SurveyItem,
+  SurveyItemResponse,
+  SurveyResponse,
+  User,
+  UserRole,
+];
 
-const options: ConnectionOptions = {
+export const options: ConnectionOptions = {
   type: "postgres",
   host: process.env.PG_HOST,
   database: process.env.PG_DATABASE,
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
-  logging: true,
-  entities: [
-    Event,
-    Group,
-    Image,
-    Letter,
-    LetterType,
-    LetterElement,
-    LetterElementType,
-    Machine,
-    PredictionTableEntry,
-    ScriptureEngagementPractice,
-    Survey,
-    SurveyDimension,
-    SurveyIndex,
-    SurveyItem,
-    SurveyItemResponse,
-    SurveyResponse,
-    User,
-    UserRole,
-  ],
+  entities,
+  logging: false,
 };
-
-export default options;

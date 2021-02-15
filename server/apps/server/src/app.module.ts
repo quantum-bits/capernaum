@@ -6,18 +6,18 @@ import { PredictionModule } from "./prediction/prediction.module";
 import { AuthModule } from "./auth/auth.module";
 import { MailModule } from "./mail/mail.module";
 
-import typeORMConfig from "./typeorm-config";
+import { options as typeORMConfig } from "./typeorm-config";
 import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
-import { inDevelopmentMode } from "./shared/helpers";
 import { MachineModule } from "./machine/machine.module";
+import { GroupModule } from "./group/group.module";
+import { FabricatorModule } from "./fabricator/fabricator.module";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
-      // logging: inDevelopmentMode(),
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",
@@ -31,6 +31,8 @@ import { MachineModule } from "./machine/machine.module";
     WriterModule,
     QualtricsModule,
     MachineModule,
+    GroupModule,
+    FabricatorModule,
   ],
 })
 export class AppModule {}
