@@ -55,6 +55,10 @@
           <v-card class="mb-6 pa-6">
             <!-- add ref to the element: https://forum.vuejs.org/t/how-do-you-access-this-refs-form-validate-in-a-form-inside-of-a-menu/79406/5 -->
             <v-col sm="12" md="10">
+              <p class="note-colour rounded font-weight-bold elevation-1 pa-2">
+                Note: Your first and last name will be shown to your group
+                when they go to take the survey.
+              </p>
               <v-text-field
                 color="#4e2b4d"
                 v-model="email"
@@ -126,7 +130,26 @@
         <v-stepper-content step="3">
           <v-card class="mb-6 pa-6">
             <v-col sm="12" md="10">
-              <p class="text-left">Type of Group:</p>
+              <p class="note-colour rounded font-weight-bold elevation-1 pa-2">
+                "Description of Group" will be shown to members of your group
+                when they go to take the survey.
+              </p>
+
+              <v-text-field
+                color="#4e2b4d"
+                v-model="descriptionOfGroup"
+                label="Description of Group"
+                ref="descriptionOfGroup"
+                name="descriptionOfGroup"
+                prepend-icon="mdi-pencil"
+                type="text"
+                hint="E.g., First Baptist Youth Group"
+                persistent-hint
+                :rules="[rules.required]"
+                required
+              />
+
+              <p class="text-left mt-10">Type of Group:</p>
               <v-radio-group class="pl-4" v-model="typeOfGroup" column>
                 <v-radio
                   label="Spiritual growth group (e.g., small group, Sunday school class)"
@@ -150,20 +173,6 @@
                 name="typeOfGroup"
                 prepend-icon="mdi-pencil"
                 type="text"
-              />
-
-              <v-text-field
-                color="#4e2b4d"
-                v-model="descriptionOfGroup"
-                label="Description of Group"
-                ref="descriptionOfGroup"
-                name="descriptionOfGroup"
-                prepend-icon="mdi-pencil"
-                type="text"
-                hint="E.g., First Baptist Youth Group (your participants will see this description)"
-                persistent-hint
-                :rules="[rules.required]"
-                required
               />
             </v-col>
           </v-card>
@@ -256,23 +265,56 @@
         <v-stepper-content step="5">
           <v-card class="mb-6 pa-6">
             <v-col sm="12">
+              <!--
               <div
                 v-for="survey in allSurveys"
                 :key="survey.id"
                 class="grey lighten-3 mt-2 mb-2 pa-2"
               >
                 <h4>{{ survey.publicName }}</h4>
-                <!--<p>{{survey.detailedDescription}}</p>-->
                 <p>
                   {{ survey.detailedDescription }}
                 </p>
               </div>
+              -->
+              <v-radio-group
+                v-model="selectedSurveyId"
+                :rules="[rules.required]"
+                required
+                :mandatory="allSurveys.length === 1"
+              >
+                <!--
+                <template v-slot:label>
+                  <div>Add separate title here if desired</div>
+                </template>
+                -->
+                <v-radio
+                  v-for="survey of allSurveys"
+                  :key="survey.id"
+                  :value="survey.id"
+                  color="#4e2b4d"
+                >
+                  <template v-slot:label>
+                    <div
+                      class="rounded elevation-1 grey lighten-3 mt-2 mb-2 pa-2"
+                    >
+                      <h4>{{ survey.publicName }}</h4>
+                      <p>
+                        {{ survey.detailedDescription }}
+                      </p>
+                    </div>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+
+              Selected survey: {{ selectedSurveyId }}
 
               <p class="mt-5">
-                Does one of the above work? If so, select it from the list
-                below.
+                If one of the above surveys works for you, select it and click
+                Submit!
               </p>
 
+              <!--
               <v-select
                 color="#4e2b4d"
                 v-model="selectedSurvey"
@@ -286,6 +328,7 @@
                 :rules="[rules.required]"
                 required
               ></v-select>
+              -->
             </v-col>
           </v-card>
 
@@ -350,7 +393,8 @@ export default class GroupSignUp extends Vue {
   //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
   formStep = 1;
-  selectedSurvey: SelectedSurvey | null = null;
+  selectedSurveyId: number | null = null;
+  //selectedSurvey: SelectedSurvey | null = null;
   //https://stackoverflow.com/questions/64116145/vuetify-multiple-v-select-required-rules-dont-work
   //surveySelectRules = {
   //  required: [(v) => !!v || "Please choose a survey."]
@@ -438,7 +482,7 @@ export default class GroupSignUp extends Vue {
       (this.$refs.form as Vue & {
         validate: () => boolean;
       }).validate() &&
-      this.selectedSurvey !== null
+      this.selectedSurveyId !== null
     ) {
       this.$apollo
         .mutate({
@@ -455,7 +499,7 @@ export default class GroupSignUp extends Vue {
               adminLastName: this.adminLastName,
               adminEmail: this.email,
               codeWord: "asdfadsf", //TODO: this should not be part of createInput (should be created by the server)....
-              surveyId: this.selectedSurvey.id,
+              surveyId: this.selectedSurveyId,
             },
           },
         })
@@ -514,5 +558,10 @@ a {
 
 .button-colour {
   color: #4e2b4d;
+}
+
+.note-colour {
+  background: #806e81;
+  color: white;
 }
 </style>
