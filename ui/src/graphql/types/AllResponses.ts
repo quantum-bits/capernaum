@@ -48,11 +48,26 @@ export interface AllResponses_surveyResponses {
    */
   id: number;
   qualtricsResponseId: string;
+  /**
+   * Respondent's email address
+   */
   email: string;
   survey: AllResponses_surveyResponses_survey;
+  /**
+   * When survey was started
+   */
   startDate: string;
+  /**
+   * When survey was completed
+   */
   endDate: string;
+  /**
+   * Time to complete (seconds)
+   */
   duration: number;
+  /**
+   * 1 = Survey complete and submitted, 0 = otherwise
+   */
   finished: number;
 }
 

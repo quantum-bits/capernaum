@@ -8,10 +8,22 @@
 // ====================================================
 
 export interface ImportSurveyResponses_importQualtricsSurveyResponses_surveyResponses {
+  /**
+   * Time to complete (seconds)
+   */
   duration: number;
+  /**
+   * Respondent's email address
+   */
   email: string;
   qualtricsResponseId: string;
+  /**
+   * When survey was started
+   */
   startDate: string;
+  /**
+   * When survey was completed
+   */
   endDate: string;
 }
 
