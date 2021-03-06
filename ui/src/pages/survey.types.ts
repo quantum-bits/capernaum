@@ -26,6 +26,10 @@ export interface SurveyQueryVariables {
   which: string;
 }
 
+export interface GroupResponsesQueryVariables {
+  groupId: number;
+}
+
 export interface QualtricsSurveySelection {
   text: string;
   value: string;

@@ -15,7 +15,10 @@
               item-value="id"
               return-object
               label="Letter Type"
+              @change="updateData($event)"
           /></v-col>
+          <!-- https://codepen.io/giorgosk/pen/zdWrEY -->
+          <!--
           <v-col v-if="isGroupLetter">
             <v-select
               class="mr-2"
@@ -25,7 +28,9 @@
               item-value="id"
               return-object
               label="Choose Group"
+              @change="fetchGroupResponses($event)"
           /></v-col>
+          -->
           <v-col>
             <v-select
               class="mr-2"
@@ -48,7 +53,6 @@
         <v-progress-circular v-if="spinnerVisible" indeterminate />
       </v-col>
     </v-row>
-
     <v-row v-if="!isGroupLetter && !isIndividualLetter">
       <v-col>
         <v-card class="mx-auto" max-width="500">
@@ -67,9 +71,50 @@
       </v-col>
     </v-row>
 
+    <v-row v-if="isGroupLetter">
+      <v-col>
+        <v-card>
+          <v-card-title>
+            Groups
+            <!--
+            <v-btn
+              color="warning"
+              :disabled="!selectedResponses.length"
+              @click="deleteDialog.visible = true"
+            >
+              Delete Selected
+            </v-btn>
+            -->
+            <v-spacer />
+            <v-text-field
+              v-model="groupSearch"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+              clearable
+            />
+          </v-card-title>
+          <v-data-table
+            :headers="groupHeaders"
+            :items="groups"
+            :search="groupSearch"
+            v-model="selectedResponses"
+            class="elevation-1"
+          >
+            <template v-slot:item.action="{ item }">
+              <v-icon class="ml-2" @click="fetchGroupResponses(item)">
+                mdi-download
+              </v-icon>
+            </template>
+          </v-data-table>
+        </v-card></v-col
+      >
+    </v-row>
+
     <v-row v-if="groupSelected">
       <v-col>
-        <v-card class="mx-auto" max-width="500">
+        <v-card class="mx-auto">
           <v-card-title>
             {{ chosenGroup.name }}
           </v-card-title>
@@ -97,39 +142,6 @@
           </v-card-actions>
         </v-card>
       </v-col>
-    </v-row>
-
-    <v-row v-if="isGroupLetter">
-      <v-col>
-        <v-card>
-          <v-card-title>
-            <v-btn
-              color="warning"
-              :disabled="!selectedResponses.length"
-              @click="deleteDialog.visible = true"
-            >
-              Delete Selected
-            </v-btn>
-            <v-spacer />
-            <v-text-field
-              v-model="responseSearch"
-              append-icon="mdi-magnify"
-              label="Search"
-              single-line
-              hide-details
-              clearable
-            />
-          </v-card-title>
-          <v-data-table
-            :headers="groupHeaders"
-            :items="groups"
-            :search="responseSearch"
-            v-model="selectedGroup"
-            show-select
-            class="elevation-1"
-          >
-          </v-data-table> </v-card
-      ></v-col>
     </v-row>
 
     <v-row v-if="isGroupLetter & groupSelected || isIndividualLetter">
@@ -237,6 +249,7 @@
 import Vue from "vue";
 import {
   ALL_RESPONSES_QUERY,
+  GROUP_RESPONSES_QUERY,
   IMPORT_SURVEY_RESPONSES,
 } from "@/graphql/responses.graphql";
 import {
@@ -250,6 +263,10 @@ import { ALL_GROUPS } from "@/graphql/groups.graphql";
 
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { AllResponses_surveyResponses as SurveyResponse } from "@/graphql/types/AllResponses";
+//import { GroupResponses_groupResponses as GroupResponses } from "@/graphql/types/GroupResponses";
+
+//import { GroupResponsesQueryVariables } from "./survey.types";
+
 import {
   WriteLetter,
   WriteLetter_writeLetter as LetterWriterOutput,
@@ -298,8 +315,10 @@ export default Vue.extend({
         description: "",
       } as ReadLetterTypes_readLetterTypes,
       chosenGroup: null as AllGroups_allGroups | null,
+      // surveySelection: {} as SurveySelection, // Selection from allSurveys
       selectedQualtricsId: "",
       responseSearch: "",
+      groupSearch: "",
       selectedResponses: [],
       surveyResponses: [] as SurveyResponse[],
 
@@ -319,7 +338,7 @@ export default Vue.extend({
         { text: "Survey", value: "survey.qualtricsName" },
         { text: "Email", value: "adminEmail" },
         { text: "Group Name", value: "name" },
-        { text: "Action", value: "action", sortable: false },
+        { text: "Fetch Responses", value: "action", sortable: false },
       ],
 
       letterWriterOutput: {} as LetterWriterOutput,
@@ -357,14 +376,6 @@ export default Vue.extend({
       query: ALL_SURVEYS_QUERY,
     },
 
-    groups: {
-      query: ALL_GROUPS,
-      update: (data) => {
-        console.log("groups: ", data);
-        return data.allGroups;
-      },
-    },
-
     letterTypes: {
       query: ALL_LETTER_TYPES_QUERY,
       update: (data) => {
@@ -382,15 +393,6 @@ export default Vue.extend({
         */
         return data.readLetterTypes;
       },
-    },
-
-    surveyResponses: {
-      query: ALL_RESPONSES_QUERY,
-      update: (data) => {
-        console.log("survey responses: ", data.surveyResponses);
-        return data.surveyResponses;
-      },
-      fetchPolicy: "network-only",
     },
   },
 
@@ -432,6 +434,65 @@ export default Vue.extend({
   },
 
   methods: {
+    updateData(chosenLetterType: ReadLetterTypes_readLetterTypes) {
+      console.log("letter type updated: ", chosenLetterType);
+      if (chosenLetterType.key === LetterTypeEnum.GROUP) {
+        this.fetchGroups();
+      } else if (chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
+        this.fetchAllResponses();
+      }
+    },
+
+    fetchGroups() {
+      this.$apollo
+        .query({
+          query: ALL_GROUPS,
+        })
+        .then(({ data }) => {
+          console.log("received groups!", data.allGroups);
+          this.groups = data.allGroups;
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    fetchAllResponses() {
+      this.$apollo
+        .query({
+          query: ALL_RESPONSES_QUERY,
+        })
+        .then(({ data }) => {
+          console.log("received responses!", data.surveyResponses);
+          this.surveyResponses = data.surveyResponses;
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    fetchGroupResponses(group: AllGroups_allGroups) {
+      console.log("inside fetch group responses: ", group);
+      this.chosenGroup = group;
+      let chosenGroupId = group.id;
+      //if (this.chosenGroup !== null) {
+      this.$apollo
+        .query({
+          query: GROUP_RESPONSES_QUERY,
+          variables: {
+            groupId: chosenGroupId,
+          },
+        })
+        .then(({ data }) => {
+          console.log("received responses!", data.groupResponses);
+          this.surveyResponses = data.groupResponses;
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+      //}
+    },
+
     clearLetterWriterOutput() {
       this.letterWriterOutput = {} as LetterWriterOutput;
     },

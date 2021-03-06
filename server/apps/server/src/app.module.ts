@@ -11,7 +11,7 @@ import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { MachineModule } from "./machine/machine.module";
 import { GroupModule } from "./group/group.module";
-import { FabricatorModule } from "./fabricator/fabricator.module";
+//import { FabricatorModule } from "./fabricator/fabricator.module";
 
 @Module({
   imports: [
@@ -32,7 +32,7 @@ import { FabricatorModule } from "./fabricator/fabricator.module";
     QualtricsModule,
     MachineModule,
     GroupModule,
-    FabricatorModule,
+    //FabricatorModule,
   ],
 })
 export class AppModule {}
