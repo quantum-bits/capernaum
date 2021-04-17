@@ -17,7 +17,7 @@
     "apollo-link-context": "^1.0.20",
     "apollo-link-http": "^1.5.17",
     "apollo-link-ws": "^1.0.20",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "filepond": "^4.16.0",
     "filepond-plugin-image-preview": "^4.6.4",
