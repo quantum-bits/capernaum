@@ -76,7 +76,7 @@ fixtures:
       demographics-chart:
         key: demographics-chart
         description: Demographics Chart
-#  - table: letter_type_letter_element_types_letter_element_type
+#  - table: letter_type_letter_element__type
 #    rows:
 #      individ-chart:
 #        letterType: ^letter_type.individual-letter
