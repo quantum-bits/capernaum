@@ -1,5 +1,5 @@
-import {config} from "dotenv";
-import {ApolloClient, HttpLink, InMemoryCache} from "@apollo/client/core";
+import { config } from "dotenv";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client/core";
 import fetch from "cross-fetch";
 
 config();

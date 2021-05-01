@@ -264,9 +264,7 @@ export class QualtricsApiService {
     startDate?: string,
     endDate?: string
   ): Promise<CreateResponseExportResponse> {
-    const postData: CreateResponseData = {
-      format: "json",
-    };
+    const postData: CreateResponseData = { format: "json" };
 
     if (startDate) {
       if (isValidDate(startDate)) {

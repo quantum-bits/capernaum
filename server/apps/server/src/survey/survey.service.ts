@@ -371,6 +371,8 @@ export class SurveyService extends BaseService {
         qualtricsSurvey.questions
       )) {
         if (question.questionType.type === "TE") {
+          // This question asks for text input. The only ones we care about here are
+          // the ones for the questions having a Qualtrics name of "EMAIL" or "GROUP_CODE".
           surveyDebug("Found a text question %O", question);
           const responseKey = `${qualtricsId}_TEXT`;
           if (question.questionName === "EMAIL") {
@@ -387,10 +389,12 @@ export class SurveyService extends BaseService {
           question.choices &&
           Object.keys(question.choices).length == 7
         ) {
+          // This question is a multiple choice question with seven choices.
+          // Consider it one of the main survey questions and import it.
           surveyDebug("Handling question %s", qualtricsId);
           const trimmedQuestionText = question.questionText.trim();
 
-          // Looks like a valid survey question. See if we've already imported it.
+          // See if we've already imported it.
           const existingItem = workingSurvey.findItem(qualtricsId);
           if (existingItem) {
             // Already have this question; update it.
