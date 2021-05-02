@@ -184,9 +184,10 @@ def read_structure(survey_id, api_token, base_url):
     for k, v in questions.items():
         question = Question(k)
         question.add_question_number(export_column_map)
-        question.add_choice_text(v['choices'])
+        if 'choices' in v:
+            question.add_choice_text(v['choices'])
         survey.append(question)
-        question.add_question_type(v['question_type'])
+        question.add_question_type(v['questionType'])
         if question.get_question_type() == "Matrix":
             question.add_sub_questions(v['sub_questions'])
     return survey

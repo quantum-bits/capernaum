@@ -1,0 +1,10 @@
+#!/usr/bin/env bash -x
+
+QUALTRICS_BASE_URL='https://taylorcfse.ca1.qualtrics.com/API/v3'
+QUALTRICS_API_TOKEN='NxUnm3Bd9ohFKd6PA4t1AxTu2L63PgbRRLuzktv7'
+QUALTRICS_SURVEY_ID='SV_0NyRAwZoSOSKPoW'
+QUALTRICS_PROGRESS_ID='d660fbcd-4f36-4958-a0ee-e7388c9fba77'
+
+curl \
+ -H "X-API-TOKEN: $QUALTRICS_API_TOKEN" \
+ "$QUALTRICS_BASE_URL/surveys/$QUALTRICS_SURVEY_ID/import-responses/$QUALTRICS_PROGRESS_ID" | jq

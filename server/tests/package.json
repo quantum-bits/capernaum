@@ -1,0 +1,19 @@
+{
+  "name": "capernaum-tests",
+  "version": "0.0.1",
+  "description": "Test support for Capernaum",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "make-responses": "ts-node create-test-responses.ts"
+  },
+  "dependencies": {
+    "chance": "^1.1.7",
+    "luxon": "^1.26.0",
+    "ts-node": "^9.1.1"
+  },
+  "devDependencies": {
+    "@types/chance": "^1.1.1",
+    "@types/luxon": "^1.26.5"
+  }
+}
