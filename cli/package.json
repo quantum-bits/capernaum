@@ -19,7 +19,7 @@
     "eslint-config-prettier": "^7.1.0",
     "graphql": "^15.4.0",
     "inquirer": "^7.3.3",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "prettier": "^2.2.1",
     "pretty-error": "^2.1.2",
     "pretty-format": "^26.6.2",
