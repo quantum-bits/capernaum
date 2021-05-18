@@ -19,4 +19,4 @@ curl \
  --header "X-API-TOKEN: $QUALTRICS_API_TOKEN" \
  --header 'Content-Type: text/csv; charset=UTF-8' \
  --data-binary @"$FILE_NAME" \
- "$QUALTRICS_BASE_URL/surveys/$QUALTRICS_SURVEY_ID/import-responses" | jq
+ "$QUALTRICS_BASE_URL/surveys/$QUALTRICS_SURVEY_ID/import-responses"
