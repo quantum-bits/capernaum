@@ -1,11 +1,13 @@
 import fields from "./fields.json";
 import { DateTime } from "luxon";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
+import minimist from "minimist";
+import { basename } from "path";
 
 import Chance from "chance";
 const chance = new Chance();
 
-function fieldValue(field) {
+function fieldValue(field, group_code) {
   // console.log(field);
   switch (field.type) {
     case "datetime":
@@ -16,6 +18,8 @@ function fieldValue(field) {
       return "";
     case "first-name":
       return chance.first();
+    case "group-code":
+      return group_code;
     case "ip":
       return chance.ip();
     case "last-name":
@@ -37,10 +41,34 @@ function fieldValue(field) {
   }
 }
 
-const header_lines = readFileSync("header-lines.csv", "utf-8");
-console.log(header_lines);
-
-for (let i = 0; i < 10; i++) {
-  const response = fields.map((field) => fieldValue(field)).join(",");
-  console.log(response + "\r");
+function usage() {
+  const file_name = basename(process.argv[1]);
+  console.error(
+    `usage: ${file_name} -n <survey-count> [--gid <group-id>] <output-file-name>`
+  );
+  process.exit(1);
 }
+
+const argv = minimist(process.argv.slice(2));
+// console.log("ARGV", argv);
+const survey_count = parseInt(argv.n);
+const output_file_name = argv._[0];
+
+if (!survey_count || !output_file_name) {
+  usage();
+}
+
+const output_lines = [];
+
+output_lines.push(readFileSync("header-lines.csv", "utf-8"));
+
+for (let i = 0; i < survey_count; i++) {
+  const response = fields
+    .map((field) => fieldValue(field, argv.gid || ""))
+    .join(",");
+  output_lines.push(response + "\r");
+}
+
+writeFileSync(output_file_name, output_lines.join("\n"));
+
+console.log(`Wrote ${survey_count} records to '${output_file_name}'`);

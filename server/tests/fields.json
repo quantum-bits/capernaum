@@ -21,7 +21,7 @@
   { "name": "DistributionChannel", "type": "empty" },
   { "name": "UserLanguage", "type": "literal", "value": "EN" },
   { "name": "EMAIL", "type": "email" },
-  { "name": "GROUP_CODE", "type": "random-str", "length": 15 },
+  { "name": "GROUP_CODE", "type": "group-code" },
   { "name": "QID4", "type": "random-int", "range": [1, 2] },
   { "name": "QID7", "type": "likert" },
   { "name": "QID8", "type": "likert" },
