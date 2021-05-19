@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { readFileSync } from "fs";
 import { inspect } from "util";
 import { ensureType, ensureValue } from "./helpers";

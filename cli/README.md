@@ -28,29 +28,9 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`cap-cli hello [FILE]`](#cap-cli-hello-file)
 * [`cap-cli help [COMMAND]`](#cap-cli-help-command)
-* [`cap-cli query [FILE]`](#cap-cli-query-file)
-
-## `cap-cli hello [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ cap-cli hello [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
-
-EXAMPLE
-  $ cap-cli hello
-  hello world from ./src/hello.ts!
-```
-
-_See code: [src/commands/hello.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/hello.ts)_
+* [`cap-cli org:show [FILE]`](#cap-cli-orgshow-file)
+* [`cap-cli query`](#cap-cli-query)
 
 ## `cap-cli help [COMMAND]`
 
@@ -69,18 +49,29 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.1/src/commands/help.ts)_
 
-## `cap-cli query [FILE]`
+## `cap-cli org:show [FILE]`
 
 describe the command here
 
 ```
 USAGE
-  $ cap-cli query [FILE]
+  $ cap-cli org:show [FILE]
 
 OPTIONS
   -f, --force
   -h, --help       show CLI help
   -n, --name=name  name to print
+```
+
+_See code: [src/commands/org/show.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/org/show.ts)_
+
+## `cap-cli query`
+
+run a GraphQL query
+
+```
+USAGE
+  $ cap-cli query
 ```
 
 _See code: [src/commands/query.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/query.ts)_

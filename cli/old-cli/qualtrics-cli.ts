@@ -9,10 +9,10 @@ import { table } from "table";
 import {
   QualtricsSurveyList,
   QualtricsSurveyMetadata,
-} from "@qapi/qualtrics-api/qualtrics-api.types";
+} from "../../server/libs/qualtrics-api";
 import chalk from "chalk";
 import { DateTime } from "luxon";
-import { QualtricsApiService } from "@qapi/qualtrics-api/qualtrics-api.service";
+import { QualtricsApiService } from "../../server/libs/qualtrics-api";
 
 const program = new commander.Command();
 program
@@ -23,7 +23,7 @@ program
 
 const qualtricsService = new QualtricsApiService();
 
-///// Organization
+// ----- Organization
 
 program
   .command("show-org")
@@ -46,13 +46,13 @@ program
           };
           console.log(table(data, options));
         })
-        .catch((err) => console.error(err));
+        .catch((error) => console.error(error));
     } else {
       throw new Error("No organization ID");
     }
   });
 
-///// Surveys
+// ----- Surveys
 
 interface SortableMetadata {
   lastModified: DateTime;
@@ -85,7 +85,7 @@ program
           ? compareDateTimes(a.lastModified, b.lastModified)
           : a.metadata.name.localeCompare(b.metadata.name);
 
-      elements.sort(sortFn).map((elt) => {
+      elements.sort(sortFn).forEach((elt) => {
         data.push([
           elt.metadata.id,
           elt.metadata.name,
@@ -109,7 +109,7 @@ program
     });
   });
 
-///// Responses
+// ----- Responses
 
 program
   .command("create-response-export <survey-id>")
@@ -118,7 +118,7 @@ program
     qualtricsService
       .createResponseExport(surveyId, program.startDate, program.endDate)
       .then((response) => console.log(JSON.stringify(response, null, 2)))
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   });
 
 program
@@ -128,7 +128,7 @@ program
     qualtricsService
       .getResponseExportProgress(surveyId, progressId)
       .then((progress) => console.log(JSON.stringify(progress, null, 2)))
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   });
 
 program
@@ -144,7 +144,7 @@ program
         }));
       })
       .then((result) => console.log(JSON.stringify(result, null, 2)))
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   });
 
 program
@@ -156,7 +156,7 @@ program
       .then((response) => response[0].content)
       .then((zipFileEntry) => JSON.parse(zipFileEntry))
       .then((jsonData) => console.log(JSON.stringify(jsonData, null, 2)))
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   });
 
 program
@@ -166,10 +166,10 @@ program
     qualtricsService
       .getOneResponse(surveyId, responseId)
       .then((response) => console.log(JSON.stringify(response, null, 2)))
-      .catch((err) => console.error(err));
+      .catch((error) => console.error(error));
   });
 
-///// Subscriptions
+// ----- Subscriptions
 
 program
   .command("create-subscription <publicationUrl> <eventName> [surveyId]")
@@ -178,7 +178,7 @@ program
     qualtricsService
       .createSubscription(publicationUrl, eventName, surveyId)
       .then((response) => console.log("RESPONSE", response))
-      .catch((err) => console.log("ERROR", err));
+      .catch((error) => console.log("ERROR", error));
   });
 
 program
@@ -188,7 +188,7 @@ program
     qualtricsService
       .listSubscriptions()
       .then((response) => console.log(response))
-      .catch((err) => console.log(err));
+      .catch((error) => console.log(error));
   });
 
 program
@@ -198,7 +198,7 @@ program
     qualtricsService
       .deleteSubscription(subscriptionId)
       .then((response) => console.log(response))
-      .catch((err) => console.log(err));
+      .catch((error) => console.log(error));
   });
 
 program
@@ -208,7 +208,7 @@ program
     qualtricsService
       .getSubscription(subscriptionId)
       .then((response) => console.log(response))
-      .catch((err) => console.log(err));
+      .catch((error) => console.log(error));
   });
 
 // Error on unknown commands; see the commander documentation

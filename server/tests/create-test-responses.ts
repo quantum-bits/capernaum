@@ -7,13 +7,13 @@ import { basename } from "path";
 import Chance from "chance";
 const chance = new Chance();
 
-function fieldValue(field, group_code) {
+function fieldValue(field, group_code, email_address) {
   // console.log(field);
   switch (field.type) {
     case "datetime":
       return DateTime.now().toFormat("yyyy-LL-dd hh:mm:ss");
     case "email":
-      return chance.email();
+      return email_address ? email_address : chance.email();
     case "empty":
       return "";
     case "first-name":
@@ -44,7 +44,7 @@ function fieldValue(field, group_code) {
 function usage() {
   const file_name = basename(process.argv[1]);
   console.error(
-    `usage: ${file_name} -n <survey-count> [--gid <group-id>] <output-file-name>`
+    `usage: ${file_name} -n <survey-count> [--email <email-addr>] [--gid <group-id>] <output-file-name>`
   );
   process.exit(1);
 }
@@ -64,7 +64,7 @@ output_lines.push(readFileSync("header-lines.csv", "utf-8"));
 
 for (let i = 0; i < survey_count; i++) {
   const response = fields
-    .map((field) => fieldValue(field, argv.gid || ""))
+    .map((field) => fieldValue(field, argv.gid || "", argv.email))
     .join(",");
   output_lines.push(response + "\r");
 }
