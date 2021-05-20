@@ -61,7 +61,21 @@
     "bin": "cap-cli",
     "plugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "topics": {
+      "survey": {
+        "description": "surveys"
+      },
+      "responses": {
+        "description": "survey responses"
+      },
+      "subscription": {
+        "description": "event subscriptions"
+      },
+      "org": {
+        "description": "Qualtrics organization"
+      }
+    }
   },
   "repository": "quantum-bits/capernaum",
   "scripts": {

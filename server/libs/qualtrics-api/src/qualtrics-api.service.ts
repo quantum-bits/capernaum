@@ -34,7 +34,7 @@ interface WebhookEvent {
   takesSurveyId: boolean;
 }
 
-class WebhookEventFactory {
+export class WebhookEventFactory {
   private webhookEvents: WebhookEvent[] = [
     {
       name: "activate-survey",
@@ -63,11 +63,11 @@ class WebhookEventFactory {
     },
   ];
 
-  private validNames() {
+  validNames(): string {
     return this.webhookEvents.map((event) => event.name).join(", ");
   }
 
-  makeEvent(name: string, surveyId?: string) {
+  makeEvent(name: string, surveyId?: string): string {
     for (const event of this.webhookEvents) {
       if (event.name === name) {
         if (event.takesSurveyId) {

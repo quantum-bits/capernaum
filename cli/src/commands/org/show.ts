@@ -1,13 +1,13 @@
 import { Command } from "@oclif/command";
 import { table } from "table";
-
 import { QualtricsApiService } from "../../../../server/libs/qualtrics-api";
-const qualtricsService = new QualtricsApiService();
 
 export default class OrgShow extends Command {
   static description = "show Qualtrics organization";
 
   async run() {
+    const qualtricsService = new QualtricsApiService();
+
     if (process.env.QUALTRICS_ORG_ID) {
       qualtricsService
         .getOrganization(process.env.QUALTRICS_ORG_ID)
@@ -23,9 +23,9 @@ export default class OrgShow extends Command {
               return index === 0 || index === size;
             },
           };
-          console.log(table(data, options));
+          this.log(table(data, options));
         })
-        .catch((error) => console.error(error));
+        .catch((error) => this.error(error));
     } else {
       throw new Error("No organization ID");
     }
