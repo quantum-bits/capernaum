@@ -75,9 +75,6 @@ export class GroupCreateInput {
   @Field({ description: "Group administrator email address" })
   adminEmail: string;
 
-  @Field({ description: "Survey code word used by group" })
-  codeWord: string;
-
   @Field((type) => Int)
   surveyId: number;
 }

@@ -3,6 +3,7 @@ import { BaseService } from "../shared/base.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
+import { CodeWord } from "@server/src/group/code-word";
 
 @Injectable()
 export class GroupService extends BaseService {
@@ -13,7 +14,13 @@ export class GroupService extends BaseService {
   }
 
   createGroup(createInput: GroupCreateInput): Promise<Group> {
-    return this.groupRepo.save(this.groupRepo.create(createInput));
+    const codeWord = CodeWord.generate();
+    return this.groupRepo.save(
+      this.groupRepo.create({
+        ...createInput,
+        codeWord,
+      })
+    );
   }
 
   readGroups(): Promise<Group[]> {

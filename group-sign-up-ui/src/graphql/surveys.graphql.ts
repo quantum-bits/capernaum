@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+ import gql from "graphql-tag";
 
 /**
  * Get all surveys in the local database (as opposed to the ones coming from Qualtrics itself)

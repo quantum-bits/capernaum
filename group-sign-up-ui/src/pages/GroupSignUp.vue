@@ -56,8 +56,8 @@
             <!-- add ref to the element: https://forum.vuejs.org/t/how-do-you-access-this-refs-form-validate-in-a-form-inside-of-a-menu/79406/5 -->
             <v-col sm="12" md="10">
               <p class="note-colour rounded font-weight-bold elevation-1 pa-2">
-                Note: Your first and last name will be shown to your group
-                when they go to take the survey.
+                Note: Your first and last name will be shown to your group when
+                they go to take the survey.
               </p>
               <v-text-field
                 color="#4e2b4d"
@@ -195,10 +195,10 @@
           class="white--text"
         >
           Closing date for the survey
-          <small
-            >This is the day when your group's access will end and your group
-            results will be sent to you</small
-          >
+          <small>
+            This is the day when your group's access will end and your group
+            results will be sent to you
+          </small>
         </v-stepper-step>
         <v-stepper-content step="4">
           <v-card class="mb-6 pa-6">
@@ -232,10 +232,10 @@
                   :min="minClosingDateString"
                   scrollable
                 >
-                  <v-spacer></v-spacer>
-                  <v-btn text color="#4e2b4d" @click="modal = false"
-                    >Cancel</v-btn
-                  >
+                  <v-spacer />
+                  <v-btn text color="#4e2b4d" @click="modal = false">
+                    Cancel
+                  </v-btn>
                   <v-btn
                     text
                     color="#4e2b4d"
@@ -307,8 +307,6 @@
                 </v-radio>
               </v-radio-group>
 
-              Selected survey: {{ selectedSurveyId }}
-
               <p class="mt-5">
                 If one of the above surveys works for you, select it and click
                 Submit!
@@ -347,15 +345,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import Vue from "vue";
 
 import {
   ALL_SURVEYS_QUERY,
   ADD_GROUP_MUTATION,
-} from "../graphql/surveys.graphql";
-//import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
+} from "@/graphql/surveys.graphql";
 
 // TODO: use the automatically generated type AllSurveys_surveys (generated using yarn gen:types);
+//import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
+
 // for some reason if I change the selectedSurvey type from SelectedSurvey to AllSurveys_surveys, I get a compilation error
 // (error: 'AllSurveys_surveys' is defined but never used  no-unused-vars)
 interface SelectedSurvey {
@@ -372,8 +371,11 @@ interface InputFieldValidationHack extends Vue {
   valid: boolean;
 }
 
-@Component({
-  components: {},
+export default Vue.extend({
+  name: "GroupSignUp",
+  // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
+  //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
+
   apollo: {
     allSurveys: {
       query: ALL_SURVEYS_QUERY,
@@ -385,138 +387,119 @@ interface InputFieldValidationHack extends Vue {
       },
     },
   },
-})
-export default class GroupSignUp extends Vue {
-  //@Prop() private msg!: string;
 
-  // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
-  //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
+  data() {
+    return {
+      allSurveys: [],
+      isValid: true,
+      formStep: 1,
 
-  formStep = 1;
-  selectedSurveyId: number | null = null;
-  //selectedSurvey: SelectedSurvey | null = null;
-  //https://stackoverflow.com/questions/64116145/vuetify-multiple-v-select-required-rules-dont-work
-  //surveySelectRules = {
-  //  required: [(v) => !!v || "Please choose a survey."]
-  //};
-  /*{
-    id: -Infinity,
-    qualtricsId: "",
-    qualtricsName: "",
-    qualtricsModDate: "",
-  };*/
-  email: string = "";
-  email2: string = "";
-  typeOfGroup: string = "";
-  typeOfGroupFreeFormText: string = "";
-  descriptionOfGroup: string = "";
-  adminFirstName: string = "";
-  adminLastName: string = "";
+      email: "",
+      email2: "",
+      typeOfGroup: "",
+      typeOfGroupFreeFormText: "",
+      descriptionOfGroup: "",
+      adminFirstName: "",
+      adminLastName: "",
+      selectedSurveyId: null, // number | null = null,
 
-  isValid: boolean = true;
-  adminInfoFormIsValid: boolean = false;
-  groupInfoFormIsValid: boolean = false;
+      closingDate: new Date().toISOString().substr(0, 10),
+      minClosingDateString: new Date().toISOString().substr(0, 10),
+      maxClosingDate: new Date(),
+      maxClosingDateString: new Date().toISOString().substr(0, 10),
+      modal: false,
 
-  closingDate: string = new Date().toISOString().substr(0, 10);
+      // https://vuetifyjs.com/en/components/text-fields/#text-fields
+      rules: {
+        required: (value: string): boolean | string => !!value || "Required.",
+        email: (value: string): boolean | string => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(value) || "Invalid e-mail.";
+        },
+      },
+    };
+  },
 
-  minClosingDateString: string = new Date().toISOString().substr(0, 10); //set to today
-
-  maxClosingDate = new Date();
-  maxClosingDateString: string = new Date().toISOString().substr(0, 10);
-
-  modal: boolean = false;
-
-  // https://vuetifyjs.com/en/components/text-fields/#text-fields
-  rules = {
-    required: (value: string): boolean | string => !!value || "Required.",
-    email: (value: string): boolean | string => {
-      const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return pattern.test(value) || "Invalid e-mail.";
+  methods: {
+    stepTwoValid() {
+      if (
+        this.$refs.email &&
+        this.$refs.email2 &&
+        this.$refs.adminFirstName &&
+        this.$refs.adminLastName
+      ) {
+        // console.log("admin info refs seem to exist....");
+        return (
+          (this.$refs.email as InputFieldValidationHack).valid &&
+          (this.$refs.email2 as InputFieldValidationHack).valid &&
+          (this.$refs.adminFirstName as InputFieldValidationHack).valid &&
+          (this.$refs.adminLastName as InputFieldValidationHack).valid
+        );
+      } else {
+        // console.log("admin info refs do not seem to exist....");
+        return false;
+      }
     },
-    emailsMatch: (): boolean | string => {
-      console.log("email and email2: ", this.email, this.email2);
-      return this.email === this.email2 || "Email addressses must match.";
+
+    stepThreeValid() {
+      if (this.$refs.descriptionOfGroup) {
+        // console.log("group info ref seems to exist....");
+        return (this.$refs.descriptionOfGroup as InputFieldValidationHack)
+          .valid;
+      } else {
+        // console.log("group info ref does not seem to exist....");
+        return false;
+      }
     },
-  };
 
-  stepTwoValid(): boolean {
-    console.log("this.$refs: ", this.$refs);
-    if (
-      this.$refs.email &&
-      this.$refs.email2 &&
-      this.$refs.adminFirstName &&
-      this.$refs.adminLastName
-    ) {
-      console.log("admin info refs seem to exist....");
-      return (
-        (this.$refs.email as InputFieldValidationHack).valid &&
-        (this.$refs.email2 as InputFieldValidationHack).valid &&
-        (this.$refs.adminFirstName as InputFieldValidationHack).valid &&
-        (this.$refs.adminLastName as InputFieldValidationHack).valid
-      );
-    } else {
-      console.log("admin info refs do not seem to exist....");
-      return false;
-    }
-  }
+    submit() {
+      console.log("submit! ", this.email, this.closingDate);
 
-  stepThreeValid(): boolean {
-    console.log("this.$refs: ", this.$refs);
-    if (this.$refs.descriptionOfGroup) {
-      console.log("group info ref seems to exist....");
-      return (this.$refs.descriptionOfGroup as InputFieldValidationHack).valid;
-    } else {
-      console.log("group info ref does not seem to exist....");
-      return false;
-    }
-  }
+      // typeOfGroup gets mapped to Group.type; if typeOfGroup==="OTHER", then use the value of typeOfGroupFreeFormText instead(!)
+      // descriptionOfGroup gets mapped to Group.name
+      // need to add in the codeWord and use first name/last name for admin
 
-  submit() {
-    console.log("submit! ", this.email, this.closingDate);
-
-    // typeOfGroup gets mapped to Group.type; if typeOfGroup==="OTHER", then use the value of typeOfGroupFreeFormText instead(!)
-    // descriptionOfGroup gets mapped to Group.name
-    // need to add in the codeWord and use first name/last name for admin
-
-    if (
-      (this.$refs.form as Vue & {
-        validate: () => boolean;
-      }).validate() &&
-      this.selectedSurveyId !== null
-    ) {
-      this.$apollo
-        .mutate({
-          mutation: ADD_GROUP_MUTATION,
-          variables: {
-            createInput: {
-              name: this.descriptionOfGroup,
-              type:
-                this.typeOfGroup === "OTHER"
-                  ? this.typeOfGroupFreeFormText
-                  : this.typeOfGroup,
-              closedAfter: this.closingDate,
-              adminFirstName: this.adminFirstName,
-              adminLastName: this.adminLastName,
-              adminEmail: this.email,
-              codeWord: "asdfadsf", //TODO: this should not be part of createInput (should be created by the server)....
-              surveyId: this.selectedSurveyId,
+      if (
+        (this.$refs.form as Vue & {
+          validate: () => boolean;
+        }).validate() &&
+        this.selectedSurveyId !== null
+      ) {
+        this.$apollo
+          .mutate({
+            mutation: ADD_GROUP_MUTATION,
+            variables: {
+              createInput: {
+                name: this.descriptionOfGroup,
+                type:
+                  this.typeOfGroup === "OTHER"
+                    ? this.typeOfGroupFreeFormText
+                    : this.typeOfGroup,
+                closedAfter: this.closingDate,
+                adminFirstName: this.adminFirstName,
+                adminLastName: this.adminLastName,
+                adminEmail: this.email,
+                surveyId: this.selectedSurveyId,
+              },
             },
-          },
-        })
-        .then(({ data }) => {
-          console.log("done!", data);
-          //this.$emit("letter-created", data.createLetter.id);
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-          //this.errorMessage =
-          //  "Sorry, there appears to have been an error.  Please tray again later.";
-        });
-    }
-  }
+          })
+          .then(({ data }) => {
+            console.log("done!", data);
+            //this.$emit("letter-created", data.createLetter.id);
+          })
+          .catch((error) => {
+            console.log("there appears to have been an error: ", error);
+            //this.errorMessage =
+            //  "Sorry, there appears to have been an error.  Please tray again later.";
+          });
+      }
+    },
+  },
 
   mounted(): void {
     console.log("inside mounted");
+    console.log("this.$refs: ", this.$refs);
+
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setDate
     // https://stackoverflow.com/questions/563406/add-days-to-javascript-date
     let closingDateObject = new Date();
@@ -525,18 +508,12 @@ export default class GroupSignUp extends Vue {
     this.maxClosingDate.setDate(this.maxClosingDate.getDate() + 42); // sets the max closing date to be six weeks from now
     this.maxClosingDateString = this.maxClosingDate.toISOString();
     console.log("max date: ", this.maxClosingDateString);
-  }
-}
+  },
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-/*
-.group-form-container {
-  width: 80%;
-}
-*/
-
 p {
   text-align: left;
 }
@@ -544,14 +521,17 @@ p {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #42b983;
 }

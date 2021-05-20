@@ -838,9 +838,6 @@ input GroupCreateInput {
 
   """Group administrator email address"""
   adminEmail: String!
-
-  """Survey code word used by group"""
-  codeWord: String!
   surveyId: Int!
 }
 

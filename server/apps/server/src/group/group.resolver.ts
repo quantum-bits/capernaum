@@ -9,7 +9,7 @@ import {
 } from "@server/src/group/entities";
 
 @Resolver("Group")
-@UseGuards(GqlAuthGuard)
+// @UseGuards(GqlAuthGuard)
 export class GroupResolver {
   constructor(private readonly groupService: GroupService) {}
 
