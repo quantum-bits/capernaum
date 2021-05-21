@@ -1,4 +1,4 @@
-# group-sign-up-ui
+# ui-group
 
 ## Project setup
 ```

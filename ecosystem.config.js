@@ -14,13 +14,13 @@ module.exports = {
     },
     {
       name: "admin-ui",
-      cwd: "./ui",
+      cwd: "./ui-admin",
       script: "yarn",
       args: "serve",
     },
     {
       name: "group-ui",
-      cwd: "./group-sign-up-ui",
+      cwd: "./ui-group",
       script: "yarn",
       args: "serve",
     },
