@@ -493,13 +493,13 @@ type Query {
 
   """Retrieve all survey items"""
   surveyItems: [SurveyItem!]!
+  surveyDimension(id: Int!): SurveyDimension!
+  updateSurveyDimension: SurveyDimension!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses(
     """Limit to one group"""
     groupId: Int
   ): [SurveyResponse!]!
-  surveyDimension(id: Int!): SurveyDimension!
-  updateSurveyDimension: SurveyDimension!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   user(id: Int!): User!
@@ -559,12 +559,13 @@ type Mutation {
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
   updateScriptureEngagementPractice(updateData: ScriptureEngagementPracticeUpdateInput!): ScriptureEngagementPractice!
   deleteScriptureEngagementPractice(id: Int!): Int!
+  login(loginCredentials: LoginCredentials!): LoginResponse!
   createUser(createInput: UserCreateInput!): User!
   updateUser(updateInput: UserUpdateInput!): User!
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
-  login(loginCredentials: LoginCredentials!): LoginResponse!
   sendLetter(mailInput: SendMailInput!): SendMailResponse!
+  writeLetter(writerInput: WriterInput!): WriterOutput!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetter(letterData: LetterUpdateInput!): Letter!
@@ -576,7 +577,6 @@ type Mutation {
   deleteLetterType(id: Int!): Int!
   updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
-  writeLetter(writerInput: WriterInput!): WriterOutput!
 
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
@@ -697,6 +697,11 @@ input ScriptureEngagementPracticeUpdateInput {
   sequence: Int
 }
 
+input LoginCredentials {
+  email: String!
+  password: String!
+}
+
 input UserCreateInput {
   email: String!
   firstName: String!
@@ -724,11 +729,6 @@ input UserRoleCreateInput {
   description: String!
 }
 
-input LoginCredentials {
-  email: String!
-  password: String!
-}
-
 input SendMailInput {
   from: String
   to: String!
@@ -736,6 +736,11 @@ input SendMailInput {
   textContent: String!
   htmlContent: String
   attachmentPath: String
+}
+
+input WriterInput {
+  letterId: Int!
+  surveyResponseId: Int!
 }
 
 input LetterCreateInput {
@@ -796,11 +801,6 @@ input LetterTypeUpdateInput {
 input ImageUpdateInput {
   id: Int!
   title: String!
-}
-
-input WriterInput {
-  letterId: Int!
-  surveyResponseId: Int!
 }
 
 input QualtricsSubscriptionCreateInput {

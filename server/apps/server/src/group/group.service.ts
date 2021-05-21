@@ -23,7 +23,7 @@ export class GroupService extends BaseService {
   ) {
     super();
 
-    const templatePath = path.join(__dirname, "letters/group-admin.txt");
+    const templatePath = path.join(__dirname, "group/letters/group-admin.txt");
     groupDebug("Compiling %s", templatePath);
     this.groupAdminTemplate = Handlebars.compile(
       readFileSync(templatePath, "utf-8")
