@@ -9,12 +9,11 @@
 
 export interface GroupCreateInput {
   name: string;
-  type: string;
+  typeId: number;
   closedAfter: string;
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
-  codeWord: string;
   surveyId: number;
 }
 

@@ -3,13 +3,11 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { GroupCreateInput } from "./globalTypes";
-
 // ====================================================
-// GraphQL mutation operation: AddGroup
+// GraphQL query operation: AllGroups
 // ====================================================
 
-export interface AddGroup_createGroup_type {
+export interface AllGroups_allGroups_type {
   id: number;
   /**
    * Group name (e.g., 'Small Group')
@@ -21,22 +19,18 @@ export interface AddGroup_createGroup_type {
   code: string;
 }
 
-export interface AddGroup_createGroup_survey {
+export interface AllGroups_allGroups_survey {
   /**
-   * Public name for survey (e.g., in group sign-up)
+   * Unique identifier for this survey on Qualtrics
    */
-  publicName: string;
+  qualtricsId: string;
   /**
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
-  /**
-   * Detailed description of this survey; mostly for group use
-   */
-  detailedDescription: string;
 }
 
-export interface AddGroup_createGroup {
+export interface AllGroups_allGroups {
   /**
    * Unique ID for this entity
    */
@@ -45,18 +39,14 @@ export interface AddGroup_createGroup {
    * Group name
    */
   name: string;
-  type: AddGroup_createGroup_type;
+  type: AllGroups_allGroups_type;
   /**
    * Survey code word used by group
    */
   codeWord: string;
-  survey: AddGroup_createGroup_survey;
+  survey: AllGroups_allGroups_survey;
 }
 
-export interface AddGroup {
-  createGroup: AddGroup_createGroup;
-}
-
-export interface AddGroupVariables {
-  createInput: GroupCreateInput;
+export interface AllGroups {
+  allGroups: AllGroups_allGroups[];
 }

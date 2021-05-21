@@ -2,7 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { BaseService } from "../shared/base.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Group, GroupCreateInput, GroupUpdateInput } from "./entities";
+import {
+  Group,
+  GroupCreateInput,
+  GroupType,
+  GroupUpdateInput,
+} from "./entities";
 import { CodeWord } from "@server/src/group/code-word";
 import Handlebars from "handlebars";
 import { readFileSync } from "fs";
@@ -37,10 +42,11 @@ export class GroupService extends BaseService {
       ...createInput,
       codeWord,
     };
-    groupDebug("createGroup %O", groupDetails);
+    groupDebug("createGroup/details %O", groupDetails);
     const group = await this.groupRepo.save(
       this.groupRepo.create(groupDetails)
     );
+    groupDebug("createGroup/new group %O", group);
 
     // Send email to group administrator.
     const mailDetails = new SendMailInput();
@@ -55,7 +61,7 @@ export class GroupService extends BaseService {
   }
 
   readGroups(): Promise<Group[]> {
-    return this.groupRepo.find({ relations: ["survey"] });
+    return this.groupRepo.find({ relations: ["survey", "type"] });
   }
 
   readGroup(id: number): Promise<Group> {
@@ -68,5 +74,17 @@ export class GroupService extends BaseService {
     return this.groupRepo
       .preload(updateInput)
       .then((result) => this.groupRepo.save(result));
+  }
+}
+
+@Injectable()
+export class GroupTypeService {
+  constructor(
+    @InjectRepository(GroupType)
+    private readonly groupTypeRepo: Repository<GroupType>
+  ) {}
+
+  readGroupTypes() {
+    return this.groupTypeRepo.find();
   }
 }

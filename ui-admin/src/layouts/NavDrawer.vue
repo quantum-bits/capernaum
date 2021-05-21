@@ -51,6 +51,11 @@ export default Vue.extend({
         icon: "mdi-format-list-bulleted-square",
       },
       {
+        title: "Groups",
+        route: "groups",
+        icon: "mdi-account-group",
+      },
+      {
         title: "Responses",
         route: "responses",
         icon: "mdi-message-outline",

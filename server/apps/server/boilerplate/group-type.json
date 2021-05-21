@@ -1,0 +1,26 @@
+{
+  "entity": {
+    "name": "GroupType",
+    "pk": "id",
+    "attributes": [
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Group name (e.g., 'Small Group')"
+      },
+      {
+        "name": "code",
+        "type": "string",
+        "description": "Group code (e.g., 'SMALL_GROUP')"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "name": "groups",
+      "type": "oneToMany",
+      "to": "Group",
+      "description": "Groups of this type"
+    }
+  ]
+}

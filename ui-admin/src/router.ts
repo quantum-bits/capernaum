@@ -68,6 +68,11 @@ const router = new VueRouter({
       component: () => import("./pages/Images.vue"),
     },
     {
+      path: "/groups",
+      name: "groups",
+      component: () => import("./pages/Groups.vue"),
+    },
+    {
       path: "/web-hooks",
       name: "web-hooks",
       component: () => import("./pages/WebHooks.vue"),

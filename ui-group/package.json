@@ -16,6 +16,7 @@
     "core-js": "^3.6.5",
     "graphql": "^15.4.0",
     "graphql-tag": "^2.11.0",
+    "lodash": "^4.17.21",
     "vue": "^2.6.11",
     "vue-apollo": "^3.0.5",
     "vue-class-component": "^7.2.3",
@@ -24,6 +25,7 @@
     "vuetify": "^2.2.11"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.170",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.4.0",

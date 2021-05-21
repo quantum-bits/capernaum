@@ -13,7 +13,11 @@ export const ALL_GROUPS = gql`
     allGroups: readGroups {
       id
       name
-      type
+      type {
+        id
+        name
+        code
+      }
       created
       closedAfter
       adminFirstName

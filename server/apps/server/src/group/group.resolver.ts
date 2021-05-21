@@ -1,15 +1,16 @@
-import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
-import { UseGuards } from "@nestjs/common";
-import { GroupService } from "@server/src/group/group.service";
-import { GqlAuthGuard } from "@server/src/auth/graphql-auth.guard";
+import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
+import {
+  GroupService,
+  GroupTypeService,
+} from "@server/src/group/group.service";
 import {
   Group,
   GroupCreateInput,
   GroupUpdateInput,
+  GroupType,
 } from "@server/src/group/entities";
 
 @Resolver("Group")
-// @UseGuards(GqlAuthGuard)
 export class GroupResolver {
   constructor(private readonly groupService: GroupService) {}
 
@@ -26,5 +27,15 @@ export class GroupResolver {
   @Mutation(() => Group)
   updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
     return this.groupService.updateGroup(updateInput);
+  }
+}
+
+@Resolver("GroupType")
+export class GroupTypeResolver {
+  constructor(private readonly grouptypeService: GroupTypeService) {}
+
+  @Query(() => [GroupType])
+  readGroupTypes() {
+    return this.grouptypeService.readGroupTypes();
   }
 }

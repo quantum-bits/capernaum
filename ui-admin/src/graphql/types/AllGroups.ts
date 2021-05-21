@@ -7,6 +7,18 @@
 // GraphQL query operation: AllGroups
 // ====================================================
 
+export interface AllGroups_allGroups_type {
+  id: number;
+  /**
+   * Group name (e.g., 'Small Group')
+   */
+  name: string;
+  /**
+   * Group code (e.g., 'SMALL_GROUP')
+   */
+  code: string;
+}
+
 export interface AllGroups_allGroups_survey {
   /**
    * Unique ID for this entity
@@ -43,10 +55,7 @@ export interface AllGroups_allGroups {
    * Group name
    */
   name: string;
-  /**
-   * Type of group
-   */
-  type: string;
+  type: AllGroups_allGroups_type;
   /**
    * Date when survey created
    */

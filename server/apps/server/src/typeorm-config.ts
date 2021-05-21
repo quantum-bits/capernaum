@@ -25,11 +25,12 @@ import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
-import { Group } from "./group/entities";
+import { Group, GroupType } from "./group/entities";
 
 export const entities = [
   Event,
   Group,
+  GroupType,
   Image,
   Letter,
   LetterType,

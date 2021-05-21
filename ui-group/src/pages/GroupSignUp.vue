@@ -150,27 +150,23 @@
               />
 
               <p class="text-left mt-10">Type of Group:</p>
-              <v-radio-group class="pl-4" v-model="typeOfGroup" column>
+              <v-radio-group class="pl-4" v-model="groupTypeSelectedId" column>
                 <v-radio
-                  label="Spiritual growth group (e.g., small group, Sunday school class)"
+                  v-for="type in groupTypes"
+                  :key="type.id"
+                  :label="type.name"
+                  :value="type.id"
                   color="#4e2b4d"
-                  value="SPIRITUAL_GROWTH_GROUP"
-                ></v-radio>
-                <v-radio
-                  label="College spiritual life assessment"
-                  color="#4e2b4d"
-                  value="COLLEGE_SPIRITUAL_LIFE_ASSESSMENT"
-                ></v-radio>
-                <v-radio label="Other" color="#4e2b4d" value="OTHER"></v-radio>
+                />
               </v-radio-group>
 
               <v-text-field
                 color="#4e2b4d"
                 class="pl-10 mt-n5"
-                v-show="typeOfGroup === 'OTHER'"
-                v-model="typeOfGroupFreeFormText"
+                v-show="isOtherGroupSelected"
+                v-model="groupTypeOtherName"
                 label="Please Specify Other Type"
-                name="typeOfGroup"
+                name="groupTypeOtherId"
                 prepend-icon="mdi-pencil"
                 type="text"
               />
@@ -347,10 +343,16 @@
 <script lang="ts">
 import Vue from "vue";
 
+import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ADD_GROUP_MUTATION, ALL_GROUP_TYPES } from "@/graphql/groups.graphql";
+import { partition } from "lodash";
+// eslint-disable-next-line no-unused-vars
 import {
-  ALL_SURVEYS_QUERY,
-  ADD_GROUP_MUTATION,
-} from "@/graphql/surveys.graphql";
+  // eslint-disable-next-line no-unused-vars
+  AllGroupTypes,
+  // eslint-disable-next-line no-unused-vars
+  AllGroupTypes_groupTypes,
+} from "@/graphql/types/AllGroupTypes";
 
 // TODO: use the automatically generated type AllSurveys_surveys (generated using yarn gen:types);
 //import { AllSurveys_surveys } from "../graphql/types/AllSurveys";
@@ -394,10 +396,13 @@ export default Vue.extend({
       isValid: true,
       formStep: 1,
 
+      groupTypes: [] as AllGroupTypes_groupTypes[], // All group types
+      groupTypeSelectedId: -1,
+      groupTypeOtherId: -Infinity, // ID of the "other" group type, if any.
+      groupTypeOtherName: "", // Name for "other" group entered by user
+
       email: "",
       email2: "",
-      typeOfGroup: "",
-      typeOfGroupFreeFormText: "",
       descriptionOfGroup: "",
       adminFirstName: "",
       adminLastName: "",
@@ -413,14 +418,42 @@ export default Vue.extend({
       rules: {
         required: (value: string): boolean | string => !!value || "Required.",
         email: (value: string): boolean | string => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          const pattern =
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           return pattern.test(value) || "Invalid e-mail.";
         },
       },
     };
   },
 
+  computed: {
+    isOtherGroupSelected(): boolean {
+      return (
+        this.groupTypeOtherId >= 0 &&
+        this.groupTypeSelectedId === this.groupTypeOtherId
+      );
+    },
+  },
+
   methods: {
+    async loadGroupTypes() {
+      const queryResult = await this.$apollo.query<AllGroupTypes>({
+        query: ALL_GROUP_TYPES,
+      });
+
+      const [[is_other], not_other] = partition(
+        queryResult.data.groupTypes,
+        (grp) => grp.code === "OTHER"
+      );
+
+      if (is_other) {
+        this.groupTypeOtherId = is_other.id;
+      }
+
+      not_other.push(is_other);
+      this.groupTypes = not_other;
+    },
+
     stepTwoValid() {
       if (
         this.$refs.email &&
@@ -455,14 +488,15 @@ export default Vue.extend({
     submit() {
       console.log("submit! ", this.email, this.closingDate);
 
-      // typeOfGroup gets mapped to Group.type; if typeOfGroup==="OTHER", then use the value of typeOfGroupFreeFormText instead(!)
       // descriptionOfGroup gets mapped to Group.name
       // need to add in the codeWord and use first name/last name for admin
 
       if (
-        (this.$refs.form as Vue & {
-          validate: () => boolean;
-        }).validate() &&
+        (
+          this.$refs.form as Vue & {
+            validate: () => boolean;
+          }
+        ).validate() &&
         this.selectedSurveyId !== null
       ) {
         this.$apollo
@@ -471,10 +505,7 @@ export default Vue.extend({
             variables: {
               createInput: {
                 name: this.descriptionOfGroup,
-                type:
-                  this.typeOfGroup === "OTHER"
-                    ? this.typeOfGroupFreeFormText
-                    : this.typeOfGroup,
+                typeId: this.groupTypeSelectedId,
                 closedAfter: this.closingDate,
                 adminFirstName: this.adminFirstName,
                 adminLastName: this.adminLastName,
@@ -499,6 +530,8 @@ export default Vue.extend({
   mounted(): void {
     console.log("inside mounted");
     console.log("this.$refs: ", this.$refs);
+
+    this.loadGroupTypes();
 
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/setDate
     // https://stackoverflow.com/questions/563406/add-days-to-javascript-date

@@ -8,7 +8,7 @@ import {
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Survey, SurveyResponse } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
-import faker from "faker";
+import { GroupType } from ".";
 
 @Entity()
 @ObjectType()
@@ -17,9 +17,10 @@ export class Group extends AbstractEntity {
   @Column()
   name: string;
 
-  @Field({ description: "Type of group" })
-  @Column()
-  type: string;
+  @Field(() => GroupType)
+  @ManyToOne(() => GroupType, (groupType) => groupType.groups)
+  type: GroupType;
+  @Column("integer") typeId: number;
 
   @Field({ description: "Date when survey created" })
   @CreateDateColumn()
@@ -45,10 +46,10 @@ export class Group extends AbstractEntity {
   @Column()
   codeWord: string;
 
-  @Column("integer") surveyId: number;
   @ManyToOne(() => Survey, (survey) => survey.groups)
   @Field(() => Survey)
   survey: Survey;
+  @Column("integer") surveyId: number;
 
   @OneToMany((type) => SurveyResponse, (sr) => sr.group)
   @Field(() => [SurveyResponse], { description: "Responses by this group" })
@@ -60,8 +61,8 @@ export class GroupCreateInput {
   @Field({ description: "Group name" })
   name: string;
 
-  @Field({ description: "Type of group" })
-  type: string;
+  @Field((type) => Int, { description: "Type of group" })
+  typeId: number;
 
   @Field({ description: "Date when survey closes" })
   closedAfter: string;
@@ -87,8 +88,8 @@ export class GroupUpdateInput implements Partial<Group> {
   @Field({ description: "Group name", nullable: true })
   name?: string;
 
-  @Field({ description: "Type of group", nullable: true })
-  type?: string;
+  @Field((type) => Int, { description: "Type of group", nullable: true })
+  typeId?: number;
 
   @Field({ description: "Date when survey closes", nullable: true })
   closedAfter?: string;

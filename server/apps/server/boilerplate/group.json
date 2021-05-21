@@ -9,11 +9,6 @@
         "description": "Group name"
       },
       {
-        "name": "type",
-        "type": "string",
-        "description": "Type of group"
-      },
-      {
         "name": "created",
         "type": "string",
         "description": "Date when survey created"
@@ -51,6 +46,12 @@
       "type": "manyToOne",
       "to": "Survey",
       "description": "Survey for this group"
+    },
+    {
+      "name": "groupType",
+      "type": "manyToOne",
+      "to": "GroupType",
+      "description": "Type for this group"
     }
   ]
 }

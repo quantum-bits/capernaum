@@ -24,19 +24,18 @@ export interface ChangePasswordInput {
 
 export interface GroupCreateInput {
   name: string;
-  type: string;
+  typeId: number;
   closedAfter: string;
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
-  codeWord: string;
   surveyId: number;
 }
 
 export interface GroupUpdateInput {
   id: number;
   name?: string | null;
-  type?: string | null;
+  typeId?: number | null;
   closedAfter?: string | null;
   adminFirstName?: string | null;
   adminLastName?: string | null;

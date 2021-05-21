@@ -20,6 +20,11 @@ Vue.filter("dateAndTime", function (value: string) {
   return dt.toFormat("y-M-d tt");
 });
 
+Vue.filter("epochToISO", function (value: string) {
+  const dt = DateTime.fromMillis(parseInt(value));
+  return dt.toFormat("y-MM-dd");
+});
+
 new Vue({
   router,
   store,

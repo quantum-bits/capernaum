@@ -159,9 +159,7 @@ type Group {
 
   """Group name"""
   name: String!
-
-  """Type of group"""
-  type: String!
+  type: GroupType!
 
   """Date when survey created"""
   created: String!
@@ -184,6 +182,17 @@ type Group {
 
   """Responses by this group"""
   surveyResponses: [SurveyResponse!]!
+}
+
+type GroupType {
+  id: Int!
+
+  """Group name (e.g., 'Small Group')"""
+  name: String!
+
+  """Group code (e.g., 'SMALL_GROUP')"""
+  code: String!
+  groups: [Group!]!
 }
 
 """One user's response to a survey"""
@@ -517,6 +526,7 @@ type Query {
   events: [Event!]!
   machines: [Machine!]!
   readGroups: [Group!]!
+  readGroupTypes: [GroupType!]!
 }
 
 type Mutation {
@@ -825,7 +835,7 @@ input GroupCreateInput {
   name: String!
 
   """Type of group"""
-  type: String!
+  typeId: Int!
 
   """Date when survey closes"""
   closedAfter: String!
@@ -848,7 +858,7 @@ input GroupUpdateInput {
   name: String
 
   """Type of group"""
-  type: String
+  typeId: Int
 
   """Date when survey closes"""
   closedAfter: String
