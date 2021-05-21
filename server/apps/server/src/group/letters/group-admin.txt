@@ -1,0 +1,23 @@
+Dear {{ adminFirstName}} {{ adminLasName }}:
+
+Thank you for signing up your group for the Christian Life Survey.
+The details we received for your group are:
+
+Name: {{ name }}
+Type: {{ type }}
+Closing date: {{ closedAfter }}
+Group code: {{ codeWord }}
+
+Please notify your group members that the Christian Life Survey
+is now available to them. Be sure to let them now the Group Code,
+which they will need to get started. If you'd like, you can copy
+the following suggested message:
+
+The Christian Life Survey is now available for our group ({{name }}).
+Please visit NEED URL HERE on or before {{ closedAfter }} to get
+started. You will be asked for our group code, which is
+
+    {{ codeWord }}
+
+Please enter it at the prompt. Thanks!
+
