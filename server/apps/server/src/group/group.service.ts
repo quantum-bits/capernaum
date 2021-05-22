@@ -46,6 +46,7 @@ export class GroupService extends BaseService {
     const group = await this.groupRepo.save(
       this.groupRepo.create(groupDetails)
     );
+
     groupDebug("createGroup/new group %O", group);
 
     // Send email to group administrator.
@@ -84,7 +85,11 @@ export class GroupTypeService {
     private readonly groupTypeRepo: Repository<GroupType>
   ) {}
 
-  readGroupTypes() {
+  readGroupTypes(): Promise<GroupType[]> {
     return this.groupTypeRepo.find();
+  }
+
+  readGroupType(id: number) {
+    return this.groupTypeRepo.findOne(id);
   }
 }

@@ -118,6 +118,10 @@ export class SurveyService extends BaseService {
     return this.surveyResponseRepo.findOne(id);
   }
 
+  readSurvey(id: number) {
+    return this.surveyRepo.findOne(id);
+  }
+
   readSurveyResponses(groupId?: number) {
     const conditions: FindConditions<SurveyResponse> = {};
     if (groupId) {
@@ -273,9 +277,10 @@ export class SurveyService extends BaseService {
         dimensionDeleteOutput.deletedIndexIds.push(
           indexDeleteOutput.deletedIndexId
         );
-        dimensionDeleteOutput.deletedItemIds = dimensionDeleteOutput.deletedItemIds.concat(
-          indexDeleteOutput.deletedItemIds
-        );
+        dimensionDeleteOutput.deletedItemIds =
+          dimensionDeleteOutput.deletedItemIds.concat(
+            indexDeleteOutput.deletedItemIds
+          );
       }
 
       await surveyDimensionRepo.remove(dimension);

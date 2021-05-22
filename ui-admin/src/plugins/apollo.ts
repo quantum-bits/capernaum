@@ -1,13 +1,13 @@
-import { InMemoryCache } from "apollo-cache-inmemory";
-import { ApolloClient } from "apollo-client";
-import { HttpLink } from "apollo-link-http";
-import { setContext } from "apollo-link-context";
+import {InMemoryCache} from "apollo-cache-inmemory";
+import {ApolloClient} from "apollo-client";
+import {HttpLink} from "apollo-link-http";
+import {setContext} from "apollo-link-context";
 import store from "../store";
 import Vue from "vue";
 import VueApollo from "vue-apollo";
-import { WebSocketLink } from "apollo-link-ws";
-import { ApolloLink, split } from "apollo-link";
-import { getMainDefinition } from "apollo-utilities";
+import {WebSocketLink} from "apollo-link-ws";
+import {ApolloLink, split} from "apollo-link";
+import {getMainDefinition} from "apollo-utilities";
 
 const loggingLink = new ApolloLink((operation, forward) => {
   console.log("OPERATION", operation);
@@ -30,13 +30,12 @@ const wsLink = new WebSocketLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const context = {
+  return {
     headers: {
       ...headers,
       authorization: `Bearer ${store.state.accessToken}`,
     },
   };
-  return context;
 });
 
 const httpLink = new HttpLink({

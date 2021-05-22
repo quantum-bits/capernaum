@@ -13,13 +13,13 @@ module.exports = {
       args: "reporter:dev",
     },
     {
-      name: "admin-ui",
+      name: "ui-admin",
       cwd: "./ui-admin",
       script: "yarn",
       args: "serve",
     },
     {
-      name: "group-ui",
+      name: "ui-group",
       cwd: "./ui-group",
       script: "yarn",
       args: "serve",
