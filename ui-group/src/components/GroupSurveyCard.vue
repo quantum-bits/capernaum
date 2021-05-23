@@ -9,8 +9,7 @@
       <v-text-field
         class="mt-4"
         color="#4e2b4d"
-        :value="codeWord"
-        @input="updateCodeWord"
+        v-model="codeWord"
         label="Your Group Code"
         hint="Provided to you by your leader"
         persistent-hint
@@ -44,7 +43,10 @@
 <script lang="ts">
 import Vue from "vue";
 import { FIND_GROUP } from "@/graphql/groups.graphql";
+// eslint-disable-next-line no-unused-vars
 import { debounce } from "lodash";
+// eslint-disable-next-line no-unused-vars
+import { FindGroup, FindGroupVariables } from "@/graphql/types/FindGroup";
 
 export default Vue.extend({
   name: "GroupSurveyCard",
@@ -63,35 +65,40 @@ export default Vue.extend({
   },
 
   watch: {
-    codeWord: async function (newValue) {
-      this.codeWordValid = false;
-      this.alert.visible = newValue.length > 0;
-
-      const group = await this.findGroupByCodeWord();
-      if (group) {
-        this.alert.type = "success";
-        this.alert.text = `That's the code for: <strong>${group.name}</strong>.`;
-        this.codeWordValid = true;
-      } else {
-        this.alert.type = "warning";
-        this.alert.text = "That code doesn't match any group.";
-      }
+    async codeWord() {
+      this.findGroupByCodeWord();
     },
   },
 
-  methods: {
-    updateCodeWord: debounce(function (this: any, value: string) {
-      this.codeWord = value;
-    }, 500),
+  created() {
+    this.findGroupByCodeWord = debounce(this.findGroupByCodeWord, 500);
+  },
 
-    findGroupByCodeWord() {
+  methods: {
+    findGroupByCodeWord: function () {
       console.log(`Search for '${this.codeWord}'`);
-      return this.$apollo
-        .query({
+
+      this.$apollo
+        .query<FindGroup, FindGroupVariables>({
           query: FIND_GROUP,
           variables: { codeWord: this.codeWord },
         })
-        .then((result) => result.data.findGroupByCodeWord);
+        .then((result) => {
+          const group = result.data.findGroupByCodeWord;
+          console.log("GROUP", group);
+
+          if (group) {
+            this.alert.type = "success";
+            this.alert.text = `That's the code for: <strong>${group.name}</strong>.`;
+            this.codeWordValid = true;
+          } else {
+            this.alert.type = "warning";
+            this.alert.text = "That code doesn't match any group.";
+            this.codeWordValid = false;
+          }
+
+          this.alert.visible = this.codeWord.length > 0;
+        });
     },
   },
 
