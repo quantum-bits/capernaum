@@ -65,19 +65,29 @@ export default Vue.extend({
   },
 
   watch: {
-    async codeWord() {
+    // Watch for changes to the code word field and check for a matching group.
+    codeWord() {
       this.findGroupByCodeWord();
     },
   },
 
   created() {
+    // In principle, we should be able to debounce a method or watcher,
+    // but doing it directly causes problems for TypeScript's idea of `this`.
+    // The approach here (from https://vuejs.org/v2/guide/computed.html#Watchers)
+    // keeps the method clean and clarifies how it's being debounced.
     this.findGroupByCodeWord = debounce(this.findGroupByCodeWord, 500);
   },
 
   methods: {
-    findGroupByCodeWord: function () {
-      console.log(`Search for '${this.codeWord}'`);
-
+    // Look for a group with the given code word. As with the example from
+    // https://vuejs.org/v2/guide/computed.html#Watchers, do all the actions
+    // inside this function. The initial version of this function just returned
+    // a group or `null`, but the combination of async and debouncing proved
+    // problematic to get right. It may be possible, but this works and is
+    // reasonably clean.
+    findGroupByCodeWord() {
+      // console.log(`Search for '${this.codeWord}'`);
       this.$apollo
         .query<FindGroup, FindGroupVariables>({
           query: FIND_GROUP,
@@ -85,7 +95,7 @@ export default Vue.extend({
         })
         .then((result) => {
           const group = result.data.findGroupByCodeWord;
-          console.log("GROUP", group);
+          // console.log("GROUP", group);
 
           if (group) {
             this.alert.type = "success";
