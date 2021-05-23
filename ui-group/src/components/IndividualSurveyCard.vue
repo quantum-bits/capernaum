@@ -9,7 +9,7 @@
     </v-card-text>
     <v-divider class="mx-4"></v-divider>
     <v-card-actions>
-      <v-btn class="button-colour" text @click="takeIndividualSurvey">
+      <v-btn class="button-colour" text :href="individualSurveyUrl">
         Go to survey
       </v-btn>
     </v-card-actions>
@@ -22,9 +22,14 @@ import Vue from "vue";
 export default Vue.extend({
   name: "IndividualSurveyCard",
 
-  methods: {
-    takeIndividualSurvey() {
-      console.log("go to individual survey");
+  computed: {
+    individualSurveyUrl(): string {
+      const survey_url = process.env.SURVEY_URL;
+      if (!survey_url) {
+        console.error("No URL configured for individual survey");
+        return "";
+      }
+      return survey_url;
     },
   },
 });

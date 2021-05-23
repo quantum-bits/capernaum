@@ -33,7 +33,7 @@
         class="button-colour"
         text
         :disabled="!codeWordValid"
-        @click="takeGroupSurvey"
+        :href="groupSurveyUrl"
       >
         Go to survey
       </v-btn>
@@ -84,10 +84,6 @@ export default Vue.extend({
       this.codeWord = value;
     }, 500),
 
-    takeGroupSurvey() {
-      console.log("go to group survey");
-    },
-
     findGroupByCodeWord() {
       console.log(`Search for '${this.codeWord}'`);
       return this.$apollo
@@ -96,6 +92,20 @@ export default Vue.extend({
           variables: { codeWord: this.codeWord },
         })
         .then((result) => result.data.findGroupByCodeWord);
+    },
+  },
+
+  computed: {
+    groupSurveyUrl(): string {
+      const survey_url = process.env.SURVEY_URL;
+      if (!survey_url) {
+        console.error("No URL configured for group survey");
+        return "";
+      }
+
+      const group_survey_url = new URL(survey_url);
+      group_survey_url.searchParams.append("GROUP_CODE_WORD", this.codeWord);
+      return group_survey_url.toString();
     },
   },
 });
