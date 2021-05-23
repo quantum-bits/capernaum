@@ -526,6 +526,7 @@ type Query {
   events: [Event!]!
   machines: [Machine!]!
   readGroups: [Group!]!
+  findGroupByCodeWord(codeWord: String!): Group
   readGroupTypes: [GroupType!]!
 }
 

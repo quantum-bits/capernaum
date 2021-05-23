@@ -42,6 +42,11 @@ export class GroupResolver {
     return this.groupService.readGroups();
   }
 
+  @Query(() => Group, { nullable: true })
+  findGroupByCodeWord(@Args("codeWord") codeWord: string) {
+    return this.groupService.findGroupByCodeWord(codeWord);
+  }
+
   @Mutation(() => Group)
   updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
     return this.groupService.updateGroup(updateInput);

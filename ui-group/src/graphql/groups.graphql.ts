@@ -19,6 +19,16 @@ export const ALL_GROUPS = gql`
   }
 `;
 
+export const FIND_GROUP = gql`
+  query FindGroup($codeWord: String!) {
+    findGroupByCodeWord(codeWord: $codeWord) {
+      name
+      adminFirstName
+      adminLastName
+    }
+  }
+`;
+
 export const ADD_GROUP_MUTATION = gql`
   mutation AddGroup($createInput: GroupCreateInput!) {
     createGroup(createInput: $createInput) {

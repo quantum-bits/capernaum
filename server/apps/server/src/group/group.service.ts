@@ -71,6 +71,10 @@ export class GroupService extends BaseService {
     });
   }
 
+  findGroupByCodeWord(codeWord: string) {
+    return this.groupRepo.findOne({ codeWord });
+  }
+
   updateGroup(updateInput: GroupUpdateInput): Promise<Group> {
     return this.groupRepo
       .preload(updateInput)

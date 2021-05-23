@@ -8,17 +8,13 @@ const router = new VueRouter({
   routes: [
     {
       path: "/",
-      redirect: { name: "take-survey" },
+      name: "landing",
+      component: () => import("./pages/Landing.vue"),
     },
     {
-      path: "/group-sign-up",
+      path: "/register-group",
       name: "group-sign-up",
       component: () => import("./pages/GroupSignUp.vue"),
-    },
-    {
-      path: "/take-survey",
-      name: "take-survey",
-      component: () => import("./pages/RedirectToSurvey.vue"),
     },
   ],
 });

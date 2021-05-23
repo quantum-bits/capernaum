@@ -76,7 +76,8 @@ describe("GroupService", () => {
   });
 
   it("can fetch all responses for a group", async () => {
-    const fixture = await groupFabricatorService.prepareGroupWithSurveysFixture();
+    const fixture =
+      await groupFabricatorService.prepareGroupWithSurveysFixture();
     const numResponses = fixture.surveyResponses.length;
 
     return groupService.readGroup(fixture.group.id).then((g) => {
