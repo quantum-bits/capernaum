@@ -2,7 +2,7 @@ import {
   SurveyDimensionCreateInput,
   SurveyIndexCreateInput,
   SurveyUpdateInput,
-} from "../../graphql/types/globalTypes";
+} from "@/graphql/types/globalTypes";
 import { SubscriptionType } from "@/types/qualtrics.types";
 
 export type DimensionDialogResponse = Pick<SurveyDimensionCreateInput, "title">;

@@ -43,3 +43,9 @@ export const UPDATE_GROUP = gql`
     }
   }
 `;
+
+export const DELETE_GROUP = gql`
+  mutation DeleteGroup($groupId: Int!) {
+    deleteGroup(id: $groupId)
+  }
+`;

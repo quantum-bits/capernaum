@@ -278,7 +278,7 @@ import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import { AllGroups_allGroups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
-import { LetterTypeEnum } from "../types/letter.types";
+import { LetterTypeEnum } from "@/types/letter.types";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 
 // FIXME: This cross application include is an abomination.

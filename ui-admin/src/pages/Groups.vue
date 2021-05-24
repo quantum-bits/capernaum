@@ -7,7 +7,7 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="groups">
+        <v-data-table class="elevation-1" :headers="headers" :items="groups">
           <template v-slot:item.adminFullName="{ item }">
             {{ item.adminFirstName }} {{ item.adminLastName }}
           </template>
@@ -17,32 +17,52 @@
           <template v-slot:item.created="{ item }">
             {{ item.created | epochToISO }}
           </template>
+          <template v-slot:item.actions="{ item }">
+            <v-icon small @click="confirmDelete(item)"> mdi-delete </v-icon>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
+
+    <confirm-dialog
+      v-model="deleteDialog.visible"
+      dialog-title="Delete group?"
+      dialog-text="Delete this group? Cannot be undone"
+      button-label="Delete"
+      @confirmed="deleteGroup()"
+    />
   </v-container>
 </template>
 
 <script>
 import Vue from "vue";
-import { ALL_GROUPS } from "@/graphql/groups.graphql";
+import { ALL_GROUPS, DELETE_GROUP } from "@/graphql/groups.graphql";
+import ConfirmDialog from "@/components/dialogs/ConfirmDialog";
 
 export default Vue.extend({
   name: "Groups",
+
+  components: { ConfirmDialog },
 
   data() {
     return {
       groups: [],
       headers: [
         { text: "Group Name", value: "name" },
-        { text: "Group Type", value: "groupType.name" },
+        { text: "Group Type", value: "type.name" },
         { text: "Group Code", value: "codeWord" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
         { text: "Survey", value: "survey.qualtricsName" },
         { text: "Created", value: "created" },
         { text: "Closed", value: "closedAfter" },
+        { text: "Actions", value: "actions", sortable: false },
       ],
+
+      deleteDialog: {
+        group: null,
+        visible: false,
+      },
     };
   },
 
@@ -52,6 +72,26 @@ export default Vue.extend({
       update: (data) => {
         return data.allGroups;
       },
+    },
+  },
+
+  methods: {
+    confirmDelete(group) {
+      this.deleteDialog.group = group;
+      this.deleteDialog.visible = true;
+    },
+
+    deleteGroup() {
+      const id = this.deleteDialog.group.id;
+
+      this.$apollo.mutate({
+        mutation: DELETE_GROUP,
+        variables: {
+          groupId: id,
+        },
+      });
+
+      this.groups = this.groups.filter((grp) => grp.id !== id);
     },
   },
 });

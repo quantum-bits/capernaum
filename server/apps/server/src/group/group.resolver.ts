@@ -2,6 +2,7 @@ import {
   Args,
   Context,
   Info,
+  Int,
   Mutation,
   Parent,
   Query,
@@ -50,6 +51,13 @@ export class GroupResolver {
   @Mutation(() => Group)
   updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
     return this.groupService.updateGroup(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deleteGroup(
+    @Args({ name: "id", type: () => Int }) id: number
+  ): Promise<number> {
+    return this.groupService.deleteGroup(id).then((result) => result.affected);
   }
 
   @ResolveField()

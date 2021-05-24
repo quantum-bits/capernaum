@@ -603,6 +603,7 @@ type Mutation {
   deleteMachine(id: Int!): Int!
   createGroup(createInput: GroupCreateInput!): Group!
   updateGroup(updateInput: GroupUpdateInput!): Group!
+  deleteGroup(id: Int!): Int!
 }
 
 input SurveyCreateInput {

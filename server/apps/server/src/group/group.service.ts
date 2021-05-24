@@ -120,6 +120,11 @@ export class GroupService extends BaseService {
       .preload(updateInput)
       .then((result) => this.groupRepo.save(result));
   }
+
+  deleteGroup(id: number) {
+    groupDebug("deleting group %d", id);
+    return this.groupRepo.delete(id);
+  }
 }
 
 @Injectable()
