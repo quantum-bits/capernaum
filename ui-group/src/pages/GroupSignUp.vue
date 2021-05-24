@@ -13,7 +13,6 @@
           class="white--text"
         >
           Overview
-          <!--<small>Summarize if needed</small>-->
         </v-stepper-step>
 
         <v-stepper-content step="1">
@@ -261,29 +260,12 @@
         <v-stepper-content step="5">
           <v-card class="mb-6 pa-6">
             <v-col sm="12">
-              <!--
-              <div
-                v-for="survey in allSurveys"
-                :key="survey.id"
-                class="grey lighten-3 mt-2 mb-2 pa-2"
-              >
-                <h4>{{ survey.publicName }}</h4>
-                <p>
-                  {{ survey.detailedDescription }}
-                </p>
-              </div>
-              -->
               <v-radio-group
                 v-model="selectedSurveyId"
                 :rules="[rules.required]"
                 required
                 :mandatory="allSurveys.length === 1"
               >
-                <!--
-                <template v-slot:label>
-                  <div>Add separate title here if desired</div>
-                </template>
-                -->
                 <v-radio
                   v-for="survey of allSurveys"
                   :key="survey.id"
@@ -295,9 +277,9 @@
                       class="rounded elevation-1 grey lighten-3 mt-2 mb-2 pa-2"
                     >
                       <h4>{{ survey.publicName }}</h4>
-                      <p>
+                      <span>
                         {{ survey.detailedDescription }}
-                      </p>
+                      </span>
                     </div>
                   </template>
                 </v-radio>
@@ -307,22 +289,6 @@
                 If one of the above surveys works for you, select it and click
                 Submit!
               </p>
-
-              <!--
-              <v-select
-                color="#4e2b4d"
-                v-model="selectedSurvey"
-                :items="allSurveys"
-                item-text="publicName"
-                item-value="id"
-                persistent-hint
-                return-object
-                filled
-                label="Survey"
-                :rules="[rules.required]"
-                required
-              ></v-select>
-              -->
             </v-col>
           </v-card>
 
@@ -346,7 +312,6 @@ import Vue from "vue";
 import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { ADD_GROUP_MUTATION, ALL_GROUP_TYPES } from "@/graphql/groups.graphql";
 import { partition } from "lodash";
-// eslint-disable-next-line no-unused-vars
 import {
   // eslint-disable-next-line no-unused-vars
   AllGroupTypes,
@@ -545,7 +510,6 @@ export default Vue.extend({
 });
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 p {
   text-align: left;

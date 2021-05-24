@@ -20,7 +20,8 @@ const groupDebug = debug("group");
 
 @Injectable()
 export class GroupService extends BaseService {
-  private readonly groupAdminTemplate;
+  private readonly groupAdminTextTemplate;
+  private readonly groupAdminHtmlTemplate;
 
   constructor(
     @InjectRepository(Group) private readonly groupRepo: Repository<Group>,
@@ -28,33 +29,72 @@ export class GroupService extends BaseService {
   ) {
     super();
 
-    const templatePath = path.join(__dirname, "group/letters/group-admin.txt");
-    groupDebug("Compiling %s", templatePath);
-    this.groupAdminTemplate = Handlebars.compile(
-      readFileSync(templatePath, "utf-8")
+    this.groupAdminTextTemplate = GroupService.compileTemplate(
+      "group/letters/group-admin.txt"
+    );
+    this.groupAdminHtmlTemplate = GroupService.compileTemplate(
+      "group/letters/group-admin.html"
     );
   }
 
+  private static compileTemplate(fileName: string) {
+    const templatePath = path.join(__dirname, fileName);
+    groupDebug("Compiling %s", templatePath);
+    return Handlebars.compile(readFileSync(templatePath, "utf-8"));
+  }
+
+  // Generate a code word that doesn't already exist.
+  private async generateUniqueCodeWord() {
+    let tries = 100;
+    while (tries--) {
+      const codeWord = CodeWord.generate();
+      const existingGroup = await this.groupRepo.findOne({ codeWord });
+      if (existingGroup) {
+        console.warn(
+          `Code word '${codeWord}' already exists; ${tries} more tries`
+        );
+      } else {
+        return codeWord;
+      }
+    }
+    throw new Error("Failed to generate unique code word");
+  }
+
   async createGroup(createInput: GroupCreateInput): Promise<Group> {
-    const codeWord = CodeWord.generate(); // We generate the code word.
-    // Persist to the database.
-    const groupDetails = {
-      ...createInput,
-      codeWord,
-    };
-    groupDebug("createGroup/details %O", groupDetails);
+    // Create the new group, including a code word that hasn't been used.
     const group = await this.groupRepo.save(
-      this.groupRepo.create(groupDetails)
+      this.groupRepo.create({
+        ...createInput,
+        codeWord: await this.generateUniqueCodeWord(),
+      })
     );
 
-    groupDebug("createGroup/new group %O", group);
+    // Fetch the new group and related data for the admin email.
+    const groupPlus = await this.groupRepo.findOneOrFail(group.id, {
+      relations: ["survey"],
+    });
+
+    if (!process.env.TU_C4SE_URL) {
+      console.error("No C4SE URL configured");
+    }
+    if (!process.env.TU_CLS_URL) {
+      console.error("No CLS URL configured");
+    }
+
+    const groupDetails = {
+      ...groupPlus,
+      tuC4seUrl: process.env.TU_C4SE_URL,
+      tuClsUrl: process.env.TU_CLS_URL,
+    };
+    groupDebug("createGroup/groupDetails %O", groupDetails);
 
     // Send email to group administrator.
     const mailDetails = new SendMailInput();
     mailDetails.from = "";
     mailDetails.to = groupDetails.adminEmail;
     mailDetails.subject = "Christian Life Survey Group Sign-up";
-    mailDetails.textContent = this.groupAdminTemplate(groupDetails);
+    mailDetails.htmlContent = this.groupAdminHtmlTemplate(groupDetails);
+    mailDetails.textContent = this.groupAdminTextTemplate(groupDetails);
     await this.mailService.sendMail(mailDetails);
     groupDebug("sent email");
 

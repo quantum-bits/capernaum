@@ -2,8 +2,8 @@ import Chance from "chance";
 const chance = new Chance();
 
 export class CodeWord {
-  private static readonly CONSONANTS = "bcdfghjklmnpqrstvwxz".split("");
-  private static readonly VOWELS = "aeiouy".split("");
+  private static readonly CONSONANTS = "bcdfghjklmnpqrstvwxyz".split("");
+  private static readonly VOWELS = "aeiou".split("");
   private static readonly NUM_PAIRS = 4;
 
   static randomConsonant(): string {

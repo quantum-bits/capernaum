@@ -15,7 +15,7 @@
       "sourceRoot": "apps/server/src",
       "compilerOptions": {
         "tsConfigPath": "apps/server/tsconfig.app.json",
-        "assets": ["**/group/letters/*.txt"]
+        "assets": ["**/group/letters/*.txt", "**/group/letters/*.html"]
       }
     },
     "reporter": {

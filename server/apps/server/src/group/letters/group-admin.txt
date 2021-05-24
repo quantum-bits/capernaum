@@ -1,22 +1,29 @@
 Dear {{ adminFirstName}} {{ adminLastName }}:
 
-Thank you for signing up your group for the Christian Life Survey.
-The details we received for your group are:
+Thank you for signing up your group for {{ survey.publicName }}. The details
+we received for your group are:
 
-Name: {{ name }}
-Type: {{ type }}
-Closing date: {{ closedAfter }}
-Group code: {{ codeWord }}
+* Your name: {{ adminFirstName }} {{ adminLastName }}
+* Your email: {{ adminEmail }}
+* Group name: {{ name }}
+* Survey closing date: {{ closedAfter }}
 
-Please notify your group members that the Christian Life Survey
-is now available to them. Be sure to let them now the Group Code,
-which they will need to get started. If you'd like, you can copy
-the following suggested message:
+Please notify your group members that the survey is now available to them. Be
+sure to let them know your group code ({{ codeWord }}), which they will need
+to get started. If you'd like, you can copy the suggested message below.
 
-The Christian Life Survey is now available for our group ({{name }}).
-Please visit NEED URL HERE on or before {{ closedAfter }} to take
-the survey. You will be asked for our group code, which is
+Thank you,
+Taylor University Center for Scripture Engagement
+{{ tuC4seUrl }}
 
-    {{ codeWord }}
+-----
 
-Please enter it at the prompt. Thanks!
+{{ name }}:
+
+{{ survey.publicName }} is now available for our group. To access the
+survey, please follow these steps.
+
+1. Visit Taylor University's web site ({{ tuClsUrl }}) on or before {{ closedAfter }}.
+2. Click the "Take Survey" button.
+3. Under "Take Group Survey", enter our group's code word: {{ codeWord }}
+4. Click the "Go To Survey" button.

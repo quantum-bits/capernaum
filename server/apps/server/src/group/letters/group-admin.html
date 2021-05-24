@@ -1,0 +1,50 @@
+<p>Dear {{ adminFirstName}} {{ adminLastName }}:</p>
+
+<p>
+  Thank you for signing up your group for {{ survey.publicName }}. The details
+  we received for your group are:
+</p>
+
+<ul>
+  <li>Your name: {{ adminFirstName }} {{ adminLastName }}</li>
+  <li>Your email: {{ adminEmail }}</li>
+  <li>Group name: {{ name }}</li>
+  <li>Survey closing date: {{ closedAfter }}</li>
+</ul>
+
+<p>
+  Please notify your group members that the survey is now available to them. Be
+  sure to let them know your group code (<code>{{ codeWord }}</code>), which
+  they will need to get started. If you'd like, you can copy the suggested
+  message below.
+</p>
+
+<p>
+  Thank you,
+  <br />
+  <a href="{{ tuC4seUrl }}">
+    Taylor University Center for Scripture Engagement
+  </a>
+</p>
+
+<hr />
+<blockquote>
+  <p>{{ name }}:</p>
+  <p>
+    {{ survey.publicName }} is now available for our group. To access the
+    survey, please follow these steps.
+  </p>
+  <ol>
+    <li>
+      Visit
+      <a href="{{ tuClsUrl }}"> Taylor University's web site </a> on or before
+      {{ closedAfter }}.
+    </li>
+    <li>Click the <strong>Take Survey</strong> button.</li>
+    <li>
+      Under <strong>Take Group Survey</strong>, enter our group's code word:
+      <code>{{ codeWord }}</code>
+    </li>
+    <li>Click the <strong>Go To Survey</strong> button.</li>
+  </ol>
+</blockquote>
