@@ -22,6 +22,10 @@ export class Group extends AbstractEntity {
   type: GroupType;
   @Column("integer") typeId: number;
 
+  @Field({ description: "Name for 'other' type ", nullable: true })
+  @Column({ nullable: true })
+  otherTypeName?: string;
+
   @Field({ description: "Date when survey created" })
   @CreateDateColumn()
   created: string;
@@ -64,6 +68,9 @@ export class GroupCreateInput {
   @Field((type) => Int, { description: "Type of group" })
   typeId: number;
 
+  @Field({ description: "Name for 'other' type ", nullable: true })
+  otherTypeName?: string;
+
   @Field({ description: "Date when survey closes" })
   closedAfter: string;
 
@@ -90,6 +97,9 @@ export class GroupUpdateInput implements Partial<Group> {
 
   @Field((type) => Int, { description: "Type of group", nullable: true })
   typeId?: number;
+
+  @Field({ description: "Name for 'other' type ", nullable: true })
+  otherTypeName?: string;
 
   @Field({ description: "Date when survey closes", nullable: true })
   closedAfter?: string;

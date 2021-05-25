@@ -39,6 +39,7 @@ export const ADD_GROUP_MUTATION = gql`
         name
         code
       }
+      otherTypeName
       codeWord
       survey {
         publicName

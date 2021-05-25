@@ -18,6 +18,7 @@ export const ALL_GROUPS = gql`
         name
         code
       }
+      otherTypeName
       created
       closedAfter
       adminFirstName

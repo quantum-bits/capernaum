@@ -161,6 +161,9 @@ type Group {
   name: String!
   type: GroupType!
 
+  """Name for 'other' type """
+  otherTypeName: String
+
   """Date when survey created"""
   created: String!
 
@@ -526,6 +529,7 @@ type Query {
   events: [Event!]!
   machines: [Machine!]!
   readGroups: [Group!]!
+  readGroup(id: Int!): Group
   findGroupByCodeWord(codeWord: String!): Group
   readGroupTypes: [GroupType!]!
 }
@@ -839,6 +843,9 @@ input GroupCreateInput {
   """Type of group"""
   typeId: Int!
 
+  """Name for 'other' type """
+  otherTypeName: String
+
   """Date when survey closes"""
   closedAfter: String!
 
@@ -861,6 +868,9 @@ input GroupUpdateInput {
 
   """Type of group"""
   typeId: Int
+
+  """Name for 'other' type """
+  otherTypeName: String
 
   """Date when survey closes"""
   closedAfter: String

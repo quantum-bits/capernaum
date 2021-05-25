@@ -8,6 +8,9 @@
     <v-row>
       <v-col>
         <v-data-table class="elevation-1" :headers="headers" :items="groups">
+          <template v-slot:item.groupType="{ item }">
+            {{ groupTypeName(item) }}
+          </template>
           <template v-slot:item.adminFullName="{ item }">
             {{ item.adminFirstName }} {{ item.adminLastName }}
           </template>
@@ -27,7 +30,7 @@
     <confirm-dialog
       v-model="deleteDialog.visible"
       dialog-title="Delete group?"
-      dialog-text="Delete this group? Cannot be undone"
+      :dialog-text="deleteDialogText"
       button-label="Delete"
       @confirmed="deleteGroup()"
     />
@@ -47,9 +50,10 @@ export default Vue.extend({
   data() {
     return {
       groups: [],
+
       headers: [
         { text: "Group Name", value: "name" },
-        { text: "Group Type", value: "type.name" },
+        { text: "Group Type", value: "groupType" },
         { text: "Group Code", value: "codeWord" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
@@ -66,6 +70,12 @@ export default Vue.extend({
     };
   },
 
+  computed: {
+    deleteDialogText() {
+      return `Delete group '${this.deleteDialog.group.name}'?  This can't be undone!`;
+    },
+  },
+
   apollo: {
     groups: {
       query: ALL_GROUPS,
@@ -76,6 +86,12 @@ export default Vue.extend({
   },
 
   methods: {
+    groupTypeName(group) {
+      return group.type.code === "OTHER"
+        ? `Other (${group.otherTypeName})`
+        : group.type.name;
+    },
+
     confirmDelete(group) {
       this.deleteDialog.group = group;
       this.deleteDialog.visible = true;

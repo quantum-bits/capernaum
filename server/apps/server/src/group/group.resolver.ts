@@ -44,6 +44,11 @@ export class GroupResolver {
   }
 
   @Query(() => Group, { nullable: true })
+  readGroup(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.groupService.readGroup(id);
+  }
+
+  @Query(() => Group, { nullable: true })
   findGroupByCodeWord(@Args("codeWord") codeWord: string) {
     return this.groupService.findGroupByCodeWord(codeWord);
   }

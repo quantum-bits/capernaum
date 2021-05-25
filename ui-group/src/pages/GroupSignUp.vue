@@ -471,6 +471,9 @@ export default Vue.extend({
               createInput: {
                 name: this.descriptionOfGroup,
                 typeId: this.groupTypeSelectedId,
+                otherTypeName: this.isOtherGroupSelected
+                  ? this.groupTypeOtherName
+                  : null,
                 closedAfter: this.closingDate,
                 adminFirstName: this.adminFirstName,
                 adminLastName: this.adminLastName,
