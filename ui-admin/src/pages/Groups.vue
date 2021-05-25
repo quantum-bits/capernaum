@@ -11,6 +11,9 @@
           <template v-slot:item.groupType="{ item }">
             {{ groupTypeName(item) }}
           </template>
+          <template v-slot:item.responses="{ item }">
+            {{ item.surveyResponses.length }}
+          </template>
           <template v-slot:item.adminFullName="{ item }">
             {{ item.adminFirstName }} {{ item.adminLastName }}
           </template>
@@ -55,6 +58,7 @@ export default Vue.extend({
         { text: "Group Name", value: "name" },
         { text: "Group Type", value: "groupType" },
         { text: "Group Code", value: "codeWord" },
+        { text: "Responses", value: "responses" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
         { text: "Survey", value: "survey.qualtricsName" },
@@ -72,7 +76,7 @@ export default Vue.extend({
 
   computed: {
     deleteDialogText() {
-      return `Delete group '${this.deleteDialog.group.name}'?  This can't be undone!`;
+      return `Delete group '${this.deleteDialog.group?.name}'?  This can't be undone!`;
     },
   },
 

@@ -184,7 +184,7 @@ type Group {
   survey: Survey!
 
   """Responses by this group"""
-  surveyResponses: [SurveyResponse!]!
+  surveyResponses: [SurveyResponse!]
 }
 
 type GroupType {

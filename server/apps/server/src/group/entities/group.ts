@@ -56,7 +56,10 @@ export class Group extends AbstractEntity {
   @Column("integer") surveyId: number;
 
   @OneToMany((type) => SurveyResponse, (sr) => sr.group)
-  @Field(() => [SurveyResponse], { description: "Responses by this group" })
+  @Field(() => [SurveyResponse], {
+    description: "Responses by this group",
+    nullable: true,
+  })
   surveyResponses: SurveyResponse[];
 }
 

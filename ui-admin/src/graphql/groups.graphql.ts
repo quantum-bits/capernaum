@@ -33,6 +33,10 @@ export const ALL_GROUPS = gql`
         groupCodeKey
         okayForGroup
       }
+      surveyResponses {
+        id
+        email
+      }
     }
   }
 `;
