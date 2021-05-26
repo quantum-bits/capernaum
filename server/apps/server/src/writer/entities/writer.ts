@@ -3,8 +3,8 @@ import { ResponseSummary } from "../../survey/entities";
 
 @InputType()
 export class WriterInput {
-  @Field((type) => Int) letterId: number;
-  @Field((type) => Int) surveyResponseId: number;
+  @Field(() => Int) letterId: number;
+  @Field(() => Int) surveyResponseId: number;
 }
 
 @ObjectType()
@@ -28,6 +28,6 @@ export class WriterOutput {
   })
   pdfAbsolutePath: string;
 
-  @Field((type) => ResponseSummary, { nullable: true })
+  @Field(() => ResponseSummary, { nullable: true })
   responseSummary?: ResponseSummary;
 }

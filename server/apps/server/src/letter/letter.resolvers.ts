@@ -37,7 +37,7 @@ import { SurveyService } from "@server/src/survey/survey.service";
 import Debug from "debug";
 const debug = Debug("letter:resolver");
 
-@Resolver((of) => Letter)
+@Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)
 export class LetterResolver {
   constructor(
@@ -45,85 +45,85 @@ export class LetterResolver {
     private readonly surveyService: SurveyService
   ) {}
 
-  @Mutation((returns) => Letter)
+  @Mutation(() => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
     return this.letterService.create(Letter, createInput);
   }
 
-  @Mutation((returns) => LetterElement)
+  @Mutation(() => LetterElement)
   createLetterElement(
     @Args("createInput") createInput: LetterElementCreateInput
   ) {
     return this.letterService.create(LetterElement, createInput);
   }
 
-  @Query((returns) => Letter)
+  @Query(() => Letter)
   letter(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterService.letter(id);
   }
 
-  @Query((returns) => [Letter])
+  @Query(() => [Letter])
   letters() {
     return this.letterService.find(Letter);
   }
 
-  @Mutation((returns) => Letter)
+  @Mutation(() => Letter)
   updateLetter(@Args("letterData") letterData: LetterUpdateInput) {
     return this.letterService.update(Letter, letterData);
   }
 
-  @Mutation((returns) => LetterElement)
+  @Mutation(() => LetterElement)
   updateLetterElement(
     @Args("updateInput") updateInput: LetterElementUpdateInput
   ) {
     return this.letterService.update(LetterElement, updateInput);
   }
 
-  @Mutation((returns) => Int)
+  @Mutation(() => Int)
   deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterService.delete(Letter, id);
   }
 
-  @Mutation((returns) => Int)
+  @Mutation(() => Int)
   deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterService.delete(LetterElement, id);
   }
 
-  @ResolveField("scriptureEngagementPractices", (type) => [
+  @ResolveField("scriptureEngagementPractices", () => [
     ScriptureEngagementPractice,
   ])
   resolveScriptureEngagementPractices(@Parent() survey: Survey) {
     return this.letterService.find(ScriptureEngagementPractice);
   }
 
-  @ResolveField("survey", (type) => Survey)
+  @ResolveField("survey", () => Survey)
   resolveSurvey(@Parent() letter: Letter) {
     return this.surveyService.findOne(Survey, letter.surveyId);
   }
 
-  @ResolveField("letterElements", (type) => [LetterElement])
+  @ResolveField("letterElements", () => [LetterElement])
   resolveElements(@Parent() letter: Letter) {
     return this.letterService.letterElements(letter);
   }
 
-  @ResolveField("tableEntries", (type) => [PredictionTableEntry])
+  @ResolveField("tableEntries", () => [PredictionTableEntry])
   resolveEntries(@Parent() letter: Letter) {
     return this.letterService.tableEntries(letter);
   }
 
-  @ResolveField("letterType", (type) => LetterType)
+  @ResolveField("letterType", () => LetterType)
   resolveLetterType(@Parent() letter: Letter) {
     debug("resolveLetterType(%O)", letter);
     return this.letterService.findOneOrFail(LetterType, letter.letterTypeId);
   }
 }
 
-@Resolver((of) => LetterElement)
+@Resolver(() => LetterElement)
 @UseGuards(GqlAuthGuard)
 export class LetterElementResolver {
   constructor(private readonly letterService: LetterService) {}
 
-  @ResolveField("letterElementType", (type) => LetterElementType)
+  @ResolveField("letterElementType", () => LetterElementType)
   resolveLetterElementType(@Parent() letterElement: LetterElement) {
     return this.letterService.findOneOrFail(
       LetterElementType,
@@ -131,7 +131,7 @@ export class LetterElementResolver {
     );
   }
 
-  @ResolveField("image", (type) => Image, { nullable: true })
+  @ResolveField("image", () => Image, { nullable: true })
   resolveImage(@Parent() letterElement: LetterElement) {
     if (letterElement.imageId) {
       return this.letterService.findOneOrFail(Image, letterElement.imageId);
@@ -140,7 +140,7 @@ export class LetterElementResolver {
     }
   }
 
-  @ResolveField("surveyDimension", (type) => SurveyDimension, {
+  @ResolveField("surveyDimension", () => SurveyDimension, {
     nullable: true,
   })
   resolveSurveyDimension(@Parent() letterElement: LetterElement) {
@@ -155,7 +155,7 @@ export class LetterElementResolver {
   }
 }
 
-@Resolver((of) => LetterElementType)
+@Resolver(() => LetterElementType)
 @UseGuards(GqlAuthGuard)
 export class LetterElementTypeResolver {
   constructor(
@@ -163,19 +163,19 @@ export class LetterElementTypeResolver {
     private readonly letterElementTypeService: LetterElementTypeService
   ) {}
 
-  @Query((returns) => [LetterElementType])
+  @Query(() => [LetterElementType])
   letterElementTypes() {
     return this.letterService.letterElementTypes();
   }
 
-  @ResolveField("letterTypes", (returns) => [LetterType])
+  @ResolveField("letterTypes", () => [LetterType])
   resolveLetterTypes(@Parent() letterElementType: LetterElementType) {
     debug("resolveLetterTypes(%O)", letterElementType);
     return this.letterElementTypeService.readLetterTypes(letterElementType);
   }
 }
 
-@Resolver((of) => LetterType)
+@Resolver(() => LetterType)
 @UseGuards(GqlAuthGuard)
 export class LetterTypeResolver {
   constructor(private readonly letterTypeService: LetterTypeService) {}
@@ -200,7 +200,7 @@ export class LetterTypeResolver {
     return this.letterTypeService.deleteLetterType(id);
   }
 
-  @ResolveField("letterElementTypes", (returns) => [LetterElementType])
+  @ResolveField("letterElementTypes", () => [LetterElementType])
   resolveLetterElementTypes(@Parent() letterType: LetterType) {
     debug("resolveLetterElementTypes(%O)", letterType);
     return this.letterTypeService.readLetterElementTypes(letterType);

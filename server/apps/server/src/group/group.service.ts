@@ -15,6 +15,7 @@ import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
 import debug from "debug";
 import path from "path";
+import { DateTime } from "luxon";
 
 const groupDebug = debug("group");
 
@@ -65,6 +66,9 @@ export class GroupService extends BaseService {
     const group = await this.groupRepo.save(
       this.groupRepo.create({
         ...createInput,
+        closedAfter: DateTime.fromISO(createInput.closedAfter).toLocaleString(
+          DateTime.DATE_FULL
+        ),
         codeWord: await this.generateUniqueCodeWord(),
       })
     );

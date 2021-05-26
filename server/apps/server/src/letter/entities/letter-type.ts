@@ -14,7 +14,7 @@ export class LetterType extends AbstractEntity {
   @Column()
   description: string;
 
-  @Field((returns) => [LetterElementType])
+  @Field(() => [LetterElementType])
   @ManyToMany(
     () => LetterElementType,
     (letterElementType) => letterElementType.letterTypes

@@ -7,7 +7,7 @@ import { LetterService } from "../letter/letter.service";
 import { WriterService } from "./writer.service";
 import { SurveyService } from "../survey/survey.service";
 
-@Resolver((of) => Letter)
+@Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)
 export class WriterResolver {
   constructor(
@@ -16,7 +16,7 @@ export class WriterResolver {
     private readonly surveyService: SurveyService
   ) {}
 
-  @Mutation((returns) => WriterOutput)
+  @Mutation(() => WriterOutput)
   async writeLetter(@Args("writerInput") writerInput: WriterInput) {
     return this.letterWriter.renderLetter(
       writerInput.letterId,

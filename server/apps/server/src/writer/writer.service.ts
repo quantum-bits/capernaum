@@ -161,14 +161,14 @@ export class WriterService {
     return lineBuffer.concatenateLines();
   }
 
-  private static chartHeight(chartData: ChartData) {
-    const height =
-      2.218962113 + 0.372607394 * (2 * chartData.entries.length - 1); //Math.max(chartData.entries.length + 1, 3);
-    return `height=${height}cm`;
-  }
-
   private static renderChart(chartData: ChartData) {
     letterDebug("renderChart - %O", chartData);
+
+    function chartHeight() {
+      const height =
+        2.218962113 + 0.372607394 * (2 * chartData.entries.length - 1);
+      return `height=${height}cm`;
+    }
 
     const chart = `
       \\begin{adjustwidth}{0cm}{1.5cm}
@@ -178,7 +178,7 @@ export class WriterService {
           title=${chartData.title},
           xbar, xmin=0, xmax=7,
           width=0.75\\textwidth,
-          ${WriterService.chartHeight(chartData)},
+          ${chartHeight()},
           enlarge y limits={abs=0.5cm},
           symbolic y coords={${chartData.allTitles()}},
           ytick=data,
@@ -306,18 +306,21 @@ export class WriterService {
   }
 
   private renderAllElements(letter: Letter, surveyResponse: SurveyResponse) {
-    const renderedElements = [];
+    const renderedElements: string[] = [];
 
     for (const letterElement of letter.letterElements) {
       letterDebug("render element - %O", letterElement);
       switch (letterElement.letterElementType.key) {
+        // Boilerplate text
         case "boilerplate":
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
+        // Boolean predictions
         case "boolean-calculation-results":
           const predictions = surveyResponse.predictScriptureEngagement();
           renderedElements.push(this.renderPredictions(predictions));
           break;
+        // Bar chart
         case "chart":
           const dimension = surveyResponse.findDimensionById(
             letterElement.surveyDimension.id
@@ -332,12 +335,18 @@ export class WriterService {
             );
           }
           break;
+        // Demographics
+        case "demographics-chart":
+          break;
+        // Footer at end of letter
         case "footer":
           renderedElements.push(WriterService.renderFooter());
           break;
+        // Header at top of letter
         case "header":
           renderedElements.push(WriterService.renderHeader());
           break;
+        // Image embedded in letter
         case "image":
           renderedElements.push(this.renderImage(letterElement));
           break;
@@ -374,7 +383,7 @@ export class WriterService {
   }
 
   private runLaTeX(
-    renderedElements,
+    renderedElements: string[],
     letter: Letter,
     surveyResponse: SurveyResponse
   ): Promise<WriterOutput> {

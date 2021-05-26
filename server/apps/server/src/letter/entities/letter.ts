@@ -44,21 +44,21 @@ export class Letter extends AbstractEntity {
   isFrozen: false;
 
   @Column("int") surveyId?: number;
-  @ManyToOne((type) => Survey, (survey) => survey.letters)
-  @Field((type) => Survey)
+  @ManyToOne(() => Survey, (survey) => survey.letters)
+  @Field(() => Survey)
   survey?: Survey;
 
   @Column("int") letterTypeId: number;
-  @ManyToOne((type) => LetterType)
-  @Field((type) => LetterType)
+  @ManyToOne(() => LetterType)
+  @Field(() => LetterType)
   letterType: LetterType;
 
-  @OneToMany((type) => LetterElement, (letterElement) => letterElement.letter)
-  @Field((type) => [LetterElement])
+  @OneToMany(() => LetterElement, (letterElement) => letterElement.letter)
+  @Field(() => [LetterElement])
   letterElements: LetterElement[];
 
-  @OneToMany((type) => PredictionTableEntry, (entry) => entry.letter)
-  @Field((type) => [PredictionTableEntry])
+  @OneToMany(() => PredictionTableEntry, (entry) => entry.letter)
+  @Field(() => [PredictionTableEntry])
   tableEntries: PredictionTableEntry[];
 }
 
@@ -68,17 +68,17 @@ export class LetterCreateInput {
   @Field() description: string;
   @Field() emailMessage: string;
   @Field({ nullable: true, defaultValue: false }) isFrozen?: boolean;
-  @Field((type) => Int) surveyId: number;
-  @Field((type) => Int) letterTypeId: number;
+  @Field(() => Int) surveyId: number;
+  @Field(() => Int) letterTypeId: number;
 }
 
 @InputType()
 export class LetterUpdateInput {
-  @Field((type) => Int) id: number;
+  @Field(() => Int) id: number;
   @Field({ nullable: true }) title: string;
   @Field({ nullable: true }) description: string;
   @Field({ nullable: true }) emailMessage: string;
   @Field({ nullable: true }) isFrozen: boolean;
-  @Field((type) => Int, { nullable: true }) surveyId: number;
-  @Field((type) => Int, { nullable: true }) letterTypeId: number;
+  @Field(() => Int, { nullable: true }) surveyId: number;
+  @Field(() => Int, { nullable: true }) letterTypeId: number;
 }

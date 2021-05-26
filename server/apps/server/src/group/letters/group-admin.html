@@ -1,4 +1,4 @@
-<p>Dear {{ adminFirstName}} {{ adminLastName }}:</p>
+<p>Dear {{ adminFirstName }} {{ adminLastName }}:</p>
 
 <p>
   Thank you for signing up your group for {{ survey.publicName }}. The details
@@ -37,7 +37,9 @@
   <ol>
     <li>
       Visit
-      <a href="{{ tuClsUrl }}"> Taylor University's web site </a> on or before
+      <a href="{{ tuClsUrl }}"> Taylor University's web site </a>
+      ({{ tuClsUrl }})
+      on or before
       {{ closedAfter }}.
     </li>
     <li>Click the <strong>Take Survey</strong> button.</li>
