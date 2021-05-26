@@ -36,11 +36,17 @@ export class SurveyItem extends AbstractEntity {
   sequence: number;
 
   @Column()
-  @Field({ description: "Qualtrics identifier for this question" })
+  @Field({
+    description: "Qualtrics identifier (value of key in `questions` object)",
+  })
   qualtricsId: string;
 
+  @Column({ nullable: true })
+  @Field({ description: "Qualtrics `questionName` field", nullable: true })
+  qualtricsName?: string;
+
   @Column()
-  @Field({ description: "Text of this question from Qualtrics" })
+  @Field({ description: "Qualtrics `questionText` field" })
   qualtricsText: string;
 
   public surveyItemResponse() {

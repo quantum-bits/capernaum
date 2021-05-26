@@ -267,10 +267,13 @@ type SurveyItem {
   """Sequence number; items will be displayed in this order"""
   sequence: Int!
 
-  """Qualtrics identifier for this question"""
+  """Qualtrics identifier (value of key in `questions` object)"""
   qualtricsId: String!
 
-  """Text of this question from Qualtrics"""
+  """Qualtrics `questionName` field"""
+  qualtricsName: String
+
+  """Qualtrics `questionText` field"""
   qualtricsText: String!
   surveyItemResponse(responseId: Int!): SurveyItemResponse
 }

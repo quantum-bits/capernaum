@@ -405,6 +405,7 @@ export class SurveyService extends BaseService {
             // Already have this question; update it.
             surveyDebug(`Update existing question to '${trimmedQuestionText}'`);
             existingItem.qualtricsText = trimmedQuestionText;
+            existingItem.qualtricsName = question.questionName;
             await surveyItemRepo.save(existingItem);
           } else {
             // New question; create it.
@@ -414,6 +415,7 @@ export class SurveyService extends BaseService {
             const newItem = surveyItemRepo.create({
               qualtricsId,
               qualtricsText: trimmedQuestionText,
+              qualtricsName: question.questionName,
             });
             await surveyItemRepo.save(newItem);
             workingSurvey.surveyItems.push(newItem);

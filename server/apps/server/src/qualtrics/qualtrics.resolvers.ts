@@ -20,7 +20,7 @@ export class QualtricsResolver {
     private readonly surveyService: SurveyService
   ) {}
 
-  @Query((returns) => [QualtricsSurveyListItem])
+  @Query(() => [QualtricsSurveyListItem])
   async qualtricsSurveys(
     @Args({
       name: "includeInactive",
@@ -65,7 +65,7 @@ export class QualtricsResolver {
     return surveyList;
   }
 
-  @Mutation((returns) => Survey, {
+  @Mutation(() => Survey, {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey.",
   })
@@ -82,7 +82,7 @@ export class QualtricsResolver {
     return this.surveyService.importQualtricsSurvey(qualtricsSurvey, updateOk);
   }
 
-  @Mutation((returns) => QualtricsResponseImportStats, {
+  @Mutation(() => QualtricsResponseImportStats, {
     description: "Fetch responses to a survey",
   })
   async importQualtricsSurveyResponses(
@@ -101,10 +101,11 @@ export class QualtricsResolver {
     // For each response retrieved from Qualtrics, import it into the database.
     const importStats = new QualtricsResponseImportStats();
     for (const oneResponse of allResponses) {
-      const importResponse = await this.surveyService.importQualtricsSurveyResponse(
-        survey.id,
-        oneResponse
-      );
+      const importResponse =
+        await this.surveyService.importQualtricsSurveyResponse(
+          survey.id,
+          oneResponse
+        );
 
       importStats.importCount += 1;
       if (importResponse.isDuplicate) {
@@ -116,7 +117,7 @@ export class QualtricsResolver {
     return importStats;
   }
 
-  @Query((returns) => QualtricsOrganization)
+  @Query(() => QualtricsOrganization)
   organization(
     @Args({
       name: "organizationId",
@@ -128,7 +129,7 @@ export class QualtricsResolver {
     return this.qualtricsApiService.getOrganization(organizationId);
   }
 
-  @Mutation((returns) => QualtricsSubscription)
+  @Mutation(() => QualtricsSubscription)
   createSubscription(
     @Args("createInput") createInput: QualtricsSubscriptionCreateInput
   ) {
@@ -146,7 +147,6 @@ export class QualtricsResolver {
         throw Error(
           `No support for subscription '${createInput.subscriptionType}'`
         );
-        break;
       case "completed-response":
         if (createInput.surveyId) {
           eventType = finalSegment = createInput.subscriptionType;
@@ -170,12 +170,12 @@ export class QualtricsResolver {
     return returnValue;
   }
 
-  @Query((returns) => [QualtricsSubscription])
+  @Query(() => [QualtricsSubscription])
   subscriptions() {
     return this.qualtricsApiService.listSubscriptions();
   }
 
-  @Mutation((returns) => String)
+  @Mutation(() => String)
   deleteSubscription(@Args("subscriptionId") subscriptionId: string) {
     return this.qualtricsApiService.deleteSubscription(subscriptionId);
   }
