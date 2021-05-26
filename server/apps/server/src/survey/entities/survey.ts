@@ -1,5 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Column, Entity, OneToMany} from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -13,24 +13,24 @@ import { SurveyResponse } from "./survey-response";
   description: "All information about a survey imported from Qualtrics",
 })
 export class Survey extends AbstractEntity {
-  @OneToMany((type) => Letter, (letter) => letter.survey)
-  @Field((type) => [Letter])
+  @OneToMany(() => Letter, (letter) => letter.survey)
+  @Field(() => [Letter])
   letters: Letter[];
 
-  @OneToMany((type) => SurveyItem, (item) => item.survey)
-  @Field((type) => [SurveyItem])
+  @OneToMany(() => SurveyItem, (item) => item.survey)
+  @Field(() => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany((type) => Group, (group) => group.survey)
-  @Field((type) => [Group])
+  @OneToMany(() => Group, (group) => group.survey)
+  @Field(() => [Group])
   groups: Group[];
 
-  @OneToMany((type) => SurveyDimension, (dimension) => dimension.survey)
-  @Field((type) => [SurveyDimension])
+  @OneToMany(() => SurveyDimension, (dimension) => dimension.survey)
+  @Field(() => [SurveyDimension])
   surveyDimensions: SurveyDimension[];
 
-  @OneToMany((type) => SurveyResponse, (response) => response.survey)
-  @Field((type) => [SurveyResponse])
+  @OneToMany(() => SurveyResponse, (response) => response.survey)
+  @Field(() => [SurveyResponse])
   surveyResponses: SurveyResponse[];
 
   @Column()
@@ -75,7 +75,7 @@ export class Survey extends AbstractEntity {
   })
   detailedDescription: string;
 
-  @Field((type) => [ScriptureEngagementPractice], {
+  @Field(() => [ScriptureEngagementPractice], {
     description: "Convenience property to retrieve SE practices",
   })
   scriptureEngagementPractices: ScriptureEngagementPractice[];
@@ -107,13 +107,13 @@ export class SurveyCreateInput {
   @Field() okayForGroup: boolean;
   @Field() publicName: string;
   @Field() detailedDescription: string;
-  @Field((type) => [SurveyItemCreateInput])
+  @Field(() => [SurveyItemCreateInput])
   surveyItems: SurveyItemCreateInput[];
 }
 
 @InputType()
 export class SurveyUpdateInput {
-  @Field((type) => Int) id: number;
+  @Field(() => Int) id: number;
   @Field({ nullable: true }) qualtricsId?: string;
   @Field({ nullable: true }) qualtricsName?: string;
   @Field({ nullable: true }) qualtricsModDate?: string;
