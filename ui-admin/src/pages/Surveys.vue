@@ -106,9 +106,7 @@
                             <v-list-item
                               v-on="on"
                               :disabled="disableUpdate(item)"
-                              @click="
-                                importQualtricsSurvey(item.qualtricsId, true)
-                              "
+                              @click="importQualtricsSurvey(item.qualtricsId)"
                             >
                               <v-list-item-title>Update</v-list-item-title>
                             </v-list-item>
@@ -450,23 +448,18 @@ export default Vue.extend({
   },
 
   methods: {
-    importQualtricsSurvey(qualtricsSurveyId: string, updateOk: boolean) {
+    importQualtricsSurvey(qualtricsSurveyId: string) {
       this.$apollo
         .mutate({
           mutation: IMPORT_QUALTRICS_SURVEY,
           variables: {
             qualtricsId: qualtricsSurveyId,
-            updateOk,
           },
           refetchQueries: ["AllSurveys", "QualtricsSurveys"],
         })
         .then((result) => {
           console.log("IMPORT RESULT", result);
-          if (updateOk) {
-            this.showSnackbar("Updated successfully");
-          } else {
-            this.showSnackbar("Imported successfully");
-          }
+          this.showSnackbar("Imported successfully");
         })
         .catch((error) => this.showSnackbar(error));
     },

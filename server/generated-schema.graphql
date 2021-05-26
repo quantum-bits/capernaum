@@ -599,7 +599,7 @@ type Mutation {
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
   """
-  importQualtricsSurvey(updateOk: Boolean!, qualtricsId: String!): Survey!
+  importQualtricsSurvey(qualtricsId: String!): Survey!
 
   """Fetch responses to a survey"""
   importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!

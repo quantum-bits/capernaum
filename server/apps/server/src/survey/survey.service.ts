@@ -300,7 +300,7 @@ export class SurveyService extends BaseService {
     );
   }
 
-  private async _deleteSurveyResponse(
+  private static async _deleteSurveyResponse(
     manager: EntityManager,
     surveyResponseId: number
   ) {
@@ -316,7 +316,7 @@ export class SurveyService extends BaseService {
 
   async deleteSurveyResponse(surveyResponseId: number) {
     return this.entityManager.transaction(async (manager) => {
-      const result = await this._deleteSurveyResponse(
+      const result = await SurveyService._deleteSurveyResponse(
         manager,
         surveyResponseId
       );
@@ -329,11 +329,9 @@ export class SurveyService extends BaseService {
    * from `importQualtricsSurvey` in the Qualtrics resolver.
    *
    * @param qualtricsSurvey Data fetched from Qualtrics.
-   * @param updateOk Is it all right to update a previously imported survey?
    */
   async importQualtricsSurvey(
-    qualtricsSurvey: QualtricsSurvey,
-    updateOk: boolean
+    qualtricsSurvey: QualtricsSurvey
   ): Promise<Survey> {
     // surveyDebug("QualtricsSurvey %O", qualtricsSurvey);
 
@@ -356,19 +354,11 @@ export class SurveyService extends BaseService {
           surveyItems: [],
         });
       } else {
-        if (updateOk) {
-          surveyDebug(
-            `Survey '${qualtricsSurvey.id}' already in database; updating`
-          );
-          workingSurvey.qualtricsName = qualtricsSurvey.name;
-          workingSurvey.qualtricsModDate = qualtricsSurvey.lastModifiedDate;
-        } else {
-          // Have imported this survey previously, but we're not enabled to update it.
-          surveyDebug("Survey already in database; update not authorized");
-          throw Error(
-            `Already have qualtrics survey '${qualtricsSurvey.id}' but update not enabled`
-          );
-        }
+        surveyDebug(
+          `Survey '${qualtricsSurvey.id}' already in database; updating`
+        );
+        workingSurvey.qualtricsName = qualtricsSurvey.name;
+        workingSurvey.qualtricsModDate = qualtricsSurvey.lastModifiedDate;
       }
 
       // Create or update questions for this survey.
@@ -454,7 +444,7 @@ export class SurveyService extends BaseService {
           "Delete previously imported response %s",
           createInput.responseId
         );
-        this._deleteSurveyResponse(manager, previousImport.id);
+        SurveyService._deleteSurveyResponse(manager, previousImport.id);
       }
 
       // Load the survey and its items from the database.
