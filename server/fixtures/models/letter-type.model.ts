@@ -2,8 +2,8 @@ import { Model } from "objection";
 import { LetterElementTypeModel } from "./letter-element-type.model";
 import { LetterModel } from "./letter.model";
 
-import Debug from "debug";
-const debug = Debug("fixtures");
+import { getDebugger } from "../debug-factory";
+const debug = getDebugger("letter");
 
 export class LetterTypeModel extends Model {
   id!: number;
@@ -29,12 +29,12 @@ export class LetterTypeModel extends Model {
   });
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("UN-RELATE LETTER ELEMENT TYPES");
+    debug("Un-relate letter element types");
     await LetterTypeModel.relatedQuery("elementTypes", transaction)
       .for(await asFindQuery().select("id"))
       .unrelate();
 
-    debug("DELETE LETTER MODELS");
+    debug("Delete letter models");
     await LetterModel.query(transaction)
       .delete()
       .whereIn("letterTypeId", asFindQuery().select("id"));

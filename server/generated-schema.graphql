@@ -181,6 +181,12 @@ type Group {
 
   """Survey code word used by group"""
   codeWord: String!
+
+  """Comments from administrator"""
+  adminComments: String!
+
+  """Planned invitee count"""
+  plannedInvitees: Int!
   survey: Survey!
 
   """Responses by this group"""
@@ -195,6 +201,9 @@ type GroupType {
 
   """Group code (e.g., 'SMALL_GROUP')"""
   code: String!
+
+  """Sequence number"""
+  seq: Int!
   groups: [Group!]!
 }
 
@@ -860,6 +869,12 @@ input GroupCreateInput {
 
   """Group administrator email address"""
   adminEmail: String!
+
+  """Comments from administrator"""
+  adminComments: String!
+
+  """Planned invitee count"""
+  plannedInvitees: Int!
   surveyId: Int!
 }
 
@@ -889,6 +904,12 @@ input GroupUpdateInput {
 
   """Survey code word used by group"""
   codeWord: String
+
+  """Comments from administrator"""
+  adminComments: String
+
+  """Planned invitee count"""
+  plannedInvitees: Int
   surveyId: Int
 }
 

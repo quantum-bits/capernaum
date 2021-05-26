@@ -15,6 +15,10 @@ export class GroupType {
   @Column()
   code: string;
 
+  @Field(() => Int, { description: "Sequence number" })
+  @Column({ default: -1 })
+  seq: number;
+
   @Field(() => [Group])
   @OneToMany(() => Group, (group) => group.type)
   groups: Group[];

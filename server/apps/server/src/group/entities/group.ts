@@ -50,12 +50,20 @@ export class Group extends AbstractEntity {
   @Column()
   codeWord: string;
 
+  @Field({ description: "Comments from administrator" })
+  @Column()
+  adminComments: string;
+
+  @Field(() => Int, { description: "Planned invitee count" })
+  @Column()
+  plannedInvitees: number;
+
   @ManyToOne(() => Survey, (survey) => survey.groups)
   @Field(() => Survey)
   survey: Survey;
   @Column("integer") surveyId: number;
 
-  @OneToMany((type) => SurveyResponse, (sr) => sr.group)
+  @OneToMany(() => SurveyResponse, (sr) => sr.group)
   @Field(() => [SurveyResponse], {
     description: "Responses by this group",
     nullable: true,
@@ -68,7 +76,7 @@ export class GroupCreateInput {
   @Field({ description: "Group name" })
   name: string;
 
-  @Field((type) => Int, { description: "Type of group" })
+  @Field(() => Int, { description: "Type of group" })
   typeId: number;
 
   @Field({ description: "Name for 'other' type ", nullable: true })
@@ -86,7 +94,13 @@ export class GroupCreateInput {
   @Field({ description: "Group administrator email address" })
   adminEmail: string;
 
-  @Field((type) => Int)
+  @Field({ description: "Comments from administrator" })
+  adminComments: string;
+
+  @Field(() => Int, { description: "Planned invitee count" })
+  plannedInvitees: number;
+
+  @Field(() => Int)
   surveyId: number;
 }
 
@@ -98,7 +112,7 @@ export class GroupUpdateInput implements Partial<Group> {
   @Field({ description: "Group name", nullable: true })
   name?: string;
 
-  @Field((type) => Int, { description: "Type of group", nullable: true })
+  @Field(() => Int, { description: "Type of group", nullable: true })
   typeId?: number;
 
   @Field({ description: "Name for 'other' type ", nullable: true })
@@ -119,6 +133,12 @@ export class GroupUpdateInput implements Partial<Group> {
   @Field({ description: "Survey code word used by group", nullable: true })
   codeWord?: string;
 
-  @Field((type) => Int, { nullable: true })
+  @Field({ description: "Comments from administrator", nullable: true })
+  adminComments?: string;
+
+  @Field(() => Int, { description: "Planned invitee count", nullable: true })
+  plannedInvitees?: number;
+
+  @Field(() => Int, { nullable: true })
   surveyId?: number;
 }

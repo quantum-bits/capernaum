@@ -2,15 +2,19 @@ import { AbstractFixture } from "./abstract-fixture";
 import { LetterTypeModel } from "./models/letter-type.model";
 import { LetterElementTypeModel } from "./models/letter-element-type.model";
 
+import { getDebugger } from "./debug-factory";
+const debug = getDebugger("letter");
+
 export class LetterTypeFixture extends AbstractFixture {
   async delete() {
-    console.log("DELETE LETTER TYPES");
+    debug("Delete letter types");
     await LetterTypeModel.query().delete();
-    console.log("DELETE LETTER ELEMENT TYPES");
+    debug("Delete letter element types");
     await LetterElementTypeModel.query().delete();
   }
 
   insert() {
+    debug("Insert letter type graph");
     return LetterTypeModel.query().insertGraph(
       [
         {

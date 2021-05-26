@@ -1,15 +1,14 @@
 {
   "name": "server",
   "version": "0.1.0",
-  "description": "Caparnaum servers",
+  "description": "Capernaum servers",
   "author": "Tom Nurkkala",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "load-fake-survey": "ts-node fixtures/fixture-loader.ts --nuclear --fake-survey",
-    "load-fixtures": "ts-node fixtures/fixture-loader.ts --nuclear",
+    "load-fixtures": "ts-node fixtures/main.ts",
     "reporter": "nest start reporter",
     "reporter:build": "nest build reporter",
     "reporter:debug": "nest start --debug --watch reporter",

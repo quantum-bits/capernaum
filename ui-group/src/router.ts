@@ -14,7 +14,7 @@ const router = new VueRouter({
     {
       path: "/register-group",
       name: "group-sign-up",
-      component: () => import("./pages/GroupSignUp.vue"),
+      component: () => import("./pages/RegisterGroup.vue"),
     },
   ],
 });

@@ -5,7 +5,7 @@ import { Field, Int, ObjectType } from "@nestjs/graphql";
 @ObjectType()
 export abstract class AbstractEntity {
   @PrimaryGeneratedColumn()
-  @Field((type) => Int, {
+  @Field(() => Int, {
     description: "Unique ID for this entity",
   })
   id: number;

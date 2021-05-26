@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import GroupSignUp from "./pages/GroupSignUp.vue";
+import GroupSignUp from "./pages/RegisterGroup.vue";
 
 @Component({
   components: {

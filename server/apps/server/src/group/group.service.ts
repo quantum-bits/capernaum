@@ -113,7 +113,7 @@ export class GroupService extends BaseService {
 
   readGroup(id: number): Promise<Group> {
     return this.groupRepo.findOne(id, {
-      relations: ["survey", "surveyResponses"],
+      relations: ["type", "survey", "surveyResponses"],
     });
   }
 
@@ -141,7 +141,7 @@ export class GroupTypeService {
   ) {}
 
   readGroupTypes(): Promise<GroupType[]> {
-    return this.groupTypeRepo.find();
+    return this.groupTypeRepo.find({ order: { seq: "ASC" } });
   }
 
   readGroupType(id: number) {

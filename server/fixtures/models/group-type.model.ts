@@ -5,6 +5,7 @@ export class GroupTypeModel extends Model {
   id: number;
   name: string;
   code: string;
+  seq: number;
   groups: GroupModel[];
 
   static tableName = "group_type";

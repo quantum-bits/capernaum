@@ -8,29 +8,29 @@ import { SurveyItemResponse } from "./survey-item-response";
 @Entity()
 @ObjectType({ description: "One item (question) from a survey" })
 export class SurveyItem extends AbstractEntity {
-  @ManyToOne((type) => Survey, (survey) => survey.surveyItems)
-  @Field((type) => Survey)
+  @ManyToOne(() => Survey, (survey) => survey.surveyItems)
+  @Field(() => Survey)
   survey: Survey;
   @Column("integer", { nullable: true })
   surveyId: number;
 
-  @ManyToOne((type) => SurveyIndex, (surveyIndex) => surveyIndex.surveyItems, {
+  @ManyToOne(() => SurveyIndex, (surveyIndex) => surveyIndex.surveyItems, {
     nullable: true,
   })
-  @Field((type) => SurveyIndex, { nullable: true })
+  @Field(() => SurveyIndex, { nullable: true })
   surveyIndex: SurveyIndex;
   @Column("integer", { nullable: true })
   surveyIndexId: number;
 
   @OneToMany(
-    (type) => SurveyItemResponse,
+    () => SurveyItemResponse,
     (surveyItemResponse) => surveyItemResponse.surveyItem
   )
-  @Field((type) => [SurveyItemResponse])
+  @Field(() => [SurveyItemResponse])
   surveyItemResponses: SurveyItemResponse[];
 
   @Column("integer", { default: -1 })
-  @Field((type) => Int, {
+  @Field(() => Int, {
     description: "Sequence number; items will be displayed in this order",
   })
   sequence: number;
@@ -59,7 +59,7 @@ export class SurveyItem extends AbstractEntity {
 
 @InputType()
 export class SurveyItemCreateInput {
-  @Field((type) => Int, { defaultValue: -1 }) sequence?: number;
+  @Field(() => Int, { defaultValue: -1 }) sequence?: number;
   @Field() qualtricsId: string;
   @Field() qualtricsText: string;
 }

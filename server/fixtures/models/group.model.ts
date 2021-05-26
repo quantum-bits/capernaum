@@ -9,6 +9,8 @@ export class GroupModel extends Model {
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
+  adminComments: string;
+  plannedInvitees: number;
   codeWord: string;
   created: number;
   type: GroupTypeModel;

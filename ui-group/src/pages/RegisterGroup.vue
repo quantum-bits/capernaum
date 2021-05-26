@@ -169,6 +169,18 @@
                 prepend-icon="mdi-pencil"
                 type="text"
               />
+
+              <p class="text-left mt-10">
+                About how many people will you invite to participate?
+              </p>
+              <v-text-field
+                color="#4e2b4d"
+                class="pl-10 mt-n5"
+                type="number"
+                label="Please enter a number"
+                v-model="plannedInvitees"
+                :rules="[rules.positiveInteger]"
+              />
             </v-col>
           </v-card>
           <v-btn
@@ -301,6 +313,24 @@
           >
           <v-btn text @click="formStep = 4"> Back </v-btn>
         </v-stepper-content>
+
+        <v-stepper-step
+          :editable="stepTwoValid() && stepThreeValid()"
+          step="6"
+          color="#4e2b4d"
+          class="white--text"
+        >
+          Comments
+          <small>Let us know how we can serve you better</small>
+        </v-stepper-step>
+        <v-stepper-content step="6">
+          <p>
+            Do you have other comments that might help us know who is using the
+            group administration of the Christian Life Survey, or what features
+            we might add in the future?
+          </p>
+          <v-textarea v-model="adminComments" outlined />
+        </v-stepper-content>
       </v-stepper>
     </v-form>
   </v-container>
@@ -339,7 +369,8 @@ interface InputFieldValidationHack extends Vue {
 }
 
 export default Vue.extend({
-  name: "GroupSignUp",
+  name: "RegisterGroup",
+
   // TODO -- assign the type (not sure why AllSurveys_surveys isn't being recognized....)
   //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
@@ -371,6 +402,8 @@ export default Vue.extend({
       descriptionOfGroup: "",
       adminFirstName: "",
       adminLastName: "",
+      adminComments: "",
+      plannedInvitees: 1,
       selectedSurveyId: null, // number | null = null,
 
       closingDate: new Date().toISOString().substr(0, 10),
@@ -387,6 +420,8 @@ export default Vue.extend({
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           return pattern.test(value) || "Invalid e-mail.";
         },
+        positiveInteger: (value: string) =>
+          /^[1-9]\d*$/.test(value) || "Must be at least one",
       },
     };
   },
@@ -478,6 +513,8 @@ export default Vue.extend({
                 adminFirstName: this.adminFirstName,
                 adminLastName: this.adminLastName,
                 adminEmail: this.email,
+                adminComments: this.adminComments,
+                plannedInvitees: +this.plannedInvitees,
                 surveyId: this.selectedSurveyId,
               },
             },
