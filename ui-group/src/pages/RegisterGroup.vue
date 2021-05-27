@@ -304,13 +304,9 @@
             </v-col>
           </v-card>
 
-          <v-btn
-            @click="submit"
-            color="#4e2b4d"
-            class="white--text"
-            :disabled="!isValid"
-            >Submit</v-btn
-          >
+          <v-btn color="#4e2b4d" class="white--text" @click="formStep = 6">
+            Continue
+          </v-btn>
           <v-btn text @click="formStep = 4"> Back </v-btn>
         </v-stepper-content>
 
@@ -330,6 +326,15 @@
             we might add in the future?
           </p>
           <v-textarea v-model="adminComments" outlined />
+
+          <v-btn
+            @click="submit"
+            color="#4e2b4d"
+            class="white--text"
+            :disabled="!isValid"
+            >Submit</v-btn
+          >
+          <v-btn text @click="formStep = 5"> Back </v-btn>
         </v-stepper-content>
       </v-stepper>
     </v-form>
