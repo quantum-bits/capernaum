@@ -51,11 +51,11 @@ export class Group extends AbstractEntity {
   codeWord: string;
 
   @Field({ description: "Comments from administrator" })
-  @Column()
+  @Column({ default: "" })
   adminComments: string;
 
   @Field(() => Int, { description: "Planned invitee count" })
-  @Column()
+  @Column({ default: 1 })
   plannedInvitees: number;
 
   @ManyToOne(() => Survey, (survey) => survey.groups)

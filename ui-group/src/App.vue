@@ -3,7 +3,6 @@
     <div id="app">
       <div class="tu-logo-container">
         <div class="tu-logo"></div>
-        <!--<div class="gradient-bar"></div>-->
         <div class="cls-banner-container">
           <img
             alt="Center for Scripture Engagement Logo"
@@ -12,24 +11,11 @@
           <v-main>
             <router-view />
           </v-main>
-          <!--<GroupSignUp msg="Welcome dude to Your Vue.js + TypeScript App"/>-->
         </div>
       </div>
     </div>
   </v-app>
 </template>
-
-<script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import GroupSignUp from "./pages/RegisterGroup.vue";
-
-@Component({
-  components: {
-    GroupSignUp,
-  },
-})
-export default class App extends Vue {}
-</script>
 
 <style lang="scss">
 #app {

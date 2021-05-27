@@ -263,6 +263,7 @@
         <v-stepper-step
           :editable="stepTwoValid() && stepThreeValid()"
           step="5"
+          :complete="formStep > 4"
           color="#4e2b4d"
           class="white--text"
         >
@@ -526,7 +527,7 @@ export default Vue.extend({
           })
           .then(({ data }) => {
             console.log("done!", data);
-            //this.$emit("letter-created", data.createLetter.id);
+            this.$router.push({ name: "registration-complete" });
           })
           .catch((error) => {
             console.log("there appears to have been an error: ", error);
