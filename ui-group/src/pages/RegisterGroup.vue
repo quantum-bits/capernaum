@@ -129,6 +129,11 @@
         <v-stepper-content step="3">
           <v-card class="mb-6 pa-6">
             <v-col sm="12" md="10">
+              <p>
+                Please tell us a little about your group. (Knowing which kinds
+                of groups use this service will help us know what kinds of new
+                features might be most helpful in the future.)
+              </p>
               <p class="note-colour rounded font-weight-bold elevation-1 pa-2">
                 "Description of Group" will be shown to members of your group
                 when they go to take the survey.

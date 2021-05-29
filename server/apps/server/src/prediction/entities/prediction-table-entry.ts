@@ -13,47 +13,49 @@ import { AbstractEntity } from "../../shared/abstract-entity";
 @ObjectType({ description: "One entry in a prediction table" })
 export class PredictionTableEntry extends AbstractEntity {
   @Column("int") letterId: number;
-  @ManyToOne((type) => Letter, { primary: true })
-  @Field((type) => [PredictionTableEntry])
+  @ManyToOne(() => Letter, { primary: true })
+  @Field(() => [PredictionTableEntry])
   letter: Letter;
 
   @Column("int") surveyIndexId: number;
-  @ManyToOne((type) => SurveyIndex, { primary: true })
-  @Field((type) => SurveyIndex)
+  @ManyToOne(() => SurveyIndex, { primary: true })
+  @Field(() => SurveyIndex)
   surveyIndex: SurveyIndex;
 
   @Column("int") practiceId: number;
-  @ManyToOne((type) => ScriptureEngagementPractice, { primary: true })
-  @Field((type) => ScriptureEngagementPractice)
+  @ManyToOne(() => ScriptureEngagementPractice, { primary: true })
+  @Field(() => ScriptureEngagementPractice)
   practice: ScriptureEngagementPractice;
 
-  @Column() @Field((type) => Int) sequence: number;
+  @Column()
+  @Field(() => Int)
+  sequence: number;
 }
 
 @InputType()
 class PartialPredictionTableEntry {
-  @Field((type) => Int) surveyIndexId: number;
-  @Field((type) => Int) practiceId: number;
-  @Field((type) => Int) sequence: number;
+  @Field(() => Int) surveyIndexId: number;
+  @Field(() => Int) practiceId: number;
+  @Field(() => Int) sequence: number;
 }
 
 @InputType()
 export class PredictionTableEntryCreateInput extends PartialPredictionTableEntry {
-  @Field((type) => Int) letterId: number;
+  @Field(() => Int) letterId: number;
 }
 
 @InputType()
 export class PredictionTableEntryUpdateInput {
-  @Field((type) => Int) id: number;
-  @Field((type) => Int, { nullable: true }) letterId?: number;
-  @Field((type) => Int, { nullable: true }) surveyIndexId: number;
-  @Field((type) => Int, { nullable: true }) practiceId: number;
-  @Field((type) => Int, { nullable: true }) sequence: number;
+  @Field(() => Int) id: number;
+  @Field(() => Int, { nullable: true }) letterId?: number;
+  @Field(() => Int, { nullable: true }) surveyIndexId: number;
+  @Field(() => Int, { nullable: true }) practiceId: number;
+  @Field(() => Int, { nullable: true }) sequence: number;
 }
 
 @InputType()
 export class PredictionTableEntryReplaceInput {
-  @Field((type) => Int) letterId: number;
-  @Field((type) => [PartialPredictionTableEntry])
+  @Field(() => Int) letterId: number;
+  @Field(() => [PartialPredictionTableEntry])
   entries: PartialPredictionTableEntry[];
 }

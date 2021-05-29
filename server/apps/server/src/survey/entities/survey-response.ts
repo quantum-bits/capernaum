@@ -13,7 +13,16 @@ import { SurveyDimension } from "@server/src/survey/entities/survey-dimension";
 
 const surveyDebug = debug("survey");
 
+/**
+ * Encapsulate the prediction for a single SE practice.
+ * We predict a practice if _every_ survey index associated with that practice
+ * has a mean value that exceeds a configurable threshold.
+ */
 class ScriptureEngagementPracticePrediction {
+  /**
+   * Map of survey index by its ID.
+   * @private
+   */
   private surveyIndexMap: Map<number, SurveyIndex> = new Map();
 
   constructor(
@@ -21,12 +30,22 @@ class ScriptureEngagementPracticePrediction {
     private scriptureEngagementPractice: ScriptureEngagementPractice
   ) {}
 
+  /**
+   * Add `surveyIndex` to the map if it's not already there.
+   * TODO: Is this necessary?
+   * A survey index appears in only one survey dimension
+   * and can only predict a single SE practice.
+   * @param surveyIndex
+   */
   public maybeAddSurveyIndex(surveyIndex: SurveyIndex) {
     if (!this.surveyIndexMap.has(surveyIndex.id)) {
       this.surveyIndexMap.set(surveyIndex.id, surveyIndex);
     }
   }
 
+  /**
+   * Get the prediction for this practice.
+   */
   public getPrediction(): Prediction {
     const threshold = parseFloat(process.env.SEP_PREDICTION_THRESHOLD);
     const results: PredictionDetails[] = [];
@@ -128,59 +147,72 @@ export class SurveyResponse extends AbstractEntity {
   @Field({ description: "Respondent's longitude" })
   longitude: string;
 
-  summarize = (): ResponseSummary => ({
-    id: this.id,
-    qualtricsResponseId: this.qualtricsResponseId,
-    email: this.email,
-    date: this.endDate,
+  /**
+   * Summarize a survey response for use in debugging/validation.
+   */
+  public summarize(): ResponseSummary {
+    return {
+      id: this.id,
+      qualtricsResponseId: this.qualtricsResponseId,
+      email: this.email,
+      date: this.endDate,
 
-    surveySummary: {
-      id: this.survey.id,
-      title: this.survey.qualtricsName,
-      qualtricsId: this.survey.qualtricsId,
-      qualtricsName: this.survey.qualtricsName,
-    },
+      surveySummary: {
+        id: this.survey.id,
+        title: this.survey.qualtricsName,
+        qualtricsId: this.survey.qualtricsId,
+        qualtricsName: this.survey.qualtricsName,
+      },
 
-    dimensionSummaries: this.survey.surveyDimensions.map((dimension) => ({
-      id: dimension.id,
-      title: dimension.title,
-      indexSummaries: dimension.surveyIndices.map((index) => ({
-        id: index.id,
-        title: index.title,
-        abbreviation: index.abbreviation,
-        meanResponse: index.meanResponse(),
-        itemSummaries: index.surveyItems.map((item) => {
-          const itemResponse = item.surveyItemResponse();
-          return {
-            id: item.id,
-            qualtricsId: item.qualtricsId,
-            qualtricsText: item.qualtricsText,
-            responseId: itemResponse.id,
-            responseLabel: itemResponse.label,
-            responseValue: itemResponse.value,
-          };
-        }),
+      dimensionSummaries: this.survey.surveyDimensions.map((dimension) => ({
+        id: dimension.id,
+        title: dimension.title,
+        indexSummaries: dimension.surveyIndices.map((index) => ({
+          id: index.id,
+          title: index.title,
+          abbreviation: index.abbreviation,
+          meanResponse: index.meanResponse(),
+          itemSummaries: index.surveyItems.map((item) => {
+            const itemResponse = item.surveyItemResponse();
+            return {
+              id: item.id,
+              qualtricsId: item.qualtricsId,
+              qualtricsText: item.qualtricsText,
+              responseId: itemResponse.id,
+              responseLabel: itemResponse.label,
+              responseValue: itemResponse.value,
+            };
+          }),
+        })),
       })),
-    })),
-    predictionSummaries: this.predictScriptureEngagement().map((prediction) => {
-      const practice = prediction.practice;
-      return {
-        practiceSummary: {
-          id: practice.id,
-          title: practice.title,
-          description: practice.description,
-        },
-        predictionDetails: prediction.details,
-        predict: prediction.predict,
-      };
-    }),
-  });
+      predictionSummaries: this.predictScriptureEngagement().map(
+        (prediction) => {
+          const practice = prediction.practice;
+          return {
+            practiceSummary: {
+              id: practice.id,
+              title: practice.title,
+              description: practice.description,
+            },
+            predictionDetails: prediction.details,
+            predict: prediction.predict,
+          };
+        }
+      ),
+    };
+  }
 
-  findDimensionById = (dimensionId: number): SurveyDimension =>
-    this.survey.surveyDimensions.find(
+  public findDimensionById(dimensionId: number): SurveyDimension {
+    return this.survey.surveyDimensions.find(
       (dimension) => dimension.id === dimensionId
     );
+  }
 
+  /**
+   * Predict scripture engagement based on this survey result.
+   *
+   * @returns Array of `Prediction` objects.
+   */
   public predictScriptureEngagement(): Prediction[] {
     const predictionMap: Map<
       number, // Practice ID
@@ -219,11 +251,15 @@ export class SurveyResponse extends AbstractEntity {
     return predictions;
   }
 
-  static tab = (n: number, message: string): string =>
-    "|  ".repeat(n) + message;
-
+  /**
+   * Dump the contents of a survey response for use in debugging/verification.
+   */
   public dump(): void {
     console.log("RESPONSE", this.id);
+
+    function tab(n: number, message: string): string {
+      return "|  ".repeat(n) + message;
+    }
 
     for (const dim of this.survey.surveyDimensions) {
       console.log(`DIM (${dim.id}) ${dim.title}`);
@@ -231,7 +267,7 @@ export class SurveyResponse extends AbstractEntity {
 
       for (const index of dim.surveyIndices) {
         console.log(
-          SurveyResponse.tab(
+          tab(
             1,
             `IDX (${index.id}-${index.abbreviation}) ${index.title} 
                           ${
@@ -244,16 +280,14 @@ export class SurveyResponse extends AbstractEntity {
         );
 
         for (const pte of index.predictionTableEntries) {
-          console.log(
-            SurveyResponse.tab(2, `PTE (${pte.id}) ${pte.practice.title}`)
-          );
+          console.log(tab(2, `PTE (${pte.id}) ${pte.practice.title}`));
         }
 
         const showResponses = false;
         if (showResponses) {
           for (const item of index.surveyItems) {
             console.log(
-              SurveyResponse.tab(
+              tab(
                 2,
                 `ITEM (${item.id}-${item.qualtricsId}) ${item.qualtricsText}`
               )
@@ -261,7 +295,7 @@ export class SurveyResponse extends AbstractEntity {
 
             for (const response of item.surveyItemResponses) {
               console.log(
-                SurveyResponse.tab(
+                tab(
                   3,
                   `RESP (${response.id}) ${response.label}, ${response.value}`
                 )
@@ -275,7 +309,7 @@ export class SurveyResponse extends AbstractEntity {
     console.log("SCRIPTURE ENGAGEMENT");
     for (const prediction of this.predictScriptureEngagement()) {
       console.log(
-        SurveyResponse.tab(
+        tab(
           1,
           `${prediction.practice.title} - ${
             prediction.predict ? "PREDICT" : "DON'T PREDICT"
@@ -284,12 +318,7 @@ export class SurveyResponse extends AbstractEntity {
       );
 
       for (const detail of prediction.details) {
-        console.log(
-          SurveyResponse.tab(
-            2,
-            `${detail.abbreviation} - ${detail.meanResponse}`
-          )
-        );
+        console.log(tab(2, `${detail.abbreviation} - ${detail.meanResponse}`));
       }
     }
   }

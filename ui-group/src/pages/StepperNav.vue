@@ -1,9 +1,16 @@
 <template>
   <div>
-    <v-btn v-if="!isLastStep" color="primary" @click="updateStep(+1)">
+    <v-btn
+      v-if="!isLastStep"
+      color="primary"
+      :disabled="disabled"
+      @click="updateStep(+1)"
+    >
       Continue
     </v-btn>
-    <v-btn v-else color="primary" @click="submit()"> Submit </v-btn>
+    <v-btn v-else color="primary" :disabled="disabled" @click="submit()">
+      Submit
+    </v-btn>
     <v-btn v-if="!isFirstStep" text @click="updateStep(-1)"> Back </v-btn>
   </div>
 </template>
@@ -17,12 +24,14 @@ export default Vue.extend({
   props: {
     value: { type: Number, required: true },
     stepCount: { type: Number, required: true },
+    disabled: { type: Boolean, default: false },
   },
 
   computed: {
     isFirstStep(): boolean {
       return this.value === 1;
     },
+
     isLastStep(): boolean {
       return this.value === this.stepCount;
     },
@@ -35,5 +44,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>
