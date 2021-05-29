@@ -535,15 +535,15 @@ type Query {
   readLetterTypes: [LetterType!]!
   images: [Image!]!
   image(id: Int!): Image!
+  readGroups: [Group!]!
+  readGroup(id: Int!): Group
+  findGroupByCodeWord(codeWord: String!): Group
+  readGroupTypes: [GroupType!]!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   subscriptions: [QualtricsSubscription!]!
   events: [Event!]!
   machines: [Machine!]!
-  readGroups: [Group!]!
-  readGroup(id: Int!): Group
-  findGroupByCodeWord(codeWord: String!): Group
-  readGroupTypes: [GroupType!]!
 }
 
 type Mutation {
@@ -604,6 +604,9 @@ type Mutation {
   deleteLetterType(id: Int!): Int!
   updateImage(updateInput: ImageUpdateInput!): Image!
   deleteImage(id: Int!): Int!
+  createGroup(createInput: GroupCreateInput!): Group!
+  updateGroup(updateInput: GroupUpdateInput!): Group!
+  deleteGroup(id: Int!): Int!
 
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
@@ -617,9 +620,6 @@ type Mutation {
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
-  createGroup(createInput: GroupCreateInput!): Group!
-  updateGroup(updateInput: GroupUpdateInput!): Group!
-  deleteGroup(id: Int!): Int!
 }
 
 input SurveyCreateInput {
@@ -831,23 +831,6 @@ input ImageUpdateInput {
   title: String!
 }
 
-input QualtricsSubscriptionCreateInput {
-  hostName: String!
-  subscriptionType: String!
-  surveyId: String
-}
-
-input EventCreateInput {
-  type: String!
-  details: String!
-}
-
-input MachineCreateInput {
-  name: String!
-  hostName: String!
-  active: Boolean!
-}
-
 input GroupCreateInput {
   """Group name"""
   name: String!
@@ -911,6 +894,23 @@ input GroupUpdateInput {
   """Planned invitee count"""
   plannedInvitees: Int
   surveyId: Int
+}
+
+input QualtricsSubscriptionCreateInput {
+  hostName: String!
+  subscriptionType: String!
+  surveyId: String
+}
+
+input EventCreateInput {
+  type: String!
+  details: String!
+}
+
+input MachineCreateInput {
+  name: String!
+  hostName: String!
+  active: Boolean!
 }
 
 type Subscription {

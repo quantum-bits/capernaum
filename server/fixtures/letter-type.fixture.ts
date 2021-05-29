@@ -13,6 +13,9 @@ export class LetterTypeFixture extends AbstractFixture {
     await LetterElementTypeModel.query().delete();
   }
 
+  /**
+   * The `key`s for each `elementType` _must_ match the cases in `WriterService.renderAllElements`.
+   */
   insert() {
     debug("Insert letter type graph");
     return LetterTypeModel.query().insertGraph(
@@ -22,28 +25,19 @@ export class LetterTypeFixture extends AbstractFixture {
           description: "Individual Letter",
           elementTypes: [
             {
-              "#id": "boilerplate",
-              key: "boilerplate",
+              "#id": "boilerplate-text",
+              key: "boilerplate-text",
               description: "Boilerplate Text",
             },
             {
-              key: "boolean-calculation-results",
-              description: "Boolean Calculation Results",
+              "#id": "scripture-engagement-prediction",
+              key: "scripture-engagement-prediction",
+              description: "Scripture Engagement Prediction",
             },
             {
-              "#id": "chart",
-              key: "chart",
-              description: "Bar Chart",
-            },
-            {
-              "#id": "footer",
-              key: "footer",
-              description: "Footer (End of Letter)",
-            },
-            {
-              "#id": "header",
-              key: "header",
-              description: "Header (Top of Letter)",
+              "#id": "dimension-chart",
+              key: "dimension-chart",
+              description: "Dimension Chart",
             },
             {
               "#id": "image",
@@ -55,15 +49,13 @@ export class LetterTypeFixture extends AbstractFixture {
         {
           key: "GROUP",
           description: "Group Letter",
+          // These element types are identical to the individual letter.
+          // This was not always the case, and I'm leaving this in place
+          // in case it is again in the future.
           elementTypes: [
-            { "#ref": "boilerplate" },
-            { "#ref": "chart" },
-            {
-              key: "demographics-chart",
-              description: "Demographics Chart",
-            },
-            { "#ref": "footer" },
-            { "#ref": "header" },
+            { "#ref": "boilerplate-text" },
+            { "#ref": "scripture-engagement-prediction" },
+            { "#ref": "dimension-chart" },
             { "#ref": "image" },
           ],
         },

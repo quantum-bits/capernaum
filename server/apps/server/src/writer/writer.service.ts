@@ -13,6 +13,7 @@ import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
 import { LetterService } from "../letter/letter.service";
 import { SurveyService } from "../survey/survey.service";
+import { GroupService } from "../group/group.service";
 import * as IsEmail from "isemail";
 
 import debug from "debug";
@@ -85,7 +86,8 @@ export class WriterService {
     @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
     @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,
     private readonly letterService: LetterService,
-    private readonly surveyService: SurveyService
+    private readonly surveyService: SurveyService,
+    private readonly groupService: GroupService
   ) {}
 
   private renderImage(letterElement: LetterElement) {
@@ -311,17 +313,14 @@ export class WriterService {
     for (const letterElement of letter.letterElements) {
       letterDebug("render element - %O", letterElement);
       switch (letterElement.letterElementType.key) {
-        // Boilerplate text
-        case "boilerplate":
+        case "boilerplate-text":
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
-        // Boolean predictions
-        case "boolean-calculation-results":
+        case "scripture-engagement-prediction":
           const predictions = surveyResponse.predictScriptureEngagement();
           renderedElements.push(this.renderPredictions(predictions));
           break;
-        // Bar chart
-        case "chart":
+        case "dimension-chart":
           const dimension = surveyResponse.findDimensionById(
             letterElement.surveyDimension.id
           );
@@ -335,18 +334,6 @@ export class WriterService {
             );
           }
           break;
-        // Demographics
-        case "demographics-chart":
-          break;
-        // Footer at end of letter
-        case "footer":
-          renderedElements.push(WriterService.renderFooter());
-          break;
-        // Header at top of letter
-        case "header":
-          renderedElements.push(WriterService.renderHeader());
-          break;
-        // Image embedded in letter
         case "image":
           renderedElements.push(this.renderImage(letterElement));
           break;
@@ -434,7 +421,7 @@ export class WriterService {
     });
   }
 
-  async renderLetter(letterId: number, surveyResponseId: number) {
+  async renderIndividualLetter(letterId: number, surveyResponseId: number) {
     const letter = await this.letterService.letter(letterId);
     const surveyResponse = await this.surveyService.surveyResponseComplete(
       surveyResponseId
@@ -455,5 +442,18 @@ export class WriterService {
       const renderedElements = this.renderAllElements(letter, surveyResponse);
       return await this.runLaTeX(renderedElements, letter, surveyResponse);
     }
+  }
+
+  async renderGroupLetter(letterId: number, groupId: number) {
+    const letter = await this.letterService.letter(letterId);
+    const group = await this.groupService.readGroup(groupId);
+    const completeResponses: SurveyResponse[] = [];
+    for (const response of group.surveyResponses) {
+      const completeResponse = await this.surveyService.surveyResponseComplete(
+        response.id
+      );
+      completeResponses.push(completeResponse);
+    }
+    letterDebug("renderGroupLetter/completeResponses %O", completeResponses);
   }
 }

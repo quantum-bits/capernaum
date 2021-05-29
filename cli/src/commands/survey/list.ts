@@ -18,10 +18,10 @@ const compareDateTimes = (a: DateTime, b: DateTime) =>
   a < b ? -1 : a > b ? 1 : 0;
 
 export default class SurveyList extends Command {
-  static description = "describe the command here";
+  static description = "list all surveys";
 
   static flags = {
-    "by-date": flags.boolean()
+    "by-date": flags.boolean(),
   };
 
   async run() {
@@ -42,7 +42,7 @@ export default class SurveyList extends Command {
       const data = [[...headers]];
 
       const sortFn = (a: SortableMetadata, b: SortableMetadata) =>
-        flags['by-date']
+        flags["by-date"]
           ? compareDateTimes(a.lastModified, b.lastModified)
           : a.metadata.name.localeCompare(b.metadata.name);
 

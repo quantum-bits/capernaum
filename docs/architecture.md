@@ -123,7 +123,7 @@ package prediction {
 package writer {
     class LineBuffer
     class Writer {
-        + renderLetter(letterId, surveyResponseId)
+        + renderIndividualLetter(letterId, surveyResponseId)
         - renderAllElements(letter, surveyResponse)
         - runLaTeX(renderedElements, letter, surveyResponse)
     }
@@ -170,7 +170,7 @@ rqc -> survey: importQualtricsSurveyResponse
 note right: Store in Capernaum database
 return importedResponse
 
-rqc -> writer: renderLetter(letterId, surveyResponseId)
+rqc -> writer: renderIndividualLetter(letterId, surveyResponseId)
     writer -> letter: findLetter
     return letter
     

@@ -18,7 +18,7 @@ export class WriterResolver {
 
   @Mutation(() => WriterOutput)
   async writeLetter(@Args("writerInput") writerInput: WriterInput) {
-    return this.letterWriter.renderLetter(
+    return this.letterWriter.renderIndividualLetter(
       writerInput.letterId,
       writerInput.surveyResponseId
     );

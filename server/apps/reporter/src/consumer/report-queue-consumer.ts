@@ -69,7 +69,7 @@ export class ReportQueueConsumer {
     const letter = await this.surveyService.findLetter(survey.id);
 
     // Write a letter.
-    const writerOutput = await this.writerService.renderLetter(
+    const writerOutput = await this.writerService.renderIndividualLetter(
       letter.id,
       importedResponse.surveyResponse.id
     );

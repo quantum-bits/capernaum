@@ -19,7 +19,7 @@ $ npm install -g cap-cli
 $ cap-cli COMMAND
 running command...
 $ cap-cli (-v|--version|version)
-cap-cli/0.0.0 darwin-x64 node-v14.15.3
+cap-cli/0.0.0 darwin-x64 node-v14.17.0
 $ cap-cli --help [COMMAND]
 USAGE
   $ cap-cli COMMAND
@@ -28,16 +28,33 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`cap-cli group:list [FILE]`](#cap-cli-grouplist-file)
 * [`cap-cli help [COMMAND]`](#cap-cli-help-command)
 * [`cap-cli org:show`](#cap-cli-orgshow)
 * [`cap-cli query`](#cap-cli-query)
 * [`cap-cli responses:get SURVEY-ID [RESPONSE-ID]`](#cap-cli-responsesget-survey-id-response-id)
-* [`cap-cli subscription:create [FILE]`](#cap-cli-subscriptioncreate-file)
-* [`cap-cli subscription:delete [FILE]`](#cap-cli-subscriptiondelete-file)
-* [`cap-cli subscription:get [FILE]`](#cap-cli-subscriptionget-file)
-* [`cap-cli subscription:list [FILE]`](#cap-cli-subscriptionlist-file)
+* [`cap-cli subscription:create PUBLICATION-URL TOPICS SURVEY-ID`](#cap-cli-subscriptioncreate-publication-url-topics-survey-id)
+* [`cap-cli subscription:delete ID`](#cap-cli-subscriptiondelete-id)
+* [`cap-cli subscription:get ID`](#cap-cli-subscriptionget-id)
+* [`cap-cli subscription:list`](#cap-cli-subscriptionlist)
 * [`cap-cli survey:get SURVEYID`](#cap-cli-surveyget-surveyid)
 * [`cap-cli survey:list`](#cap-cli-surveylist)
+
+## `cap-cli group:list [FILE]`
+
+describe the command here
+
+```
+USAGE
+  $ cap-cli group:list [FILE]
+
+OPTIONS
+  -f, --force
+  -h, --help       show CLI help
+  -n, --name=name  name to print
+```
+
+_See code: [src/commands/group/list.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/group/list.ts)_
 
 ## `cap-cli help [COMMAND]`
 
@@ -97,66 +114,60 @@ OPTIONS
 
 _See code: [src/commands/responses/get.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/responses/get.ts)_
 
-## `cap-cli subscription:create [FILE]`
+## `cap-cli subscription:create PUBLICATION-URL TOPICS SURVEY-ID`
 
-describe the command here
+create a subscription
 
 ```
 USAGE
-  $ cap-cli subscription:create [FILE]
+  $ cap-cli subscription:create PUBLICATION-URL TOPICS SURVEY-ID
 
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+ARGUMENTS
+  PUBLICATION-URL  Fully qualified URL; must accept POST request
+
+  TOPICS           Subscribe to topics: activate-survey, deactivate-survey, started-session, partial-response,
+                   completed-response
+
+  SURVEY-ID
 ```
 
 _See code: [src/commands/subscription/create.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/subscription/create.ts)_
 
-## `cap-cli subscription:delete [FILE]`
+## `cap-cli subscription:delete ID`
 
-describe the command here
+delete a subscription
 
 ```
 USAGE
-  $ cap-cli subscription:delete [FILE]
+  $ cap-cli subscription:delete ID
 
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+ARGUMENTS
+  ID  Subscription ID (SUB_...)
 ```
 
 _See code: [src/commands/subscription/delete.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/subscription/delete.ts)_
 
-## `cap-cli subscription:get [FILE]`
+## `cap-cli subscription:get ID`
 
-describe the command here
+get a single subscription
 
 ```
 USAGE
-  $ cap-cli subscription:get [FILE]
+  $ cap-cli subscription:get ID
 
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+ARGUMENTS
+  ID  Subscription ID (SUB_...)
 ```
 
 _See code: [src/commands/subscription/get.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/subscription/get.ts)_
 
-## `cap-cli subscription:list [FILE]`
+## `cap-cli subscription:list`
 
-describe the command here
+list subscriptions
 
 ```
 USAGE
-  $ cap-cli subscription:list [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  $ cap-cli subscription:list
 ```
 
 _See code: [src/commands/subscription/list.ts](https://github.com/quantum-bits/capernaum/blob/v0.0.0/src/commands/subscription/list.ts)_
