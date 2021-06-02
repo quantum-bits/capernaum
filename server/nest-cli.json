@@ -42,7 +42,7 @@
     "cli": {
       "type": "application",
       "root": "apps/cli",
-      "entryFile": "main",
+      "entryFile": "../bin/cap-cli",
       "sourceRoot": "apps/cli/src",
       "compilerOptions": {
         "tsConfigPath": "apps/cli/tsconfig.app.json"

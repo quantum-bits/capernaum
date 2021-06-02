@@ -14,18 +14,10 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "paths": {
-      "@server/*": [
-        "apps/server/*"
-      ],
-      "@reporter/*": [
-        "apps/reporter/*"
-      ],
-      "@common/*": [
-        "apps/*"
-      ],
-      "@qapi/*": [
-        "libs/qualtrics-api/src/*"
-      ]
+      "@server/*": ["apps/server/*"],
+      "@reporter/*": ["apps/reporter/*"],
+      "@common/*": ["apps/*"],
+      "@qapi/*": ["libs/qualtrics-api/src/*"]
     }
   }
 }
