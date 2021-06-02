@@ -1,4 +1,4 @@
-import { GluegunToolbox } from "gluegun";
+import { GluegunCommand, GluegunToolbox } from "gluegun";
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 
 export default {
@@ -9,9 +9,11 @@ export default {
     const qualtricsService = new QualtricsApiService();
 
     if (process.env.QUALTRICS_ORG_ID) {
+      const spinner = toolbox.print.spin("Fetching org info");
       qualtricsService
         .getOrganization(process.env.QUALTRICS_ORG_ID)
         .then((organization) => {
+          spinner.succeed("Done");
           const data = [
             ["Id", organization.id],
             ["Name", organization.name],
@@ -30,4 +32,4 @@ export default {
       throw new Error("No organization ID");
     }
   },
-};
+} as GluegunCommand;

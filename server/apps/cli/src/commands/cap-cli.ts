@@ -2,6 +2,7 @@ import { GluegunCommand } from "gluegun";
 
 const command: GluegunCommand = {
   name: "cap-cli",
+  description: "Capernaum API",
   run: async (toolbox) => {
     const { print } = toolbox;
 
@@ -9,4 +10,4 @@ const command: GluegunCommand = {
   },
 };
 
-module.exports = command;
+export default command;

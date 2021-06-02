@@ -1,4 +1,4 @@
-import { GluegunToolbox } from "gluegun";
+import { GluegunCommand, GluegunToolbox } from "gluegun";
 import { GroupService } from "@server/src/group/group.service";
 import { INestApplicationContext } from "@nestjs/common";
 import { GroupModule } from "@server/src/group/group.module";
@@ -6,19 +6,17 @@ import { GroupModule } from "@server/src/group/group.module";
 import Debug from "debug";
 const debug = Debug("cli");
 
-module.exports = {
+export default {
   name: "list",
   alias: ["l"],
   description: "List all groups",
   run: async (toolbox: GluegunToolbox) => {
-    toolbox.print.debug("HELLO");
     const app: INestApplicationContext = await toolbox.getNestApp();
     const groupService: GroupService = app
       .select(GroupModule)
       .get(GroupService, {
         strict: true,
       });
-    debug("groupService %O", groupService);
 
     const groups = await groupService.readGroups();
     debug("groups %O", groups);
@@ -35,4 +33,4 @@ module.exports = {
 
     await app.close();
   },
-};
+} as GluegunCommand;

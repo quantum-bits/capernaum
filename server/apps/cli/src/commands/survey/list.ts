@@ -1,4 +1,4 @@
-import { GluegunToolbox } from "gluegun";
+import { GluegunCommand, GluegunToolbox } from "gluegun";
 import {
   QualtricsSurveyList,
   QualtricsSurveyMetadata,
@@ -21,9 +21,9 @@ export default {
   alias: ["l"],
   description: "List surveys",
   run: async (toolbox: GluegunToolbox) => {
-    toolbox.print.info(toolbox.parameters);
     const qualtricsService = new QualtricsApiService();
 
+    const spinner = toolbox.print.spin("Fetching surveys");
     qualtricsService.listSurveys().then((surveyList: QualtricsSurveyList) => {
       const elements: SortableMetadata[] = surveyList.elements.map(
         (element) => ({
@@ -31,6 +31,7 @@ export default {
           metadata: element,
         })
       );
+      spinner.succeed("Done");
 
       const headers = ["Id", "Name", "Last Modified"].map((hdr) =>
         chalk.greenBright(hdr)
@@ -52,4 +53,4 @@ export default {
       toolbox.print.table(data, { format: "lean" });
     });
   },
-};
+} as GluegunCommand;

@@ -5,16 +5,13 @@ import { INestApplicationContext } from "@nestjs/common";
 
 // add your CLI-specific functionality here, which will then be accessible
 // to your commands
-module.exports = (toolbox: GluegunToolbox) => {
+export default (toolbox: GluegunToolbox) => {
   let cachedApp: INestApplicationContext = undefined;
 
   toolbox.getNestApp = async () => {
-    console.log("GET");
     if (!cachedApp) {
-      console.log("NOT CACHED");
       cachedApp = await NestFactory.createApplicationContext(CliModule);
     }
-    console.log("CACHED");
     return cachedApp;
   };
 
