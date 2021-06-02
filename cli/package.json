@@ -8,12 +8,11 @@
     "cap-cli": "bin/cap-cli"
   },
   "scripts": {
-    "format": "prettier --write **/*.{js,ts,tsx,json}",
-    "lint": "tslint -p .",
+    "format": "prettier --write **/*.{js,ts,json}",
     "clean-build": "rm -rf ./build",
     "compile": "tsc -p .",
     "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "build": "yarn format && yarn clean-build && yarn compile && yarn copy-templates",
     "prepublishOnly": "yarn build",
     "test": "jest",
     "watch": "jest --watch",
@@ -33,32 +32,27 @@
   "dependencies": {
     "@nestjs/common": "^7.6.17",
     "@nestjs/core": "^7.6.17",
+    "@nestjs/typeorm": "^7.1.5",
     "gluegun": "latest",
     "luxon": "^1.27.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.0.0",
+    "typeorm": "^0.2.33"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.18",
+    "@types/jest": "^26.0.23",
     "@types/luxon": "^1.26.5",
-    "@types/node": "^12.7.11",
+    "@types/node": "^15.6.2",
     "dotenv": "^10.0.0",
-    "jest": "^24.1.0",
-    "prettier": "^1.12.1",
-    "ts-jest": "^24.1.0",
+    "jest": "^27.0.3",
+    "prettier": "^2.3.0",
+    "ts-jest": "^27.0.2",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.9.0",
-    "tslint": "^5.12.0",
-    "tslint-config-prettier": "^1.17.0",
-    "tslint-config-standard": "^8.0.1",
-    "typescript": "^3.6.3"
+    "typescript": "^4.3.2"
   },
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   }
 }
