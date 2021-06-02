@@ -1,89 +1,57 @@
 {
   "name": "cap-cli",
-  "description": "Capernaum CLI",
-  "version": "0.0.0",
-  "author": "Tom Nurkkala @nurkkala",
+  "version": "0.0.1",
+  "description": "cap-cli CLI",
+  "private": true,
+  "types": "build/types/types.d.ts",
   "bin": {
-    "cap-cli": "./bin/run"
+    "cap-cli": "bin/cap-cli"
   },
-  "bugs": "https://github.com/quantum-bits/capernaum/issues",
-  "dependencies": {
-    "@apollo/client": "^3.3.19",
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/plugin-help": "^3",
-    "@types/debug": "^4.1.5",
-    "cross-fetch": "^3.1.4",
-    "debug": "^4.3.2",
-    "dotenv": "^9.0.2",
-    "eslint-config-prettier": "^8.3.0",
-    "graphql": "^15.5.0",
-    "inquirer": "^8.0.0",
-    "lodash": "^4.17.21",
-    "luxon": "^1.27.0",
-    "prettier": "^2.3.0",
-    "pretty-error": "^3.0.3",
-    "pretty-format": "^26.6.2",
-    "reflect-metadata": "^0.1.13",
-    "table": "^6.7.1",
-    "tslib": "^2"
-  },
-  "devDependencies": {
-    "@oclif/dev-cli": "^1",
-    "@types/inquirer": "^7.3.1",
-    "@types/lodash": "^4.14.169",
-    "@types/luxon": "^1.26.5",
-    "@types/node": "^15",
-    "@types/table": "^6.3.2",
-    "eslint": "^7.26",
-    "eslint-config-oclif": "^3.1",
-    "eslint-config-oclif-typescript": "^0.2",
-    "ts-node": "^9",
-    "typescript": "^4.2"
-  },
-  "engines": {
-    "node": ">=8.0.0"
+  "scripts": {
+    "format": "prettier --write **/*.{js,ts,tsx,json}",
+    "lint": "tslint -p .",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "prepublishOnly": "yarn build",
+    "test": "jest",
+    "watch": "jest --watch",
+    "snapupdate": "jest --updateSnapshot",
+    "coverage": "jest --coverage"
   },
   "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/quantum-bits/capernaum",
-  "keywords": [
-    "oclif"
+    "tsconfig.json",
+    "tslint.json",
+    "build",
+    "LICENSE",
+    "readme.md",
+    "docs",
+    "bin"
   ],
   "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "cap-cli",
-    "plugins": [
-      "@oclif/plugin-help"
-    ],
-    "topics": {
-      "survey": {
-        "description": "surveys"
-      },
-      "responses": {
-        "description": "survey responses"
-      },
-      "subscription": {
-        "description": "event subscriptions"
-      },
-      "org": {
-        "description": "Qualtrics organization"
-      }
-    }
+  "dependencies": {
+    "gluegun": "latest"
   },
-  "repository": "quantum-bits/capernaum",
-  "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "echo NO TESTS",
-    "version": "oclif-dev readme && git add README.md"
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.11",
+    "dotenv": "^10.0.0",
+    "jest": "^24.1.0",
+    "prettier": "^1.12.1",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "tslint": "^5.12.0",
+    "tslint-config-prettier": "^1.17.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.6.3"
   },
-  "types": "lib/index.d.ts"
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  }
 }
