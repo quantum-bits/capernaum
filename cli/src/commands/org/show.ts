@@ -1,5 +1,5 @@
 import { GluegunToolbox } from 'gluegun'
-import { QualtricsApiService } from '../../../server/libs/qualtrics-api'
+import { QualtricsApiService } from '../../../../server/libs/qualtrics-api'
 
 module.exports = {
   run: async (toolbox: GluegunToolbox) => {
