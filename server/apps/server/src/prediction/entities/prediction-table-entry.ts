@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryColumn, Index } from "typeorm";
+import { Column, Entity, ManyToOne, Index } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";

@@ -22,7 +22,6 @@ import {
   Repository,
 } from "typeorm";
 import {
-  QualtricsQuestion,
   QualtricsSurvey,
   QualtricsSurveyResponse,
 } from "@qapi/qualtrics-api.types";
@@ -289,16 +288,16 @@ export class SurveyService extends BaseService {
     });
   }
 
-  private static dumpQualtricsQuestion(
-    questionId: string,
-    question: QualtricsQuestion
-  ) {
-    console.log(
-      `${questionId} - ${JSON.stringify(question.questionType)} - ${
-        question.questionText
-      }`
-    );
-  }
+  // private static dumpQualtricsQuestion(
+  //   questionId: string,
+  //   question: QualtricsQuestion
+  // ) {
+  //   console.log(
+  //     `${questionId} - ${JSON.stringify(question.questionType)} - ${
+  //       question.questionText
+  //     }`
+  //   );
+  // }
 
   private static async _deleteSurveyResponse(
     manager: EntityManager,

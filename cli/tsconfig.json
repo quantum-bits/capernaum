@@ -20,7 +20,6 @@
     "inlineSourceMap": true,
     "outDir": "build",
     "strict": false,
-    "target": "es5",
     "declaration": true,
     "declarationDir": "build/types"
   },

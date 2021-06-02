@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 import { AbstractEntity } from "../../shared/abstract-entity";
-import { ChartData, ChartEntry } from "../survey.types";
+import { ChartData } from "../survey.types";
 
 @Entity()
 @ObjectType({

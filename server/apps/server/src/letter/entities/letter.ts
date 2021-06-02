@@ -3,10 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   UpdateDateColumn,
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";

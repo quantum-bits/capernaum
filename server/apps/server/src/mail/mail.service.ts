@@ -1,8 +1,8 @@
 import debug from "debug";
 import { Injectable, Logger } from "@nestjs/common";
-import nodemailer, { SentMessageInfo, Transporter } from "nodemailer";
-import Mail from "nodemailer/lib/mailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { SentMessageInfo, Transporter, createTransport } from "nodemailer";
+import Mail = require("nodemailer/lib/mailer");
+import SMTPTransport = require("nodemailer/lib/smtp-transport");
 import { SendMailInput } from "./entities";
 
 const mailDebug = debug("mail");
@@ -35,7 +35,7 @@ export class MailService {
     }
 
     mailDebug("transport options %O", options);
-    this.transporter = nodemailer.createTransport(options);
+    this.transporter = createTransport(options);
   }
 
   sendMail(mailInput: SendMailInput): Promise<SentMessageInfo> {

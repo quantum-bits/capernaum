@@ -26,7 +26,7 @@ class ScriptureEngagementPracticePrediction {
   private surveyIndexMap: Map<number, SurveyIndex> = new Map();
 
   constructor(
-    private responseId: number,
+    // private responseId: number,
     private scriptureEngagementPractice: ScriptureEngagementPractice
   ) {}
 
@@ -227,7 +227,7 @@ export class SurveyResponse extends AbstractEntity {
               predictionMap.set(
                 predictionTableEntry.practiceId,
                 new ScriptureEngagementPracticePrediction(
-                  this.id,
+                  // this.id,
                   predictionTableEntry.practice
                 )
               );

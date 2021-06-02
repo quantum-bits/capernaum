@@ -9,12 +9,12 @@ import {
   GroupUpdateInput,
 } from "./entities";
 import { CodeWord } from "@server/src/group/code-word";
-import Handlebars from "handlebars";
+import Handlebars = require("handlebars");
 import { readFileSync } from "fs";
 import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
 import debug from "debug";
-import path from "path";
+import * as path from "path";
 import { DateTime } from "luxon";
 
 const groupDebug = debug("group");

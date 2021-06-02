@@ -1,7 +1,7 @@
 import { GluegunToolbox } from 'gluegun'
-import { QualtricsApiService } from '../../../../server/libs/qualtrics-api'
+import { QualtricsApiService } from '@qapi/qualtrics-api.service'
 
-module.exports = {
+export default {
   run: async (toolbox: GluegunToolbox) => {
     const qualtricsService = new QualtricsApiService()
 

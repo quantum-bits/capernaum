@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// Resolve tsconfig paths.
+require('tsconfig-paths').register()
 
 /* tslint:disable */
 // check if we're running in dev mode
@@ -17,5 +19,3 @@ if (wantsCompiled || !devMode) {
   // run the CLI with the current process arguments
   require(`${__dirname}/../src/cli`).run(process.argv)
 }
-
-

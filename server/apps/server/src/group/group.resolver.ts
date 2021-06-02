@@ -1,14 +1,11 @@
 import {
   Args,
-  Context,
-  Info,
   Int,
   Mutation,
   Parent,
   Query,
   ResolveField,
   Resolver,
-  Root,
 } from "@nestjs/graphql";
 import {
   GroupService,
