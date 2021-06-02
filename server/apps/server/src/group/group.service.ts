@@ -31,10 +31,10 @@ export class GroupService extends BaseService {
     super();
 
     this.groupAdminTextTemplate = GroupService.compileTemplate(
-      "group/letters/group-admin.txt"
+      "letters/group-admin.txt"
     );
     this.groupAdminHtmlTemplate = GroupService.compileTemplate(
-      "group/letters/group-admin.html"
+      "letters/group-admin.html"
     );
   }
 
@@ -105,10 +105,19 @@ export class GroupService extends BaseService {
     return group;
   }
 
-  readGroups(): Promise<Group[]> {
-    return this.groupRepo.find({
-      relations: ["type", "survey", "surveyResponses"],
-    });
+  readGroups() {
+    groupDebug("groupRepo %O", this.groupRepo);
+    return this.groupRepo
+      .find({
+        relations: ["type", "survey", "surveyResponses"],
+      })
+      .then((result) => {
+        groupDebug("readGroups %O", result);
+        return result;
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 
   readGroup(id: number): Promise<Group> {
