@@ -31,16 +31,21 @@ export class GroupService extends BaseService {
     super();
 
     this.groupAdminTextTemplate = GroupService.compileTemplate(
-      "letters/group-admin.txt"
+      "server/group/letters/group-admin.txt"
     );
     this.groupAdminHtmlTemplate = GroupService.compileTemplate(
-      "letters/group-admin.html"
+      "server/group/letters/group-admin.html"
     );
   }
 
-  private static compileTemplate(fileName: string) {
-    const templatePath = path.join(__dirname, fileName);
-    groupDebug("Compiling %s", templatePath);
+  /**
+   * Compile a template.
+   * @param relativePath Relative path to template from `.../dist/apps/`.
+   * @private
+   */
+  private static compileTemplate(relativePath: string) {
+    const templatePath = path.join(__dirname, "..", relativePath);
+    groupDebug("template '%s'", templatePath);
     return Handlebars.compile(readFileSync(templatePath, "utf-8"));
   }
 
@@ -106,7 +111,6 @@ export class GroupService extends BaseService {
   }
 
   readGroups() {
-    groupDebug("groupRepo %O", this.groupRepo);
     return this.groupRepo
       .find({
         relations: ["type", "survey", "surveyResponses"],

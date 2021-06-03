@@ -21,6 +21,7 @@ import {
   ScriptureEngagementPractice,
 } from "@server/src/prediction/entities";
 import { Image } from "@server/src/image/entities";
+import { Connection } from "typeorm";
 
 @Module({
   imports: [
@@ -52,4 +53,10 @@ import { Image } from "@server/src/image/entities";
     GroupModule,
   ],
 })
-export class CliModule {}
+export class CliModule {
+  // constructor(private connection: Connection) {
+  //   console.warn("name", connection.name);
+  //   console.warn("options", connection.options);
+  //   console.warn("connected", connection.isConnected);
+  // }
+}

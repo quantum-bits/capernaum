@@ -15,10 +15,7 @@
       "sourceRoot": "apps/server/src",
       "compilerOptions": {
         "tsConfigPath": "apps/server/tsconfig.app.json",
-        "assets": [
-          "**/group/letters/*.txt",
-          "**/group/letters/*.html"
-        ]
+        "assets": ["**/group/letters/*.txt", "**/group/letters/*.html"]
       }
     },
     "reporter": {
@@ -42,7 +39,7 @@
     "cli": {
       "type": "application",
       "root": "apps/cli",
-      "entryFile": "../bin/cap-cli",
+      "entryFile": "cap-cli",
       "sourceRoot": "apps/cli/src",
       "compilerOptions": {
         "tsConfigPath": "apps/cli/tsconfig.app.json"
