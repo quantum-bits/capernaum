@@ -1,126 +1,101 @@
 import { config } from "dotenv";
 config();
 
-import { NestFactory } from "@nestjs/core";
-import { CliModule } from "./cli.module";
-import { Command } from "commander";
-import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import { table } from "table";
+import { Command, Option } from "commander";
 import {
-  QualtricsSurveyList,
-  QualtricsSurveyMetadata,
-} from "@qapi/qualtrics-api.types";
-import { DateTime } from "luxon";
-import chalk = require("chalk");
-import { INestApplicationContext } from "@nestjs/common";
-import { GroupService } from "@server/src/group/group.service";
-import Debug from "debug";
-import ora from "ora";
-
-const debug = Debug("cli");
-
-interface SortableMetadata {
-  lastModified: DateTime;
-  metadata: QualtricsSurveyMetadata;
-}
-
-// Compare a and b and return -1, 0, or 1.
-const compareDateTimes = (a: DateTime, b: DateTime) =>
-  a < b ? -1 : a > b ? 1 : 0;
-
-function listSurveys(options) {
-  const qualtricsService = new QualtricsApiService();
-  const spinner = ora("Fetching surveys from Qualtrics").start();
-
-  qualtricsService.listSurveys().then((surveyList: QualtricsSurveyList) => {
-    const elements: SortableMetadata[] = surveyList.elements.map((element) => ({
-      lastModified: DateTime.fromISO(element.lastModified),
-      metadata: element,
-    }));
-    spinner.stop();
-
-    const headers = ["Id", "Name", "Last Modified"].map((hdr) =>
-      chalk.greenBright(hdr)
-    );
-    const data = [[...headers]];
-
-    const sortFn = (a: SortableMetadata, b: SortableMetadata) =>
-      options.byDate
-        ? compareDateTimes(a.lastModified, b.lastModified)
-        : a.metadata.name.localeCompare(b.metadata.name);
-
-    elements.sort(sortFn).forEach((elt) => {
-      data.push([
-        elt.metadata.id,
-        elt.metadata.name,
-        elt.lastModified.toISODate(),
-      ]);
-    });
-    console.log(table(data));
-  });
-}
-
-function showOrg() {
-  const qualtricsService = new QualtricsApiService();
-
-  if (process.env.QUALTRICS_ORG_ID) {
-    qualtricsService
-      .getOrganization(process.env.QUALTRICS_ORG_ID)
-      .then((organization) => {
-        const data = [
-          ["Id", organization.id],
-          ["Name", organization.name],
-          ["Type", organization.type],
-          ["Status", organization.status],
-        ];
-        const options = {
-          drawHorizontalLine: (index: number, size: number) => {
-            return index === 0 || index === size;
-          },
-        };
-        console.log(table(data, options));
-      })
-      .catch((error) => console.error(error));
-  } else {
-    throw new Error("No organization ID");
-  }
-}
-
-async function listGroups() {
-  const app: INestApplicationContext =
-    await NestFactory.createApplicationContext(CliModule);
-  const groupService: GroupService = app.get(GroupService);
-
-  const groups = await groupService.readGroups();
-  debug("groups %O", groups);
-
-  const headers = ["ID", "Name", "Admin", "Code"];
-  const data = groups.map((grp) => [
-    grp.id.toString(),
-    grp.name,
-    [grp.adminFirstName, grp.adminLastName].join(" "),
-    grp.codeWord,
-  ]);
-  data.unshift(headers);
-  console.log(table(data));
-  await app.close();
-}
+  createSubscription,
+  deleteSubscription,
+  getResponse,
+  getSubscription,
+  getSurvey,
+  listGroups,
+  listSubscriptions,
+  listSurveys,
+  showOrg,
+} from "./commands";
+import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
 const program = new Command();
 program.version("0.0.1");
 
-const org = program.command("org").description("Qualtrics organization");
-org
-  .command("show", { isDefault: true })
-  .description("show organization details")
+// Org
+program
+  .command("org")
+  .description("show Qualtrics organization details")
   .action(showOrg);
 
-program
-  .command("survey")
+// Survey
+const surveyCommands = program.command("survey").description("survey commands");
+
+surveyCommands
+  .command("list")
   .option("--by-date", "sort by date")
   .description("list all surveys")
   .action(listSurveys);
 
+surveyCommands
+  .command("get <survey-id>")
+  .description("get survey by ID", {
+    "survey-id": "survey ID (SV_...)",
+  })
+  .action(getSurvey);
+
+// Group
 program.command("group").description("list all groups").action(listGroups);
 
+// Response
+program
+  .command("response <survey-id> [response-id]")
+  .description("get response(s)", {
+    "survey-id": "survey ID (SV_...)",
+    "response-id": "response ID (R_...)",
+  })
+  .option("--start-date", "start date (YYYY-MM-DD)")
+  .option("--end-date", "end date (YYYY-MM-DD)")
+  .action(getResponse);
+
+// Subscription
+
+function validEventNames(): string[] {
+  const factory = new WebhookEventFactory();
+  return factory.validNameArray();
+}
+
+const subscriptionCommands = program
+  .command("subscription")
+  .description("event subscription commands");
+
+subscriptionCommands
+  .command("list")
+  .description("list all subscriptions")
+  .action(listSubscriptions);
+
+subscriptionCommands
+  .command("get <subscription-id>")
+  .description("get subscription with ID", {
+    "subscription-id": "subscription ID (SUB_...)",
+  })
+  .action(getSubscription);
+
+subscriptionCommands
+  .command("create <publication-url> <survey-id>")
+  .addOption(
+    new Option("--topic <name>", "topic to subscribe")
+      .choices(validEventNames())
+      .makeOptionMandatory()
+  )
+  .description("subscribe to an event", {
+    "publication-url": "public URL to notify",
+    "survey-id": "survey ID (SV_...)",
+  })
+  .action(createSubscription);
+
+subscriptionCommands
+  .command("delete <subscription-id>")
+  .description("delete an event subscription", {
+    "subscription-id": "subscription ID (SUB_...)",
+  })
+  .action(deleteSubscription);
+
+// Do it.
 program.parse();

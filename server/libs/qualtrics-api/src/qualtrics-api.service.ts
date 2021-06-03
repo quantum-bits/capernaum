@@ -25,6 +25,7 @@ import {
   QualtricsSubscription,
 } from "@server/src/qualtrics/entities";
 import tunnel from "tunnel";
+import * as events from "events";
 
 const qualtricsDebug = debug("qualtrics");
 
@@ -63,8 +64,12 @@ export class WebhookEventFactory {
     },
   ];
 
+  validNameArray(): string[] {
+    return this.webhookEvents.map((event) => event.name);
+  }
+
   validNames(): string {
-    return this.webhookEvents.map((event) => event.name).join(", ");
+    return this.validNameArray().join(", ");
   }
 
   makeEvent(name: string, surveyId?: string): string {
