@@ -12,6 +12,7 @@ import {
   listSubscriptions,
   listSurveys,
   showOrg,
+  getGroup,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -41,7 +42,17 @@ surveyCommands
   .action(getSurvey);
 
 // Group
-program.command("group").description("list all groups").action(listGroups);
+const groupCommands = program.command("group").description("group commands");
+
+groupCommands.command("list").description("list all groups").action(listGroups);
+
+groupCommands
+  .command("get <code-word>")
+  .option("--with-responses", "include all responses for group")
+  .description("get group by code word", {
+    "code-word": "code word for group",
+  })
+  .action(getGroup);
 
 // Response
 program
