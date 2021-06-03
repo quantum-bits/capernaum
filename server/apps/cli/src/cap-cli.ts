@@ -15,6 +15,7 @@ import chalk = require("chalk");
 import { INestApplicationContext } from "@nestjs/common";
 import { GroupService } from "@server/src/group/group.service";
 import Debug from "debug";
+import ora from "ora";
 
 const debug = Debug("cli");
 
@@ -27,15 +28,16 @@ interface SortableMetadata {
 const compareDateTimes = (a: DateTime, b: DateTime) =>
   a < b ? -1 : a > b ? 1 : 0;
 
-function listSurveys() {
+function listSurveys(options) {
   const qualtricsService = new QualtricsApiService();
-  const byDate = false;
+  const spinner = ora("Fetching surveys from Qualtrics").start();
 
   qualtricsService.listSurveys().then((surveyList: QualtricsSurveyList) => {
     const elements: SortableMetadata[] = surveyList.elements.map((element) => ({
       lastModified: DateTime.fromISO(element.lastModified),
       metadata: element,
     }));
+    spinner.stop();
 
     const headers = ["Id", "Name", "Last Modified"].map((hdr) =>
       chalk.greenBright(hdr)
@@ -43,7 +45,7 @@ function listSurveys() {
     const data = [[...headers]];
 
     const sortFn = (a: SortableMetadata, b: SortableMetadata) =>
-      byDate
+      options.byDate
         ? compareDateTimes(a.lastModified, b.lastModified)
         : a.metadata.name.localeCompare(b.metadata.name);
 
@@ -107,17 +109,18 @@ async function listGroups() {
 const program = new Command();
 program.version("0.0.1");
 
-program
-  .command("org")
-  .description("Qualtrics organization details")
+const org = program.command("org").description("Qualtrics organization");
+org
+  .command("show", { isDefault: true })
+  .description("show organization details")
   .action(showOrg);
 
 program
   .command("survey")
-  .option("--by-date")
-  .description("List all surveys")
+  .option("--by-date", "sort by date")
+  .description("list all surveys")
   .action(listSurveys);
 
-program.command("group").action(listGroups);
+program.command("group").description("list all groups").action(listGroups);
 
-program.parse(process.argv);
+program.parse();
