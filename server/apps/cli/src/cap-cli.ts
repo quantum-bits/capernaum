@@ -13,6 +13,7 @@ import {
   listSurveys,
   showOrg,
   getGroup,
+  graphQLQuery,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -107,6 +108,11 @@ subscriptionCommands
     "subscription-id": "subscription ID (SUB_...)",
   })
   .action(deleteSubscription);
+
+program
+  .command("gql <query-string>")
+  .description("Run a GraphQL query")
+  .action(graphQLQuery);
 
 // Do it.
 program.parse();
