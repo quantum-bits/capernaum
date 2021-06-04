@@ -18,7 +18,6 @@ import {
 } from "@qapi/qualtrics-api.types";
 import { Injectable } from "@nestjs/common";
 
-import debug from "debug";
 import got, { Got, Options } from "got";
 import {
   QualtricsOrganization,
@@ -26,8 +25,9 @@ import {
 } from "@server/src/qualtrics/entities";
 import tunnel from "tunnel";
 import * as events from "events";
+import { getDebugger } from "@helpers/debug-factory";
 
-const qualtricsDebug = debug("qualtrics");
+const qualtricsDebug = getDebugger("qualtrics");
 
 interface WebhookEvent {
   name: string;

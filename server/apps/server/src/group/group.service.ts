@@ -13,11 +13,11 @@ import Handlebars = require("handlebars");
 import { readFileSync } from "fs";
 import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
-import debug from "debug";
 import * as path from "path";
 import { DateTime } from "luxon";
+import { getDebugger } from '@helpers/debug-factory'
 
-const groupDebug = debug("group");
+const groupDebug = getDebugger("group");
 
 @Injectable()
 export class GroupService extends BaseService {

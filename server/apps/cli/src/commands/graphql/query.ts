@@ -7,10 +7,10 @@ import { TypeKind } from "graphql";
 import prettyFormat from "pretty-format";
 
 import PrettyError = require("pretty-error");
+import { getDebugger } from "@helpers/debug-factory";
 PrettyError.start();
 
-import debugFactory from "debug";
-const debug = debugFactory("query");
+const debug = getDebugger("query");
 
 export default class Query {
   //extends Command {

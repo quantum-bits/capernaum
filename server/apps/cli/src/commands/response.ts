@@ -1,13 +1,10 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-
-import Debug from "debug";
-import { INestApplicationContext } from "@nestjs/common";
-import { NestFactory } from "@nestjs/core";
-import { CliModule } from "@common/cli/src/cli.module";
-import { GroupService } from "@server/src/group/group.service";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
-const debug = Debug("response");
+import NestContext from "@common/cli/src/nest-helpers";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("response");
 
 export function getResponse(surveyId: string, responseId: string, options) {
   const qualtricsService = new QualtricsApiService();
@@ -31,11 +28,10 @@ export function getResponse(surveyId: string, responseId: string, options) {
 }
 
 export async function getGroupResponses(groupId: number) {
-  const app: INestApplicationContext =
-    await NestFactory.createApplicationContext(CliModule);
-  const surveyService: SurveyService = app.get(SurveyService);
+  const nestContext = new NestContext();
+  const surveyService: SurveyService = await nestContext.get(SurveyService);
   const responses = surveyService.readSurveyResponses(groupId);
-  await app.close();
+  await nestContext.close();
 
   console.log(JSON.stringify(responses));
 }
@@ -45,13 +41,12 @@ export async function getGroupResponses(groupId: number) {
  * @param surveyId ID of survey
  */
 export async function importSurveyResponses(surveyId: string) {
-  const app: INestApplicationContext =
-    await NestFactory.createApplicationContext(CliModule);
-  const qualtricsResolver = app.get(QualtricsResolver);
+  const nestContext = new NestContext();
+  const qualtricsResolver = await nestContext.get(QualtricsResolver);
   const result = await qualtricsResolver.importQualtricsSurveyResponses(
     surveyId
   );
-  await app.close();
+  await nestContext.close();
 
   console.log("RESULT", result);
 }

@@ -11,8 +11,8 @@ import {
 } from "typeorm";
 import { UserRole } from "./user-role";
 import { hashPassword } from "../../auth/crypto";
-import Debug from "debug";
-const debug = Debug("user");
+import { getDebugger } from "@helpers/debug-factory";
+const debug = getDebugger("user");
 
 @Entity()
 @ObjectType()

@@ -17,7 +17,8 @@
       "@server/*": ["apps/server/*"],
       "@reporter/*": ["apps/reporter/*"],
       "@common/*": ["apps/*"],
-      "@qapi/*": ["libs/qualtrics-api/src/*"]
+      "@qapi/*": ["libs/qualtrics-api/src/*"],
+      "@helpers/*": ["helpers/*"]
     }
   }
 }

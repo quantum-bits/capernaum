@@ -1,7 +1,7 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import Debug from "debug";
+import { getDebugger } from "@helpers/debug-factory";
 
-const debug = Debug("subscription");
+const debug = getDebugger("subscription");
 
 export function createSubscription(
   publicationUrl: string,

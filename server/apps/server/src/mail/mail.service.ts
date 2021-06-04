@@ -1,11 +1,11 @@
-import debug from "debug";
 import { Injectable, Logger } from "@nestjs/common";
 import { SentMessageInfo, Transporter, createTransport } from "nodemailer";
 import Mail = require("nodemailer/lib/mailer");
 import SMTPTransport = require("nodemailer/lib/smtp-transport");
 import { SendMailInput } from "./entities";
+import { getDebugger } from "@helpers/debug-factory";
 
-const mailDebug = debug("mail");
+const mailDebug = getDebugger("mail");
 
 @Injectable()
 export class MailService {

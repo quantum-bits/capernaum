@@ -1,7 +1,7 @@
 import { GroupTypeModel } from "./models/group-type.model";
 import { AbstractFixture } from "./abstract-fixture";
+import { getDebugger } from "@helpers/debug-factory";
 
-import { getDebugger } from "./debug-factory";
 const debug = getDebugger("group");
 
 export class GroupTypeFixture extends AbstractFixture {

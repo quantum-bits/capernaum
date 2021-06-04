@@ -1,6 +1,6 @@
 import Debug, { Debugger } from "debug";
 
-const PREFIX = "fixture";
+const PREFIX = "cap:server";
 
 interface DebugCache {
   [name: string]: Debugger;

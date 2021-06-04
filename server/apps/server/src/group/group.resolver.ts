@@ -18,9 +18,9 @@ import {
   GroupType,
 } from "@server/src/group/entities";
 import { SurveyService } from "@server/src/survey/survey.service";
+import { getDebugger } from "@helpers/debug-factory";
 
-import debug from "debug";
-const groupDebug = debug("group");
+const groupDebug = getDebugger("group");
 
 @Resolver(() => Group)
 export class GroupResolver {

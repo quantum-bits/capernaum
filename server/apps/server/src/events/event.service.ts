@@ -5,9 +5,9 @@ import { Event, EventCreateInput } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NEW_EVENT_TRIGGER_NAME, PUB_SUB_PROVIDER } from "./event.types";
 import { PubSub } from "graphql-subscriptions";
+import { getDebugger } from "@helpers/debug-factory";
 
-import debug from "debug";
-const eventDebug = debug("events");
+const eventDebug = getDebugger("events");
 
 @Injectable()
 export class EventService extends BaseService {

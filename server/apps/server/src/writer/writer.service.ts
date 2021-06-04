@@ -15,9 +15,9 @@ import { LetterService } from "../letter/letter.service";
 import { SurveyService } from "../survey/survey.service";
 import { GroupService } from "../group/group.service";
 import * as IsEmail from "isemail";
+import { getDebugger } from "@helpers/debug-factory";
 
-import debug from "debug";
-const letterDebug = debug("letter");
+const letterDebug = getDebugger("letter");
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];

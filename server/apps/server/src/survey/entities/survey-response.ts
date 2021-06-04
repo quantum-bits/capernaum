@@ -8,10 +8,10 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Prediction, PredictionDetails } from "../survey.types";
 import { ResponseSummary } from "./survey-response-summary";
 import { Group } from "../../group/entities";
-import debug from "debug";
 import { SurveyDimension } from "@server/src/survey/entities/survey-dimension";
+import { getDebugger } from "@helpers/debug-factory";
 
-const surveyDebug = debug("survey");
+const surveyDebug = getDebugger("survey");
 
 /**
  * Encapsulate the prediction for a single SE practice.

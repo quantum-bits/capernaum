@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client/core";
 import prettyFormat from "pretty-format";
-import Debug from "debug";
 import { Command } from "commander";
 import { graphqlClient } from "./graphql-client";
+import { getDebugger } from "@helpers/debug-factory";
 
-const debug = Debug("graphql");
+const debug = getDebugger("graphql");
 
 export function graphQLQuery(queryString: string, options, command: Command) {
   debug("queryString '%s'", queryString);

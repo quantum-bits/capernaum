@@ -28,10 +28,10 @@ import {
 import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
-import debug from "debug";
 import { Letter } from "@server/src/letter/entities";
+import { getDebugger } from "@helpers/debug-factory";
 
-const surveyDebug = debug("survey");
+const surveyDebug = getDebugger("survey");
 
 @Injectable()
 export class SurveyService extends BaseService {

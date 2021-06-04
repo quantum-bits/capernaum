@@ -1,8 +1,8 @@
 import { Model } from "objection";
 import { LetterElementTypeModel } from "./letter-element-type.model";
 import { LetterModel } from "./letter.model";
+import { getDebugger } from "@helpers/debug-factory";
 
-import { getDebugger } from "../debug-factory";
 const debug = getDebugger("letter");
 
 export class LetterTypeModel extends Model {

@@ -34,6 +34,7 @@ const surveyCommands = program.command("survey").description("survey commands");
 surveyCommands
   .command("list")
   .option("--by-date", "sort by date")
+  .option("--all", "show all, active and inactive")
   .description("list all surveys")
   .action(listSurveys);
 

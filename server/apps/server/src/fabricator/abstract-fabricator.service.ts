@@ -3,9 +3,9 @@ import _ from "lodash";
 import { EntityManager } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import pluralize from "pluralize";
-import Debug from "debug";
+import { getDebugger } from "@helpers/debug-factory";
 
-const debug = Debug("test:abstract");
+const debug = getDebugger("test:abstract");
 
 export type FabricatedData = { [key: string]: string | number | boolean };
 
@@ -70,6 +70,6 @@ export abstract class AbstractFabricatorService {
       throw new ReferenceError(messages.join("\n"));
     }
 
-    return (data as unknown) as Entity;
+    return data as unknown as Entity;
   }
 }
