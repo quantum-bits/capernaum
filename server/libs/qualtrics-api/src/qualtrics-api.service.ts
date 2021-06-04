@@ -24,7 +24,6 @@ import {
   QualtricsSubscription,
 } from "@server/src/qualtrics/entities";
 import tunnel from "tunnel";
-import * as events from "events";
 import { getDebugger } from "@helpers/debug-factory";
 
 const qualtricsDebug = getDebugger("qualtrics");

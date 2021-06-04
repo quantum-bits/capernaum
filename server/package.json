@@ -9,7 +9,7 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "load-fixtures": "DEBUG=cap:* ts-node -r tsconfig-paths/register fixtures/main.ts",
-    "cli": "nest start cli",
+    "cli": "node ./dist/apps/cli/cap-cli.js",
     "cli:build": "nest build cli",
     "cli:dev": "nest build cli --watch",
     "reporter": "nest start reporter",

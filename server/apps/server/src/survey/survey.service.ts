@@ -30,12 +30,15 @@ import { QualtricsImportedResponse, WhichItems } from "./survey.types";
 import { BaseService } from "../shared/base.service";
 import { Letter } from "@server/src/letter/entities";
 import { getDebugger } from "@helpers/debug-factory";
+import { GroupService } from "@server/src/group/group.service";
 
 const surveyDebug = getDebugger("survey");
 
 @Injectable()
 export class SurveyService extends BaseService {
   constructor(
+    private readonly groupService: GroupService,
+
     @InjectRepository(Survey)
     private readonly surveyRepo: Repository<Survey>,
     @InjectRepository(SurveyDimension)
@@ -443,7 +446,7 @@ export class SurveyService extends BaseService {
           "Delete previously imported response %s",
           createInput.responseId
         );
-        SurveyService._deleteSurveyResponse(manager, previousImport.id);
+        await SurveyService._deleteSurveyResponse(manager, previousImport.id);
       }
 
       // Load the survey and its items from the database.
@@ -451,12 +454,21 @@ export class SurveyService extends BaseService {
         relations: ["surveyItems"],
       });
 
+      // If this response has a group code, associate it with the group.
+      const codeWord = createInput.values[survey.groupCodeKey];
+      let group = null;
+      if (codeWord) {
+        group = await this.groupService.findGroupByCodeWord(codeWord);
+      }
+      surveyDebug("Code word '%s', group %O", codeWord, group);
+
       // Save response metadata to the database.
       const newSurveyResponse = await surveyResponseRepo.save(
         surveyResponseRepo.create({
           survey,
           email: createInput.values[survey.emailKey] || "??",
-          codeWord: createInput.values[survey.groupCodeKey] || "??",
+          codeWord: codeWord || "??",
+          group,
           qualtricsResponseId: createInput.responseId || "??",
           startDate: createInput.values["startDate"] || "??",
           endDate: createInput.values["endDate"] || "??",

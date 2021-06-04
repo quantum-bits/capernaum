@@ -11,7 +11,6 @@ import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { MachineModule } from "./machine/machine.module";
 import { GroupModule } from "./group/group.module";
-import { Connection } from "typeorm";
 //import { FabricatorModule } from "./fabricator/fabricator.module";
 
 @Module({
@@ -36,10 +35,4 @@ import { Connection } from "typeorm";
     //FabricatorModule,
   ],
 })
-export class AppModule {
-  constructor(private connection: Connection) {
-    console.warn("name", connection.name);
-    console.warn("options", connection.options);
-    console.warn("connected", connection.isConnected);
-  }
-}
+export class AppModule {}

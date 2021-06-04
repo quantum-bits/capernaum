@@ -15,7 +15,7 @@ import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
 import * as path from "path";
 import { DateTime } from "luxon";
-import { getDebugger } from '@helpers/debug-factory'
+import { getDebugger } from "@helpers/debug-factory";
 
 const groupDebug = getDebugger("group");
 
@@ -25,8 +25,9 @@ export class GroupService extends BaseService {
   private readonly groupAdminHtmlTemplate;
 
   constructor(
-    @InjectRepository(Group) private readonly groupRepo: Repository<Group>,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    @InjectRepository(Group)
+    private readonly groupRepo: Repository<Group>
   ) {
     super();
 

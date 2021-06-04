@@ -75,7 +75,7 @@ export class SurveyResponse extends AbstractEntity {
     nullable: true,
     description: "Group for this response (if any)",
   })
-  group: Group;
+  group?: Group;
 
   @Column("int") surveyId: number;
   @ManyToOne(() => Survey, (survey) => survey.surveyItems)
