@@ -1,5 +1,8 @@
 import { Model } from "objection";
 import { GroupModel } from "./group.model";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("group");
 
 export class GroupTypeModel extends Model {
   id: number;
@@ -22,6 +25,7 @@ export class GroupTypeModel extends Model {
   });
 
   static async beforeDelete({ asFindQuery, transaction }) {
+    debug("Delete groups");
     await GroupModel.query(transaction)
       .delete()
       .whereIn("typeId", asFindQuery().select("id"));

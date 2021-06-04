@@ -6,12 +6,12 @@ const debug = getDebugger("group");
 
 export class GroupTypeFixture extends AbstractFixture {
   delete() {
-    debug("Deleting group type graph");
+    debug("Delete group type graph");
     return GroupTypeModel.query().delete();
   }
 
   insert() {
-    debug("Inserting group types");
+    debug("Insert group types");
     return GroupTypeModel.query().insertGraph([
       {
         seq: 5,
