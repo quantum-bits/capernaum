@@ -4,10 +4,11 @@ import { CliModule } from "@common/cli/src/cli.module";
 import { GroupService } from "@server/src/group/group.service";
 import { Group } from "@server/src/group/entities";
 import { table } from "table";
-
 import Debug from "debug";
 import { SurveyService } from "@server/src/survey/survey.service";
 import { SurveyResponse } from "@server/src/survey/entities";
+import prettyFormat from "pretty-format";
+
 const debug = Debug("group");
 
 export async function listGroups() {
@@ -46,5 +47,5 @@ export async function getGroup(codeWord: string, options) {
 
   await app.close();
 
-  console.log(JSON.stringify(result));
+  console.log(prettyFormat(result));
 }

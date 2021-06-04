@@ -64,6 +64,7 @@
     "pg": "^8.6.0",
     "pify": "^5.0.0",
     "pluralize": "^8.0.0",
+    "pretty-error": "^3.0.3",
     "prom-client": "^13.1.0",
     "quill-delta": "^4.2.2",
     "quill-delta-to-html": "^0.12.0",

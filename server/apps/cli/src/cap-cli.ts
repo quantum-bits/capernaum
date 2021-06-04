@@ -5,15 +5,17 @@ import { Command, Option } from "commander";
 import {
   createSubscription,
   deleteSubscription,
+  getGroup,
   getResponse,
   getSubscription,
   getSurvey,
+  graphQLQuery,
+  importSurvey,
+  importSurveyResponses,
   listGroups,
   listSubscriptions,
   listSurveys,
   showOrg,
-  getGroup,
-  graphQLQuery,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -42,6 +44,11 @@ surveyCommands
   })
   .action(getSurvey);
 
+surveyCommands
+  .command("import <survey-id>")
+  .description("import survey by ID", { "survey-id": "survey ID (SV_...)" })
+  .action(importSurvey);
+
 // Group
 const groupCommands = program.command("group").description("group commands");
 
@@ -56,8 +63,12 @@ groupCommands
   .action(getGroup);
 
 // Response
-program
-  .command("response <survey-id> [response-id]")
+const responseCommands = program
+  .command("response")
+  .description("survey response commands");
+
+responseCommands
+  .command("get <survey-id> [response-id]")
   .description("get response(s)", {
     "survey-id": "survey ID (SV_...)",
     "response-id": "response ID (R_...)",
@@ -65,6 +76,13 @@ program
   .option("--start-date", "start date (YYYY-MM-DD)")
   .option("--end-date", "end date (YYYY-MM-DD)")
   .action(getResponse);
+
+responseCommands
+  .command("import <survey-id>")
+  .description("import responses to survey", {
+    "survey-id": "survey ID (SV_...)",
+  })
+  .action(importSurveyResponses);
 
 // Subscription
 

@@ -7,6 +7,10 @@ import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import ora from "ora";
 import { table } from "table";
 import chalk from "chalk";
+import { INestApplicationContext } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { CliModule } from "@common/cli/src/cli.module";
+import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
 
 interface SortableMetadata {
   lastModified: DateTime;
@@ -55,4 +59,18 @@ export function getSurvey(surveyId: string) {
   qualtricsService
     .getSurvey(surveyId)
     .then((survey) => console.log(JSON.stringify(survey)));
+}
+
+/**
+ * Import a survey.
+ * @param surveyId ID of survey to import
+ */
+export async function importSurvey(surveyId: string) {
+  const app: INestApplicationContext =
+    await NestFactory.createApplicationContext(CliModule);
+  const qualtricsResolver = app.get(QualtricsResolver);
+  const result = await qualtricsResolver.importQualtricsSurvey(surveyId);
+  await app.close();
+
+  console.log("RESULT", result);
 }

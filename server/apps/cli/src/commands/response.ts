@@ -6,6 +6,7 @@ import { NestFactory } from "@nestjs/core";
 import { CliModule } from "@common/cli/src/cli.module";
 import { GroupService } from "@server/src/group/group.service";
 import { SurveyService } from "@server/src/survey/survey.service";
+import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
 const debug = Debug("response");
 
 export function getResponse(surveyId: string, responseId: string, options) {
@@ -37,4 +38,20 @@ export async function getGroupResponses(groupId: number) {
   await app.close();
 
   console.log(JSON.stringify(responses));
+}
+
+/**
+ * Import responses for a survey.
+ * @param surveyId ID of survey
+ */
+export async function importSurveyResponses(surveyId: string) {
+  const app: INestApplicationContext =
+    await NestFactory.createApplicationContext(CliModule);
+  const qualtricsResolver = app.get(QualtricsResolver);
+  const result = await qualtricsResolver.importQualtricsSurveyResponses(
+    surveyId
+  );
+  await app.close();
+
+  console.log("RESULT", result);
 }
