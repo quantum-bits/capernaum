@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 config();
 
+import { knex } from "./models/db";
+
 import { Command, Option } from "commander";
 import {
   createSubscription,
@@ -17,6 +19,7 @@ import {
   listSurveys,
   predictEngagement,
   showOrg,
+  simpleFixture,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -150,10 +153,18 @@ responseCommands
   })
   .action(predictEngagement);
 
+// Fixture
+
+const fixtureCommands = program
+  .command("fixture")
+  .description("fixture loader commands");
+
+fixtureCommands.command("simple").action(simpleFixture);
+
 program
   .command("gql <query-string>")
   .description("Run a GraphQL query")
   .action(graphQLQuery);
 
 // Do it.
-program.parse();
+program.parseAsync().then(() => knex.destroy());
