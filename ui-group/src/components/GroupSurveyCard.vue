@@ -91,7 +91,7 @@ export default Vue.extend({
       this.$apollo
         .query<FindGroup, FindGroupVariables>({
           query: FIND_GROUP,
-          variables: { codeWord: this.codeWord },
+          variables: { codeWord: this.codeWord.trim() },
         })
         .then((result) => {
           const group = result.data.findGroupByCodeWord;
@@ -107,7 +107,7 @@ export default Vue.extend({
             this.codeWordValid = false;
           }
 
-          this.alert.visible = this.codeWord.length > 0;
+          this.alert.visible = this.codeWord.trim().length > 0;
         });
     },
   },
@@ -121,7 +121,7 @@ export default Vue.extend({
       }
 
       const group_survey_url = new URL(survey_url);
-      group_survey_url.searchParams.append("GROUP_CODE_WORD", this.codeWord);
+      group_survey_url.searchParams.append("GROUP_CODE_WORD", this.codeWord.trim());
       return group_survey_url.toString();
     },
   },
