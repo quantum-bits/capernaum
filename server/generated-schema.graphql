@@ -400,6 +400,22 @@ type ResponseSummary {
   predictionSummaries: [PredictionSummary!]!
 }
 
+type Envelope {
+  from: String!
+  to: [String!]!
+}
+
+type SendMailResponse {
+  accepted: [String!]!
+  rejected: [String!]!
+  envelopeTime: Float!
+  messageTime: Float!
+  messageSize: Float!
+  response: String!
+  envelope: Envelope!
+  messageId: String!
+}
+
 type UserRole {
   """Unique ID for this entity"""
   id: Int!
@@ -427,22 +443,6 @@ type UserPayload {
 type LoginResponse {
   accessToken: String!
   user: UserPayload!
-}
-
-type Envelope {
-  from: String!
-  to: [String!]!
-}
-
-type SendMailResponse {
-  accepted: [String!]!
-  rejected: [String!]!
-  envelopeTime: Float!
-  messageTime: Float!
-  messageSize: Float!
-  response: String!
-  envelope: Envelope!
-  messageId: String!
 }
 
 type Event {
@@ -524,6 +524,10 @@ type Query {
     """Limit to one group"""
     groupId: Int
   ): [SurveyResponse!]!
+  readGroups: [Group!]!
+  readGroup(id: Int!): Group
+  findGroupByCodeWord(codeWord: String!): Group
+  readGroupTypes: [GroupType!]!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   user(id: Int!): User!
@@ -540,10 +544,6 @@ type Query {
   subscriptions: [QualtricsSubscription!]!
   events: [Event!]!
   machines: [Machine!]!
-  readGroups: [Group!]!
-  readGroup(id: Int!): Group
-  findGroupByCodeWord(codeWord: String!): Group
-  readGroupTypes: [GroupType!]!
 }
 
 type Mutation {
@@ -579,6 +579,10 @@ type Mutation {
 
   """Delete a survey response"""
   deleteSurveyResponse(id: Int!): Int!
+  createGroup(createInput: GroupCreateInput!): Group!
+  updateGroup(updateInput: GroupUpdateInput!): Group!
+  deleteGroup(id: Int!): Int!
+  sendLetter(mailInput: SendMailInput!): SendMailResponse!
   createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
   replacePredictionTableEntries(replaceInput: PredictionTableEntryReplaceInput!): [PredictionTableEntry!]!
 
@@ -591,7 +595,6 @@ type Mutation {
   updateUser(updateInput: UserUpdateInput!): User!
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
-  sendLetter(mailInput: SendMailInput!): SendMailResponse!
   writeLetter(writerInput: WriterInput!): WriterOutput!
   createLetter(createInput: LetterCreateInput!): Letter!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
@@ -617,9 +620,6 @@ type Mutation {
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
-  createGroup(createInput: GroupCreateInput!): Group!
-  updateGroup(updateInput: GroupUpdateInput!): Group!
-  deleteGroup(id: Int!): Int!
 }
 
 input SurveyCreateInput {
@@ -692,6 +692,80 @@ input SurveyIndexUpdateInput {
   useForPredictions: Boolean
 }
 
+input GroupCreateInput {
+  """Group name"""
+  name: String!
+
+  """Type of group"""
+  typeId: Int!
+
+  """Name for 'other' type """
+  otherTypeName: String
+
+  """Date when survey closes"""
+  closedAfter: String!
+
+  """Group administrator first name"""
+  adminFirstName: String!
+
+  """Group administrator last name"""
+  adminLastName: String!
+
+  """Group administrator email address"""
+  adminEmail: String!
+
+  """Comments from administrator"""
+  adminComments: String!
+
+  """Planned invitee count"""
+  plannedInvitees: Int!
+  surveyId: Int!
+}
+
+input GroupUpdateInput {
+  id: Int!
+
+  """Group name"""
+  name: String
+
+  """Type of group"""
+  typeId: Int
+
+  """Name for 'other' type """
+  otherTypeName: String
+
+  """Date when survey closes"""
+  closedAfter: String
+
+  """Group administrator first name"""
+  adminFirstName: String
+
+  """Group administrator last name"""
+  adminLastName: String
+
+  """Group administrator email address"""
+  adminEmail: String
+
+  """Survey code word used by group"""
+  codeWord: String
+
+  """Comments from administrator"""
+  adminComments: String
+
+  """Planned invitee count"""
+  plannedInvitees: Int
+  surveyId: Int
+}
+
+input SendMailInput {
+  from: String
+  to: String!
+  subject: String!
+  textContent: String!
+  htmlContent: String
+  attachmentPath: String
+}
+
 input PredictionTableEntryCreateInput {
   surveyIndexId: Int!
   practiceId: Int!
@@ -755,15 +829,6 @@ input ChangePasswordInput {
 input UserRoleCreateInput {
   name: String!
   description: String!
-}
-
-input SendMailInput {
-  from: String
-  to: String!
-  subject: String!
-  textContent: String!
-  htmlContent: String
-  attachmentPath: String
 }
 
 input WriterInput {
@@ -846,71 +911,6 @@ input MachineCreateInput {
   name: String!
   hostName: String!
   active: Boolean!
-}
-
-input GroupCreateInput {
-  """Group name"""
-  name: String!
-
-  """Type of group"""
-  typeId: Int!
-
-  """Name for 'other' type """
-  otherTypeName: String
-
-  """Date when survey closes"""
-  closedAfter: String!
-
-  """Group administrator first name"""
-  adminFirstName: String!
-
-  """Group administrator last name"""
-  adminLastName: String!
-
-  """Group administrator email address"""
-  adminEmail: String!
-
-  """Comments from administrator"""
-  adminComments: String!
-
-  """Planned invitee count"""
-  plannedInvitees: Int!
-  surveyId: Int!
-}
-
-input GroupUpdateInput {
-  id: Int!
-
-  """Group name"""
-  name: String
-
-  """Type of group"""
-  typeId: Int
-
-  """Name for 'other' type """
-  otherTypeName: String
-
-  """Date when survey closes"""
-  closedAfter: String
-
-  """Group administrator first name"""
-  adminFirstName: String
-
-  """Group administrator last name"""
-  adminLastName: String
-
-  """Group administrator email address"""
-  adminEmail: String
-
-  """Survey code word used by group"""
-  codeWord: String
-
-  """Comments from administrator"""
-  adminComments: String
-
-  """Planned invitee count"""
-  plannedInvitees: Int
-  surveyId: Int
 }
 
 type Subscription {

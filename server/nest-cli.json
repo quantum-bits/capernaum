@@ -35,6 +35,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/qualtrics-api/tsconfig.lib.json"
       }
+    },
+    "cli": {
+      "type": "application",
+      "root": "apps/cli",
+      "entryFile": "cap-cli",
+      "sourceRoot": "apps/cli/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/cli/tsconfig.app.json"
+      }
     }
   }
 }

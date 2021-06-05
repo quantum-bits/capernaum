@@ -18,15 +18,15 @@ import {
 } from "@qapi/qualtrics-api.types";
 import { Injectable } from "@nestjs/common";
 
-import debug from "debug";
 import got, { Got, Options } from "got";
 import {
   QualtricsOrganization,
   QualtricsSubscription,
 } from "@server/src/qualtrics/entities";
 import tunnel from "tunnel";
+import { getDebugger } from "@helpers/debug-factory";
 
-const qualtricsDebug = debug("qualtrics");
+const qualtricsDebug = getDebugger("qualtrics");
 
 interface WebhookEvent {
   name: string;
@@ -63,8 +63,12 @@ export class WebhookEventFactory {
     },
   ];
 
+  validNameArray(): string[] {
+    return this.webhookEvents.map((event) => event.name);
+  }
+
   validNames(): string {
-    return this.webhookEvents.map((event) => event.name).join(", ");
+    return this.validNameArray().join(", ");
   }
 
   makeEvent(name: string, surveyId?: string): string {

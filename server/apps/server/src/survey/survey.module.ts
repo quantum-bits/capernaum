@@ -1,4 +1,4 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   SurveyDimensionResolver,
@@ -19,6 +19,7 @@ import {
 } from "./entities";
 import { registerEnumType } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
+import { GroupModule } from "@server/src/group/group.module";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { WhichItems } from "./survey.types";
       SurveyItemResponse,
       SurveyItem,
     ]),
+    GroupModule,
   ],
   providers: [
     SurveyService,

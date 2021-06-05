@@ -54,19 +54,22 @@ export class ReportQueueConsumer {
     qualtricsDebug("qualtricsResponse - %O", qualtricsResponse);
 
     // Store it locally.
-    const importedResponse = await this.surveyService.importQualtricsSurveyResponse(
-      survey.id,
-      qualtricsResponse as QualtricsSurveyResponse
-    );
+    const importedResponse =
+      await this.surveyService.importQualtricsSurveyResponse(
+        survey.id,
+        qualtricsResponse as QualtricsSurveyResponse
+      );
     this.logger.debug("Imported response");
     qualtricsDebug("importedResponse - %O", importedResponse);
 
     // Fetch the letter.
     // TODO: Sort out how to pass stuff to `renderLetter`.
+    // Currently we're getting the letter to get it's ID in order to pass it to renderLetter,
+    // which turns around and gets the letter.
     const letter = await this.surveyService.findLetter(survey.id);
 
     // Write a letter.
-    const writerOutput = await this.writerService.renderLetter(
+    const writerOutput = await this.writerService.renderIndividualLetter(
       letter.id,
       importedResponse.surveyResponse.id
     );

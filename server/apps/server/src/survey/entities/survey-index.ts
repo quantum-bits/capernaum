@@ -9,8 +9,8 @@ import { mean } from "lodash";
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
 export class SurveyIndex extends AbstractEntity {
-  @ManyToOne((type) => SurveyDimension, (dimension) => dimension.surveyIndices)
-  @Field((type) => SurveyDimension)
+  @ManyToOne(() => SurveyDimension, (dimension) => dimension.surveyIndices)
+  @Field(() => SurveyDimension)
   surveyDimension: SurveyDimension;
   @Column("integer")
   surveyDimensionId: number;
@@ -21,12 +21,12 @@ export class SurveyIndex extends AbstractEntity {
   })
   useForPredictions: boolean;
 
-  @OneToMany((type) => SurveyItem, (item) => item.surveyIndex)
-  @Field((type) => [SurveyItem])
+  @OneToMany(() => SurveyItem, (item) => item.surveyIndex)
+  @Field(() => [SurveyItem])
   surveyItems: SurveyItem[];
 
-  @OneToMany((type) => PredictionTableEntry, (ptEntry) => ptEntry.surveyIndex)
-  @Field((type) => [PredictionTableEntry])
+  @OneToMany(() => PredictionTableEntry, (ptEntry) => ptEntry.surveyIndex)
+  @Field(() => [PredictionTableEntry])
   predictionTableEntries: PredictionTableEntry[];
 
   @Column()
@@ -43,6 +43,9 @@ export class SurveyIndex extends AbstractEntity {
     );
   }
 
+  /**
+   * Calculate the mean of the values from all responses to this survey item.
+   */
   public meanResponse() {
     return mean(
       this.surveyItemResponses().map(
@@ -54,12 +57,12 @@ export class SurveyIndex extends AbstractEntity {
 
 @InputType()
 export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
-  @Field((type) => Int, {
+  @Field(() => Int, {
     description: "ID of the dimension to contain this index",
   })
   surveyDimensionId: number;
 
-  @Field((type) => [Int], {
+  @Field(() => [Int], {
     description: "List of IDs of the items to include in this index.",
   })
   itemIds: number[];
@@ -79,8 +82,8 @@ export class SurveyIndexCreateInput implements Partial<SurveyIndex> {
 
 @InputType()
 export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
-  @Field((type) => Int) id: number;
-  @Field((type) => [Int], { nullable: true }) itemIds?: number[];
+  @Field(() => Int) id: number;
+  @Field(() => [Int], { nullable: true }) itemIds?: number[];
   @Field({ nullable: true }) abbreviation?: string;
   @Field({ nullable: true }) title?: string;
   @Field({ nullable: true }) useForPredictions?: boolean;
@@ -88,10 +91,10 @@ export class SurveyIndexUpdateInput implements Partial<SurveyIndex> {
 
 @ObjectType()
 export class SurveyIndexDeleteOutput {
-  @Field((type) => Int, { description: "ID of deleted index" })
+  @Field(() => Int, { description: "ID of deleted index" })
   deletedIndexId: number;
 
-  @Field((type) => [Int], {
+  @Field(() => [Int], {
     description: "IDs of items removed from the deleted index",
   })
   deletedItemIds: number[];

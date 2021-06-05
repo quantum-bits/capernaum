@@ -1,14 +1,11 @@
 import {
   Args,
-  Context,
-  Info,
   Int,
   Mutation,
   Parent,
   Query,
   ResolveField,
   Resolver,
-  Root,
 } from "@nestjs/graphql";
 import {
   GroupService,
@@ -20,17 +17,15 @@ import {
   GroupUpdateInput,
   GroupType,
 } from "@server/src/group/entities";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { getDebugger } from "@helpers/debug-factory";
 
-import debug from "debug";
-const groupDebug = debug("group");
+const groupDebug = getDebugger("group");
 
 @Resolver(() => Group)
 export class GroupResolver {
   constructor(
     private readonly groupService: GroupService,
-    private readonly groupTypeService: GroupTypeService,
-    private readonly surveyService: SurveyService
+    private readonly groupTypeService: GroupTypeService
   ) {}
 
   @Mutation(() => Group)
@@ -75,13 +70,6 @@ export class GroupResolver {
       groupDebug("Must fetch type");
       return this.groupTypeService.readGroupType(group.typeId);
     }
-  }
-
-  @ResolveField()
-  survey(@Parent() group: Group) {
-    const { surveyId } = group;
-    groupDebug("survey/resolving %d", surveyId);
-    return this.surveyService.readSurvey(surveyId);
   }
 }
 

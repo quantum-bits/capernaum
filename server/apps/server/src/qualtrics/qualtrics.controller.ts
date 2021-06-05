@@ -1,5 +1,3 @@
-import debug from "debug";
-
 import { Body, Controller, Post, Headers, Logger } from "@nestjs/common";
 import {
   WebHookActivateDeactivateSurvey,
@@ -8,8 +6,9 @@ import {
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
 import { ReportQueueProducer } from "@reporter/src/producer/report-queue-producer";
+import { getDebugger } from "@helpers/debug-factory";
 
-const qualtricsDebug = debug("qualtrics");
+const qualtricsDebug = getDebugger("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {

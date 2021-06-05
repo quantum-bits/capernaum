@@ -11,9 +11,9 @@ import {
 import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
 import { PredictionTableEntry } from "../prediction/entities";
+import { getDebugger } from "@helpers/debug-factory";
 
-import Debug from "debug";
-const debug = Debug("letter:service");
+const debug = getDebugger("letter:service");
 
 @Injectable()
 export class LetterService extends BaseService {

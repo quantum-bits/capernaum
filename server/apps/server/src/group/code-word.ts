@@ -1,4 +1,4 @@
-import Chance from "chance";
+import Chance = require("chance");
 const chance = new Chance();
 
 export class CodeWord {

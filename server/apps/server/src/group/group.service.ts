@@ -9,15 +9,15 @@ import {
   GroupUpdateInput,
 } from "./entities";
 import { CodeWord } from "@server/src/group/code-word";
-import Handlebars from "handlebars";
+import Handlebars = require("handlebars");
 import { readFileSync } from "fs";
 import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
-import debug from "debug";
-import path from "path";
+import * as path from "path";
 import { DateTime } from "luxon";
+import { getDebugger } from "@helpers/debug-factory";
 
-const groupDebug = debug("group");
+const groupDebug = getDebugger("group");
 
 @Injectable()
 export class GroupService extends BaseService {
@@ -25,22 +25,28 @@ export class GroupService extends BaseService {
   private readonly groupAdminHtmlTemplate;
 
   constructor(
-    @InjectRepository(Group) private readonly groupRepo: Repository<Group>,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
+    @InjectRepository(Group)
+    private readonly groupRepo: Repository<Group>
   ) {
     super();
 
     this.groupAdminTextTemplate = GroupService.compileTemplate(
-      "group/letters/group-admin.txt"
+      "server/group/letters/group-admin.txt"
     );
     this.groupAdminHtmlTemplate = GroupService.compileTemplate(
-      "group/letters/group-admin.html"
+      "server/group/letters/group-admin.html"
     );
   }
 
-  private static compileTemplate(fileName: string) {
-    const templatePath = path.join(__dirname, fileName);
-    groupDebug("Compiling %s", templatePath);
+  /**
+   * Compile a template.
+   * @param relativePath Relative path to template from `.../dist/apps/`.
+   * @private
+   */
+  private static compileTemplate(relativePath: string) {
+    const templatePath = path.join(__dirname, "..", relativePath);
+    groupDebug("template '%s'", templatePath);
     return Handlebars.compile(readFileSync(templatePath, "utf-8"));
   }
 
@@ -105,10 +111,18 @@ export class GroupService extends BaseService {
     return group;
   }
 
-  readGroups(): Promise<Group[]> {
-    return this.groupRepo.find({
-      relations: ["type", "survey", "surveyResponses"],
-    });
+  readGroups() {
+    return this.groupRepo
+      .find({
+        relations: ["type", "survey", "surveyResponses"],
+      })
+      .then((result) => {
+        groupDebug("readGroups %O", result);
+        return result;
+      })
+      .catch((err) => {
+        throw err;
+      });
   }
 
   readGroup(id: number): Promise<Group> {

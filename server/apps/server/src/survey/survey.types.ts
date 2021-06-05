@@ -16,7 +16,7 @@ export class ChartEntry {
   @Field()
   title: string;
 
-  @Field((type) => Int)
+  @Field(() => Int)
   value: number;
 }
 
@@ -25,7 +25,7 @@ export class ChartData {
   @Field()
   title: string;
 
-  @Field((type) => [ChartEntry])
+  @Field(() => [ChartEntry])
   entries: ChartEntry[];
 
   constructor(title: string, entries: ChartEntry[]) {
@@ -76,16 +76,16 @@ export class PredictionDetails {
   @Field()
   abbreviation: string;
 
-  @Field((type) => Float)
+  @Field(() => Float)
   meanResponse: number;
 }
 
 @ObjectType()
 export class Prediction {
-  @Field((type) => ScriptureEngagementPractice)
+  @Field(() => ScriptureEngagementPractice)
   practice: ScriptureEngagementPractice;
 
-  @Field((type) => [PredictionDetails])
+  @Field(() => [PredictionDetails])
   details: PredictionDetails[];
 
   @Field()
@@ -94,9 +94,9 @@ export class Prediction {
 
 @ObjectType()
 export class QualtricsResponseImportStats {
-  @Field((type) => Int) importCount: number;
-  @Field((type) => Int) duplicateCount: number;
-  @Field((type) => [SurveyResponse]) surveyResponses: SurveyResponse[];
+  @Field(() => Int) importCount: number;
+  @Field(() => Int) duplicateCount: number;
+  @Field(() => [SurveyResponse]) surveyResponses: SurveyResponse[];
 
   constructor() {
     this.importCount = 0;

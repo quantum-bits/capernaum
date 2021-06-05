@@ -33,9 +33,9 @@ import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { SurveyService } from "@server/src/survey/survey.service";
+import { getDebugger } from '@helpers/debug-factory'
 
-import Debug from "debug";
-const debug = Debug("letter:resolver");
+const debug = getDebugger("letter:resolver");
 
 @Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)

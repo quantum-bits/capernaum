@@ -15,3 +15,4 @@ private.yaml
 coverage/
 venv/
 .ipynb_checkpoints/
+.vscode/

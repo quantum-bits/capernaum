@@ -21,6 +21,11 @@ const router = new VueRouter({
       name: "registration-complete",
       component: () => import("./pages/Complete.vue"),
     },
+    {
+      path: "/new-stepper",
+      name: "new-stepper",
+      component: () => import("./pages/NewStepper.vue"),
+    },
   ],
 });
 

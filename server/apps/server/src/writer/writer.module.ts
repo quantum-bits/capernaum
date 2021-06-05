@@ -5,9 +5,10 @@ import { LetterModule } from "../letter/letter.module";
 import { ImageModule } from "../image/image.module";
 import { FileModule } from "../file/file.module";
 import { WriterResolver } from "./writer.resolvers";
+import { GroupModule } from "@server/src/group/group.module";
 
 @Module({
-  imports: [SurveyModule, LetterModule, ImageModule, FileModule],
+  imports: [SurveyModule, LetterModule, ImageModule, FileModule, GroupModule],
   providers: [WriterService, WriterResolver],
   exports: [WriterService],
 })

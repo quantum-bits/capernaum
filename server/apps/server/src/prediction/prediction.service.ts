@@ -16,9 +16,7 @@ export class PredictionService extends BaseService {
     @InjectRepository(PredictionTableEntry)
     private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,
     @InjectRepository(ScriptureEngagementPractice)
-    private readonly scriptureEngagementRepo: Repository<
-      ScriptureEngagementPractice
-    >
+    private readonly scriptureEngagementRepo: Repository<ScriptureEngagementPractice>
   ) {
     super();
   }
@@ -27,9 +25,8 @@ export class PredictionService extends BaseService {
     replaceInput: PredictionTableEntryReplaceInput
   ): Promise<PredictionTableEntry[]> {
     return this.entityManager.transaction(async (manager) => {
-      const predictionTableEntryRepo = manager.getRepository(
-        PredictionTableEntry
-      );
+      const predictionTableEntryRepo =
+        manager.getRepository(PredictionTableEntry);
 
       // Remove all the old prediction table entries.
       await predictionTableEntryRepo.delete({
