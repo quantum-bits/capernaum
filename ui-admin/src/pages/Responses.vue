@@ -285,7 +285,7 @@ import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes
 import {
   quillDeltaToHtml,
   quillHtmlToText,
-} from "../../../server/apps/server/src/helpers/quill";
+} from "../../../server/helpers/quill";
 
 interface ImportedSurvey {
   id: number;

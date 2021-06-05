@@ -15,6 +15,7 @@ import {
   listGroups,
   listSubscriptions,
   listSurveys,
+  predictEngagement,
   showOrg,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
@@ -23,6 +24,7 @@ const program = new Command();
 program.version("0.0.1");
 
 // Qualtrics
+
 const qualtricsCommands = program
   .command("qualtrics")
   .description("qualtrics commands");
@@ -106,6 +108,7 @@ qualtricsSubscriptionCommands
   .action(deleteSubscription);
 
 // Survey
+
 const surveyCommands = program.command("survey").description("survey commands");
 
 surveyCommands
@@ -114,6 +117,7 @@ surveyCommands
   .action(importSurvey);
 
 // Group
+
 const groupCommands = program.command("group").description("group commands");
 
 groupCommands.command("list").description("list all groups").action(listGroups);
@@ -127,6 +131,7 @@ groupCommands
   .action(getGroup);
 
 // Response
+
 const responseCommands = program
   .command("response")
   .description("survey response commands");
@@ -137,6 +142,13 @@ responseCommands
     "survey-id": "survey ID (SV_...)",
   })
   .action(importSurveyResponses);
+
+responseCommands
+  .command("predict <response-pk>")
+  .description("predict scripture engagement", {
+    "response-pk": "database id",
+  })
+  .action(predictEngagement);
 
 program
   .command("gql <query-string>")
