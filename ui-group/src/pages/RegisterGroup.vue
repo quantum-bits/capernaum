@@ -157,11 +157,6 @@
               />
 
               <p class="text-left mt-10">
-                Please tell us a little about your group. 
-                (Knowing which kinds of groups use this service will help us know what kinds of new 
-                features might be most helpful in the future.)
-              </p>
-              <p class="text-left">
                 Which of these best describes your group?
               </p>
               <v-radio-group 
