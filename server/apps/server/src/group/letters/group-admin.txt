@@ -1,29 +1,45 @@
 Dear {{ adminFirstName}} {{ adminLastName }}:
 
-Thank you for signing up your group for {{ survey.publicName }}. The details
-we received for your group are:
+Thank you for signing up your group for {{ survey.publicName }}. The details we received for your group are:
 
 * Your name: {{ adminFirstName }} {{ adminLastName }}
 * Your email: {{ adminEmail }}
 * Group name: {{ name }}
 * Survey closing date: {{ closedAfter }}
+* Group code: {{ codeWord }}
 
-Please notify your group members that the survey is now available to them. Be
-sure to let them know your group code ({{ codeWord }}), which they will need
-to get started. If you'd like, you can copy the suggested message below.
+Your next step will be to notify your group members that the survey is now available to them (email, text, social media, etc.). Be sure to let them know your group code and the survey closing date for your group (see above), which they will need to get started.  
 
-Thank you,
-Taylor University Center for Scripture Engagement
+Please note:
+
+* You may add as many people as you would like to take the survey at any time until the survey is closed.  It is not possible to add people to the survey after it is closed.
+* You will not hear back from us again until the survey is closed and we send you your report.
+* If you'd like, you can follow the suggested message below to send out to the people in your group.  Feel free to modify it as you’d like. 
+* It's possible that your email to your group members won't make it through their spam filters.  You should consider sending a separate email to your group members letting them know to check their spam filters.
+
+Thank you, 
+Taylor University Center for Scripture Engagement 
 {{ tuC4seUrl }}
 
 -----
 
-{{ name }}:
+Example message to your group members:
 
-{{ survey.publicName }} is now available for our group. To access the
-survey, please follow these steps.
+Dear {{ name }}:
 
-1. Visit Taylor University's web site ({{ tuClsUrl }}) on or before {{ closedAfter }}.
-2. Click the "Take Survey" button.
-3. Under "Take Group Survey", enter our group's code word: {{ codeWord }}
-4. Click the "Go To Survey" button.
+I’m excited to share with you the link and group code (see below) for the Christian Life Survey.  The CLS is designed to give you new ways to think about your walk with God and will provide you insights into your spiritual priorities and areas of focus that can help you engage better with Scripture.  The survey is free.
+
+Most people need from 15 to 25 minutes to complete the survey. You’ll receive your personal results by email within a few minutes. Your answers will not be shared with anyone other than you. I will get averages for our group and your results might be included in aggregate results (results for thousands of people all joined together) reported by the Center for Scripture Engagement, but only you will see your individual results.    
+
+Here is the information you need to know to take the survey.
+* Link to the survey: {{ tuClsUrl }} (scroll down and click on "Take Survey")
+* When you are asked if you want to take an individual survey or the group survey, select group survey by entering our group code: {{codeWord}}
+* Click the "Go To Survey" button
+* You must take the survey by midnight on {{ closedAfter }}
+
+I’m looking forward to talking to you about the survey.
+
+Sincerely,
+
+{{ adminFirstName }} {{ adminLastName }}
+
