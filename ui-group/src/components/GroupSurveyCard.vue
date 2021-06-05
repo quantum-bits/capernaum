@@ -86,6 +86,10 @@ export default Vue.extend({
     // a group or `null`, but the combination of async and debouncing proved
     // problematic to get right. It may be possible, but this works and is
     // reasonably clean.
+    //
+    // Use this.codeWord.trim() throughout, in case the user inadvertently pastes
+    // in some whitespace.  See: https://www.w3schools.com/jsref/jsref_trim_string.asp
+    //
     findGroupByCodeWord() {
       // console.log(`Search for '${this.codeWord}'`);
       this.$apollo
