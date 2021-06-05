@@ -29,7 +29,7 @@ export class LetterTypeModel extends Model {
   });
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("Un-relate letter element types");
+    debug("Un-relate letter types");
     await LetterTypeModel.relatedQuery("elementTypes", transaction)
       .for(await asFindQuery().select("id"))
       .unrelate();

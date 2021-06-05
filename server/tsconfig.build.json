@@ -1,4 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "etc", "**/*spec.ts", "fixtures"]
+  "exclude": ["node_modules", "test", "dist", "etc", "**/*spec.ts",
+    "fixture-loader"
+  ]
 }

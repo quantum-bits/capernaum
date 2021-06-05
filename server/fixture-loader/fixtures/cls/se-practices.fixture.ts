@@ -1,6 +1,6 @@
 import { AbstractFixture } from "../abstract-fixture";
 import { getDebugger } from "@helpers/debug-factory";
-import { ScriptureEngagementPracticeModel } from "../models/scripture-engagement-practice.model";
+import { ScriptureEngagementPracticeModel } from "../../models/scripture-engagement-practice.model";
 
 const debug = getDebugger("sep");
 

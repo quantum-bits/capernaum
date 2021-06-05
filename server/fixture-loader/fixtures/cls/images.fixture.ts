@@ -1,6 +1,6 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
-import { ImageModel } from "../models/image.model";
+import { ImageModel } from "../../models/image.model";
 
 const debug = getDebugger("image");
 

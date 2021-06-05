@@ -1,6 +1,6 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
-import { PredictionTableEntryModel } from "../models/prediction-table-entry.model";
+import { PredictionTableEntryModel } from "../../models/prediction-table-entry.model";
 
 const debug = getDebugger("pte");
 

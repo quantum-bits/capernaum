@@ -1,8 +1,7 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
-import { LetterElementModel } from "../models/letter-element.model";
-import { LetterElementTypeModel } from "../models/letter-element-type.model";
-import * as _ from "lodash";
+import { LetterElementModel } from "../../models/letter-element.model";
+import { LetterElementTypeModel } from "../../models/letter-element-type.model";
 
 const debug = getDebugger("letter");
 

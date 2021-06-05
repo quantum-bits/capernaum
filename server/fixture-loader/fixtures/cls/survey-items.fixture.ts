@@ -1,6 +1,6 @@
 import { AbstractFixture } from "../abstract-fixture";
 import { getDebugger } from "@helpers/debug-factory";
-import { SurveyItemModel } from "../models/survey-item.model";
+import { SurveyItemModel } from "../../models/survey-item.model";
 
 const debug = getDebugger("item");
 

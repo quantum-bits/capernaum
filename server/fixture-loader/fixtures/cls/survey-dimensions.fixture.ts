@@ -1,6 +1,6 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
-import { SurveyDimensionModel } from "../models/survey-dimension.model";
+import { SurveyDimensionModel } from "../../models/survey-dimension.model";
 
 const debug = getDebugger("dim");
 

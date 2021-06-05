@@ -35,7 +35,7 @@ export class SurveyResponseModel extends Model {
   });
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("Delete  survey item responses");
+    debug("Delete survey item responses");
     await SurveyItemResponseModel.query(transaction)
       .delete()
       .whereIn("surveyResponseId", asFindQuery().select("id"));

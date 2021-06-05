@@ -1,6 +1,6 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
-import { LetterModel } from "../models/letter.model";
+import { LetterModel } from "../../models/letter.model";
 
 const debug = getDebugger("letter");
 

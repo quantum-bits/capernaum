@@ -1,4 +1,4 @@
-import { GroupTypeModel } from "./models/group-type.model";
+import { GroupTypeModel } from "../models/group-type.model";
 import { AbstractFixture } from "./abstract-fixture";
 import { getDebugger } from "@helpers/debug-factory";
 
@@ -6,7 +6,7 @@ const debug = getDebugger("group");
 
 export class GroupTypeFixture extends AbstractFixture {
   delete() {
-    debug("Delete group type graph");
+    debug("Delete group types");
     return GroupTypeModel.query().delete();
   }
 
