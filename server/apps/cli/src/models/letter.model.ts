@@ -4,7 +4,7 @@ import { LetterElementModel } from "./letter-element.model";
 import { PredictionTableEntryModel } from "./prediction-table-entry.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("model:letter");
 
 export class LetterModel extends Model {
   id!: number;

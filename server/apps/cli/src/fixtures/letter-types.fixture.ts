@@ -1,11 +1,11 @@
 import { AbstractFixture } from "./abstract-fixture";
-import { LetterTypeModel } from "./models/letter-type.model";
-import { LetterElementTypeModel } from "./models/letter-element-type.model";
+import { LetterTypeModel } from "../models/letter-type.model";
+import { LetterElementTypeModel } from "../models/letter-element-type.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("fixture:letter-type");
 
-export class LetterTypeFixture extends AbstractFixture {
+export class LetterTypesFixture extends AbstractFixture {
   async delete() {
     debug("Delete letter types");
     await LetterTypeModel.query().delete();
@@ -17,11 +17,11 @@ export class LetterTypeFixture extends AbstractFixture {
    * The `key`s for each `elementType` _must_ match the cases in `WriterService.renderAllElements`.
    */
   insert() {
-    debug("Insert letter type graph");
+    debug("Insert letter types");
     return LetterTypeModel.query().insertGraph(
       [
         {
-          key: "INDIVIDUAL",
+          key: "individual",
           description: "Individual Letter",
           elementTypes: [
             {
@@ -47,7 +47,7 @@ export class LetterTypeFixture extends AbstractFixture {
           ],
         },
         {
-          key: "GROUP",
+          key: "group",
           description: "Group Letter",
           // These element types are identical to the individual letter.
           // This was not always the case, and I'm leaving this in place

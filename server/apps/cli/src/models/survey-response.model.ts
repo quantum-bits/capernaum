@@ -3,7 +3,7 @@ import { GroupModel } from "./group.model";
 import { SurveyItemResponseModel } from "./survey-item-response.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("survey");
+const debug = getDebugger("model:survey-response");
 
 export class SurveyResponseModel extends Model {
   id!: number;
@@ -35,7 +35,7 @@ export class SurveyResponseModel extends Model {
   });
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("Delete  survey item responses");
+    debug("Delete survey item responses");
     await SurveyItemResponseModel.query(transaction)
       .delete()
       .whereIn("surveyResponseId", asFindQuery().select("id"));

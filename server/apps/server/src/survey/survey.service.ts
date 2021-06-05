@@ -100,6 +100,8 @@ export class SurveyService extends BaseService {
   }
 
   surveyResponseComplete(responseId: number) {
+    surveyDebug("get complete response %d", responseId);
+
     return this.surveyResponseRepo
       .createQueryBuilder("surveyResponse")
       .innerJoinAndSelect("surveyResponse.survey", "survey")

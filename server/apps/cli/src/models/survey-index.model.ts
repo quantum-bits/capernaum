@@ -8,5 +8,5 @@ export class SurveyIndexModel extends Model {
   abbreviation: string;
   title: string;
 
-  tableName = "survey_index";
+  static tableName = "survey_index";
 }

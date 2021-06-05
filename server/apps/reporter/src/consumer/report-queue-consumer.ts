@@ -3,7 +3,7 @@ import { Process, Processor } from "@nestjs/bull";
 import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { Job } from "bull";
 import { QualtricsSurveyResponse } from "@qapi/qualtrics-api.types";
-import { quillDeltaToHtml, quillHtmlToText } from "@server/src/helpers/quill";
+import { quillDeltaToHtml, quillHtmlToText } from "@helpers/quill";
 import { EventCreateInput } from "@server/src/events/entities";
 import { EventService } from "@server/src/events/event.service";
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";

@@ -1,6 +1,8 @@
 import { config } from "dotenv";
 config();
 
+import { knex } from "./models/db";
+
 import { Command, Option } from "commander";
 import {
   createSubscription,
@@ -15,7 +17,9 @@ import {
   listGroups,
   listSubscriptions,
   listSurveys,
+  predictEngagement,
   showOrg,
+  nuclearOption,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -23,6 +27,7 @@ const program = new Command();
 program.version("0.0.1");
 
 // Qualtrics
+
 const qualtricsCommands = program
   .command("qualtrics")
   .description("qualtrics commands");
@@ -106,6 +111,7 @@ qualtricsSubscriptionCommands
   .action(deleteSubscription);
 
 // Survey
+
 const surveyCommands = program.command("survey").description("survey commands");
 
 surveyCommands
@@ -114,6 +120,7 @@ surveyCommands
   .action(importSurvey);
 
 // Group
+
 const groupCommands = program.command("group").description("group commands");
 
 groupCommands.command("list").description("list all groups").action(listGroups);
@@ -127,6 +134,7 @@ groupCommands
   .action(getGroup);
 
 // Response
+
 const responseCommands = program
   .command("response")
   .description("survey response commands");
@@ -138,10 +146,30 @@ responseCommands
   })
   .action(importSurveyResponses);
 
+responseCommands
+  .command("predict <response-pk>")
+  .description("predict scripture engagement", {
+    "response-pk": "database id",
+  })
+  .action(predictEngagement);
+
+// Fixture
+
+const fixtureCommands = program
+  .command("fixture")
+  .description("fixture loader commands");
+
+fixtureCommands
+  .command("nuke")
+  .description("nuclear option; replace almost all data")
+  .option("--force", "force nuclear option (no confirmation)")
+  .option("--survey-id <survey-id>", "qualtrics ID of survey to import")
+  .action(nuclearOption);
+
 program
   .command("gql <query-string>")
   .description("Run a GraphQL query")
   .action(graphQLQuery);
 
 // Do it.
-program.parse();
+program.parseAsync().then(() => knex.destroy());

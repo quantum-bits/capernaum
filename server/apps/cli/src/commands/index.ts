@@ -4,3 +4,4 @@ export * from "./org";
 export * from "./group";
 export * from "./subscription";
 export * from "./graphql/graphql";
+export * from "./fixture";
