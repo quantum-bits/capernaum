@@ -3,9 +3,9 @@ import { LetterTypeModel } from "../models/letter-type.model";
 import { LetterElementTypeModel } from "../models/letter-element-type.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("fixture:letter-type");
 
-export class LetterTypeFixture extends AbstractFixture {
+export class LetterTypesFixture extends AbstractFixture {
   async delete() {
     debug("Delete letter types");
     await LetterTypeModel.query().delete();

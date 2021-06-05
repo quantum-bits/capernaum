@@ -1,5 +1,5 @@
 import { times, timesSeries } from "async";
-import { MultiTimer } from "@helpers/MultiTimer";
+import { MultiTimer } from "@helpers/multi-timer";
 
 const mt = new MultiTimer();
 const PARALLEL = false; // Run times() or timesSeries()?

@@ -3,7 +3,7 @@ import { SurveyModel } from "./survey.model";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyIndexModel } from "./survey-index.model";
 
-const debug = getDebugger("dim");
+const debug = getDebugger("model:survey-dim");
 
 export class SurveyDimensionModel extends Model {
   id!: number;
@@ -14,7 +14,7 @@ export class SurveyDimensionModel extends Model {
   static tableName = "survey_dimension";
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("Delete indexes");
+    debug("Delete survey indexes");
     await SurveyIndexModel.query(transaction)
       .delete()
       .whereIn("surveyDimensionId", asFindQuery().select("id"));

@@ -3,7 +3,7 @@ import { GroupTypeModel } from "./group-type.model";
 import { SurveyResponseModel } from "./survey-response.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("group");
+const debug = getDebugger("model:group");
 
 export class GroupModel extends Model {
   id: number;

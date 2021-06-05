@@ -4,7 +4,7 @@ import { SurveyIndexModel } from "./survey-index.model";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyItemResponseModel } from "./survey-item-response.model";
 
-const debug = getDebugger("item");
+const debug = getDebugger("model:survey-item");
 
 export class SurveyItemModel extends Model {
   id!: number;

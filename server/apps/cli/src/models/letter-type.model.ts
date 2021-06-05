@@ -3,7 +3,7 @@ import { LetterElementTypeModel } from "./letter-element-type.model";
 import { LetterModel } from "./letter.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("model:letter-type");
 
 export class LetterTypeModel extends Model {
   id!: number;

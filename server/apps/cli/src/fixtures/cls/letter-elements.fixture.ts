@@ -3,7 +3,7 @@ import { AbstractFixture } from "../abstract-fixture";
 import { LetterElementModel } from "../../models/letter-element.model";
 import { LetterElementTypeModel } from "../../models/letter-element-type.model";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("fixture:letter-element");
 
 export class LetterElementsFixture extends AbstractFixture {
   delete() {
@@ -14,22 +14,29 @@ export class LetterElementsFixture extends AbstractFixture {
   async insert() {
     debug("Load element IDs");
 
-    const typeNameToId = new Map<string, number>();
-    const elementTypes = await LetterElementTypeModel.query();
-    elementTypes.forEach((element) =>
-      typeNameToId.set(element.key, element.id)
-    );
-    debug("element types %O", elementTypes);
-    debug("element map %O", typeNameToId);
+    // const typeNameToId = new Map<string, number>();
+    // const elementTypes = await LetterElementTypeModel.query();
+    // elementTypes.forEach((element) =>
+    //   typeNameToId.set(element.key, element.id)
+    // );
+    // debug("element types %O", elementTypes);
+    // debug("element map %O", typeNameToId);
+    //
+    // const fixed = letterElements.map((element) => {
+    //   element["letterElementTypeId"] = typeNameToId.get(
+    //     element._letterElementName
+    //   );
+    //   delete element._letterElementName;
+    //   return element;
+    // });
+    // debug("updated elements %O", fixed);
 
-    const fixed = letterElements.map((element) => {
-      element["letterElementTypeId"] = typeNameToId.get(
-        element._letterElementName
-      );
-      delete element._letterElementName;
-      return element;
-    });
-    debug("updated elements %O", fixed);
+    const fixed = await this.updateFromTypeModel(
+      LetterElementTypeModel,
+      letterElements,
+      "_letterElementName",
+      "letterElementTypeId"
+    );
 
     debug("Insert letter elements");
     return LetterElementModel.query().insert(fixed);

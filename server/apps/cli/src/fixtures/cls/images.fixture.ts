@@ -2,7 +2,7 @@ import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
 import { ImageModel } from "../../models/image.model";
 
-const debug = getDebugger("image");
+const debug = getDebugger("fixture:image");
 
 export class ImagesFixture extends AbstractFixture {
   delete() {

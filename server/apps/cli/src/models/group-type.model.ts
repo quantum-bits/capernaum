@@ -2,7 +2,7 @@ import { Model } from "objection";
 import { GroupModel } from "./group.model";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("group");
+const debug = getDebugger("model:group-type");
 
 export class GroupTypeModel extends Model {
   id: number;

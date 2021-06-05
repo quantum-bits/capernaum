@@ -1,8 +1,9 @@
 import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
 import { LetterModel } from "../../models/letter.model";
+import { LetterTypeModel } from "@common/cli/src/models/letter-type.model";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("fixture:letter");
 
 export class LettersFixture extends AbstractFixture {
   delete() {
@@ -10,10 +11,18 @@ export class LettersFixture extends AbstractFixture {
     return LetterModel.query().delete();
   }
 
-  insert() {
+  async insert(update) {
     debug("Insert letters");
-    const fixed = letters.map((elt) => ({ ...elt, surveyId: 22 }));
-    return LetterModel.query().insert(fixed);
+
+    const foo = await this.updateFromTypeModel(
+      LetterTypeModel,
+      letters,
+      "_letterTypeName",
+      "letterTypeId"
+    );
+    debug("============= %O", foo);
+
+    return LetterModel.query().insert(this.updateFromOptions(letters, update));
   }
 }
 
@@ -29,5 +38,6 @@ const letters = [
     isFrozen: false,
     surveyId: 22,
     letterTypeId: 56,
+    _letterTypeName: "individual",
   },
 ];

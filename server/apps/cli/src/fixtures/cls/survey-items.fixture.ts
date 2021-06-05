@@ -2,7 +2,7 @@ import { AbstractFixture } from "../abstract-fixture";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyItemModel } from "../../models/survey-item.model";
 
-const debug = getDebugger("item");
+const debug = getDebugger("fixture:survey-item");
 
 export class SurveyItemsFixture extends AbstractFixture {
   delete() {
@@ -10,10 +10,11 @@ export class SurveyItemsFixture extends AbstractFixture {
     return SurveyItemModel.query().delete();
   }
 
-  insert() {
+  insert(update) {
     debug("Insert survey items");
-    const fixed = surveyItems.map((elt) => ({ ...elt, surveyId: 22 }));
-    return SurveyItemModel.query().insert(fixed);
+    return SurveyItemModel.query().insert(
+      this.updateFromOptions(surveyItems, update)
+    );
   }
 }
 

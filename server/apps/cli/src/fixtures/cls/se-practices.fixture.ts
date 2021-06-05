@@ -2,7 +2,7 @@ import { AbstractFixture } from "../abstract-fixture";
 import { getDebugger } from "@helpers/debug-factory";
 import { ScriptureEngagementPracticeModel } from "../../models/scripture-engagement-practice.model";
 
-const debug = getDebugger("sep");
+const debug = getDebugger("fixture:sep");
 
 export class ScriptureEngagementPracticeFixture extends AbstractFixture {
   delete() {

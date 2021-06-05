@@ -1,6 +1,5 @@
 import { Model } from "objection";
 import { LetterTypeModel } from "./letter-type.model";
-import { SurveyResponseModel } from "./survey-response.model";
 
 export class LetterElementTypeModel extends Model {
   id!: number;
@@ -13,7 +12,7 @@ export class LetterElementTypeModel extends Model {
   static relationMappings = () => ({
     letterTypes: {
       modelClass: LetterTypeModel,
-      relation: Model.ManyToManyRelation  ,
+      relation: Model.ManyToManyRelation,
       join: {
         from: "letter_element_type.id",
         through: {

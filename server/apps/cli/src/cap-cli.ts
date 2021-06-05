@@ -19,7 +19,7 @@ import {
   listSurveys,
   predictEngagement,
   showOrg,
-  simpleFixture,
+  nuclearOption,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -159,7 +159,12 @@ const fixtureCommands = program
   .command("fixture")
   .description("fixture loader commands");
 
-fixtureCommands.command("simple").action(simpleFixture);
+fixtureCommands
+  .command("nuke")
+  .description("nuclear option; replace almost all data")
+  .option("--force", "force nuclear option (no confirmation)")
+  .option("--survey-id <survey-id>", "qualtrics ID of survey to import")
+  .action(nuclearOption);
 
 program
   .command("gql <query-string>")

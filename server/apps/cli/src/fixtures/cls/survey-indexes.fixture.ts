@@ -2,7 +2,7 @@ import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
 import { SurveyIndexModel } from "../../models/survey-index.model";
 
-const debug = getDebugger("idx");
+const debug = getDebugger("fixture:survey-index");
 
 export class SurveyIndexesFixture extends AbstractFixture {
   delete() {

@@ -2,7 +2,7 @@ import { getDebugger } from "@helpers/debug-factory";
 import { AbstractFixture } from "../abstract-fixture";
 import { SurveyDimensionModel } from "../../models/survey-dimension.model";
 
-const debug = getDebugger("dim");
+const debug = getDebugger("fixture:survey-dim");
 
 export class SurveyDimensionsFixture extends AbstractFixture {
   delete() {
@@ -10,10 +10,11 @@ export class SurveyDimensionsFixture extends AbstractFixture {
     return SurveyDimensionModel.query().delete();
   }
 
-  insert() {
+  insert(update) {
     debug("Insert survey dimensions");
-    const dim = surveyDimensions.map((elt) => ({ ...elt, surveyId: 22 }));
-    return SurveyDimensionModel.query().insert(dim);
+    return SurveyDimensionModel.query().insert(
+      this.updateFromOptions(surveyDimensions, update)
+    );
   }
 }
 
