@@ -21,31 +21,31 @@ export class SurveyDimensionsFixture extends AbstractFixture {
 const surveyDimensions = [
   {
     id: 26,
-    surveyId: 10,
+    surveyId: 38,
     title: "Additional",
     sequence: 10,
   },
   {
     id: 27,
-    surveyId: 10,
+    surveyId: 38,
     title: "Centers",
     sequence: 10,
   },
   {
     id: 28,
-    surveyId: 10,
+    surveyId: 38,
     title: "Ways of life",
     sequence: 10,
   },
   {
     id: 29,
-    surveyId: 10,
+    surveyId: 38,
     title: "Disciplines",
     sequence: 10,
   },
   {
     id: 30,
-    surveyId: 10,
+    surveyId: 38,
     title: "Bible engagement",
     sequence: 10,
   },

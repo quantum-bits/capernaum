@@ -36,7 +36,7 @@ const letters = [
     created: "2020-05-13 13:11:51.390327",
     updated: "2020-07-21 14:25:06.522352",
     isFrozen: false,
-    surveyId: 22,
+    surveyId: 38,
     letterTypeId: 56,
     _letterTypeName: "individual",
   },
