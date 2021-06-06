@@ -17,6 +17,9 @@ import {
   importQualtricsSurvey,
 } from "@common/cli/src/commands/survey";
 import { SurveyModel } from "@common/cli/src/models/survey.model";
+import NestContext from "@common/cli/src/nest-helpers";
+import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyUpdateInput } from "@server/src/survey/entities";
 
 const debug = getDebugger("fixture");
 
@@ -80,6 +83,26 @@ export async function nuclearOption(options) {
     }
   }
 
+  async function replaceSurvey(qualtricsSurveyId) {
+    debug("Delete surveys");
+    await SurveyModel.query().delete();
+
+    debug("Import survey");
+    const importedSurvey = await importQualtricsSurvey(qualtricsSurveyId);
+    const surveyUpdateInput: SurveyUpdateInput = {
+      id: importedSurvey.id,
+      okayForGroup: true,
+      publicName: "Capernaum Test Survey",
+      detailedDescription: "Capernaum test fixture survey",
+    };
+    const nestContext = new NestContext();
+    const surveyService = await nestContext.get(SurveyService);
+    await surveyService.updateSurvey(surveyUpdateInput);
+    await nestContext.close();
+
+    return importedSurvey;
+  }
+
   const qualtricsSurveyId = await promptForSurveyId();
 
   await groupTypesFixture.load();
@@ -87,9 +110,7 @@ export async function nuclearOption(options) {
   await imagesFixture.load();
   await sePracticesFixture.load();
 
-  debug("Delete surveys");
-  await SurveyModel.query().delete();
-  const importedSurvey = await importQualtricsSurvey(qualtricsSurveyId);
+  const importedSurvey = await replaceSurvey(qualtricsSurveyId);
 
   await surveyDimensionsFixture.load({ surveyId: importedSurvey.id });
   await surveyIndexesFixture.load();

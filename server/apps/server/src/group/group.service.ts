@@ -108,7 +108,7 @@ export class GroupService extends BaseService {
     await this.mailService.sendMail(mailDetails);
     groupDebug("sent email");
 
-    return group;
+    return groupDetails;
   }
 
   readGroups() {

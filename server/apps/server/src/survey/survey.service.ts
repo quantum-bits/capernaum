@@ -12,6 +12,7 @@ import {
   SurveyItem,
   SurveyItemResponse,
   SurveyResponse,
+  SurveyUpdateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import {
@@ -177,6 +178,10 @@ export class SurveyService extends BaseService {
       where,
       order: { id: "ASC" },
     });
+  }
+
+  updateSurvey(updateInput: SurveyUpdateInput) {
+    return this.update(Survey, updateInput);
   }
 
   updateSurveyIndex(updateInput: SurveyIndexUpdateInput): Promise<SurveyIndex> {
