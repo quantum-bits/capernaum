@@ -11,6 +11,9 @@ import {
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
+  SurveyLetterCreateInput,
+  SurveyLetterUpdateInput,
   SurveyResponse,
   SurveyUpdateInput,
 } from "./entities";
@@ -518,5 +521,33 @@ export class SurveyService extends BaseService {
         surveyResponse: newSurveyResponse,
       };
     });
+  }
+}
+
+@Injectable()
+export class SurveyLetterService {
+  constructor(
+    @InjectRepository(SurveyLetter)
+    private readonly surveyletterRepo: Repository<SurveyLetter>
+  ) {}
+
+  createSurveyLetter(createInput: SurveyLetterCreateInput) {
+    return this.surveyletterRepo.save(
+      this.surveyletterRepo.create(createInput)
+    );
+  }
+
+  readSurveyLetters() {
+    return this.surveyletterRepo.find();
+  }
+
+  updateSurveyLetter(updateInput: SurveyLetterUpdateInput) {
+    return this.surveyletterRepo
+      .preload(updateInput)
+      .then((result) => this.surveyletterRepo.save(result));
+  }
+
+  deleteSurveyLetter(id: number) {
+    return this.surveyletterRepo.delete(id).then((result) => result.affected);
   }
 }

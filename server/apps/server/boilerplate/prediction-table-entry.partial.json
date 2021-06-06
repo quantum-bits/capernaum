@@ -1,0 +1,14 @@
+{
+  "entity": {
+    "name": "PredictionTableEntry",
+    "pk": "id"
+  },
+  "relationships": [
+    {
+      "name": "predictionTable",
+      "type": "manyToOne",
+      "to": "PredictionTable",
+      "description": "Table containing this entry"
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
   SurveyResponse,
 } from "./entities";
 import { registerEnumType } from "@nestjs/graphql";
@@ -30,6 +31,7 @@ import { GroupModule } from "@server/src/group/group.module";
       SurveyResponse,
       SurveyItemResponse,
       SurveyItem,
+      SurveyLetter,
     ]),
     GroupModule,
   ],

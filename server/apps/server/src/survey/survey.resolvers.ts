@@ -19,10 +19,13 @@ import {
   SurveyIndexUpdateInput,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
+  SurveyLetterCreateInput,
+  SurveyLetterUpdateInput,
   SurveyResponse,
   SurveyUpdateInput,
 } from "./entities";
-import { SurveyService } from "./survey.service";
+import { SurveyLetterService, SurveyService } from "./survey.service";
 import { Int } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
@@ -314,5 +317,34 @@ export class SurveyItemResolver {
     @Args({ name: "responseId", type: () => Int }) responseId: number
   ) {
     return this.surveyService.findItemResponse(surveyItem, responseId);
+  }
+}
+
+@Resolver("SurveyLetter")
+export class SurveyLetterResolver {
+  constructor(private readonly surveyletterService: SurveyLetterService) {}
+
+  @Mutation(() => SurveyLetter)
+  createSurveyLetter(
+    @Args("createInput") createInput: SurveyLetterCreateInput
+  ) {
+    return this.surveyletterService.createSurveyLetter(createInput);
+  }
+
+  @Query(() => [SurveyLetter])
+  readSurveyLetters() {
+    return this.surveyletterService.readSurveyLetters();
+  }
+
+  @Mutation(() => SurveyLetter)
+  updateSurveyLetter(
+    @Args("updateInput") updateInput: SurveyLetterUpdateInput
+  ) {
+    return this.surveyletterService.updateSurveyLetter(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deleteSurveyLetter(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.surveyletterService.deleteSurveyLetter(id);
   }
 }

@@ -73,6 +73,16 @@ type LetterElement {
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension
+  predictionTable: PredictionTable!
+}
+
+type PredictionTable {
+  id: Int!
+
+  """Prediction table name"""
+  name: String!
+  predictionTableEntries: [PredictionTableEntry!]!
+  letterElements: [LetterElement!]!
 }
 
 """One entry in a prediction table"""
@@ -83,6 +93,7 @@ type PredictionTableEntry {
   surveyIndex: SurveyIndex!
   practice: ScriptureEngagementPractice!
   sequence: Int!
+  predictionTable: PredictionTable!
 }
 
 type ChartEntry {

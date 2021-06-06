@@ -1,0 +1,15 @@
+{
+  "entity": {
+    "name": "LetterElement",
+    "pk": "id"
+  },
+  "relationships": [
+    {
+      "name": "predictionTable",
+      "type": "manyToOne",
+      "to": "PredictionTable",
+      "description": "Table to use for prediction",
+      "nullable": true
+    }
+  ]
+}

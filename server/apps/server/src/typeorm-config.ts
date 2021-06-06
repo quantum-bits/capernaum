@@ -15,9 +15,11 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
   SurveyResponse,
 } from "./survey/entities";
 import {
+  PredictionTable,
   PredictionTableEntry,
   ScriptureEngagementPractice,
 } from "./prediction/entities";
@@ -47,6 +49,8 @@ export const entities = [
   SurveyResponse,
   User,
   UserRole,
+  SurveyLetter,
+  PredictionTable,
 ];
 
 export const options: ConnectionOptions = {

@@ -4,6 +4,7 @@ import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
 import { Letter } from "../../letter/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { PredictionTable } from "@server/src/prediction/entities/prediction-table";
 
 /**
  * This entity is a ternary association table.
@@ -30,6 +31,14 @@ export class PredictionTableEntry extends AbstractEntity {
   @Column()
   @Field(() => Int)
   sequence: number;
+
+  @Field(() => PredictionTable)
+  @ManyToOne(
+    () => PredictionTable,
+    (predictionTable) => predictionTable.predictionTableEntries
+  )
+  predictionTable: PredictionTable;
+  @Column("integer") predictionTableId: number;
 }
 
 @InputType()

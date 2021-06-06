@@ -6,6 +6,7 @@ import { LetterElementType } from "./letter-element-type";
 import { SurveyDimension } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { Image } from "../../image/entities";
+import { PredictionTable } from "@server/src/prediction/entities";
 
 @Entity()
 @ObjectType()
@@ -38,6 +39,15 @@ export class LetterElement extends AbstractEntity {
   @ManyToOne(() => SurveyDimension, { nullable: true })
   @Field(() => SurveyDimension, { nullable: true })
   surveyDimension?: SurveyDimension;
+
+  @Column({ type: "int", nullable: true }) predictionTableId: number;
+  @Field(() => PredictionTable)
+  @ManyToOne(
+    () => PredictionTable,
+    (predictionTable) => predictionTable.letterElements,
+    { nullable: true }
+  )
+  predictionTable?: PredictionTable;
 }
 
 @InputType()

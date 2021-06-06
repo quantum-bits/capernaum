@@ -9,6 +9,11 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { BaseService } from "../shared/base.service";
+import {
+  PredictionTable,
+  PredictionTableCreateInput,
+  PredictionTableUpdateInput,
+} from "@server/src/prediction/entities/prediction-table";
 
 @Injectable()
 export class PredictionService extends BaseService {
@@ -52,5 +57,35 @@ export class PredictionService extends BaseService {
   ): Promise<ScriptureEngagementPractice> {
     const practice = await this.scriptureEngagementRepo.preload(updateInput);
     return this.scriptureEngagementRepo.save(practice);
+  }
+}
+
+@Injectable()
+export class PredictionTableService {
+  constructor(
+    @InjectRepository(PredictionTable)
+    private readonly predictiontableRepo: Repository<PredictionTable>
+  ) {}
+
+  createPredictionTable(createInput: PredictionTableCreateInput) {
+    return this.predictiontableRepo.save(
+      this.predictiontableRepo.create(createInput)
+    );
+  }
+
+  readPredictionTables() {
+    return this.predictiontableRepo.find();
+  }
+
+  updatePredictionTable(updateInput: PredictionTableUpdateInput) {
+    return this.predictiontableRepo
+      .preload(updateInput)
+      .then((result) => this.predictiontableRepo.save(result));
+  }
+
+  deletePredictionTable(id: number) {
+    return this.predictiontableRepo
+      .delete(id)
+      .then((result) => result.affected);
   }
 }
