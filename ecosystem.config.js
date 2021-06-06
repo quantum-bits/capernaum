@@ -13,6 +13,12 @@ module.exports = {
       args: "reporter:dev",
     },
     {
+      name: "cli-build",
+      cwd: "./server",
+      script: "yarn",
+      args: "cli:dev",
+    },
+    {
       name: "ui-admin",
       cwd: "./ui-admin",
       script: "yarn",
