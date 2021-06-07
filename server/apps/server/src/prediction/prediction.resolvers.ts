@@ -13,11 +13,16 @@ import {
   ScriptureEngagementPracticeCreateInput,
   PredictionTableEntryReplaceInput,
   ScriptureEngagementPracticeUpdateInput,
+  PredictionTable,
+  PredictionTableCreateInput,
+  PredictionTableUpdateInput,
 } from "./entities";
-import { PredictionService } from "./prediction.service";
+import {
+  PredictionService,
+  PredictionTableService,
+} from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "@nestjs/graphql";
-import { Letter } from "../letter/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 
@@ -55,14 +60,6 @@ export class PredictionTableEntryResolver {
     return this.predictionService.findOneOrFail(
       ScriptureEngagementPractice,
       predictionTableEntry.practiceId
-    );
-  }
-
-  @ResolveField("letter", () => Letter)
-  resolveLetter(@Parent() predictionTableEntry: PredictionTableEntry) {
-    return this.predictionService.findOneOrFail(
-      Letter,
-      predictionTableEntry.letterId
     );
   }
 }
@@ -120,5 +117,36 @@ export class ScriptureEngagementPracticeResolver {
     return this.predictionService.find(PredictionTableEntry, {
       practiceId: scriptureEngagementPractice.id,
     });
+  }
+}
+
+@Resolver("PredictionTable")
+export class PredictionTableResolver {
+  constructor(
+    private readonly predictiontableService: PredictionTableService
+  ) {}
+
+  @Mutation(() => PredictionTable)
+  createPredictionTable(
+    @Args("createInput") createInput: PredictionTableCreateInput
+  ) {
+    return this.predictiontableService.createPredictionTable(createInput);
+  }
+
+  @Query(() => [PredictionTable])
+  readPredictionTables() {
+    return this.predictiontableService.readPredictionTables();
+  }
+
+  @Mutation(() => PredictionTable)
+  updatePredictionTable(
+    @Args("updateInput") updateInput: PredictionTableUpdateInput
+  ) {
+    return this.predictiontableService.updatePredictionTable(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deletePredictionTable(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.predictiontableService.deletePredictionTable(id);
   }
 }

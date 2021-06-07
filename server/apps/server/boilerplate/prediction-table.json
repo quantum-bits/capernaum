@@ -2,6 +2,7 @@
   "entity": {
     "name": "PredictionTable",
     "pk": "id",
+    "description": "SE practice prediction table",
     "attributes": [
       {
         "name": "name",

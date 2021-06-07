@@ -9,7 +9,6 @@ import {
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { LetterElement } from "./letter-element";
-import { PredictionTableEntry } from "../../prediction/entities";
 import { Survey } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { LetterType } from "./letter-type";
@@ -55,9 +54,6 @@ export class Letter extends AbstractEntity {
   @Field(() => [LetterElement])
   letterElements: LetterElement[];
 
-  @OneToMany(() => PredictionTableEntry, (entry) => entry.letter)
-  @Field(() => [PredictionTableEntry])
-  tableEntries: PredictionTableEntry[];
 }
 
 @InputType()

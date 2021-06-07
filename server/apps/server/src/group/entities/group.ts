@@ -9,12 +9,12 @@ import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Survey, SurveyResponse } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { GroupType } from ".";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
 export class Group extends AbstractEntity {
-  @Field({ description: "Group name" })
-  @Column()
+  @FieldColumn("Group name")
   name: string;
 
   @Field(() => GroupType)
@@ -22,40 +22,34 @@ export class Group extends AbstractEntity {
   type: GroupType;
   @Column("integer") typeId: number;
 
-  @Field({ description: "Name for 'other' type ", nullable: true })
-  @Column({ nullable: true })
+  @FieldColumn("Name for 'other' type ", { nullable: true })
   otherTypeName?: string;
 
   @Field({ description: "Date when survey created" })
   @CreateDateColumn()
   created: string;
 
-  @Field({ description: "Date when survey closes" })
-  @Column()
+  @FieldColumn("Date when survey closes")
   closedAfter: string;
 
-  @Field({ description: "Group administrator first name" })
-  @Column()
+  @FieldColumn("Group administrator first name")
   adminFirstName: string;
 
-  @Field({ description: "Group administrator last name" })
-  @Column()
+  @FieldColumn("Group administrator last name")
   adminLastName: string;
 
-  @Field({ description: "Group administrator email address" })
-  @Column()
+  @FieldColumn("Group administrator email address")
   adminEmail: string;
 
-  @Field({ description: "Survey code word used by group" })
-  @Column()
+  @FieldColumn("Survey code word used by group")
   codeWord: string;
 
-  @Field({ description: "Comments from administrator" })
-  @Column({ default: "" })
+  @FieldColumn("Comments from administrator", { default: "" })
   adminComments: string;
 
-  @Field(() => Int, { description: "Planned invitee count" })
-  @Column({ default: 1 })
+  @FieldColumn("Planned invitee count", () => Int, {
+    default: 1,
+  })
   plannedInvitees: number;
 
   @ManyToOne(() => Survey, (survey) => survey.groups)

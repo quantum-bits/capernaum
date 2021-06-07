@@ -3,7 +3,6 @@ import {
   PredictionTableEntry,
   PredictionTableEntryReplaceInput,
   ScriptureEngagementPractice,
-  ScriptureEngagementPracticeCreateInput,
   ScriptureEngagementPracticeUpdateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -33,17 +32,11 @@ export class PredictionService extends BaseService {
       const predictionTableEntryRepo =
         manager.getRepository(PredictionTableEntry);
 
-      // Remove all the old prediction table entries.
-      await predictionTableEntryRepo.delete({
-        letterId: replaceInput.letterId,
-      });
-
       // Insert the replacement entries.
       const newEntries: PredictionTableEntry[] = [];
       for (const inputEntry of replaceInput.entries) {
         const entry = predictionTableEntryRepo.create({
           ...inputEntry,
-          letterId: replaceInput.letterId,
         });
         newEntries.push(await predictionTableEntryRepo.save(entry));
       }
@@ -64,27 +57,27 @@ export class PredictionService extends BaseService {
 export class PredictionTableService {
   constructor(
     @InjectRepository(PredictionTable)
-    private readonly predictiontableRepo: Repository<PredictionTable>
+    private readonly predictionTableRepo: Repository<PredictionTable>
   ) {}
 
   createPredictionTable(createInput: PredictionTableCreateInput) {
-    return this.predictiontableRepo.save(
-      this.predictiontableRepo.create(createInput)
+    return this.predictionTableRepo.save(
+      this.predictionTableRepo.create(createInput)
     );
   }
 
   readPredictionTables() {
-    return this.predictiontableRepo.find();
+    return this.predictionTableRepo.find();
   }
 
   updatePredictionTable(updateInput: PredictionTableUpdateInput) {
-    return this.predictiontableRepo
+    return this.predictionTableRepo
       .preload(updateInput)
-      .then((result) => this.predictiontableRepo.save(result));
+      .then((result) => this.predictionTableRepo.save(result));
   }
 
   deletePredictionTable(id: number) {
-    return this.predictiontableRepo
+    return this.predictionTableRepo
       .delete(id)
       .then((result) => result.affected);
   }

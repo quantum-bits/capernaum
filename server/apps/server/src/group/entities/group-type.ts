@@ -1,18 +1,17 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { Group } from "@server/src/group/entities/group";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
 export class GroupType {
   @Field(() => Int) @PrimaryGeneratedColumn() id: number;
 
-  @Field({ description: "Group name (e.g., 'Small Group')" })
-  @Column()
+  @FieldColumn("Group name (e.g., 'Small Group')")
   name: string;
 
-  @Field({ description: "Group code (e.g., 'SMALL_GROUP')" })
-  @Column()
+  @FieldColumn("Group code (e.g., 'small-group')")
   code: string;
 
   @Field(() => Int, { description: "Sequence number" })

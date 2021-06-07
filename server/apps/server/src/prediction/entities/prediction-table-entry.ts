@@ -2,7 +2,6 @@ import { Column, Entity, ManyToOne, Index } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
-import { Letter } from "../../letter/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { PredictionTable } from "@server/src/prediction/entities/prediction-table";
 
@@ -10,13 +9,15 @@ import { PredictionTable } from "@server/src/prediction/entities/prediction-tabl
  * This entity is a ternary association table.
  */
 @Entity()
-@Index(["letter", "surveyIndex", "practice"], { unique: true })
+@Index(["predictionTable", "surveyIndex", "practice"], { unique: true })
 @ObjectType({ description: "One entry in a prediction table" })
 export class PredictionTableEntry extends AbstractEntity {
-  @Column("int") letterId: number;
-  @ManyToOne(() => Letter, { primary: true })
-  @Field(() => [PredictionTableEntry])
-  letter: Letter;
+  @Field(() => PredictionTable)
+  @ManyToOne(
+    () => PredictionTable,
+    (predictionTable) => predictionTable.predictionTableEntries
+  )
+  predictionTable: PredictionTable;
 
   @Column("int") surveyIndexId: number;
   @ManyToOne(() => SurveyIndex, { primary: true })
@@ -28,17 +29,10 @@ export class PredictionTableEntry extends AbstractEntity {
   @Field(() => ScriptureEngagementPractice)
   practice: ScriptureEngagementPractice;
 
+  @Column("integer") predictionTableId: number;
   @Column()
   @Field(() => Int)
   sequence: number;
-
-  @Field(() => PredictionTable)
-  @ManyToOne(
-    () => PredictionTable,
-    (predictionTable) => predictionTable.predictionTableEntries
-  )
-  predictionTable: PredictionTable;
-  @Column("integer") predictionTableId: number;
 }
 
 @InputType()
