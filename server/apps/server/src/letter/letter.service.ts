@@ -9,14 +9,14 @@ import {
   LetterTypeUpdateInput,
 } from "./entities";
 import { Repository } from "typeorm";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 import { PredictionTableEntry } from "../prediction/entities";
 import { getDebugger } from "@helpers/debug-factory";
 
 const debug = getDebugger("letter:service");
 
 @Injectable()
-export class LetterService extends BaseService {
+export class LetterService extends OldBaseService {
   constructor(
     @InjectRepository(Letter)
     private readonly letterRepo: Repository<Letter>,
@@ -71,7 +71,7 @@ export class LetterService extends BaseService {
 }
 
 @Injectable()
-export class LetterTypeService extends BaseService {
+export class LetterTypeService extends OldBaseService {
   constructor(
     @InjectRepository(LetterType)
     private readonly letterTypeRepo: Repository<LetterType>,
@@ -111,7 +111,7 @@ export class LetterTypeService extends BaseService {
 }
 
 @Injectable()
-export class LetterElementTypeService extends BaseService {
+export class LetterElementTypeService extends OldBaseService {
   constructor(
     @InjectRepository(LetterType)
     private readonly letterTypeRepo: Repository<LetterType>

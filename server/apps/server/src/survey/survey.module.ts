@@ -8,7 +8,11 @@ import {
   SurveyResolver,
   SurveyResponseResolver,
 } from "./survey.resolvers";
-import { SurveyService } from "./survey.service";
+import {
+  SurveyDimensionService,
+  SurveyIndexService,
+  SurveyService,
+} from "./survey.service";
 import {
   Survey,
   SurveyDimension,
@@ -38,6 +42,8 @@ import { GroupModule } from "@server/src/group/group.module";
   providers: [
     SurveyService,
     SurveyResolver,
+    SurveyDimensionService,
+    SurveyIndexService,
     SurveyDimensionResolver,
     SurveyResponseResolver,
     SurveyItemResponseResolver,

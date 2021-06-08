@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 import { Repository } from "typeorm";
 import {
   User,
@@ -10,7 +10,7 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
-export class UserService extends BaseService {
+export class UserService extends OldBaseService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(UserRole)

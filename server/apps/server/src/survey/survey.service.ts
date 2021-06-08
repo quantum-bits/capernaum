@@ -31,16 +31,16 @@ import {
 } from "@qapi/qualtrics-api.types";
 import { assign, difference, pick } from "lodash";
 import { QualtricsImportedResponse, WhichItems } from "./survey.types";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 import { Letter } from "@server/src/letter/entities";
 import { getDebugger } from "@helpers/debug-factory";
 import { GroupService } from "@server/src/group/group.service";
-import { BaseService2 } from "@server/src/shared/base2.service";
+import { BaseService } from "@server/src/shared/base.service";
 
 const debug = getDebugger("survey");
 
 @Injectable()
-export class SurveyService extends BaseService {
+export class SurveyService extends OldBaseService {
   constructor(
     private readonly groupService: GroupService,
 
@@ -519,26 +519,22 @@ export class SurveyService extends BaseService {
 }
 
 @Injectable()
-export class SurveyDimensionService extends BaseService2<SurveyDimension> {
+export class SurveyDimensionService extends BaseService<SurveyDimension> {
   constructor(
     @InjectRepository(SurveyDimension)
     private readonly surveyDimensionRepo: Repository<SurveyDimension>
   ) {
     super(surveyDimensionRepo);
   }
-
-  labradorRetriever(id: number) {
-    return this.findOneOrFail(id);
-  }
 }
 
 @Injectable()
-class Foo {
+export class SurveyIndexService extends BaseService<SurveyIndex> {
   constructor(
-    private readonly surveyDimensionService: SurveyDimensionService
-  ) {}
-  getOne() {
-    return this.surveyDimensionService.labradorRetriever(27);
+    @InjectRepository(SurveyIndex)
+    private readonly surveyDimensionRepo: Repository<SurveyIndex>
+  ) {
+    super(surveyDimensionRepo);
   }
 }
 

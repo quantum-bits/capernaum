@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 
 @Injectable()
-export class MachineService extends BaseService {
+export class MachineService extends OldBaseService {
   constructor() {
     super();
   }

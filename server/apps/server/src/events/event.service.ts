@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 import { Repository } from "typeorm";
 import { Event, EventCreateInput } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -10,7 +10,7 @@ import { getDebugger } from "@helpers/debug-factory";
 const eventDebug = getDebugger("events");
 
 @Injectable()
-export class EventService extends BaseService {
+export class EventService extends OldBaseService {
   constructor(
     @Inject(PUB_SUB_PROVIDER) private readonly pubSub: PubSub,
     @InjectRepository(Event) private readonly eventRepo: Repository<Event>

@@ -25,7 +25,12 @@ import {
   SurveyResponse,
   SurveyUpdateInput,
 } from "./entities";
-import { SurveyLetterService, SurveyService } from "./survey.service";
+import {
+  SurveyDimensionService,
+  SurveyIndexService,
+  SurveyLetterService,
+  SurveyService,
+} from "./survey.service";
 import { Int } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
 import { PredictionTableEntry } from "../prediction/entities";
@@ -234,33 +239,36 @@ export class SurveyItemResponseResolver {
 
 @Resolver(() => SurveyDimension)
 export class SurveyDimensionResolver {
-  constructor(private readonly surveyService: SurveyService) {}
+  constructor(
+    private readonly surveyDimensionService: SurveyDimensionService,
+    private readonly surveyIndexService: SurveyIndexService
+  ) {}
 
   @Query(() => [SurveyDimension])
   surveyDimensions() {
-    return this.surveyService.find(SurveyDimension);
+    return this.surveyDimensionService.find();
   }
 
   @Query(() => SurveyDimension)
   surveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.findOne(SurveyDimension, id);
+    return this.surveyDimensionService.findOne(id);
   }
 
   @Query(() => SurveyDimension)
   updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
-    return this.surveyService.update(SurveyDimension, updateInput);
+    return this.surveyDimensionService.update(updateInput);
   }
 
   @ResolveField(() => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
-    return this.surveyService.findOne(Survey, surveyDimension.surveyId);
+    return this.surveyDimensionService.findOne(surveyDimension.surveyId);
   }
 
   @ResolveField(() => [SurveyIndex], {
     description: "List of survey index entries for this dimension.",
   })
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
-    return this.surveyService.find(SurveyIndex, { surveyDimension });
+    return this.surveyIndexService.find({ surveyDimension });
   }
 }
 

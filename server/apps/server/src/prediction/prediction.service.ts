@@ -7,7 +7,7 @@ import {
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { BaseService } from "../shared/base.service";
+import { OldBaseService } from "../shared/old-base.service";
 import {
   PredictionTable,
   PredictionTableCreateInput,
@@ -15,7 +15,7 @@ import {
 } from "@server/src/prediction/entities/prediction-table";
 
 @Injectable()
-export class PredictionService extends BaseService {
+export class PredictionService extends OldBaseService {
   constructor(
     @InjectRepository(PredictionTableEntry)
     private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,

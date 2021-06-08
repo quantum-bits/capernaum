@@ -1,65 +1,39 @@
 import {
   DeleteResult,
-  EntityManager,
   FindConditions,
   FindManyOptions,
-  ObjectType,
+  Repository,
 } from "typeorm";
-import { AbstractEntity } from "./abstract-entity";
-import { validate } from "class-validator";
-import { Inject } from "@nestjs/common";
 
-export class BaseService {
-  @Inject()
-  protected readonly entityManager: EntityManager;
+export class BaseService<Entity> {
+  constructor(private readonly repo: Repository<Entity>) {}
 
-  create<Entity, CreateInput>(
-    entityClass: ObjectType<Entity>,
-    createInput: CreateInput
-  ) {
-    return this.entityManager.save(
-      entityClass,
-      this.entityManager.create(entityClass, createInput)
-    );
+  create<CreateInput>(createInput: CreateInput) {
+    return this.repo.save(this.repo.create(createInput));
   }
 
-  async validateAndSave(entity: AbstractEntity) {
-    const errors = await validate(entity);
-    if (errors.length) {
-      throw new Error(errors.toString());
-    } else {
-      return this.entityManager.save(entity);
-    }
+  find(conditions?: FindConditions<Entity> | FindManyOptions<Entity>) {
+    return this.repo.find(conditions);
   }
 
-  find<Entity>(
-    entityClass: ObjectType<Entity>,
-    conditions?: FindConditions<Entity> | FindManyOptions<Entity>
-  ) {
-    return this.entityManager.find(entityClass, conditions);
+  findOne(id: number) {
+    return this.repo.findOne(id);
   }
 
-  findOne<Entity>(entityClass: ObjectType<Entity>, id: number) {
-    return this.entityManager.findOne(entityClass, id);
+  findOneOrFail(id: number) {
+    return this.repo.findOneOrFail(id);
   }
 
-  findOneOrFail<Entity>(entityClass: ObjectType<Entity>, id: number) {
-    return this.entityManager.findOneOrFail(entityClass, id);
+  async update<UpdateInput>(updateInput: UpdateInput) {
+    const preload = await this.repo.preload(updateInput);
+    return this.repo.save(preload);
   }
 
-  async update<Entity, UpdateInput>(
-    entityClass: ObjectType<Entity>,
-    updateInput: UpdateInput
-  ) {
-    const preload = await this.entityManager.preload(entityClass, updateInput);
-    return this.entityManager.save(entityClass, preload);
-  }
-
-  async delete<Entity>(entityClass: ObjectType<Entity>, id: number) {
-    const result: DeleteResult = await this.entityManager.delete(
-      entityClass,
-      id
-    );
+  async delete(id: number) {
+    const result: DeleteResult = await this.repo.delete(id);
     return result.affected;
   }
 }
+
+// Credits:
+// https://stackoverflow.com/a/60574675/1477144
