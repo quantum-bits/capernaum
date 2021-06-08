@@ -261,14 +261,12 @@ export class SurveyDimensionResolver {
 
   @ResolveField(() => Survey)
   survey(@Parent() surveyDimension: SurveyDimension) {
-    return this.surveyDimensionService.findOne(surveyDimension.surveyId);
+    return this.surveyDimensionService.findSurvey(surveyDimension);
   }
 
-  @ResolveField(() => [SurveyIndex], {
-    description: "List of survey index entries for this dimension.",
-  })
+  @ResolveField(() => [SurveyIndex])
   surveyIndices(@Parent() surveyDimension: SurveyDimension) {
-    return this.surveyIndexService.find({ surveyDimension });
+    return this.surveyDimensionService.findIndices(surveyDimension);
   }
 }
 

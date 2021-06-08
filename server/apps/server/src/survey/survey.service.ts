@@ -522,9 +522,25 @@ export class SurveyService extends OldBaseService {
 export class SurveyDimensionService extends BaseService<SurveyDimension> {
   constructor(
     @InjectRepository(SurveyDimension)
-    private readonly surveyDimensionRepo: Repository<SurveyDimension>
+    private readonly surveyDimensionRepository: Repository<SurveyDimension>
   ) {
-    super(surveyDimensionRepo);
+    super(surveyDimensionRepository);
+  }
+
+  findSurvey(surveyDimension: SurveyDimension) {
+    return this.surveyDimensionRepository
+      .createQueryBuilder()
+      .relation("survey")
+      .of(surveyDimension)
+      .loadOne();
+  }
+
+  findIndices(surveyDimension: SurveyDimension) {
+    return this.surveyDimensionRepository
+      .createQueryBuilder()
+      .relation("surveyIndices")
+      .of(surveyDimension)
+      .loadMany();
   }
 }
 
@@ -532,9 +548,9 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
 export class SurveyIndexService extends BaseService<SurveyIndex> {
   constructor(
     @InjectRepository(SurveyIndex)
-    private readonly surveyDimensionRepo: Repository<SurveyIndex>
+    private readonly surveyIndexRepository: Repository<SurveyIndex>
   ) {
-    super(surveyDimensionRepo);
+    super(surveyIndexRepository);
   }
 }
 
