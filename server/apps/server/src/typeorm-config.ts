@@ -2,7 +2,6 @@ import { config } from "dotenv";
 config();
 
 import { ConnectionOptions } from "typeorm";
-
 import {
   Letter,
   LetterElement,
@@ -28,6 +27,9 @@ import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
 import { Group, GroupType } from "./group/entities";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("orm");
 
 export const entities = [
   Event,
@@ -60,5 +62,5 @@ export const options: ConnectionOptions = {
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
   entities,
-  logging: false,
+  logging: debug.enabled,
 };

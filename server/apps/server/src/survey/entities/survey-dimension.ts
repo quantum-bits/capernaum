@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Column, DeepPartial, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -50,7 +50,7 @@ export class SurveyDimension extends AbstractEntity {
   description:
     "Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.",
 })
-export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
+export class SurveyDimensionCreateInput implements DeepPartial<SurveyDimension> {
   @Field(() => Int) surveyId: number;
   @Field() title: string;
   @Field(() => Int) sequence: number;

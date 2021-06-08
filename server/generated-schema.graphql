@@ -116,7 +116,7 @@ type QualtricsResponseImportStats {
 type SurveyDimension {
   """Unique ID for this entity"""
   id: Int!
-  survey: Survey
+  survey: Survey!
   surveyIndices: [SurveyIndex!]!
 
   """Title of this dimension (e.g., 'Focus on Prayer')"""
@@ -523,18 +523,18 @@ type QualtricsSubscription {
 type Query {
   survey(id: Int!): Survey!
   surveys: [Survey!]!
-  surveyDimensions: [SurveyDimension!]!
-  surveyIndices: [SurveyIndex!]!
-
-  """Retrieve all survey items"""
-  surveyItems: [SurveyItem!]!
-  surveyDimension(id: Int!): SurveyDimension!
+  readAllSurveyDimensions: [SurveyDimension!]!
+  readOneSurveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
   surveyResponse(id: Int!): SurveyResponse!
   surveyResponses(
     """Limit to one group"""
     groupId: Int
   ): [SurveyResponse!]!
+  surveyIndices: [SurveyIndex!]!
+
+  """Retrieve all survey items"""
+  surveyItems: [SurveyItem!]!
   readGroups: [Group!]!
   readGroup(id: Int!): Group
   findGroupByCodeWord(codeWord: String!): Group
@@ -560,20 +560,7 @@ type Query {
 type Mutation {
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
-
-  """Create a survey dimension."""
-  createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
-
-  """Create a survey index. Can add survey items directly by item ID."""
-  createSurveyIndex(createInput: SurveyIndexCreateInput!): SurveyIndex!
   updateSurvey(updateInput: SurveyUpdateInput!): Survey!
-  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
-
-  """
-  Update an index. Field values will replaces existing values in the object.
-        (e.g., if you give a value for itemIds, it will replace the current list.
-  """
-  updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
   deleteSurvey(id: Int!): Int!
 
   """
@@ -590,6 +577,18 @@ type Mutation {
 
   """Delete a survey response"""
   deleteSurveyResponse(id: Int!): Int!
+
+  """Create a survey dimension."""
+  createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
+
+  """Create a survey index. Can add survey items directly by item ID."""
+  createSurveyIndex(createInput: SurveyIndexCreateInput!): SurveyIndex!
+
+  """
+  Update an index. Field values will replaces existing values in the object.
+        (e.g., if you give a value for itemIds, it will replace the current list.
+  """
+  updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
   createGroup(createInput: GroupCreateInput!): Group!
   updateGroup(updateInput: GroupUpdateInput!): Group!
   deleteGroup(id: Int!): Int!
@@ -651,6 +650,18 @@ input SurveyItemCreateInput {
   qualtricsText: String!
 }
 
+input SurveyUpdateInput {
+  id: Int!
+  qualtricsId: String
+  qualtricsName: String
+  qualtricsModDate: String
+  emailKey: String
+  groupCodeKey: String
+  okayForGroup: Boolean
+  publicName: String
+  detailedDescription: String
+}
+
 """
 Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.
 """
@@ -675,24 +686,6 @@ input SurveyIndexCreateInput {
 
   """Use this index in prediction tables?"""
   useForPredictions: Boolean!
-}
-
-input SurveyUpdateInput {
-  id: Int!
-  qualtricsId: String
-  qualtricsName: String
-  qualtricsModDate: String
-  emailKey: String
-  groupCodeKey: String
-  okayForGroup: Boolean
-  publicName: String
-  detailedDescription: String
-}
-
-input SurveyDimensionUpdateInput {
-  id: Int!
-  title: String
-  sequence: Int
 }
 
 input SurveyIndexUpdateInput {

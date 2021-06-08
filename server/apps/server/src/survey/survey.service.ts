@@ -64,17 +64,6 @@ export class SurveyService extends OldBaseService {
     return this.surveyRepo.save(this.surveyRepo.create(createInput));
   }
 
-  async createDimension(createInput: SurveyDimensionCreateInput) {
-    const survey = await this.surveyRepo.findOneOrFail(createInput.surveyId);
-    return this.surveyDimensionRepo.save(
-      this.surveyDimensionRepo.create({
-        survey,
-        title: createInput.title,
-        sequence: createInput.sequence,
-      })
-    );
-  }
-
   async createIndex(createInput: SurveyIndexCreateInput) {
     return this.entityManager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
@@ -521,26 +510,35 @@ export class SurveyService extends OldBaseService {
 @Injectable()
 export class SurveyDimensionService extends BaseService<SurveyDimension> {
   constructor(
+    private readonly surveyService: SurveyService,
+
     @InjectRepository(SurveyDimension)
-    private readonly surveyDimensionRepository: Repository<SurveyDimension>
+    private readonly repo: Repository<SurveyDimension>
   ) {
-    super(surveyDimensionRepository);
+    super(repo);
   }
 
-  findSurvey(surveyDimension: SurveyDimension) {
-    return this.surveyDimensionRepository
-      .createQueryBuilder()
-      .relation("survey")
-      .of(surveyDimension)
-      .loadOne();
+  async create(createInput: SurveyDimensionCreateInput) {
+    const survey = await this.surveyService.readSurvey(createInput.surveyId);
+    return this.repo.save(
+      this.repo.create({
+        survey,
+        title: createInput.title,
+        sequence: createInput.sequence,
+      })
+    );
   }
 
-  findIndices(surveyDimension: SurveyDimension) {
-    return this.surveyDimensionRepository
-      .createQueryBuilder()
-      .relation("surveyIndices")
-      .of(surveyDimension)
-      .loadMany();
+  readOne(id: number) {
+    return this.repo.findOne(id, { relations: ["survey", "surveyIndices"] });
+  }
+
+  readRelatedSurvey(surveyDimension: SurveyDimension) {
+    return this.resolveOne(surveyDimension, "survey");
+  }
+
+  readRelatedIndices(surveyDimension: SurveyDimension) {
+    return this.resolveMany(surveyDimension, "surveyIndices");
   }
 }
 
