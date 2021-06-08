@@ -28,21 +28,23 @@ export class PredictionService extends BaseService {
   replacePredictionTableEntries(
     replaceInput: PredictionTableEntryReplaceInput
   ): Promise<PredictionTableEntry[]> {
-    return this.entityManager.transaction(async (manager) => {
-      const predictionTableEntryRepo =
-        manager.getRepository(PredictionTableEntry);
+    return this.predictionTableEntryRepo.manager.transaction(
+      async (manager) => {
+        const predictionTableEntryRepo =
+          manager.getRepository(PredictionTableEntry);
 
-      // Insert the replacement entries.
-      const newEntries: PredictionTableEntry[] = [];
-      for (const inputEntry of replaceInput.entries) {
-        const entry = predictionTableEntryRepo.create({
-          ...inputEntry,
-        });
-        newEntries.push(await predictionTableEntryRepo.save(entry));
+        // Insert the replacement entries.
+        const newEntries: PredictionTableEntry[] = [];
+        for (const inputEntry of replaceInput.entries) {
+          const entry = predictionTableEntryRepo.create({
+            ...inputEntry,
+          });
+          newEntries.push(await predictionTableEntryRepo.save(entry));
+        }
+
+        return newEntries;
       }
-
-      return newEntries;
-    });
+    );
   }
 
   async updateScriptureEngagementPractice(

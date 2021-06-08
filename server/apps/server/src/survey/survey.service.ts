@@ -35,8 +35,9 @@ import { BaseService } from "../shared/base.service";
 import { Letter } from "@server/src/letter/entities";
 import { getDebugger } from "@helpers/debug-factory";
 import { GroupService } from "@server/src/group/group.service";
+import { BaseService2 } from "@server/src/shared/base2.service";
 
-const surveyDebug = getDebugger("survey");
+const debug = getDebugger("survey");
 
 @Injectable()
 export class SurveyService extends BaseService {
@@ -104,7 +105,7 @@ export class SurveyService extends BaseService {
   }
 
   surveyResponseComplete(responseId: number) {
-    surveyDebug("get complete response %d", responseId);
+    debug("get complete response %d", responseId);
 
     return this.surveyResponseRepo
       .createQueryBuilder("surveyResponse")
@@ -358,7 +359,7 @@ export class SurveyService extends BaseService {
 
       if (!workingSurvey) {
         // Haven't imported this survey. Create a new one.
-        surveyDebug("Survey not in database; creating new one");
+        debug("Survey not in database; creating new one");
         workingSurvey = surveyRepo.create({
           qualtricsId: qualtricsSurvey.id,
           qualtricsName: qualtricsSurvey.name,
@@ -366,9 +367,7 @@ export class SurveyService extends BaseService {
           surveyItems: [],
         });
       } else {
-        surveyDebug(
-          `Survey '${qualtricsSurvey.id}' already in database; updating`
-        );
+        debug(`Survey '${qualtricsSurvey.id}' already in database; updating`);
         workingSurvey.qualtricsName = qualtricsSurvey.name;
         workingSurvey.qualtricsModDate = qualtricsSurvey.lastModifiedDate;
       }
@@ -380,16 +379,16 @@ export class SurveyService extends BaseService {
         if (question.questionType.type === "TE") {
           // This question asks for text input. The only ones we care about here are
           // the ones for the questions having a Qualtrics name of "EMAIL" or "GROUP_CODE".
-          surveyDebug("Found a text question %O", question);
+          debug("Found a text question %O", question);
           const responseKey = `${qualtricsId}_TEXT`;
           if (question.questionName === "EMAIL") {
             workingSurvey.emailKey = responseKey;
-            surveyDebug(`Found the EMAIL question - '${responseKey}'`);
+            debug(`Found the EMAIL question - '${responseKey}'`);
           } else if (question.questionName === "GROUP_CODE") {
             workingSurvey.groupCodeKey = responseKey;
-            surveyDebug(`Found the GROUP_CODE question - '${responseKey}'`);
+            debug(`Found the GROUP_CODE question - '${responseKey}'`);
           } else {
-            surveyDebug("Ignoring this text question");
+            debug("Ignoring this text question");
           }
         } else if (
           question.questionType.type === "MC" &&
@@ -398,22 +397,20 @@ export class SurveyService extends BaseService {
         ) {
           // This question is a multiple choice question with seven choices.
           // Consider it one of the main survey questions and import it.
-          surveyDebug("Handling question %s", qualtricsId);
+          debug("Handling question %s", qualtricsId);
           const trimmedQuestionText = question.questionText.trim();
 
           // See if we've already imported it.
           const existingItem = workingSurvey.findItem(qualtricsId);
           if (existingItem) {
             // Already have this question; update it.
-            surveyDebug(`Update existing question to '${trimmedQuestionText}'`);
+            debug(`Update existing question to '${trimmedQuestionText}'`);
             existingItem.qualtricsText = trimmedQuestionText;
             existingItem.qualtricsName = question.questionName;
             await surveyItemRepo.save(existingItem);
           } else {
             // New question; create it.
-            surveyDebug(
-              `Add new question ${qualtricsId} - ${trimmedQuestionText}`
-            );
+            debug(`Add new question ${qualtricsId} - ${trimmedQuestionText}`);
             const newItem = surveyItemRepo.create({
               qualtricsId,
               qualtricsText: trimmedQuestionText,
@@ -426,7 +423,7 @@ export class SurveyService extends BaseService {
       }
 
       // Save everything to the database.
-      surveyDebug("Save to the database");
+      debug("Save to the database");
       return surveyRepo.save(workingSurvey);
     });
   }
@@ -452,10 +449,7 @@ export class SurveyService extends BaseService {
       if (previousImport) {
         foundPreviousImport = true;
         // We've previously imported this response; toss it and replace it from Qualtrics.
-        surveyDebug(
-          "Delete previously imported response %s",
-          createInput.responseId
-        );
+        debug("Delete previously imported response %s", createInput.responseId);
         await SurveyService._deleteSurveyResponse(manager, previousImport.id);
       }
 
@@ -470,7 +464,7 @@ export class SurveyService extends BaseService {
       if (codeWord) {
         group = await this.groupService.findGroupByCodeWord(codeWord);
       }
-      surveyDebug("Code word '%s', group %O", codeWord, group);
+      debug("Code word '%s', group %O", codeWord, group);
 
       // Save response metadata to the database.
       const newSurveyResponse = await surveyResponseRepo.save(
@@ -521,6 +515,30 @@ export class SurveyService extends BaseService {
         surveyResponse: newSurveyResponse,
       };
     });
+  }
+}
+
+@Injectable()
+export class SurveyDimensionService extends BaseService2<SurveyDimension> {
+  constructor(
+    @InjectRepository(SurveyDimension)
+    private readonly surveyDimensionRepo: Repository<SurveyDimension>
+  ) {
+    super(surveyDimensionRepo);
+  }
+
+  labradorRetriever(id: number) {
+    return this.findOneOrFail(id);
+  }
+}
+
+@Injectable()
+class Foo {
+  constructor(
+    private readonly surveyDimensionService: SurveyDimensionService
+  ) {}
+  getOne() {
+    return this.surveyDimensionService.labradorRetriever(27);
   }
 }
 

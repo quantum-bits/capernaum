@@ -49,3 +49,5 @@ export function FieldColumn(
     })(target, propertyName);
   };
 }
+
+// The structure of the function overloads is cribbed from the @nestjs/graphql decorators.

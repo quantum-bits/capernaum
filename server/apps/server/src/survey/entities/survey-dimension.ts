@@ -13,8 +13,7 @@ export class SurveyDimension extends AbstractEntity {
   @ManyToOne(() => Survey, (survey) => survey.surveyDimensions)
   @Field(() => Survey, { nullable: true })
   survey: Survey;
-  @Column("integer")
-  surveyId: number;
+  @Column("integer") surveyId: number;
 
   @OneToMany(() => SurveyIndex, (index) => index.surveyDimension)
   @Field(() => [SurveyIndex])

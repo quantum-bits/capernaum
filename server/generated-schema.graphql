@@ -204,6 +204,7 @@ type Group {
 }
 
 type GroupType {
+  """Unique ID for this entity"""
   id: Int!
 
   """Group name (e.g., 'Small Group')"""

@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { BaseService } from "../shared/base.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import {
@@ -17,10 +16,10 @@ import * as path from "path";
 import { DateTime } from "luxon";
 import { getDebugger } from "@helpers/debug-factory";
 
-const groupDebug = getDebugger("group");
+const debug = getDebugger("group");
 
 @Injectable()
-export class GroupService extends BaseService {
+export class GroupService {
   private readonly groupAdminTextTemplate;
   private readonly groupAdminHtmlTemplate;
 
@@ -29,8 +28,6 @@ export class GroupService extends BaseService {
     @InjectRepository(Group)
     private readonly groupRepo: Repository<Group>
   ) {
-    super();
-
     this.groupAdminTextTemplate = GroupService.compileTemplate(
       "server/group/letters/group-admin.txt"
     );
@@ -46,7 +43,7 @@ export class GroupService extends BaseService {
    */
   private static compileTemplate(relativePath: string) {
     const templatePath = path.join(__dirname, "..", relativePath);
-    groupDebug("template '%s'", templatePath);
+    debug("template '%s'", templatePath);
     return Handlebars.compile(readFileSync(templatePath, "utf-8"));
   }
 
@@ -96,7 +93,7 @@ export class GroupService extends BaseService {
       tuC4seUrl: process.env.TU_C4SE_URL,
       tuClsUrl: process.env.TU_CLS_URL,
     };
-    groupDebug("createGroup/groupDetails %O", groupDetails);
+    debug("createGroup/groupDetails %O", groupDetails);
 
     // Send email to group administrator.
     const mailDetails = new SendMailInput();
@@ -106,7 +103,7 @@ export class GroupService extends BaseService {
     mailDetails.htmlContent = this.groupAdminHtmlTemplate(groupDetails);
     mailDetails.textContent = this.groupAdminTextTemplate(groupDetails);
     await this.mailService.sendMail(mailDetails);
-    groupDebug("sent email");
+    debug("sent email");
 
     return groupDetails;
   }
@@ -117,7 +114,7 @@ export class GroupService extends BaseService {
         relations: ["type", "survey", "surveyResponses"],
       })
       .then((result) => {
-        groupDebug("readGroups %O", result);
+        debug("readGroups %O", result);
         return result;
       })
       .catch((err) => {
@@ -142,7 +139,7 @@ export class GroupService extends BaseService {
   }
 
   deleteGroup(id: number) {
-    groupDebug("deleting group %d", id);
+    debug("deleting group %d", id);
     return this.groupRepo.delete(id);
   }
 }
