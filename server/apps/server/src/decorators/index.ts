@@ -1,11 +1,15 @@
 import { isFunction } from "@nestjs/common/utils/shared.utils";
 import { ReturnTypeFunc, Field, FieldOptions } from "@nestjs/graphql";
-import { Column } from "typeorm";
+import {
+  Column,
+  ColumnOptions,
+  ManyToOne,
+  ObjectType,
+  RelationOptions,
+} from "typeorm";
 
-interface FieldColumnOptions {
-  nullable?: boolean;
-  default?: any;
-}
+type FieldColumnOptions = FieldOptions & ColumnOptions;
+type FieldRelationOptions = FieldOptions & RelationOptions;
 
 export function FieldColumn(
   description: string,
@@ -50,4 +54,17 @@ export function FieldColumn(
   };
 }
 
-// The structure of the function overloads is cribbed from the @nestjs/graphql decorators.
+export function FieldManyToOne<T>(
+  description: string,
+  typeFunction: (type?: any) => ObjectType<T>,
+  inverseFunction: (object: T) => any,
+  options: FieldRelationOptions = {}
+): PropertyDecorator {
+  return (target: any, propertyName: string) => {
+    ManyToOne(typeFunction, inverseFunction)(target, propertyName);
+    Field(typeFunction, options)(target, propertyName);
+  };
+}
+
+// Credits:
+// * The structure of the function overloads is cribbed from the @nestjs/graphql decorators.

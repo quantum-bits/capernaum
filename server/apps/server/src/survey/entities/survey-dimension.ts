@@ -1,32 +1,34 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Column, DeepPartial, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, OneToMany } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ChartData } from "../survey.types";
+import { FieldColumn, FieldManyToOne } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({
   description: "Top-level grouping of questions in Capernaum; contains indices",
 })
 export class SurveyDimension extends AbstractEntity {
-  @ManyToOne(() => Survey, (survey) => survey.surveyDimensions)
-  @Field(() => Survey, { nullable: true })
+  // @ManyToOne(() => Survey, (survey) => survey.surveyDimensions)
+  // @Field(() => Survey, { nullable: true })
+  @FieldManyToOne(
+    "Survey that owns this dimension",
+    () => Survey,
+    (survey) => survey.surveyDimensions,
+    { nullable: true }
+  )
   survey: Survey;
-  @Column("integer") surveyId: number;
 
   @OneToMany(() => SurveyIndex, (index) => index.surveyDimension)
   @Field(() => [SurveyIndex])
   surveyIndices: SurveyIndex[];
 
-  @Column()
-  @Field({ description: "Title of this dimension (e.g., 'Focus on Prayer')" })
+  @FieldColumn("Title of this dimension (e.g., 'Focus on Prayer')")
   title: string;
 
-  @Column("int")
-  @Field(() => Int, {
-    description: "Sequence number; dimension are displayed in this order.",
-  })
+  @FieldColumn("Sequence number", () => Int)
   sequence: number;
 
   /**
@@ -50,7 +52,7 @@ export class SurveyDimension extends AbstractEntity {
   description:
     "Data to create a new dimension. Does not embed indices. Add them with createSurveyIndex.",
 })
-export class SurveyDimensionCreateInput implements DeepPartial<SurveyDimension> {
+export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
   @Field(() => Int) surveyId: number;
   @Field() title: string;
   @Field(() => Int) sequence: number;
