@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -20,7 +19,6 @@ export class Group extends AbstractEntity {
   @Field(() => GroupType)
   @ManyToOne(() => GroupType, (groupType) => groupType.groups)
   type: GroupType;
-  @Column("integer") typeId: number;
 
   @FieldColumn("Name for 'other' type ", { nullable: true })
   otherTypeName?: string;
@@ -52,16 +50,15 @@ export class Group extends AbstractEntity {
   })
   plannedInvitees: number;
 
-  @ManyToOne(() => Survey, (survey) => survey.groups)
   @Field(() => Survey)
+  @ManyToOne(() => Survey, (survey) => survey.groups)
   survey: Survey;
-  @Column("integer") surveyId: number;
 
-  @OneToMany(() => SurveyResponse, (sr) => sr.group)
   @Field(() => [SurveyResponse], {
     description: "Responses by this group",
     nullable: true,
   })
+  @OneToMany(() => SurveyResponse, (sr) => sr.group)
   surveyResponses: SurveyResponse[];
 }
 

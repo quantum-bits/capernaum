@@ -14,7 +14,6 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { FileService } from "../file/file.service";
 import { ImageService } from "./image.service";
-import { Image } from "./entities";
 import getRawBody from "raw-body";
 import { IMAGE_FILE_SERVICE } from "../file/file.module";
 
@@ -29,7 +28,7 @@ export class ImageController {
   @Header("Content-Type", "text/plain")
   @UseInterceptors(FileInterceptor("filepondUpload"))
   async process(@UploadedFile() file): Promise<number> {
-    const imageDetails = await this.imageService.createImage(
+    const imageDetails = await this.imageService.create(
       file.originalname,
       file.mimetype
     );
@@ -39,7 +38,7 @@ export class ImageController {
 
   @Get(":id")
   async getImage(@Res() res, @Param("id") id: number) {
-    const imageDetails = await this.imageService.findOne(Image, id);
+    const imageDetails = await this.imageService.readOne(id);
     const imagePath = this.imageFileService.absolutePath(
       imageDetails.fileName()
     );
@@ -56,10 +55,10 @@ export class ImageController {
     getRawBody(req)
       .then(async (body) => {
         const id = parseInt(body.toString());
-        const imageDetails = await this.imageService.findOne(Image, id);
+        const imageDetails = await this.imageService.readOne(id);
 
         await this.imageFileService.deleteFile(imageDetails.fileName());
-        await this.imageService.delete(Image, id);
+        await this.imageService.delete(id);
       })
       .catch((err) => {
         throw err;

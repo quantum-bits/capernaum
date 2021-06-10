@@ -150,7 +150,7 @@ export class QualtricsService {
       const codeWord = createInput.values[survey.groupCodeKey];
       let group = null;
       if (codeWord) {
-        group = await this.groupService.findGroupByCodeWord(codeWord);
+        group = await this.groupService.findByCodeWord(codeWord);
       }
       debug("Code word '%s', group %O", codeWord, group);
 
@@ -177,20 +177,20 @@ export class QualtricsService {
 
       // Map the qualtrics ID for each question to its database ID.
       // We will only import responses to these questions.
-      const qualtricsIdToId = new Map<string, number>(
-        survey.surveyItems.map((item) => [item.qualtricsId, item.id])
+      const qualtricsIdToSurveyItem = new Map<string, SurveyItem>(
+        survey.surveyItems.map((item) => [item.qualtricsId, item])
       );
 
       // Save response for each question to database. Use the above
       // map to avoid inserting any response that doesn't exist in the survey.
       // This may be unnecessarily paranoid.
       for (const [key, value] of Object.entries(createInput.values)) {
-        if (key.startsWith("QID") && qualtricsIdToId.has(key)) {
+        if (key.startsWith("QID") && qualtricsIdToSurveyItem.has(key)) {
           const label = createInput.labels[key];
           await surveyItemResponseRepo.save(
             surveyItemResponseRepo.create({
               surveyResponse: newSurveyResponse,
-              surveyItemId: qualtricsIdToId.get(key),
+              surveyItem: qualtricsIdToSurveyItem.get(key),
               label: label,
               value: parseInt(value),
             })

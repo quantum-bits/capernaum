@@ -25,7 +25,7 @@ export class SurveyService extends BaseService<Survey> {
     super(repo);
   }
 
-  create(createInput: SurveyCreateInput) {
+  construct(createInput: SurveyCreateInput) {
     return this.repo.save(this.repo.create(createInput));
   }
 
@@ -80,7 +80,7 @@ export class SurveyService extends BaseService<Survey> {
       .then((result) => this.repo.save(result));
   }
 
-  async delete(id: number) {
+  async deconstruct(id: number) {
     return this.repo.manager.transaction(async (manager) => {
       await manager.delete(SurveyItem, { surveyId: id });
       const deleteResult = await manager.delete(Survey, id);

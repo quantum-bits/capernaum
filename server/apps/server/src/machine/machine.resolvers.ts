@@ -5,23 +5,23 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { MachineService } from "./machine.service";
 import { Int } from "@nestjs/graphql";
 
-@Resolver(of => Machine)
+@Resolver(() => Machine)
 @UseGuards(GqlAuthGuard)
 export class MachineResolver {
   constructor(protected readonly machineService: MachineService) {}
 
-  @Mutation(returns => Machine)
+  @Mutation(() => Machine)
   createMachine(@Args("createInput") createInput: MachineCreateInput) {
-    return this.machineService.create(Machine, createInput);
+    return this.machineService.create(createInput);
   }
 
-  @Query(returns => [Machine])
+  @Query(() => [Machine])
   machines() {
-    return this.machineService.find(Machine);
+    return this.machineService.readAll();
   }
 
-  @Mutation(returns => Int)
+  @Mutation(() => Int)
   deleteMachine(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.machineService.delete(Machine, id);
+    return this.machineService.delete(id);
   }
 }

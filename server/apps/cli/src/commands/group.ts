@@ -13,7 +13,7 @@ export async function listGroups() {
   const nestContext = new NestContext();
   const groupService: GroupService = await nestContext.get(GroupService);
 
-  const groups = await groupService.readGroups();
+  const groups = await groupService.readAll();
   debug("groups %O", groups);
   await nestContext.close();
 
@@ -35,7 +35,7 @@ export async function getGroup(codeWord: string, options) {
 
   const result = {} as { group: Group; responses: SurveyResponse[] };
 
-  result.group = await groupService.findGroupByCodeWord(codeWord);
+  result.group = await groupService.findByCodeWord(codeWord);
 
   if (options.withResponses) {
     result.responses = await surveyService.readSurveyResponses(result.group.id);

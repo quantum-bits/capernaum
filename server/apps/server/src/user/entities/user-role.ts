@@ -1,12 +1,16 @@
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Field, InputType, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Entity } from "typeorm";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
 export class UserRole extends AbstractEntity {
-  @Field() @Column({ unique: true }) name: string;
-  @Field() @Column() description: string;
+  @FieldColumn("Role name", { unique: true })
+  name: string;
+
+  @FieldColumn("Role description")
+  description: string;
 }
 
 @InputType()

@@ -1,86 +1,125 @@
 import { Injectable } from "@nestjs/common";
 import {
   PredictionTableEntry,
+  PredictionTableEntryCreateInput,
   PredictionTableEntryReplaceInput,
   ScriptureEngagementPractice,
+  ScriptureEngagementPracticeCreateInput,
   ScriptureEngagementPracticeUpdateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { OldBaseService } from "../shared/old-base.service";
 import {
   PredictionTable,
   PredictionTableCreateInput,
   PredictionTableUpdateInput,
 } from "@server/src/prediction/entities/prediction-table";
-
-@Injectable()
-export class PredictionService extends OldBaseService {
-  constructor(
-    @InjectRepository(PredictionTableEntry)
-    private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>,
-    @InjectRepository(ScriptureEngagementPractice)
-    private readonly scriptureEngagementRepo: Repository<ScriptureEngagementPractice>
-  ) {
-    super();
-  }
-
-  replacePredictionTableEntries(
-    replaceInput: PredictionTableEntryReplaceInput
-  ): Promise<PredictionTableEntry[]> {
-    return this.predictionTableEntryRepo.manager.transaction(
-      async (manager) => {
-        const predictionTableEntryRepo =
-          manager.getRepository(PredictionTableEntry);
-
-        // Insert the replacement entries.
-        const newEntries: PredictionTableEntry[] = [];
-        for (const inputEntry of replaceInput.entries) {
-          const entry = predictionTableEntryRepo.create({
-            ...inputEntry,
-          });
-          newEntries.push(await predictionTableEntryRepo.save(entry));
-        }
-
-        return newEntries;
-      }
-    );
-  }
-
-  async updateScriptureEngagementPractice(
-    updateInput: ScriptureEngagementPracticeUpdateInput
-  ): Promise<ScriptureEngagementPractice> {
-    const practice = await this.scriptureEngagementRepo.preload(updateInput);
-    return this.scriptureEngagementRepo.save(practice);
-  }
-}
+import { BaseService } from "@server/src/shared/base.service";
 
 @Injectable()
 export class PredictionTableService {
   constructor(
     @InjectRepository(PredictionTable)
-    private readonly predictionTableRepo: Repository<PredictionTable>
+    private readonly repo: Repository<PredictionTable>
   ) {}
 
-  createPredictionTable(createInput: PredictionTableCreateInput) {
-    return this.predictionTableRepo.save(
-      this.predictionTableRepo.create(createInput)
-    );
+  create(createInput: PredictionTableCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
   }
 
-  readPredictionTables() {
-    return this.predictionTableRepo.find();
+  readAll() {
+    return this.repo.find();
   }
 
-  updatePredictionTable(updateInput: PredictionTableUpdateInput) {
-    return this.predictionTableRepo
+  update(updateInput: PredictionTableUpdateInput) {
+    return this.repo
       .preload(updateInput)
-      .then((result) => this.predictionTableRepo.save(result));
+      .then((result) => this.repo.save(result));
   }
 
-  deletePredictionTable(id: number) {
-    return this.predictionTableRepo
-      .delete(id)
-      .then((result) => result.affected);
+  delete(id: number) {
+    return this.repo.delete(id).then((result) => result.affected);
+  }
+}
+
+@Injectable()
+export class PredictionTableEntryService extends BaseService<PredictionTableEntry> {
+  constructor(
+    @InjectRepository(PredictionTableEntry)
+    private readonly repo: Repository<PredictionTableEntry>
+  ) {
+    super(repo);
+  }
+
+  construct(createInput: PredictionTableEntryCreateInput) {
+    this.repo.save(this.repo.create(createInput));
+  }
+
+  resolveSurveyIndex(predictionTableEntry: PredictionTableEntry) {
+    return super.resolveOne(predictionTableEntry, "surveyIndex");
+  }
+
+  resolveScriptureEngagementPractice(
+    predictionTableEntry: PredictionTableEntry
+  ) {
+    return super.resolveOne(predictionTableEntry, "practice");
+  }
+
+  replacePredictionTableEntries(
+    replaceInput: PredictionTableEntryReplaceInput
+  ): Promise<PredictionTableEntry[]> {
+    return this.repo.manager.transaction(async (manager) => {
+      const predictionTableEntryRepo =
+        manager.getRepository(PredictionTableEntry);
+
+      // Insert the replacement entries.
+      const newEntries: PredictionTableEntry[] = [];
+      for (const inputEntry of replaceInput.entries) {
+        const entry = predictionTableEntryRepo.create({
+          ...inputEntry,
+        });
+        newEntries.push(await predictionTableEntryRepo.save(entry));
+      }
+
+      return newEntries;
+    });
+  }
+}
+
+@Injectable()
+export class ScriptureEngagementPracticeService extends BaseService<ScriptureEngagementPractice> {
+  constructor(
+    @InjectRepository(ScriptureEngagementPractice)
+    private readonly repo: Repository<ScriptureEngagementPractice>
+  ) {
+    super(repo);
+  }
+
+  create(createInput: ScriptureEngagementPracticeCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id);
+  }
+
+  readAll() {
+    return this.repo.find();
+  }
+
+  resolvePredictionTableEntries(practice: ScriptureEngagementPractice) {
+    return super.resolveMany(practice, "predictionTableEntries");
+  }
+
+  update(
+    updateInput: ScriptureEngagementPracticeUpdateInput
+  ): Promise<ScriptureEngagementPractice> {
+    return this.repo
+      .preload(updateInput)
+      .then((result) => this.repo.save(result));
+  }
+
+  deconstruct(id: number) {
+    return this.repo.delete(id).then((result) => result.affected);
   }
 }

@@ -1,14 +1,22 @@
-import { Column, Entity } from "typeorm";
+import { Entity } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({ description: "Scripture engagement practice" })
 export class ScriptureEngagementPractice extends AbstractEntity {
-  @Column() @Field() title: string;
-  @Column("text") @Field() description: string;
-  @Column() @Field() moreInfoUrl: string;
-  @Column() @Field((type) => Int) sequence: number;
+  @FieldColumn("Practice title")
+  title: string;
+
+  @FieldColumn("Description of this practice", { type: "text" })
+  description: string;
+
+  @FieldColumn("URL for more information on practice")
+  moreInfoUrl: string;
+
+  @FieldColumn("Sequence number", () => Int)
+  sequence: number;
 }
 
 @InputType()

@@ -1,30 +1,24 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Entity, ManyToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { SurveyResponse } from "./survey-response";
 import { SurveyItem } from "./survey-item";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({ description: "One user's response to a single survey question" })
 export class SurveyItemResponse extends AbstractEntity {
-  @Column("integer") surveyResponseId: number;
-  @ManyToOne((type) => SurveyResponse, (survey) => survey.surveyItemResponses)
-  @Field((type) => SurveyResponse)
+  @Field(() => SurveyResponse)
+  @ManyToOne(() => SurveyResponse, (survey) => survey.surveyItemResponses)
   surveyResponse: SurveyResponse;
 
-  @Column("integer") surveyItemId: number;
-  @ManyToOne(
-    (type) => SurveyItem,
-    (surveyItem) => surveyItem.surveyItemResponses
-  )
-  @Field((type) => SurveyItem)
+  @Field(() => SurveyItem)
+  @ManyToOne(() => SurveyItem, (surveyItem) => surveyItem.surveyItemResponses)
   surveyItem: SurveyItem;
 
-  @Column()
-  @Field()
+  @FieldColumn("Qualtrics question label")
   label: string;
 
-  @Column("int")
-  @Field((type) => Int)
+  @FieldColumn("Qualtrics question response", () => Int)
   value: number;
 }

@@ -8,24 +8,24 @@ import { getDebugger } from "@helpers/debug-factory";
 
 const eventDebug = getDebugger("events");
 
-@Resolver((of) => Event)
+@Resolver(() => Event)
 export class EventResolver {
   constructor(
     private readonly eventService: EventService,
     @Inject(PUB_SUB_PROVIDER) private readonly pubSub: PubSub
   ) {}
 
-  @Mutation((returns) => Event)
+  @Mutation(() => Event)
   createEvent(@Args("createInput") createInput: EventCreateInput) {
     return this.eventService.createEvent(createInput);
   }
 
-  @Query((returns) => [Event])
+  @Query(() => [Event])
   events() {
-    return this.eventService.find(Event);
+    return this.eventService.readAll();
   }
 
-  @Subscription((returns) => Event)
+  @Subscription(() => Event)
   newEvent() {
     eventDebug("newEvent Subscription");
     return this.pubSub.asyncIterator(NEW_EVENT_TRIGGER_NAME);

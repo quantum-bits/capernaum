@@ -5,6 +5,8 @@ import { Column } from "typeorm";
 interface FieldColumnOptions {
   nullable?: boolean;
   default?: string | number | boolean;
+  unique?: boolean;
+  type?: "integer" | "text";
 }
 
 export function FieldColumn(
@@ -46,6 +48,8 @@ export function FieldColumn(
       comment: description,
       nullable: options?.nullable,
       default: options?.default,
+      unique: options?.unique,
+      type: options?.type,
     })(target, propertyName);
   };
 }

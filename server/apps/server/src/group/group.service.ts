@@ -15,6 +15,7 @@ import { MailService } from "@server/src/mail/mail.service";
 import * as path from "path";
 import { DateTime } from "luxon";
 import { getDebugger } from "@helpers/debug-factory";
+import { BaseService } from "@server/src/shared/base.service";
 
 const debug = getDebugger("group");
 
@@ -64,7 +65,7 @@ export class GroupService {
     throw new Error("Failed to generate unique code word");
   }
 
-  async createGroup(createInput: GroupCreateInput): Promise<Group> {
+  async create(createInput: GroupCreateInput): Promise<Group> {
     // Create the new group, including a code word that hasn't been used.
     const group = await this.groupRepo.save(
       this.groupRepo.create({
@@ -108,54 +109,51 @@ export class GroupService {
     return groupDetails;
   }
 
-  readGroups() {
-    return this.groupRepo
-      .find({
-        relations: ["type", "survey", "surveyResponses"],
-      })
-      .then((result) => {
-        debug("readGroups %O", result);
-        return result;
-      })
-      .catch((err) => {
-        throw err;
-      });
-  }
+  // Always resolve these relations.
+  private alwaysResolve = ["type", "survey", "surveyResponses"];
 
-  readGroup(id: number): Promise<Group> {
-    return this.groupRepo.findOne(id, {
-      relations: ["type", "survey", "surveyResponses"],
+  readAll() {
+    return this.groupRepo.find({
+      relations: this.alwaysResolve,
     });
   }
 
-  findGroupByCodeWord(codeWord: string) {
+  readOne(id: number): Promise<Group> {
+    return this.groupRepo.findOne(id, {
+      relations: this.alwaysResolve,
+    });
+  }
+
+  findByCodeWord(codeWord: string) {
     return this.groupRepo.findOne({ codeWord });
   }
 
-  updateGroup(updateInput: GroupUpdateInput): Promise<Group> {
+  update(updateInput: GroupUpdateInput): Promise<Group> {
     return this.groupRepo
       .preload(updateInput)
       .then((result) => this.groupRepo.save(result));
   }
 
-  deleteGroup(id: number) {
+  delete(id: number) {
     debug("deleting group %d", id);
     return this.groupRepo.delete(id);
   }
 }
 
 @Injectable()
-export class GroupTypeService {
+export class GroupTypeService extends BaseService<GroupType> {
   constructor(
     @InjectRepository(GroupType)
-    private readonly groupTypeRepo: Repository<GroupType>
-  ) {}
-
-  readGroupTypes(): Promise<GroupType[]> {
-    return this.groupTypeRepo.find({ order: { seq: "ASC" } });
+    private readonly repo: Repository<GroupType>
+  ) {
+    super(repo);
   }
 
-  readGroupType(id: number) {
-    return this.groupTypeRepo.findOne(id);
+  readAll(): Promise<GroupType[]> {
+    return this.repo.find({ order: { seq: "ASC" } });
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id);
   }
 }

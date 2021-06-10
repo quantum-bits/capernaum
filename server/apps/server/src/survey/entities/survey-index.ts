@@ -4,53 +4,31 @@ import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { PredictionTableEntry } from "../../prediction/entities";
-import { mean } from "lodash";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
 export class SurveyIndex extends AbstractEntity {
-  @ManyToOne(() => SurveyDimension, (dimension) => dimension.surveyIndices)
   @Field(() => SurveyDimension)
+  @ManyToOne(() => SurveyDimension, (dimension) => dimension.surveyIndices)
   surveyDimension: SurveyDimension;
 
-  @Column({ default: true })
-  @Field({
-    description: "Use this index in prediction tables?",
-  })
+  @FieldColumn("Use this index in prediction tables?", { default: true })
   useForPredictions: boolean;
 
-  @OneToMany(() => SurveyItem, (item) => item.surveyIndex)
   @Field(() => [SurveyItem])
+  @OneToMany(() => SurveyItem, (item) => item.surveyIndex)
   surveyItems: SurveyItem[];
 
-  @OneToMany(() => PredictionTableEntry, (ptEntry) => ptEntry.surveyIndex)
   @Field(() => [PredictionTableEntry])
+  @OneToMany(() => PredictionTableEntry, (pte) => pte.surveyIndex)
   predictionTableEntries: PredictionTableEntry[];
 
-  @Column()
-  @Field({ description: "Abbreviation for this index (e.g., 'FOG')" })
+  @FieldColumn("Abbreviation for this index (e.g., 'FOG')")
   abbreviation: string;
 
-  @Column()
-  @Field({ description: "Title of this index" })
+  @FieldColumn("Title of this index")
   title: string;
-
-  private surveyItemResponses() {
-    return this.surveyItems.map((surveyItem) =>
-      surveyItem.surveyItemResponse()
-    );
-  }
-
-  /**
-   * Calculate the mean of the values from all responses to this survey item.
-   */
-  public meanResponse() {
-    return mean(
-      this.surveyItemResponses().map(
-        (surveyItemResponse) => surveyItemResponse.value
-      )
-    );
-  }
 }
 
 @InputType()

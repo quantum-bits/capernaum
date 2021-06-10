@@ -14,14 +14,14 @@ export class SurveyItemService extends BaseService<SurveyItem> {
   }
 
   readAll() {
-    this.repo.find();
+    return this.repo.find();
   }
 
   resolveRelatedSurveyIndex(surveyItem: SurveyItem) {
     return super.resolveOne(surveyItem, "surveyIndex");
   }
 
-  resolveRelatedSurveyItemResponse(surveyItem: SurveyItem) {
+  resolveRelatedSurveyItemResponses(surveyItem: SurveyItem) {
     return super.resolveMany(surveyItem, "surveyItemResponses");
   }
 }

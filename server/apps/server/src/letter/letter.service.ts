@@ -12,8 +12,6 @@ import {
   LetterUpdateInput,
 } from "./entities";
 import { Repository } from "typeorm";
-import { OldBaseService } from "../shared/old-base.service";
-import { PredictionTableEntry } from "../prediction/entities";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 
@@ -23,21 +21,13 @@ const debug = getDebugger("letter:service");
 export class LetterService extends BaseService<Letter> {
   constructor(
     @InjectRepository(Letter)
-    private readonly letterRepo: Repository<Letter>,
-    @InjectRepository(LetterType)
-    private readonly letterTypeRepo: Repository<LetterType>,
-    @InjectRepository(LetterElement)
-    private readonly letterElementRepo: Repository<LetterElement>,
-    @InjectRepository(LetterElementType)
-    private readonly letterElementTypeRepo: Repository<LetterElementType>,
-    @InjectRepository(PredictionTableEntry)
-    private readonly predictionTableEntryRepo: Repository<PredictionTableEntry>
+    private readonly repo: Repository<Letter>
   ) {
-    super(letterRepo);
+    super(repo);
   }
 
-  create(createInput: LetterCreateInput) {
-    return this.letterRepo.save(this.letterRepo.create(createInput));
+  construct(createInput: LetterCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
   }
 
   private alwaysResolve = [
@@ -48,11 +38,11 @@ export class LetterService extends BaseService<Letter> {
   ];
 
   readAll() {
-    this.letterRepo.find({ relations: this.alwaysResolve });
+    this.repo.find({ relations: this.alwaysResolve });
   }
 
   readOne(id: number) {
-    return this.letterRepo.findOneOrFail(id, {
+    return this.repo.findOne(id, {
       relations: [
         ...this.alwaysResolve,
         "letterElements.textDelta",
@@ -68,77 +58,45 @@ export class LetterService extends BaseService<Letter> {
   }
 
   update(updateInput: LetterUpdateInput) {
-    return this.letterRepo
+    return this.repo
       .preload(updateInput)
-      .then((result) => this.letterRepo.save(result));
+      .then((result) => this.repo.save(result));
   }
 
   delete(id: number) {
-    return this.letterRepo.delete(id).then((result) => result.affected);
-  }
-
-  letterElementTypes() {
-    debug("Called letterElementTypes");
-    return this.letterElementTypeRepo.find({ order: { description: "ASC" } });
-  }
-
-  /**
-   * Return elements of letter in sequence order.
-   * @param letter
-   */
-  letterElements(letter: Letter) {
-    debug("Called letterElements");
-    return this.letterElementRepo.find({
-      where: { letter },
-      order: { sequence: "ASC" },
-    });
-  }
-
-  tableEntries(letter: Letter) {
-    return this.predictionTableEntryRepo.find({
-      where: { letter },
-      order: { sequence: "ASC" },
-    });
+    return this.repo.delete(id).then((result) => result.affected);
   }
 }
 
 @Injectable()
-export class LetterTypeService extends OldBaseService {
+export class LetterTypeService extends BaseService<LetterType> {
   constructor(
     @InjectRepository(LetterType)
-    private readonly letterTypeRepo: Repository<LetterType>,
-    @InjectRepository(LetterElementType)
-    private readonly letterElementTypeRepo: Repository<LetterElementType>
+    private readonly repo: Repository<LetterType>
   ) {
-    super();
+    super(repo);
   }
 
-  createLetterType(createInput: LetterTypeCreateInput) {
-    return this.letterTypeRepo.save(this.letterTypeRepo.create(createInput));
+  construct(createInput: LetterTypeCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
   }
 
-  readLetterTypes() {
-    debug("readLetterTypes");
-    return this.letterTypeRepo.find({ relations: ["letterElementTypes"] });
+  readOne(id: number) {
+    return this.repo.findOne(id);
   }
 
-  readLetterElementTypes(letterType: LetterType) {
-    debug("readLetterElementTypes(%O)", letterType);
-    return this.letterElementTypeRepo
-      .createQueryBuilder("letterElementType")
-      .leftJoinAndSelect("letterElementType.letterTypes", "letterType")
-      .where("letterType.id = :id", { id: letterType.id })
-      .getMany();
+  readAll() {
+    return this.repo.find({ relations: ["letterElementTypes"] });
   }
 
-  updateLetterType(updateInput: LetterTypeUpdateInput) {
-    return this.letterTypeRepo
+  update(updateInput: LetterTypeUpdateInput) {
+    return this.repo
       .preload(updateInput)
-      .then((result) => this.letterTypeRepo.save(result));
+      .then((result) => this.repo.save(result));
   }
 
-  deleteLetterType(id: number) {
-    return this.letterTypeRepo.delete(id).then((result) => result.affected);
+  deconstruct(id: number) {
+    return this.repo.delete(id).then((result) => result.affected);
   }
 }
 
@@ -157,7 +115,7 @@ export class LetterElementService extends BaseService<LetterElement> {
       .then((result) => this.letterElementRepo.save(result));
   }
 
-  delete(id: number) {
+  deconstruct(id: number) {
     return this.letterElementRepo.delete(id).then((result) => result.affected);
   }
 
@@ -175,20 +133,19 @@ export class LetterElementService extends BaseService<LetterElement> {
 }
 
 @Injectable()
-export class LetterElementTypeService extends OldBaseService {
+export class LetterElementTypeService extends BaseService<LetterElementType> {
   constructor(
-    @InjectRepository(LetterType)
-    private readonly letterTypeRepo: Repository<LetterType>
+    @InjectRepository(LetterElementType)
+    private readonly repo: Repository<LetterElementType>
   ) {
-    super();
+    super(repo);
   }
 
-  readLetterTypes(letterElementType: LetterElementType) {
-    debug("readLetterTypes(%O)", letterElementType);
-    return this.letterTypeRepo
-      .createQueryBuilder("letterType")
-      .leftJoinAndSelect("letterType.letterElementTypes", "letterElementType")
-      .where("letterElementType.id = :id", { id: letterElementType.id })
-      .getMany();
+  readAll() {
+    return this.repo.find({ order: { description: "ASC" } });
+  }
+
+  resolveLetterTypes(letterElementType: LetterElementType) {
+    return this.resolveMany(letterElementType, "letterTypes");
   }
 }

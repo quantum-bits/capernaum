@@ -27,24 +27,24 @@ export class ImageResolver {
 
   @Query(() => [Image])
   images() {
-    return this.imageService.find(Image);
+    return this.imageService.readAll();
   }
 
   @Query(() => Image)
   image(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.imageService.findOne(Image, id);
+    return this.imageService.readOne(id);
   }
 
   @Mutation(() => Image)
   updateImage(@Args("updateInput") updateInput: ImageUpdateInput) {
-    return this.imageService.update(Image, updateInput);
+    return this.imageService.update(updateInput);
   }
 
   @Mutation(() => Int)
   async deleteImage(@Args({ name: "id", type: () => Int }) id: number) {
-    const imageDetails = await this.imageService.findOne(Image, id);
+    const imageDetails = await this.imageService.readOne(id);
     await this.fileService.deleteFile(imageDetails.fileName());
-    return this.imageService.delete(Image, id);
+    return this.imageService.delete(id);
   }
 
   @ResolveField(() => String)
@@ -57,8 +57,8 @@ export class ImageResolver {
     return this.fileService.absolutePath(image.fileName());
   }
 
-  @ResolveField("letterElements", (type) => [LetterElement])
+  @ResolveField("letterElements", () => [LetterElement])
   resolveLetterElements(@Parent() image: Image) {
-    return this.imageService.find(LetterElement, { image });
+    return this.imageService.resolveLetterElements(image);
   }
 }

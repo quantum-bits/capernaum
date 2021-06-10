@@ -274,7 +274,11 @@ type SurveyItemResponse {
   id: Int!
   surveyResponse: SurveyResponse!
   surveyItem: SurveyItem!
+
+  """Qualtrics question label"""
   label: String!
+
+  """Qualtrics question response"""
   value: Int!
 }
 

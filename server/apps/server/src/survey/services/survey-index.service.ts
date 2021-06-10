@@ -21,7 +21,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     super(repo);
   }
 
-  async create(createInput: SurveyIndexCreateInput) {
+  async construct(createInput: SurveyIndexCreateInput) {
     return this.repo.manager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
@@ -120,7 +120,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     };
   }
 
-  async delete(id: number) {
+  async deconstruct(id: number) {
     return this.repo.manager.transaction(async (manager) =>
       SurveyIndexService._deleteHelper(manager, id)
     );

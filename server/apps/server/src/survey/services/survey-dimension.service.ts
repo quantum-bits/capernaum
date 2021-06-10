@@ -5,7 +5,6 @@ import {
   SurveyDimensionCreateInput,
   SurveyDimensionDeleteOutput,
   SurveyDimensionUpdateInput,
-  SurveyLetterUpdateInput,
 } from "@server/src/survey/entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -23,7 +22,7 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
     super(repo);
   }
 
-  async create(createInput: SurveyDimensionCreateInput) {
+  async construct(createInput: SurveyDimensionCreateInput) {
     const survey = await this.surveyService.readOne(createInput.surveyId);
     return this.repo.save(
       this.repo.create({
@@ -56,7 +55,7 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
       .then((result) => this.repo.save(result));
   }
 
-  async delete(dimensionId: number): Promise<SurveyDimensionDeleteOutput> {
+  async deconstruct(dimensionId: number): Promise<SurveyDimensionDeleteOutput> {
     return this.repo.manager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
 

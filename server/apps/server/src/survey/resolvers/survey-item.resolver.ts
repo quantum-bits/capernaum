@@ -20,6 +20,6 @@ export class SurveyItemResolver {
 
   @ResolveField("surveyItemResponses", () => [SurveyItemResponse])
   resolveSurveyItemResponses(@Parent() surveyItem: SurveyItem) {
-    return this.surveyItemService.resolveRelatedSurveyItemResponse(surveyItem);
+    return this.surveyItemService.resolveRelatedSurveyItemResponses(surveyItem);
   }
 }

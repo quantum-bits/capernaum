@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "@server/src/shared/base.service";
-import { SurveyItem, SurveyItemResponse } from "@server/src/survey/entities";
+import { SurveyItemResponse } from "@server/src/survey/entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -15,15 +15,5 @@ export class SurveyItemResponseService extends BaseService<SurveyItemResponse> {
 
   resolveSurveyItem(surveyItemResponse: SurveyItemResponse) {
     return this.resolveOne(surveyItemResponse, "surveyItem");
-  }
-
-  find(
-    surveyItem: SurveyItem,
-    responseId: number
-  ): Promise<SurveyItemResponse> {
-    return this.repo.findOne({
-      surveyItemId: surveyItem.id,
-      surveyResponseId: responseId,
-    });
   }
 }

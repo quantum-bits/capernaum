@@ -32,7 +32,7 @@ export class SurveyResolver {
   createSurvey(
     @Args("createInput") createInput: SurveyCreateInput
   ): Promise<Survey> {
-    return this.surveyService.create(createInput);
+    return this.surveyService.construct(createInput);
   }
 
   @Query(() => [Survey])
@@ -52,7 +52,7 @@ export class SurveyResolver {
 
   @Mutation(() => Int)
   deleteSurvey(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.delete(id);
+    return this.surveyService.deconstruct(id);
   }
 
   @ResolveField("letters", () => [Letter], {

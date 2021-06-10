@@ -29,7 +29,7 @@ export class SurveyDimensionResolver {
   createSurveyDimension(
     @Args("createInput") createInput: SurveyDimensionCreateInput
   ) {
-    return this.surveyDimensionService.create(createInput);
+    return this.surveyDimensionService.construct(createInput);
   }
 
   @Query(() => [SurveyDimension])
@@ -53,7 +53,7 @@ export class SurveyDimensionResolver {
     Returns details of everything that was deleted.`,
   })
   deleteSurveyDimension(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyDimensionService.delete(id);
+    return this.surveyDimensionService.deconstruct(id);
   }
 
   @ResolveField("survey", () => Survey)

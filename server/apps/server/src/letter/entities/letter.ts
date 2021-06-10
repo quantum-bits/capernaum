@@ -1,6 +1,6 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import {
-  Column,
+  AfterLoad,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -12,20 +12,21 @@ import { LetterElement } from "./letter-element";
 import { Survey } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { LetterType } from "./letter-type";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
 export class Letter extends AbstractEntity {
-  @Column()
-  @Field()
+  @FieldColumn("Letter title")
   title: string;
 
-  @Column("text")
-  @Field()
+  @FieldColumn("Description of letter")
   description: string;
 
-  @Field()
-  @Column({ type: "text", default: DEFAULT_QUILL_DELTA })
+  @FieldColumn("Email message to go out with letter", {
+    type: "text",
+    default: DEFAULT_QUILL_DELTA,
+  })
   emailMessage: string;
 
   @Field()
@@ -36,23 +37,27 @@ export class Letter extends AbstractEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @Field({ defaultValue: false })
-  @Column()
+  @FieldColumn("Is this letter frozen?", { default: false })
   isFrozen: boolean;
 
-  @Column("int") surveyId?: number;
-  @ManyToOne(() => Survey, (survey) => survey.letters)
   @Field(() => Survey)
+  @ManyToOne(() => Survey, (survey) => survey.letters)
   survey?: Survey;
 
-  @Column("int") letterTypeId: number;
-  @ManyToOne(() => LetterType)
   @Field(() => LetterType)
+  @ManyToOne(() => LetterType)
   letterType: LetterType;
 
-  @OneToMany(() => LetterElement, (letterElement) => letterElement.letter)
   @Field(() => [LetterElement])
+  @OneToMany(() => LetterElement, (elt) => elt.letter)
   letterElements: LetterElement[];
+
+  @AfterLoad()
+  sortLetterElements() {
+    this.letterElements = this.letterElements.sort(
+      (a, b) => b.sequence - a.sequence
+    );
+  }
 }
 
 @InputType()

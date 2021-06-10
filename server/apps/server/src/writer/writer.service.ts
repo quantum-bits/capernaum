@@ -11,7 +11,7 @@ import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { DateTime } from "luxon";
 import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
-import { LetterService } from "../letter/letter.service";
+import { LetterElementService, LetterService } from "../letter/letter.service";
 import {
   SurveyResponseService,
   SurveyService,
@@ -89,6 +89,7 @@ export class WriterService {
     @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
     @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,
     private readonly letterService: LetterService,
+    private readonly letterElementService: LetterElementService,
     private readonly surveyService: SurveyService,
     private readonly groupService: GroupService,
     private readonly surveyResponseService: SurveyResponseService
@@ -292,13 +293,15 @@ export class WriterService {
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
         case "scripture-engagement-prediction":
-          const predictions = surveyResponse.predictScriptureEngagement();
+          const predictions: Prediction[] =
+            surveyResponse.predictScriptureEngagement();
           renderedElements.push(this.renderPredictions(predictions));
           break;
         case "dimension-chart":
-          const dimension = surveyResponse.findDimensionById(
-            letterElement.surveyDimension.id
-          );
+          const dimension =
+            this.letterElementService.resolveRelatedSurveyDimension(
+              letterElement
+            );
           if (dimension) {
             renderedElements.push(
               WriterService.renderChart(dimension.chartData())
@@ -421,7 +424,7 @@ export class WriterService {
 
   async renderGroupLetter(letterId: number, groupId: number) {
     const letter = await this.letterService.readOne(letterId);
-    const group = await this.groupService.readGroup(groupId);
+    const group = await this.groupService.readOne(groupId);
     const completeResponses: SurveyResponse[] = [];
     for (const response of group.surveyResponses) {
       const completeResponse = await this.surveyResponseService.readComplete(

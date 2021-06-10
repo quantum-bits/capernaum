@@ -12,16 +12,25 @@ import {
 import { UserRole } from "./user-role";
 import { hashPassword } from "../../auth/crypto";
 import { getDebugger } from "@helpers/debug-factory";
+import { FieldColumn } from "@server/src/decorators";
+
 const debug = getDebugger("user");
 
 @Entity()
 @ObjectType()
 export class User extends AbstractEntity {
-  @Field() @Column({ unique: true }) email: string;
-  @Field() @Column() firstName: string;
-  @Field() @Column() lastName: string;
+  @FieldColumn("Email address", { unique: true })
+  email: string;
 
-  @Column() password: string; // Don't expose this via GraphQL.
+  @FieldColumn("First name")
+  firstName: string;
+
+  @FieldColumn("Last name")
+  lastName: string;
+
+  @Column("Encrypted password")
+  password: string; // Don't expose this via GraphQL.
+
   private tempPassword: string;
 
   @AfterLoad()
@@ -37,7 +46,7 @@ export class User extends AbstractEntity {
   }
 
   @BeforeUpdate()
-  private async encryptonUpdate() {
+  private async encryptionUpdate() {
     debug("BEFORE UPDATE '%s', '%s'", this.tempPassword, this.password);
     if (this.tempPassword !== this.password) {
       this.password = await hashPassword(this.password);
@@ -45,8 +54,8 @@ export class User extends AbstractEntity {
     }
   }
 
-  @Field((returns) => [UserRole])
-  @ManyToMany((type) => UserRole)
+  @Field(() => [UserRole])
+  @ManyToMany(() => UserRole)
   @JoinTable()
   roles: UserRole[];
 }
@@ -57,23 +66,28 @@ export class UserCreateInput {
   @Field() firstName: string;
   @Field() lastName: string;
   @Field() password: string;
-  @Field((type) => [Int]) userRoleIds: number[];
+  @Field(() => [Int]) userRoleIds: number[];
 }
 
 @InputType()
 export class UserUpdateInput {
-  @Field((type) => Int) id: number;
+  @Field(() => Int) id: number;
   @Field({ nullable: true }) email?: string;
   @Field({ nullable: true }) firstName?: string;
   @Field({ nullable: true }) lastName?: string;
-  @Field((type) => [Int], { nullable: true }) userRoleIds?: number[];
+  @Field(() => [Int], { nullable: true }) userRoleIds?: number[];
 }
 
 @InputType()
 export class ChangePasswordInput {
-  @Field((type) => Int) userId: number;
-  @Field() currentPassword: string;
-  @Field() newPassword: string;
+  @Field(() => Int, { description: "ID of user changing password" })
+  userId: number;
+
+  @Field({ description: "Current (plaintext) password for validation" })
+  currentPassword: string;
+
+  @Field({ description: "New (plaintext) password to set" })
+  newPassword: string;
 }
 
 // JWT payload.
@@ -83,5 +97,5 @@ export class UserPayload {
   @Field() firstName: string;
   @Field() lastName: string;
   @Field() email: string;
-  @Field((type) => [UserRole]) roles: UserRole[];
+  @Field(() => [UserRole]) roles: UserRole[];
 }

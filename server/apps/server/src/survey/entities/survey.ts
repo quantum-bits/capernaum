@@ -1,5 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Entity, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -7,74 +7,64 @@ import { ScriptureEngagementPractice } from "../../prediction/entities";
 import { Letter } from "../../letter/entities";
 import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({
   description: "All information about a survey imported from Qualtrics",
 })
 export class Survey extends AbstractEntity {
-  @OneToMany(() => Letter, (letter) => letter.survey)
   @Field(() => [Letter])
+  @OneToMany(() => Letter, (letter) => letter.survey)
   letters: Letter[];
 
-  @OneToMany(() => SurveyItem, (item) => item.survey)
   @Field(() => [SurveyItem])
+  @OneToMany(() => SurveyItem, (item) => item.survey)
   surveyItems: SurveyItem[];
 
-  @OneToMany(() => Group, (group) => group.survey)
   @Field(() => [Group])
+  @OneToMany(() => Group, (group) => group.survey)
   groups: Group[];
 
-  @OneToMany(() => SurveyDimension, (dimension) => dimension.survey)
   @Field(() => [SurveyDimension])
+  @OneToMany(() => SurveyDimension, (dimension) => dimension.survey)
   surveyDimensions: SurveyDimension[];
 
-  @OneToMany(() => SurveyResponse, (response) => response.survey)
   @Field(() => [SurveyResponse])
+  @OneToMany(() => SurveyResponse, (response) => response.survey)
   surveyResponses: SurveyResponse[];
 
-  @Column()
-  @Field({ description: "Unique identifier for this survey on Qualtrics" })
+  @FieldColumn("Unique identifier for this survey on Qualtrics")
   qualtricsId: string;
 
-  @Column()
-  @Field({ description: "Name of this survey on Qualtrics" })
+  @FieldColumn("Name of this survey on Qualtrics")
   qualtricsName: string;
 
-  @Column()
-  @Field({
-    description: "Date and time at which this survey was modified on Qualtrics",
-  })
+  @FieldColumn("Date and time at which this survey was modified on Qualtrics")
   qualtricsModDate: string;
 
-  @Column({ default: "??" })
-  @Field({
-    description: "Key of response value containing email address",
+  @FieldColumn("Key of response value containing email address", {
+    default: "??",
   })
   emailKey: string;
 
-  @Column({ default: "??" })
-  @Field({
-    description: "Key of response value containing group code",
-  })
+  @FieldColumn("Key of response value containing group code", { default: "??" })
   groupCodeKey: string;
 
-  @Column({ default: false })
-  @Field({
-    description: "Make this survey available to groups?",
-  })
+  @FieldColumn("Make this survey available to groups?", { default: false })
   okayForGroup: boolean;
 
-  @Column({ default: "" })
-  @Field({ description: "Public name for survey (e.g., in group sign-up)" })
+  @FieldColumn("Public name for survey (e.g., in group sign-up)", {
+    default: "",
+  })
   publicName: string;
 
-  @Column({ default: "" })
-  @Field({
-    description: "Detailed description of this survey; mostly for group use",
+  @FieldColumn("Detailed description of this survey; mostly for group use", {
+    default: "",
   })
   detailedDescription: string;
 
+  // TODO - Figure out where/why this is used.
   @Field(() => [ScriptureEngagementPractice], {
     description: "Convenience property to retrieve SE practices",
   })

@@ -16,7 +16,7 @@ export class SurveyIndexResolver {
       "Create a survey index. Can add survey items directly by item ID.",
   })
   surveyIndexCreate(@Args("createInput") createInput: SurveyIndexCreateInput) {
-    return this.surveyIndexService.create(createInput);
+    return this.surveyIndexService.construct(createInput);
   }
 
   @Query(() => [SurveyIndex])
@@ -37,6 +37,6 @@ export class SurveyIndexResolver {
       "Delete an index. Also removes associations with items; the items are not removed.",
   })
   deleteSurveyIndex(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyIndexService.delete(id);
+    return this.surveyIndexService.deconstruct(id);
   }
 }

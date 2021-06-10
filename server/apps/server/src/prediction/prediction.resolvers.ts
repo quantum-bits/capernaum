@@ -18,8 +18,9 @@ import {
   PredictionTableUpdateInput,
 } from "./entities";
 import {
-  PredictionService,
+  PredictionTableEntryService,
   PredictionTableService,
+  ScriptureEngagementPracticeService,
 } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
 import { Int } from "@nestjs/graphql";
@@ -29,27 +30,30 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 @Resolver(() => PredictionTableEntry)
 @UseGuards(GqlAuthGuard)
 export class PredictionTableEntryResolver {
-  constructor(private readonly predictionService: PredictionService) {}
+  constructor(
+    private readonly predictionTableEntryService: PredictionTableEntryService
+  ) {}
 
   @Mutation(() => PredictionTableEntry)
   createPredictionTableEntry(
     @Args("createInput") createInput: PredictionTableEntryCreateInput
   ) {
-    return this.predictionService.create(PredictionTableEntry, createInput);
+    return this.predictionTableEntryService.construct(createInput);
   }
 
   @Mutation(() => [PredictionTableEntry])
   replacePredictionTableEntries(
     @Args("replaceInput") replaceInput: PredictionTableEntryReplaceInput
   ) {
-    return this.predictionService.replacePredictionTableEntries(replaceInput);
+    return this.predictionTableEntryService.replacePredictionTableEntries(
+      replaceInput
+    );
   }
 
   @ResolveField("surveyIndex", () => SurveyIndex)
   resolveSurveyIndex(@Parent() predictionTableEntry: PredictionTableEntry) {
-    return this.predictionService.findOneOrFail(
-      SurveyIndex,
-      predictionTableEntry.surveyIndexId
+    return this.predictionTableEntryService.resolveSurveyIndex(
+      predictionTableEntry
     );
   }
 
@@ -57,9 +61,8 @@ export class PredictionTableEntryResolver {
   resolveScriptureEngagementPractice(
     @Parent() predictionTableEntry: PredictionTableEntry
   ) {
-    return this.predictionService.findOneOrFail(
-      ScriptureEngagementPractice,
-      predictionTableEntry.practiceId
+    return this.predictionTableEntryService.resolveScriptureEngagementPractice(
+      predictionTableEntry
     );
   }
 }
@@ -67,7 +70,9 @@ export class PredictionTableEntryResolver {
 @Resolver(() => ScriptureEngagementPractice)
 @UseGuards(GqlAuthGuard)
 export class ScriptureEngagementPracticeResolver {
-  constructor(private readonly predictionService: PredictionService) {}
+  constructor(
+    private readonly scriptureEngagementPracticeService: ScriptureEngagementPracticeService
+  ) {}
 
   @Mutation(() => ScriptureEngagementPractice, {
     description: "Create a scripture engagement practice",
@@ -75,48 +80,42 @@ export class ScriptureEngagementPracticeResolver {
   createScriptureEngagementPractice(
     @Args("createInput") createInput: ScriptureEngagementPracticeCreateInput
   ) {
-    return this.predictionService.create(
-      ScriptureEngagementPractice,
-      createInput
-    );
+    return this.scriptureEngagementPracticeService.create(createInput);
   }
 
   @Query(() => ScriptureEngagementPractice)
   scriptureEngagementPractice(
     @Args({ name: "id", type: () => Int }) id: number
   ) {
-    return this.predictionService.findOne(ScriptureEngagementPractice, id);
+    return this.scriptureEngagementPracticeService.readOne(id);
   }
 
   @Query(() => [ScriptureEngagementPractice])
   scriptureEngagementPractices() {
-    return this.predictionService.find(ScriptureEngagementPractice);
+    return this.scriptureEngagementPracticeService.readAll();
   }
 
   @Mutation(() => ScriptureEngagementPractice)
   updateScriptureEngagementPractice(
     @Args("updateData") updateData: ScriptureEngagementPracticeUpdateInput
   ) {
-    return this.predictionService.update(
-      ScriptureEngagementPractice,
-      updateData
-    );
+    return this.scriptureEngagementPracticeService.update(updateData);
   }
 
   @Mutation(() => Int)
   deleteScriptureEngagementPractice(
     @Args({ name: "id", type: () => Int }) id: number
   ) {
-    return this.predictionService.delete(ScriptureEngagementPractice, id);
+    return this.scriptureEngagementPracticeService.deconstruct(id);
   }
 
   @ResolveField("predictionTableEntries", () => [PredictionTableEntry])
   resolvePredictionTableEntries(
     @Parent() scriptureEngagementPractice: ScriptureEngagementPractice
   ) {
-    return this.predictionService.find(PredictionTableEntry, {
-      practiceId: scriptureEngagementPractice.id,
-    });
+    return this.scriptureEngagementPracticeService.resolvePredictionTableEntries(
+      scriptureEngagementPractice
+    );
   }
 }
 
@@ -130,23 +129,23 @@ export class PredictionTableResolver {
   createPredictionTable(
     @Args("createInput") createInput: PredictionTableCreateInput
   ) {
-    return this.predictiontableService.createPredictionTable(createInput);
+    return this.predictiontableService.create(createInput);
   }
 
   @Query(() => [PredictionTable])
   readPredictionTables() {
-    return this.predictiontableService.readPredictionTables();
+    return this.predictiontableService.readAll();
   }
 
   @Mutation(() => PredictionTable)
   updatePredictionTable(
     @Args("updateInput") updateInput: PredictionTableUpdateInput
   ) {
-    return this.predictiontableService.updatePredictionTable(updateInput);
+    return this.predictiontableService.update(updateInput);
   }
 
   @Mutation(() => Int)
   deletePredictionTable(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.predictiontableService.deletePredictionTable(id);
+    return this.predictiontableService.delete(id);
   }
 }

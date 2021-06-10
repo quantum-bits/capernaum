@@ -7,74 +7,57 @@ import {
   UserRoleCreateInput,
   UserUpdateInput,
 } from "./entities";
-import { UserService } from "./user.service";
+import { UserRoleService, UserService } from "./user.service";
 import { Int } from "@nestjs/graphql";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { UseGuards } from "@nestjs/common";
 import { validatePassword } from "../auth/crypto";
 
-@Resolver((of) => User)
+@Resolver(() => User)
 @UseGuards(GqlAuthGuard)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   createUser(@Args("createInput") createInput: UserCreateInput) {
-    return this.userService.createUser(createInput);
+    return this.userService.create(createInput);
   }
 
-  @Query((returns) => User)
+  @Query(() => User)
   user(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.userService.oneUser(id);
+    return this.userService.readOne(id);
   }
 
-  @Query((returns) => [User])
+  @Query(() => [User])
   users() {
-    return this.userService.allUsers();
+    return this.userService.readAll();
   }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   updateUser(@Args("updateInput") updateInput: UserUpdateInput) {
-    return this.userService.update(User, updateInput);
+    return this.userService.update(updateInput);
   }
 
-  @Mutation((returns) => String)
+  @Mutation(() => String)
   async changePassword(
     @Args("passwordInput") passwordInput: ChangePasswordInput
   ) {
-    const user = await this.userService.oneUser(passwordInput.userId);
-
-    const validPassword = await validatePassword(
-      passwordInput.currentPassword,
-      user.password
-    );
-
-    if (validPassword) {
-      return this.userService
-        .update(User, {
-          id: passwordInput.userId,
-          password: passwordInput.newPassword,
-        })
-        .then(() => "Password changed")
-        .catch((err) => `Something went wrong: ${err}`);
-    } else {
-      return "Invalid credentials; please try again";
-    }
+    return this.userService.changePassword(passwordInput);
   }
 }
 
-@Resolver((of) => UserRole)
+@Resolver(() => UserRole)
 @UseGuards(GqlAuthGuard)
 export class UserRoleResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userRoleService: UserRoleService) {}
 
-  @Mutation((returns) => UserRole)
+  @Mutation(() => UserRole)
   createUserRole(@Args("createInput") createInput: UserRoleCreateInput) {
-    return this.userService.createUserRole(createInput);
+    return this.userRoleService.create(createInput);
   }
 
-  @Query((returns) => [UserRole])
+  @Query(() => [UserRole])
   userRoles() {
-    return this.userService.find(UserRole);
+    return this.userRoleService.readAll();
   }
 }

@@ -1,14 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { AfterLoad, Column, Entity, OneToMany } from "typeorm";
 import { LetterElement } from "@server/src/letter/entities";
 import { PredictionTableEntry } from "@server/src/prediction/entities/prediction-table-entry";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
+import { AbstractEntity } from "@server/src/shared/abstract-entity";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
-export class PredictionTable {
-  @Field(() => Int) @PrimaryGeneratedColumn() id: number;
-
-  @Field({ description: "Prediction table name" }) @Column() name: string;
+export class PredictionTable extends AbstractEntity {
+  @FieldColumn("Prediction table name")
+  name: string;
 
   @Field(() => [PredictionTableEntry])
   @OneToMany(
@@ -23,6 +24,13 @@ export class PredictionTable {
     (letterElement) => letterElement.predictionTable
   )
   letterElements: LetterElement[];
+
+  @AfterLoad()
+  sortTableEntries() {
+    this.predictionTableEntries = this.predictionTableEntries.sort(
+      (a, b) => b.sequence - a.sequence
+    );
+  }
 }
 
 @InputType()

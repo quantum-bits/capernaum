@@ -1,12 +1,4 @@
-import {
-  Args,
-  Int,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from "@nestjs/graphql";
+import { Args, Int, Mutation, Query, Resolver } from "@nestjs/graphql";
 import {
   GroupService,
   GroupTypeService,
@@ -17,9 +9,6 @@ import {
   GroupUpdateInput,
   GroupType,
 } from "@server/src/group/entities";
-import { getDebugger } from "@helpers/debug-factory";
-
-const groupDebug = getDebugger("group");
 
 @Resolver(() => Group)
 export class GroupResolver {
@@ -30,46 +19,34 @@ export class GroupResolver {
 
   @Mutation(() => Group)
   createGroup(@Args("createInput") createInput: GroupCreateInput) {
-    return this.groupService.createGroup(createInput);
+    return this.groupService.create(createInput);
   }
 
   @Query(() => [Group])
   readGroups() {
-    return this.groupService.readGroups();
+    return this.groupService.readAll();
   }
 
   @Query(() => Group, { nullable: true })
   readGroup(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.groupService.readGroup(id);
+    return this.groupService.readOne(id);
   }
 
   @Query(() => Group, { nullable: true })
   findGroupByCodeWord(@Args("codeWord") codeWord: string) {
-    return this.groupService.findGroupByCodeWord(codeWord);
+    return this.groupService.findByCodeWord(codeWord);
   }
 
   @Mutation(() => Group)
   updateGroup(@Args("updateInput") updateInput: GroupUpdateInput) {
-    return this.groupService.updateGroup(updateInput);
+    return this.groupService.update(updateInput);
   }
 
   @Mutation(() => Int)
   deleteGroup(
     @Args({ name: "id", type: () => Int }) id: number
   ): Promise<number> {
-    return this.groupService.deleteGroup(id).then((result) => result.affected);
-  }
-
-  @ResolveField()
-  type(@Parent() group: Group) {
-    groupDebug("type/parent %O", group);
-    if (group.type) {
-      groupDebug("Already have type");
-      return group.type;
-    } else {
-      groupDebug("Must fetch type");
-      return this.groupTypeService.readGroupType(group.typeId);
-    }
+    return this.groupService.delete(id).then((result) => result.affected);
   }
 }
 
@@ -79,6 +56,6 @@ export class GroupTypeResolver {
 
   @Query(() => [GroupType])
   readGroupTypes() {
-    return this.groupTypeService.readGroupTypes();
+    return this.groupTypeService.readAll();
   }
 }

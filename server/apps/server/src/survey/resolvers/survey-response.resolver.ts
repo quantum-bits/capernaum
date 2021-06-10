@@ -2,10 +2,14 @@ import { Args, Mutation, Query, Resolver } from "@nestjs/graphql";
 import { SurveyResponse } from "../entities";
 import { Int } from "@nestjs/graphql";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
+import { GroupService } from "@server/src/group/group.service";
 
 @Resolver(() => SurveyResponse)
 export class SurveyResponseResolver {
-  constructor(private readonly surveyResponseService: SurveyResponseService) {}
+  constructor(
+    private readonly surveyResponseService: SurveyResponseService,
+    private readonly groupService: GroupService
+  ) {}
 
   @Query(() => SurveyResponse)
   surveyResponseById(@Args({ name: "id", type: () => Int }) id: number) {
@@ -21,7 +25,7 @@ export class SurveyResponseResolver {
     })
     groupId?: number
   ) {
-    return this.surveyResponseService.findByGroupId(groupId);
+    return this.groupService.readOne(groupId);
   }
 
   @Mutation(() => Int, {

@@ -41,7 +41,7 @@ describe("GroupService", () => {
     await groupFabricatorService.dbCreate(howMany);
 
     return groupService
-      .readGroups()
+      .readAll()
       .then((groups) => expect(groups).toHaveLength(howMany));
   });
 
@@ -51,14 +51,14 @@ describe("GroupService", () => {
     groupData.surveyId = survey.id;
 
     return groupService
-      .createGroup(groupData)
+      .create(groupData)
       .then((group) => expect(groupData.name).toBe(group.name));
   });
 
   it("can't create a group without a survey", async () => {
     const groupData = groupFabricatorService.fabricateGroup();
 
-    return expect(groupService.createGroup(groupData)).rejects.toThrowError(
+    return expect(groupService.create(groupData)).rejects.toThrowError(
       QueryFailedError
     );
   });
@@ -68,7 +68,7 @@ describe("GroupService", () => {
     const groups = await groupFabricatorService.dbCreate(howMany);
     const targetGroup = chance.pickone(groups);
 
-    return groupService.readGroup(targetGroup.id).then((group) => {
+    return groupService.readOne(targetGroup.id).then((group) => {
       expect(group.name).toBe(targetGroup.name);
       expect(group.survey.id).toBe(targetGroup.surveyId);
       expect(group.survey.qualtricsName).toBe(targetGroup.survey.qualtricsName);
@@ -80,7 +80,7 @@ describe("GroupService", () => {
       await groupFabricatorService.prepareGroupWithSurveysFixture();
     const numResponses = fixture.surveyResponses.length;
 
-    return groupService.readGroup(fixture.group.id).then((g) => {
+    return groupService.readOne(fixture.group.id).then((g) => {
       expect(g.survey.qualtricsName).toEqual(
         fixture.group.survey.qualtricsName
       );

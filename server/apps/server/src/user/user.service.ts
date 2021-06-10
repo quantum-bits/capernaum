@@ -1,49 +1,99 @@
 import { Injectable } from "@nestjs/common";
-import { OldBaseService } from "../shared/old-base.service";
 import { Repository } from "typeorm";
 import {
+  ChangePasswordInput,
   User,
   UserCreateInput,
   UserRole,
   UserRoleCreateInput,
+  UserUpdateInput,
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
+import { BaseService } from "@server/src/shared/base.service";
+import { validatePassword } from "@server/src/auth/crypto";
 
 @Injectable()
-export class UserService extends OldBaseService {
+export class UserService extends BaseService<User> {
   constructor(
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(UserRole)
-    private readonly userRoleRepo: Repository<UserRole>
+    private readonly userRoleService: UserRoleService,
+    @InjectRepository(User) private readonly repo: Repository<User>
   ) {
-    super();
+    super(repo);
   }
 
-  async createUser(createInput: UserCreateInput) {
-    // Resolve role IDs to roles objects.
-    const roles: UserRole[] = [];
-    for (const id of createInput.userRoleIds) {
-      roles.push(await this.userRoleRepo.findOneOrFail(id));
-    }
+  async create(createInput: UserCreateInput) {
+    // Resolve role IDs to roles entities.
+    const roles = await Promise.all(
+      createInput.userRoleIds.map((roleId) =>
+        this.userRoleService.readOne(roleId)
+      )
+    );
 
-    // Create and save the user. Because this is the only modification to the database,
-    // don't bother with a transaction.
-    return this.userRepo.save(this.userRepo.create(createInput));
+    return this.repo.save(
+      this.repo.create({
+        ...createInput,
+        roles,
+      })
+    );
   }
 
-  createUserRole(createInput: UserRoleCreateInput) {
-    return this.userRoleRepo.save(this.userRoleRepo.create(createInput));
+  private alwaysResolve = ["roles"];
+
+  readOne(id: number) {
+    return this.repo.findOne(id, { relations: this.alwaysResolve });
   }
 
-  oneUser(id: number) {
-    return this.userRepo.findOne(id, { relations: ["roles"] });
-  }
-
-  allUsers() {
-    return this.userRepo.find({ relations: ["roles"] });
+  readAll() {
+    return this.repo.find({ relations: this.alwaysResolve });
   }
 
   findUserByEmail(email: string) {
-    return this.userRepo.findOne({ email }, { relations: ["roles"] });
+    return this.repo.findOne({ email }, { relations: this.alwaysResolve });
+  }
+
+  update(updateInput: UserUpdateInput) {
+    return this.repo
+      .preload(updateInput)
+      .then((result) => this.repo.save(result));
+  }
+
+  async changePassword(passwordInput: ChangePasswordInput) {
+    const user = await this.readOne(passwordInput.userId);
+
+    const validPassword = await validatePassword(
+      passwordInput.currentPassword,
+      user.password
+    );
+
+    if (validPassword) {
+      return this.repo
+        .update(passwordInput.userId, { password: passwordInput.newPassword })
+        .then(() => "Password changed")
+        .catch((err) => `Something went wrong: ${err}`);
+    } else {
+      return "Invalid credentials; please try again";
+    }
+  }
+}
+
+@Injectable()
+export class UserRoleService extends BaseService<UserRole> {
+  constructor(
+    @InjectRepository(UserRole)
+    private readonly repo: Repository<UserRole>
+  ) {
+    super(repo);
+  }
+
+  create(createInput: UserRoleCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id);
+  }
+
+  readAll() {
+    return this.repo.find();
   }
 }

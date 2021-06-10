@@ -1,24 +1,21 @@
-import { Column, CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { AbstractEntity } from "../../shared/abstract-entity";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType()
 export class Image extends AbstractEntity {
-  @Field()
-  @Column()
+  @FieldColumn("Original name of image file")
   originalName: string;
 
-  @Field()
-  @Column()
+  @FieldColumn("MIME encoding for this image")
   mimeType: string;
 
-  @Field()
-  @Column()
+  @FieldColumn("Internal unique ID")
   uuid: string;
 
-  @Field()
-  @Column({ default: "Not yet set" })
+  @FieldColumn("Image title from user", { default: "Not yet set" })
   title: string;
 
   @Field()
@@ -40,6 +37,6 @@ export class Image extends AbstractEntity {
 
 @InputType()
 export class ImageUpdateInput {
-  @Field((type) => Int) id: number;
+  @Field(() => Int) id: number;
   @Field() title: string;
 }
