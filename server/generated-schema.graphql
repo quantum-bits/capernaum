@@ -41,8 +41,6 @@ type Letter {
   survey: Survey!
   letterType: LetterType!
   letterElements: [LetterElement!]!
-  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
-  tableEntries: [PredictionTableEntry!]!
 }
 
 """
@@ -73,7 +71,7 @@ type LetterElement {
   letter: Letter!
   letterElementType: LetterElementType!
   surveyDimension: SurveyDimension
-  predictionTable: PredictionTable!
+  predictionTable: PredictionTable
 }
 
 type PredictionTable {
@@ -225,7 +223,11 @@ type SurveyResponse {
 
   """Group for this response (if any)"""
   group: Group
+
+  """Survey for which this is a response"""
   survey: Survey!
+
+  """Responses to individual items in the survey"""
   surveyItemResponses: [SurveyItemResponse!]!
 
   """Respondent's email address"""
@@ -295,7 +297,6 @@ type SurveyItem {
 
   """Qualtrics `questionText` field"""
   qualtricsText: String!
-  surveyItemResponse(responseId: Int!): SurveyItemResponse
 }
 
 """All information about a survey imported from Qualtrics"""
@@ -411,6 +412,13 @@ type ResponseSummary {
   predictionSummaries: [PredictionSummary!]!
 }
 
+type SurveyLetter {
+  id: Int!
+  survey: Survey!
+  letter: Letter!
+  letterType: LetterType!
+}
+
 type Envelope {
   from: String!
   to: [String!]!
@@ -521,20 +529,21 @@ type QualtricsSubscription {
 }
 
 type Query {
-  survey(id: Int!): Survey!
-  surveys: [Survey!]!
   readAllSurveyDimensions: [SurveyDimension!]!
   readOneSurveyDimension(id: Int!): SurveyDimension!
   updateSurveyDimension: SurveyDimension!
-  surveyResponse(id: Int!): SurveyResponse!
-  surveyResponses(
+  surveyIndexReadAll: [SurveyIndex!]!
+
+  """Retrieve all survey items"""
+  surveyItemsReadAll: [SurveyItem!]!
+  surveys: [Survey!]!
+  survey(id: Int!): Survey!
+  surveyResponseById(id: Int!): SurveyResponse!
+  surveyResponsesForGroup(
     """Limit to one group"""
     groupId: Int
   ): [SurveyResponse!]!
-  surveyIndices: [SurveyIndex!]!
-
-  """Retrieve all survey items"""
-  surveyItems: [SurveyItem!]!
+  readSurveyLetters: [SurveyLetter!]!
   readGroups: [Group!]!
   readGroup(id: Int!): Group
   findGroupByCodeWord(codeWord: String!): Group
@@ -544,9 +553,9 @@ type Query {
   user(id: Int!): User!
   users: [User!]!
   userRoles: [UserRole!]!
+  letterElementTypes: [LetterElementType!]!
   letter(id: Int!): Letter!
   letters: [Letter!]!
-  letterElementTypes: [LetterElementType!]!
   readLetterTypes: [LetterType!]!
   images: [Image!]!
   image(id: Int!): Image!
@@ -558,10 +567,8 @@ type Query {
 }
 
 type Mutation {
-  """Create a new survey."""
-  createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
-  updateSurvey(updateInput: SurveyUpdateInput!): Survey!
-  deleteSurvey(id: Int!): Int!
+  """Create a survey dimension."""
+  createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
 
   """
   Delete a dimension. Also deletes indices associated with this dimension.
@@ -570,25 +577,30 @@ type Mutation {
   """
   deleteSurveyDimension(id: Int!): SurveyDimensionDeleteOutput!
 
+  """Create a survey index. Can add survey items directly by item ID."""
+  surveyIndexCreate(createInput: SurveyIndexCreateInput!): SurveyIndex!
+
+  """
+  Update an index. Field values will replaces existing values in the object.
+        (e.g., if you give a value for itemIds, it will replace the current list.)
+  """
+  updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
+
   """
   Delete an index. Also removes associations with items; the items are not removed.
   """
   deleteSurveyIndex(id: Int!): SurveyIndexDeleteOutput!
 
+  """Create a new survey."""
+  createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
+  updateSurvey(updateInput: SurveyUpdateInput!): Survey!
+  deleteSurvey(id: Int!): Int!
+
   """Delete a survey response"""
   deleteSurveyResponse(id: Int!): Int!
-
-  """Create a survey dimension."""
-  createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
-
-  """Create a survey index. Can add survey items directly by item ID."""
-  createSurveyIndex(createInput: SurveyIndexCreateInput!): SurveyIndex!
-
-  """
-  Update an index. Field values will replaces existing values in the object.
-        (e.g., if you give a value for itemIds, it will replace the current list.
-  """
-  updateSurveyIndex(updateInput: SurveyIndexUpdateInput!): SurveyIndex!
+  surveyLetterCreate(createInput: SurveyLetterCreateInput!): SurveyLetter!
+  surveyLetterUpdate(updateInput: SurveyLetterUpdateInput!): SurveyLetter!
+  surveyLetterDelete(id: Int!): Int!
   createGroup(createInput: GroupCreateInput!): Group!
   updateGroup(updateInput: GroupUpdateInput!): Group!
   deleteGroup(id: Int!): Int!
@@ -606,12 +618,11 @@ type Mutation {
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   writeLetter(writerInput: WriterInput!): WriterOutput!
-  createLetter(createInput: LetterCreateInput!): Letter!
-  createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
-  updateLetter(letterData: LetterUpdateInput!): Letter!
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
-  deleteLetter(id: Int!): Int!
   deleteLetterElement(id: Int!): Int!
+  createLetter(createInput: LetterCreateInput!): Letter!
+  updateLetter(letterData: LetterUpdateInput!): Letter!
+  deleteLetter(id: Int!): Int!
   createLetterType(createInput: LetterTypeCreateInput!): LetterType!
   updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
   deleteLetterType(id: Int!): Int!
@@ -630,36 +641,6 @@ type Mutation {
   createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
-}
-
-input SurveyCreateInput {
-  qualtricsId: String!
-  qualtricsName: String!
-  qualtricsModDate: String!
-  emailKey: String!
-  groupCodeKey: String!
-  okayForGroup: Boolean!
-  publicName: String!
-  detailedDescription: String!
-  surveyItems: [SurveyItemCreateInput!]!
-}
-
-input SurveyItemCreateInput {
-  sequence: Int = -1
-  qualtricsId: String!
-  qualtricsText: String!
-}
-
-input SurveyUpdateInput {
-  id: Int!
-  qualtricsId: String
-  qualtricsName: String
-  qualtricsModDate: String
-  emailKey: String
-  groupCodeKey: String
-  okayForGroup: Boolean
-  publicName: String
-  detailedDescription: String
 }
 
 """
@@ -694,6 +675,49 @@ input SurveyIndexUpdateInput {
   abbreviation: String
   title: String
   useForPredictions: Boolean
+}
+
+input SurveyCreateInput {
+  qualtricsId: String!
+  qualtricsName: String!
+  qualtricsModDate: String!
+  emailKey: String!
+  groupCodeKey: String!
+  okayForGroup: Boolean!
+  publicName: String!
+  detailedDescription: String!
+  surveyItems: [SurveyItemCreateInput!]!
+}
+
+input SurveyItemCreateInput {
+  sequence: Int = -1
+  qualtricsId: String!
+  qualtricsText: String!
+}
+
+input SurveyUpdateInput {
+  id: Int!
+  qualtricsId: String
+  qualtricsName: String
+  qualtricsModDate: String
+  emailKey: String
+  groupCodeKey: String
+  okayForGroup: Boolean
+  publicName: String
+  detailedDescription: String
+}
+
+input SurveyLetterCreateInput {
+  surveyId: Int!
+  letterId: Int!
+  letterTypeId: Int!
+}
+
+input SurveyLetterUpdateInput {
+  id: Int!
+  surveyId: Int
+  letterId: Int
+  letterTypeId: Int
 }
 
 input GroupCreateInput {
@@ -840,6 +864,15 @@ input WriterInput {
   surveyResponseId: Int!
 }
 
+input LetterElementUpdateInput {
+  id: Int!
+  sequence: Int
+  textDelta: String
+  imageId: Int
+  letterElementTypeId: Int
+  surveyDimensionId: Int
+}
+
 input LetterCreateInput {
   title: String!
   description: String!
@@ -847,15 +880,6 @@ input LetterCreateInput {
   isFrozen: Boolean = false
   surveyId: Int!
   letterTypeId: Int!
-}
-
-input LetterElementCreateInput {
-  sequence: Int!
-  textDelta: String
-  imageId: Int
-  letterId: Int!
-  letterElementTypeId: Int!
-  surveyDimensionId: Int
 }
 
 input LetterUpdateInput {
@@ -866,15 +890,6 @@ input LetterUpdateInput {
   isFrozen: Boolean
   surveyId: Int
   letterTypeId: Int
-}
-
-input LetterElementUpdateInput {
-  id: Int!
-  sequence: Int
-  textDelta: String
-  imageId: Int
-  letterElementTypeId: Int
-  surveyDimensionId: Int
 }
 
 input LetterTypeCreateInput {

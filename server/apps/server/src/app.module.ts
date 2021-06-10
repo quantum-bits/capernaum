@@ -18,6 +18,7 @@ import { GroupModule } from "./group/group.module";
     TypeOrmModule.forRoot({
       ...typeORMConfig,
       synchronize: true,
+      retryAttempts: 3,
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: "generated-schema.graphql",

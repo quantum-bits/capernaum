@@ -8,7 +8,14 @@ import { WriterResolver } from "./writer.resolvers";
 import { GroupModule } from "@server/src/group/group.module";
 
 @Module({
-  imports: [SurveyModule, LetterModule, ImageModule, FileModule, GroupModule],
+  imports: [
+    SurveyModule,
+    LetterModule,
+    ImageModule,
+    FileModule,
+    GroupModule,
+    SurveyModule,
+  ],
   providers: [WriterService, WriterResolver],
   exports: [WriterService],
 })

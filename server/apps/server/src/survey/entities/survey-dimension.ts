@@ -1,28 +1,22 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Entity, OneToMany } from "typeorm";
+import { Entity, ManyToOne, OneToMany } from "typeorm";
 import { Survey } from "./survey";
 import { SurveyIndex } from "./survey-index";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ChartData } from "../survey.types";
-import { FieldColumn, FieldManyToOne } from "@server/src/decorators";
+import { FieldColumn } from "@server/src/decorators";
 
 @Entity()
 @ObjectType({
   description: "Top-level grouping of questions in Capernaum; contains indices",
 })
 export class SurveyDimension extends AbstractEntity {
-  // @ManyToOne(() => Survey, (survey) => survey.surveyDimensions)
-  // @Field(() => Survey, { nullable: true })
-  @FieldManyToOne(
-    "Survey that owns this dimension",
-    () => Survey,
-    (survey) => survey.surveyDimensions,
-    { nullable: true }
-  )
+  @Field(() => Survey)
+  @ManyToOne(() => Survey, (survey) => survey.surveyDimensions)
   survey: Survey;
 
-  @OneToMany(() => SurveyIndex, (index) => index.surveyDimension)
   @Field(() => [SurveyIndex])
+  @OneToMany(() => SurveyIndex, (index) => index.surveyDimension)
   surveyIndices: SurveyIndex[];
 
   @FieldColumn("Title of this dimension (e.g., 'Focus on Prayer')")

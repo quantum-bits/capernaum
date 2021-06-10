@@ -5,7 +5,7 @@ import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Letter } from "../letter/entities";
 import { LetterService } from "../letter/letter.service";
 import { WriterService } from "./writer.service";
-import { SurveyService } from "../survey/survey.service";
+import { SurveyService } from "../survey/services/survey.service";
 
 @Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)

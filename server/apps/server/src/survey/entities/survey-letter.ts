@@ -25,9 +25,16 @@ export class SurveyLetter {
 }
 
 @InputType()
-export class SurveyLetterCreateInput {}
+export class SurveyLetterCreateInput {
+  @Field(() => Int) surveyId: number;
+  @Field(() => Int) letterId: number;
+  @Field(() => Int) letterTypeId: number;
+}
 
 @InputType()
 export class SurveyLetterUpdateInput {
   @Field(() => Int) id: number;
+  @Field(() => Int, { nullable: true }) surveyId?: number;
+  @Field(() => Int, { nullable: true }) letterId?: number;
+  @Field(() => Int, { nullable: true }) letterTypeId?: number;
 }

@@ -1,5 +1,5 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
@@ -53,7 +53,7 @@ export async function importSurveyResponses(surveyId: string) {
 export async function predictEngagement(responseId: string) {
   const nestContext = new NestContext();
   const surveyService = await nestContext.get(SurveyService);
-  const response = await surveyService.surveyResponseComplete(
+  const response = await surveyService.readComplete(
     parseInt(responseId)
   );
   debug("response %O", response);

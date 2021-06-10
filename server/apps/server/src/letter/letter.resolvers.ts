@@ -10,7 +10,6 @@ import {
   Letter,
   LetterCreateInput,
   LetterElement,
-  LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
   LetterType,
@@ -19,139 +18,98 @@ import {
   LetterUpdateInput,
 } from "./entities";
 import {
+  LetterElementService,
   LetterElementTypeService,
   LetterService,
   LetterTypeService,
 } from "./letter.service";
 import { Int } from "@nestjs/graphql";
 import { Survey, SurveyDimension } from "../survey/entities";
-import {
-  PredictionTableEntry,
-  ScriptureEngagementPractice,
-} from "../prediction/entities";
+import { PredictionTable } from "../prediction/entities";
 import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
-import { SurveyService } from "@server/src/survey/survey.service";
-import { getDebugger } from '@helpers/debug-factory'
+import { getDebugger } from "@helpers/debug-factory";
 
 const debug = getDebugger("letter:resolver");
 
 @Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)
 export class LetterResolver {
-  constructor(
-    private readonly letterService: LetterService,
-    private readonly surveyService: SurveyService
-  ) {}
+  constructor(private readonly letterService: LetterService) {}
 
   @Mutation(() => Letter)
   createLetter(@Args("createInput") createInput: LetterCreateInput) {
-    return this.letterService.create(Letter, createInput);
-  }
-
-  @Mutation(() => LetterElement)
-  createLetterElement(
-    @Args("createInput") createInput: LetterElementCreateInput
-  ) {
-    return this.letterService.create(LetterElement, createInput);
+    return this.letterService.create(createInput);
   }
 
   @Query(() => Letter)
   letter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.letter(id);
+    return this.letterService.readOne(id);
   }
 
   @Query(() => [Letter])
   letters() {
-    return this.letterService.find(Letter);
+    return this.letterService.readAll();
   }
 
   @Mutation(() => Letter)
-  updateLetter(@Args("letterData") letterData: LetterUpdateInput) {
-    return this.letterService.update(Letter, letterData);
-  }
-
-  @Mutation(() => LetterElement)
-  updateLetterElement(
-    @Args("updateInput") updateInput: LetterElementUpdateInput
-  ) {
-    return this.letterService.update(LetterElement, updateInput);
+  updateLetter(@Args("letterData") letterUpdateInput: LetterUpdateInput) {
+    return this.letterService.update(letterUpdateInput);
   }
 
   @Mutation(() => Int)
   deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.delete(Letter, id);
-  }
-
-  @Mutation(() => Int)
-  deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterService.delete(LetterElement, id);
-  }
-
-  @ResolveField("scriptureEngagementPractices", () => [
-    ScriptureEngagementPractice,
-  ])
-  resolveScriptureEngagementPractices(@Parent() survey: Survey) {
-    return this.letterService.find(ScriptureEngagementPractice);
+    return this.letterService.delete(id);
   }
 
   @ResolveField("survey", () => Survey)
   resolveSurvey(@Parent() letter: Letter) {
-    return this.surveyService.findOne(Survey, letter.surveyId);
+    return this.letterService.resolveRelatedSurvey(letter);
   }
 
   @ResolveField("letterElements", () => [LetterElement])
   resolveElements(@Parent() letter: Letter) {
     return this.letterService.letterElements(letter);
   }
-
-  @ResolveField("tableEntries", () => [PredictionTableEntry])
-  resolveEntries(@Parent() letter: Letter) {
-    return this.letterService.tableEntries(letter);
-  }
-
-  @ResolveField("letterType", () => LetterType)
-  resolveLetterType(@Parent() letter: Letter) {
-    debug("resolveLetterType(%O)", letter);
-    return this.letterService.findOneOrFail(LetterType, letter.letterTypeId);
-  }
 }
 
 @Resolver(() => LetterElement)
 @UseGuards(GqlAuthGuard)
 export class LetterElementResolver {
-  constructor(private readonly letterService: LetterService) {}
+  constructor(private readonly letterElementService: LetterElementService) {}
 
-  @ResolveField("letterElementType", () => LetterElementType)
-  resolveLetterElementType(@Parent() letterElement: LetterElement) {
-    return this.letterService.findOneOrFail(
-      LetterElementType,
-      letterElement.letterElementTypeId
-    );
+  @Mutation(() => LetterElement)
+  updateLetterElement(
+    @Args("updateInput") updateInput: LetterElementUpdateInput
+  ) {
+    return this.letterElementService.update(updateInput);
+  }
+
+  @Mutation(() => Int)
+  deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
+    return this.letterElementService.delete(id);
   }
 
   @ResolveField("image", () => Image, { nullable: true })
   resolveImage(@Parent() letterElement: LetterElement) {
-    if (letterElement.imageId) {
-      return this.letterService.findOneOrFail(Image, letterElement.imageId);
-    } else {
-      return null;
-    }
+    return this.letterElementService.resolveRelatedImage(letterElement);
   }
 
   @ResolveField("surveyDimension", () => SurveyDimension, {
     nullable: true,
   })
   resolveSurveyDimension(@Parent() letterElement: LetterElement) {
-    if (letterElement.surveyDimensionId) {
-      return this.letterService.findOneOrFail(
-        SurveyDimension,
-        letterElement.surveyDimensionId
-      );
-    } else {
-      return null;
-    }
+    return this.letterElementService.resolveRelatedSurveyDimension(
+      letterElement
+    );
+  }
+
+  @ResolveField("predictionTable", () => PredictionTable, { nullable: true })
+  resolvePredictionTable(@Parent() letterElement: LetterElement) {
+    return this.letterElementService.resolveRelatedPredictionTable(
+      letterElement
+    );
   }
 }
 

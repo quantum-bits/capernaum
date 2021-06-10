@@ -1,14 +1,10 @@
-import { DeepPartial, DeleteResult, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
 
 const debug = getDebugger("service");
 
 export class BaseService<Entity> {
   constructor(private readonly entityRepo: Repository<Entity>) {}
-
-  readAll() {
-    return this.entityRepo.find();
-  }
 
   _resolve(entity: Entity, propertyPath: string, multiple: boolean) {
     function debugMessage(where: string) {
@@ -40,16 +36,6 @@ export class BaseService<Entity> {
 
   resolveMany(entity: Entity, propertyPath: string) {
     return this._resolve(entity, propertyPath, true);
-  }
-
-  async update(updateInput: DeepPartial<Entity>) {
-    const preload = await this.entityRepo.preload(updateInput);
-    return this.entityRepo.save(preload);
-  }
-
-  async delete(id: number) {
-    const result: DeleteResult = await this.entityRepo.delete(id);
-    return result.affected;
   }
 }
 

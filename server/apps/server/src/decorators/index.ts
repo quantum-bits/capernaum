@@ -1,15 +1,11 @@
 import { isFunction } from "@nestjs/common/utils/shared.utils";
 import { ReturnTypeFunc, Field, FieldOptions } from "@nestjs/graphql";
-import {
-  Column,
-  ColumnOptions,
-  ManyToOne,
-  ObjectType,
-  RelationOptions,
-} from "typeorm";
+import { Column } from "typeorm";
 
-type FieldColumnOptions = FieldOptions & ColumnOptions;
-type FieldRelationOptions = FieldOptions & RelationOptions;
+interface FieldColumnOptions {
+  nullable?: boolean;
+  default?: string | number | boolean;
+}
 
 export function FieldColumn(
   description: string,
@@ -24,10 +20,10 @@ export function FieldColumn(
 
 export function FieldColumn(
   description: string,
-  typeOrOptions: ReturnTypeFunc | FieldColumnOptions,
+  typeOrOptions?: ReturnTypeFunc | FieldColumnOptions,
   fieldColumnOptions?: FieldColumnOptions
 ): PropertyDecorator {
-  const [typeFunc, options = {}] = isFunction(typeOrOptions)
+  const [typeFunc, options] = isFunction(typeOrOptions)
     ? [typeOrOptions, fieldColumnOptions]
     : [undefined, typeOrOptions as FieldColumnOptions];
 
@@ -35,8 +31,8 @@ export function FieldColumn(
     // Field
     const fieldOptions: FieldOptions = {
       description,
-      nullable: options.nullable,
-      defaultValue: options.default,
+      nullable: options?.nullable,
+      defaultValue: options?.default,
     };
 
     if (typeFunc) {
@@ -54,17 +50,5 @@ export function FieldColumn(
   };
 }
 
-export function FieldManyToOne<T>(
-  description: string,
-  typeFunction: (type?: any) => ObjectType<T>,
-  inverseFunction: (object: T) => any,
-  options: FieldRelationOptions = {}
-): PropertyDecorator {
-  return (target: any, propertyName: string) => {
-    ManyToOne(typeFunction, inverseFunction)(target, propertyName);
-    Field(typeFunction, options)(target, propertyName);
-  };
-}
-
 // Credits:
-// * The structure of the function overloads is cribbed from the @nestjs/graphql decorators.
+// * The structure of some function overloads is cribbed from @nestjs/graphql decorators.

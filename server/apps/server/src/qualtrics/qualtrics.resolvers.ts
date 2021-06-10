@@ -4,19 +4,21 @@ import { QualtricsSurveyListItem } from "./entities/qualtrics-survey-list-item";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Survey } from "../survey/entities";
-import { SurveyService } from "../survey/survey.service";
+import { SurveyService } from "../survey/services/survey.service";
 import { QualtricsResponseImportStats } from "../survey/survey.types";
 import {
   QualtricsOrganization,
   QualtricsSubscription,
   QualtricsSubscriptionCreateInput,
 } from "./entities";
+import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
 export class QualtricsResolver {
   constructor(
     private readonly qualtricsApiService: QualtricsApiService,
+    private readonly qualtricsService: QualtricsService,
     private readonly surveyService: SurveyService
   ) {}
 
@@ -38,9 +40,7 @@ export class QualtricsResolver {
       const { elements, nextPage } = response;
 
       for (const element of elements) {
-        const survey = await this.surveyService.findSurveyByQualtricsId(
-          element.id
-        );
+        const survey = await this.surveyService.findByQualtricsId(element.id);
         if (element.isActive || includeInactive) {
           surveyList.push({
             qualtricsId: element.id,
@@ -76,7 +76,7 @@ export class QualtricsResolver {
     );
 
     // Import survey into the database.
-    return this.surveyService.importQualtricsSurvey(qualtricsSurvey);
+    return this.qualtricsService.importQualtricsSurvey(qualtricsSurvey);
   }
 
   @Mutation(() => QualtricsResponseImportStats, {
@@ -85,9 +85,7 @@ export class QualtricsResolver {
   async importQualtricsSurveyResponses(
     @Args("qualtricsId") qualtricsId: string
   ) {
-    const survey = await this.surveyService.findSurveyByQualtricsId(
-      qualtricsId
-    );
+    const survey = await this.surveyService.findByQualtricsId(qualtricsId);
 
     // Get from Qualtrics all responses to this survey.
     const zipFileEntries = await this.qualtricsApiService.getResponses(
@@ -99,7 +97,7 @@ export class QualtricsResolver {
     const importStats = new QualtricsResponseImportStats();
     for (const oneResponse of allResponses) {
       const importResponse =
-        await this.surveyService.importQualtricsSurveyResponse(
+        await this.qualtricsService.importQualtricsSurveyResponse(
           survey.id,
           oneResponse
         );

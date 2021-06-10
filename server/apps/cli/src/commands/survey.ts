@@ -10,7 +10,7 @@ import chalk from "chalk";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
 import { DateTime } from "luxon";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 import { Survey } from "@server/src/survey/entities";
 
 const debug = getDebugger("survey");

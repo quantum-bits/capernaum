@@ -38,7 +38,7 @@ export class Letter extends AbstractEntity {
 
   @Field({ defaultValue: false })
   @Column()
-  isFrozen: false;
+  isFrozen: boolean;
 
   @Column("int") surveyId?: number;
   @ManyToOne(() => Survey, (survey) => survey.letters)
@@ -53,11 +53,10 @@ export class Letter extends AbstractEntity {
   @OneToMany(() => LetterElement, (letterElement) => letterElement.letter)
   @Field(() => [LetterElement])
   letterElements: LetterElement[];
-
 }
 
 @InputType()
-export class LetterCreateInput {
+export class LetterCreateInput implements Partial<Letter> {
   @Field() title: string;
   @Field() description: string;
   @Field() emailMessage: string;

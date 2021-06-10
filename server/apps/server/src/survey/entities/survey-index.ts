@@ -12,8 +12,6 @@ export class SurveyIndex extends AbstractEntity {
   @ManyToOne(() => SurveyDimension, (dimension) => dimension.surveyIndices)
   @Field(() => SurveyDimension)
   surveyDimension: SurveyDimension;
-  @Column("integer")
-  surveyDimensionId: number;
 
   @Column({ default: true })
   @Field({

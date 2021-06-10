@@ -13,6 +13,7 @@ import {
   LetterTypeResolver,
 } from "./letter.resolvers";
 import {
+  LetterElementService,
   LetterElementTypeService,
   LetterService,
   LetterTypeService,
@@ -32,14 +33,14 @@ import { SurveyModule } from "@server/src/survey/survey.module";
     SurveyModule,
   ],
   providers: [
-    LetterService,
-    LetterResolver,
     LetterElementResolver,
+    LetterElementService,
     LetterElementTypeResolver,
-    LetterElementResolver,
-    LetterTypeService,
-    LetterTypeResolver,
     LetterElementTypeService,
+    LetterResolver,
+    LetterService,
+    LetterTypeResolver,
+    LetterTypeService,
   ],
   exports: [LetterService],
 })

@@ -12,7 +12,10 @@ import { DateTime } from "luxon";
 import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
 import { LetterService } from "../letter/letter.service";
-import { SurveyService } from "../survey/survey.service";
+import {
+  SurveyResponseService,
+  SurveyService,
+} from "@server/src/survey/services";
 import { GroupService } from "../group/group.service";
 import * as IsEmail from "isemail";
 import { getDebugger } from "@helpers/debug-factory";
@@ -87,7 +90,8 @@ export class WriterService {
     @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,
     private readonly letterService: LetterService,
     private readonly surveyService: SurveyService,
-    private readonly groupService: GroupService
+    private readonly groupService: GroupService,
+    private readonly surveyResponseService: SurveyResponseService
   ) {}
 
   private renderImage(letterElement: LetterElement) {
@@ -215,35 +219,6 @@ export class WriterService {
         ].join("\n\n");
       })
       .join("\n\n");
-  }
-
-  private static renderFooter() {
-    return `
-      \\vfill
-      \\begin{center}
-        \\vspace{0.25in}
-        \\href{http://tucse.taylor.edu/}{\\includegraphics{<$ templateDir $>/c4se-logo}}
-      
-        \\vspace{0.25in}
-        \\href{http://tucse.taylor.edu/}{Taylor University Center for Scripture Engagement}
-      
-        \\vspace{0.25in}
-        \\href{https://www.biblegateway.com/resources/scripture-engagement/}{Bible Engagement at Bible Gateway }
-      \\end{center}
-      `;
-  }
-
-  private static renderHeader() {
-    return `
-    \\begin{multicols}{2}
-    \\begin{flushleft}
-      \\Huge
-      Your personal results\\\\for the Christian Life Survey
-    \\end{flushleft}
-    \\columnbreak
-    \\includegraphics{<$ templateDir $>/c4se-logo}
-    \\end{multicols}
-    `;
   }
 
   private static renderDocument(renderedElements: string[]) {
@@ -422,8 +397,8 @@ export class WriterService {
   }
 
   async renderIndividualLetter(letterId: number, surveyResponseId: number) {
-    const letter = await this.letterService.letter(letterId);
-    const surveyResponse = await this.surveyService.surveyResponseComplete(
+    const letter = await this.letterService.readOne(letterId);
+    const surveyResponse = await this.surveyResponseService.readComplete(
       surveyResponseId
     );
 
@@ -445,11 +420,11 @@ export class WriterService {
   }
 
   async renderGroupLetter(letterId: number, groupId: number) {
-    const letter = await this.letterService.letter(letterId);
+    const letter = await this.letterService.readOne(letterId);
     const group = await this.groupService.readGroup(groupId);
     const completeResponses: SurveyResponse[] = [];
     for (const response of group.surveyResponses) {
-      const completeResponse = await this.surveyService.surveyResponseComplete(
+      const completeResponse = await this.surveyResponseService.readComplete(
         response.id
       );
       completeResponses.push(completeResponse);

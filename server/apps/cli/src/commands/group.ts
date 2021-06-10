@@ -1,7 +1,7 @@
 import { GroupService } from "@server/src/group/group.service";
 import { Group } from "@server/src/group/entities";
 import { table } from "table";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 import { SurveyResponse } from "@server/src/survey/entities";
 import prettyFormat from "pretty-format";
 import NestContext from "../nest-helpers";

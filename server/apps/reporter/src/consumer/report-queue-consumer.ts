@@ -7,7 +7,7 @@ import { quillDeltaToHtml, quillHtmlToText } from "@helpers/quill";
 import { EventCreateInput } from "@server/src/events/entities";
 import { EventService } from "@server/src/events/event.service";
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 import { WriterService } from "@server/src/writer/writer.service";
 import { MailService } from "@server/src/mail/mail.service";
 

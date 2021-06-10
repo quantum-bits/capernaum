@@ -6,7 +6,7 @@ import { Survey, SurveyResponse } from "@server/src/survey/entities";
 import { FabricatorModule } from "@server/src/fabricator/fabricator.module";
 import { GroupFabricatorService } from "@server/src/fabricator/group-fabricator.service";
 import { SurveyFabricatorService } from "@server/src/fabricator/survey-fabricator.service";
-import { SurveyService } from "@server/src/survey/survey.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 
 describe("GroupService", () => {
   let entityMgr: EntityManager;
