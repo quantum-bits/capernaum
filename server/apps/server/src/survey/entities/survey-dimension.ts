@@ -24,22 +24,6 @@ export class SurveyDimension extends AbstractEntity {
 
   @FieldColumn("Sequence number", () => Int)
   sequence: number;
-
-  /**
-   * The bar chart in the response letter corresponds to a survey dimension.
-   * Each bar represents a survey index within the survey dimension.
-   * The value of each bar is the mean of all the survey items (questions) associated with the index.
-   */
-  public chartData(): ChartData {
-    const chartEntries = this.surveyIndices.map((surveyIndex) => {
-      return {
-        title: surveyIndex.title,
-        value: surveyIndex.meanResponse(),
-      };
-    });
-
-    return new ChartData(this.title, chartEntries);
-  }
 }
 
 @InputType({

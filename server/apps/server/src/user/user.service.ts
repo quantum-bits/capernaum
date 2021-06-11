@@ -13,6 +13,28 @@ import { BaseService } from "@server/src/shared/base.service";
 import { validatePassword } from "@server/src/auth/crypto";
 
 @Injectable()
+export class UserRoleService extends BaseService<UserRole> {
+  constructor(
+    @InjectRepository(UserRole)
+    private readonly repo: Repository<UserRole>
+  ) {
+    super(repo);
+  }
+
+  create(createInput: UserRoleCreateInput) {
+    return this.repo.save(this.repo.create(createInput));
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id);
+  }
+
+  readAll() {
+    return this.repo.find();
+  }
+}
+
+@Injectable()
 export class UserService extends BaseService<User> {
   constructor(
     private readonly userRoleService: UserRoleService,
@@ -73,27 +95,5 @@ export class UserService extends BaseService<User> {
     } else {
       return "Invalid credentials; please try again";
     }
-  }
-}
-
-@Injectable()
-export class UserRoleService extends BaseService<UserRole> {
-  constructor(
-    @InjectRepository(UserRole)
-    private readonly repo: Repository<UserRole>
-  ) {
-    super(repo);
-  }
-
-  create(createInput: UserRoleCreateInput) {
-    return this.repo.save(this.repo.create(createInput));
-  }
-
-  readOne(id: number) {
-    return this.repo.findOne(id);
-  }
-
-  readAll() {
-    return this.repo.find();
   }
 }

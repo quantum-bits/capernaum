@@ -19,6 +19,7 @@ import {
 import { GroupService } from "../group/group.service";
 import * as IsEmail from "isemail";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 
 const letterDebug = getDebugger("letter");
 
@@ -92,7 +93,8 @@ export class WriterService {
     private readonly letterElementService: LetterElementService,
     private readonly surveyService: SurveyService,
     private readonly groupService: GroupService,
-    private readonly surveyResponseService: SurveyResponseService
+    private readonly surveyResponseService: SurveyResponseService,
+    private readonly surveyAnalyticsService: SurveyAnalyticsService
   ) {}
 
   private renderImage(letterElement: LetterElement) {
@@ -294,7 +296,9 @@ export class WriterService {
           break;
         case "scripture-engagement-prediction":
           const predictions: Prediction[] =
-            surveyResponse.predictScriptureEngagement();
+            this.surveyAnalyticsService.predictScriptureEngagement(
+              surveyResponse
+            );
           renderedElements.push(this.renderPredictions(predictions));
           break;
         case "dimension-chart":
@@ -304,7 +308,9 @@ export class WriterService {
             );
           if (dimension) {
             renderedElements.push(
-              WriterService.renderChart(dimension.chartData())
+              WriterService.renderChart(
+                this.surveyAnalyticsService.chartData(dimension)
+              )
             );
           } else {
             renderedElements.push(
@@ -388,8 +394,9 @@ export class WriterService {
               "Letter created successfully",
               pdfFileName,
               this.pdfFileService.relativePath(pdfFileName),
-              pdfAbsolutePath,
-              surveyResponse.summarize()
+              pdfAbsolutePath
+              // TODO - Not sure we want this any longer.
+              // surveyResponse.summarize()
             );
 
             resolve(writerOutput);

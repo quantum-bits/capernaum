@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   Letter,
@@ -30,7 +30,7 @@ import { SurveyModule } from "@server/src/survey/survey.module";
       LetterElementType,
       PredictionTableEntry,
     ]),
-    SurveyModule,
+    forwardRef(() => SurveyModule),
   ],
   providers: [
     LetterElementResolver,
@@ -42,6 +42,6 @@ import { SurveyModule } from "@server/src/survey/survey.module";
     LetterTypeResolver,
     LetterTypeService,
   ],
-  exports: [LetterService],
+  exports: [LetterService, LetterTypeService, LetterElementService],
 })
 export class LetterModule {}

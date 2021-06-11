@@ -28,7 +28,7 @@ export class User extends AbstractEntity {
   @FieldColumn("Last name")
   lastName: string;
 
-  @Column("Encrypted password")
+  @Column({ comment: "Encrypted password" })
   password: string; // Don't expose this via GraphQL.
 
   private tempPassword: string;

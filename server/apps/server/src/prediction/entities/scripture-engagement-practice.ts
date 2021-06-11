@@ -24,14 +24,14 @@ export class ScriptureEngagementPracticeCreateInput {
   @Field() title: string;
   @Field() description: string;
   @Field() moreInfoUrl: string;
-  @Field((type) => Int) sequence: number;
+  @Field(() => Int) sequence: number;
 }
 
 @InputType()
 export class ScriptureEngagementPracticeUpdateInput {
-  @Field((type) => Int) id: number;
+  @Field(() => Int) id: number;
   @Field({ nullable: true }) title?: string;
   @Field({ nullable: true }) description?: string;
   @Field({ nullable: true }) moreInfoUrl: string;
-  @Field((type) => Int, { nullable: true }) sequence?: number;
+  @Field(() => Int, { nullable: true }) sequence?: number;
 }

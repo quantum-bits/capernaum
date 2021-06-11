@@ -11,6 +11,7 @@ import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { MachineModule } from "./machine/machine.module";
 import { GroupModule } from "./group/group.module";
+import { SurveyService } from "@server/src/survey/services";
 //import { FabricatorModule } from "./fabricator/fabricator.module";
 
 @Module({

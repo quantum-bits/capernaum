@@ -2,9 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { getDebugger } from "@helpers/debug-factory";
 import { mean } from "lodash";
 import { SurveyService } from "@server/src/survey/services/survey.service";
-import { Survey } from "@server/src/survey/entities";
+import {
+  Survey,
+  SurveyDimension,
+  SurveyResponse,
+} from "@server/src/survey/entities";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
+import { ChartData, Prediction } from "@server/src/survey/survey.types";
 
 const debug = getDebugger("analytics");
 
@@ -48,7 +53,32 @@ export class SurveyAnalyticsService {
         resp.value,
       ])
     );
-
-    XXX YOU WERE HERE.
   }
+
+  predictScriptureEngagement(surveyResponse: SurveyResponse) {
+    const predictions: Prediction[] = [];
+    throw Error("Unimplemented");
+    return predictions;
+  }
+
+  public chartData(surveyDimension: SurveyDimension): ChartData {
+    return undefined;
+  }
+
+  // TODO - Rewrite - Was in survey-dimension.ts
+  // /**
+  //  * The bar chart in the response letter corresponds to a survey dimension.
+  //  * Each bar represents a survey index within the survey dimension.
+  //  * The value of each bar is the mean of all the survey items (questions) associated with the index.
+  //  */
+  // public chartData(): ChartData {
+  //   const chartEntries = this.surveyIndices.map((surveyIndex) => {
+  //     return {
+  //       title: surveyIndex.title,
+  //       value: surveyIndex.meanResponse(),
+  //     };
+  //   });
+  //
+  //   return new ChartData(this.title, chartEntries);
+  // }
 }

@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
   SurveyDimensionResolver,
@@ -30,6 +30,8 @@ import { registerEnumType } from "@nestjs/graphql";
 import { WhichItems } from "./survey.types";
 import { GroupModule } from "@server/src/group/group.module";
 import { SurveyItemService } from "@server/src/survey/services/survey-item.service";
+import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
+import { LetterModule } from "@server/src/letter/letter.module";
 
 @Module({
   imports: [
@@ -43,6 +45,7 @@ import { SurveyItemService } from "@server/src/survey/services/survey-item.servi
       SurveyLetter,
     ]),
     GroupModule,
+    forwardRef(() => LetterModule),
   ],
   providers: [
     SurveyDimensionResolver,
@@ -59,8 +62,9 @@ import { SurveyItemService } from "@server/src/survey/services/survey-item.servi
     SurveyResponseService,
     SurveyLetterResolver,
     SurveyLetterService,
+    SurveyAnalyticsService,
   ],
-  exports: [SurveyService, SurveyResponseService],
+  exports: [SurveyService, SurveyResponseService, SurveyAnalyticsService],
 })
 export class SurveyModule {
   constructor() {

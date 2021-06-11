@@ -5,7 +5,10 @@ import {
   PredictionTableEntryResolver,
   ScriptureEngagementPracticeResolver,
 } from "./prediction.resolvers";
-import { PredictionTableEntryService } from "./prediction.service";
+import {
+  PredictionTableEntryService,
+  ScriptureEngagementPracticeService,
+} from "./prediction.service";
 
 @Module({
   imports: [
@@ -17,6 +20,7 @@ import { PredictionTableEntryService } from "./prediction.service";
   providers: [
     PredictionTableEntryService,
     PredictionTableEntryResolver,
+    ScriptureEngagementPracticeService,
     ScriptureEngagementPracticeResolver,
   ],
 })

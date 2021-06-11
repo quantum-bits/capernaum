@@ -16,3 +16,4 @@ coverage/
 venv/
 .ipynb_checkpoints/
 .vscode/
+*DELETE-ME
