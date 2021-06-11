@@ -26,6 +26,16 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
     });
   }
 
+  readForAnalysis(id: number) {
+    return this.repo.findOne(id, {
+      relations: [
+        "survey",
+        "surveyItemResponses",
+        "surveyItemResponses.surveyItems",
+      ],
+    });
+  }
+
   readComplete(responseId: number) {
     debug("get complete response %d", responseId);
 

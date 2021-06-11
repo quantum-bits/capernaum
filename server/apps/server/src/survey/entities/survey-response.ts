@@ -4,10 +4,7 @@ import { Survey } from "./survey";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { SurveyItemResponse } from "./survey-item-response";
 import { Group } from "../../group/entities";
-import { getDebugger } from "@helpers/debug-factory";
 import { FieldColumn } from "@server/src/decorators";
-
-const surveyDebug = getDebugger("survey");
 
 @Entity()
 @ObjectType({ description: "One user's response to a survey" })
@@ -75,5 +72,4 @@ export class SurveyResponse extends AbstractEntity {
 
   @FieldColumn("Respondent's longitude")
   longitude: string;
-
 }

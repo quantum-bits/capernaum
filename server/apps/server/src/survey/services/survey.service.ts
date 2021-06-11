@@ -37,6 +37,21 @@ export class SurveyService extends BaseService<Survey> {
     return this.repo.findOne(id);
   }
 
+  /**
+   * Read the complete "structure" of a survey, intended to be used
+   * by the survey analytics service.
+   * @param id
+   */
+  readStructure(id: number) {
+    return this.repo.findOne(id, {
+      relations: [
+        "surveyDimensions",
+        "surveyDimensions.surveyIndices",
+        "surveyDimensions.surveyIndices.surveyItems",
+      ],
+    });
+  }
+
   findByQualtricsId(qualtricsId: string): Promise<Survey> {
     return this.repo.findOne({ qualtricsId }, { relations: ["surveyItems"] });
   }

@@ -14,6 +14,9 @@ import {
 import { Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
+import { SurveyDimension } from "@server/src/survey/entities";
+import { Image } from "@server/src/image/entities";
+import { PredictionTable } from "@server/src/prediction/entities";
 
 const debug = getDebugger("letter:service");
 
@@ -119,15 +122,15 @@ export class LetterElementService extends BaseService<LetterElement> {
     return this.letterElementRepo.delete(id).then((result) => result.affected);
   }
 
-  resolveRelatedImage(letterElement: LetterElement) {
+  resolveRelatedImage(letterElement: LetterElement): Image {
     return this.resolveOne(letterElement, "image");
   }
 
-  resolveRelatedSurveyDimension(letterElement: LetterElement) {
+  resolveRelatedSurveyDimension(letterElement: LetterElement): SurveyDimension {
     return this.resolveOne(letterElement, "surveyDimension");
   }
 
-  resolveRelatedPredictionTable(letterElement: LetterElement) {
+  resolveRelatedPredictionTable(letterElement: LetterElement): PredictionTable {
     return this.resolveOne(letterElement, "predictionTable");
   }
 }
