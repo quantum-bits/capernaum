@@ -37,6 +37,6 @@ export class SurveyIndexResolver {
       "Delete an index. Also removes associations with items; the items are not removed.",
   })
   deleteSurveyIndex(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyIndexService.deconstruct(id);
+    return this.surveyIndexService.delete(id);
   }
 }

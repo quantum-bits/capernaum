@@ -55,7 +55,7 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
       .then((result) => this.repo.save(result));
   }
 
-  async deconstruct(dimensionId: number): Promise<SurveyDimensionDeleteOutput> {
+  async delete(dimensionId: number): Promise<SurveyDimensionDeleteOutput> {
     return this.repo.manager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
 
@@ -70,7 +70,7 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
       };
 
       for (const index of dimension.surveyIndices) {
-        const indexDeleteOutput = await SurveyIndexService._deleteHelper(
+        const indexDeleteOutput = await SurveyIndexService. _deleteHelper(
           manager,
           index.id
         );

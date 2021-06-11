@@ -98,7 +98,7 @@ export class LetterTypeService extends BaseService<LetterType> {
       .then((result) => this.repo.save(result));
   }
 
-  deconstruct(id: number) {
+  delete(id: number) {
     return this.repo.delete(id).then((result) => result.affected);
   }
 }
@@ -118,7 +118,7 @@ export class LetterElementService extends BaseService<LetterElement> {
       .then((result) => this.letterElementRepo.save(result));
   }
 
-  deconstruct(id: number) {
+  delete(id: number) {
     return this.letterElementRepo.delete(id).then((result) => result.affected);
   }
 

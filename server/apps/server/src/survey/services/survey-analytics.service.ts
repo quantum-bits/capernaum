@@ -10,6 +10,8 @@ import {
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 import { ChartData, Prediction } from "@server/src/survey/survey.types";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 const debug = getDebugger("analytics");
 
@@ -20,8 +22,50 @@ export class SurveyAnalyticsService {
 
   constructor(
     private readonly surveyService: SurveyService,
-    private readonly surveyResponseService: SurveyResponseService
+    private readonly surveyResponseService: SurveyResponseService,
+    @InjectRepository(SurveyResponse)
+    private readonly surveyResponseRepo: Repository<SurveyResponse>
   ) {}
+
+  summarizeResponse(surveyResponseId: number) {
+    return this.surveyResponseRepo
+      .createQueryBuilder("sr")
+      .innerJoinAndSelect("sr.surveyItemResponses", "sir")
+      .innerJoinAndSelect("sir.surveyItem", "sitem")
+      .innerJoinAndSelect("sitem.surveyIndex", "sindex")
+      .innerJoinAndSelect("sindex.surveyDimension", "sdim")
+      .where("sr.id = :id", { id: surveyResponseId })
+      .getOne();
+  }
+
+  calculateDimensions(surveyResponseId: number) {
+    return this.surveyResponseRepo
+      .createQueryBuilder("sr")
+
+      .select("sdim.title", "dimensionTitle")
+      .groupBy("sdim.title")
+      .orderBy("sdim.title")
+
+      .addSelect("sdim.id", "dimensionId")
+      .addGroupBy("sdim.id")
+
+      .addSelect("sindex.title", "indexTitle")
+      .addGroupBy("sindex.title")
+      .addOrderBy("sindex.title")
+
+      .addSelect("sindex.id", "indexId")
+      .addGroupBy("sindex.id")
+
+      .addSelect("AVG(sir.value)", "meanSurveyIndex")
+
+      .innerJoin("sr.surveyItemResponses", "sir")
+      .innerJoin("sir.surveyItem", "sitem")
+      .innerJoin("sitem.surveyIndex", "sindex")
+      .innerJoin("sindex.surveyDimension", "sdim")
+
+      .where("sr.id = :id", { id: surveyResponseId })
+      .getRawMany();
+  }
 
   // Make sure the survey with the given ID is cached.
   private async ensureSurveyLoaded(surveyId: number) {

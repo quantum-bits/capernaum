@@ -4,7 +4,7 @@ import { QualtricsSurveyListItem } from "./entities/qualtrics-survey-list-item";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
 import { Survey } from "../survey/entities";
-import { SurveyService } from "../survey/services/survey.service";
+import { SurveyService } from "@server/src/survey/services";
 import { QualtricsResponseImportStats } from "../survey/survey.types";
 import {
   QualtricsOrganization,
@@ -12,6 +12,7 @@ import {
   QualtricsSubscriptionCreateInput,
 } from "./entities";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
+import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
@@ -69,14 +70,8 @@ export class QualtricsResolver {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey.",
   })
-  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: string) {
-    // Fetch the survey with the given ID from the Qualtrics API.
-    const qualtricsSurvey = await this.qualtricsApiService.getSurvey(
-      qualtricsId
-    );
-
-    // Import survey into the database.
-    return this.qualtricsService.importQualtricsSurvey(qualtricsSurvey);
+  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: QualtricsID) {
+    return this.qualtricsService.importQualtricsSurvey(qualtricsId);
   }
 
   @Mutation(() => QualtricsResponseImportStats, {
@@ -85,31 +80,9 @@ export class QualtricsResolver {
   async importQualtricsSurveyResponses(
     @Args("qualtricsId") qualtricsId: string
   ) {
-    const survey = await this.surveyService.findByQualtricsId(qualtricsId);
-
-    // Get from Qualtrics all responses to this survey.
-    const zipFileEntries = await this.qualtricsApiService.getResponses(
+    return this.qualtricsService.importAllResponsesForQualtricsSurvey(
       qualtricsId
     );
-    const allResponses = JSON.parse(zipFileEntries[0].content).responses;
-
-    // For each response retrieved from Qualtrics, import it into the database.
-    const importStats = new QualtricsResponseImportStats();
-    for (const oneResponse of allResponses) {
-      const importResponse =
-        await this.qualtricsService.importQualtricsSurveyResponse(
-          survey.id,
-          oneResponse
-        );
-
-      importStats.importCount += 1;
-      if (importResponse.isDuplicate) {
-        importStats.duplicateCount += 1;
-      }
-      importStats.surveyResponses.push(importResponse.surveyResponse);
-    }
-
-    return importStats;
   }
 
   @Query(() => QualtricsOrganization)

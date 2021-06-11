@@ -52,7 +52,7 @@ export class SurveyResolver {
 
   @Mutation(() => Int)
   deleteSurvey(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.surveyService.deconstruct(id);
+    return this.surveyService.delete(id);
   }
 
   @ResolveField("letters", () => [Letter], {

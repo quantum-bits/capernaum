@@ -80,7 +80,7 @@ export class LetterElementResolver {
 
   @Mutation(() => Int)
   deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterElementService.deconstruct(id);
+    return this.letterElementService.delete(id);
   }
 
   @ResolveField("image", () => Image, { nullable: true })
@@ -145,6 +145,6 @@ export class LetterTypeResolver {
 
   @Mutation(() => Int)
   deleteLetterType(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterTypeService.deconstruct(id);
+    return this.letterTypeService.delete(id);
   }
 }

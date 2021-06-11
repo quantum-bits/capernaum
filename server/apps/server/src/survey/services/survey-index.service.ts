@@ -11,6 +11,9 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import { assign, difference, pick } from "lodash";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("survey-index");
 
 @Injectable()
 export class SurveyIndexService extends BaseService<SurveyIndex> {
@@ -102,6 +105,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     manager: EntityManager,
     id: number
   ): Promise<SurveyIndexDeleteOutput> {
+    debug("_deleteHelper %d", id);
     const index = await manager.findOneOrFail(SurveyIndex, id, {
       relations: ["surveyItems"],
     });
@@ -120,7 +124,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     };
   }
 
-  async deconstruct(id: number) {
+  async delete(id: number) {
     return this.repo.manager.transaction(async (manager) =>
       SurveyIndexService._deleteHelper(manager, id)
     );

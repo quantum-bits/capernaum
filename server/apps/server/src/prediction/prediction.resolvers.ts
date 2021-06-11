@@ -106,7 +106,7 @@ export class ScriptureEngagementPracticeResolver {
   deleteScriptureEngagementPractice(
     @Args({ name: "id", type: () => Int }) id: number
   ) {
-    return this.scriptureEngagementPracticeService.deconstruct(id);
+    return this.scriptureEngagementPracticeService.delete(id);
   }
 
   @ResolveField("predictionTableEntries", () => [PredictionTableEntry])

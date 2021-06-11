@@ -95,7 +95,7 @@ export class SurveyService extends BaseService<Survey> {
       .then((result) => this.repo.save(result));
   }
 
-  async deconstruct(id: number) {
+  async delete(id: number) {
     return this.repo.manager.transaction(async (manager) => {
       await manager.delete(SurveyItem, { surveyId: id });
       const deleteResult = await manager.delete(Survey, id);

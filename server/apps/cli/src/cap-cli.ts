@@ -1,6 +1,9 @@
 import { config } from "dotenv";
 config();
 
+import PrettyError = require("pretty-error");
+PrettyError.start();
+
 import { knex } from "./models/db";
 
 import { Command, Option } from "commander";
@@ -8,7 +11,7 @@ import {
   createSubscription,
   deleteSubscription,
   getGroup,
-  getResponse,
+  getQualtricsResponse,
   getSubscription,
   getSurvey,
   graphQLQuery,
@@ -20,6 +23,8 @@ import {
   predictEngagement,
   showOrg,
   nuclearOption,
+  calculateDimensions,
+  summarizeResponse,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -67,7 +72,7 @@ qualtricsResponseCommands
   })
   .option("--start-date", "start date (YYYY-MM-DD)")
   .option("--end-date", "end date (YYYY-MM-DD)")
-  .action(getResponse);
+  .action(getQualtricsResponse);
 
 const qualtricsSubscriptionCommands = qualtricsCommands
   .command("subscription")
@@ -145,6 +150,16 @@ responseCommands
     "survey-id": "survey ID (SV_...)",
   })
   .action(importSurveyResponses);
+
+responseCommands
+  .command("dimensions <survey-response-id>")
+  .description("calculate dimensions")
+  .action(calculateDimensions);
+
+responseCommands
+  .command("summarize <survey-response-id>")
+  .description("summarize response")
+  .action(summarizeResponse);
 
 responseCommands
   .command("predict <response-pk>")

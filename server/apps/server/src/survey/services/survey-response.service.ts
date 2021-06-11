@@ -65,14 +65,15 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
   }
 
   static async _deleteHelper(manager: EntityManager, surveyResponseId: number) {
-    // Delete responses to each question.
-    await manager.delete(SurveyItemResponse, {
-      surveyResponseId,
-    });
+    // Delete item responses.
+    await manager
+      .createQueryBuilder()
+      .delete()
+      .from(SurveyItemResponse)
+      .where("surveyResponseId = :id", { id: surveyResponseId })
+      .execute();
 
-    return manager.delete(SurveyResponse, {
-      id: surveyResponseId,
-    });
+    return manager.delete(SurveyResponse, surveyResponseId);
   }
 
   async delete(surveyResponseId: number) {

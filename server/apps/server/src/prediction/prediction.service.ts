@@ -119,7 +119,7 @@ export class ScriptureEngagementPracticeService extends BaseService<ScriptureEng
       .then((result) => this.repo.save(result));
   }
 
-  deconstruct(id: number) {
+  delete(id: number) {
     return this.repo.delete(id).then((result) => result.affected);
   }
 }

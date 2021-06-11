@@ -1,14 +1,10 @@
-// import Command from "@oclif/command";
 import inquirer from "inquirer";
 import { ConcreteTypeInfo, Field, Schema, TypeObject } from "./graphql-schema";
 import { gql } from "@apollo/client/core";
 import { graphqlClient } from "./graphql-client";
 import { TypeKind } from "graphql";
 import prettyFormat from "pretty-format";
-
-import PrettyError = require("pretty-error");
 import { getDebugger } from "@helpers/debug-factory";
-PrettyError.start();
 
 const debug = getDebugger("query");
 

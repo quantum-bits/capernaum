@@ -12,6 +12,7 @@ import { getDebugger } from "@helpers/debug-factory";
 import { DateTime } from "luxon";
 import { Survey } from "@server/src/survey/entities";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
+import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 
 const debug = getDebugger("survey");
 
@@ -20,7 +21,7 @@ interface ListSurveysOptions {
   all: boolean; // Return all surveys (instead of just activeones)?
 }
 
-export function fetchQualtricsSurveyMetadata(
+function fetchQualtricsSurveyMetadata(
   options: ListSurveysOptions = { byDate: true, all: false }
 ) {
   const qualtricsService = new QualtricsApiService();
@@ -74,7 +75,7 @@ export async function listSurveys(options: ListSurveysOptions) {
   reportQualtricsSurveyMetadata(surveys);
 }
 
-export async function fetchQualtricsSurvey(
+async function fetchQualtricsSurvey(
   surveyId: string
 ): Promise<QualtricsSurvey> {
   const qualtricsService = new QualtricsApiService();
@@ -87,12 +88,12 @@ export function getSurvey(surveyId: string) {
   );
 }
 
-export async function importQualtricsSurvey(surveyId: string): Promise<Survey> {
-  const qualtricsSurvey = await fetchQualtricsSurvey(surveyId);
-
+export async function importQualtricsSurvey(
+  surveyId: QualtricsID
+): Promise<Survey> {
   const nestContext = new NestContext();
   const qualtricsService = await nestContext.get(QualtricsService);
-  const survey = await qualtricsService.importQualtricsSurvey(qualtricsSurvey);
+  const survey = await qualtricsService.importQualtricsSurvey(surveyId);
   await nestContext.close();
 
   return survey;

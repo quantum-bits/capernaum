@@ -1,15 +1,19 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import { SurveyService } from "@server/src/survey/services/survey.service";
-import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
 import prettyFormat from "pretty-format";
 import { SurveyResponseService } from "@server/src/survey/services";
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
+import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
+import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 
-const debug = getDebugger("response");
+const debug = getDebugger("cli:response");
 
-export function getResponse(surveyId: string, responseId: string, options) {
+export function getQualtricsResponse(
+  surveyId: string,
+  responseId: string,
+  options
+) {
   const qualtricsService = new QualtricsApiService();
   debug("surveyId '%s'", surveyId);
   debug("responseId '%s'", responseId);
@@ -44,14 +48,33 @@ export async function getGroupResponses(groupId: number) {
  * Import responses for a survey.
  * @param surveyId ID of survey
  */
-export async function importSurveyResponses(surveyId: string) {
+export async function importSurveyResponses(surveyId: QualtricsID) {
+  debug("importSurveyResponses/get survey '%s'", surveyId);
   const nestContext = new NestContext();
-  const qualtricsResolver = await nestContext.get(QualtricsResolver);
-  const result = await qualtricsResolver.importQualtricsSurveyResponses(
+  const qualtricsService = await nestContext.get(QualtricsService);
+  const result = await qualtricsService.importAllResponsesForQualtricsSurvey(
     surveyId
   );
   await nestContext.close();
   console.log("RESULT", result);
+}
+
+export async function calculateDimensions(responseId: number) {
+  const nestContext = new NestContext();
+  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const dimensions = await surveyAnalysisService.calculateDimensions(
+    responseId
+  );
+  await nestContext.close();
+  console.log(dimensions);
+}
+
+export async function summarizeResponse(responseId: number) {
+  const nestContext = new NestContext();
+  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const summary = await surveyAnalysisService.summarizeResponse(responseId);
+  await nestContext.close();
+  console.log(prettyFormat(summary, { highlight: true }));
 }
 
 export async function predictEngagement(responseId: string) {

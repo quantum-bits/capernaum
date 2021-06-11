@@ -5,36 +5,36 @@ import {
   SurveyItemResponse,
   SurveyResponse,
 } from "@server/src/survey/entities";
+import { QualtricsSurveyResponse } from "@qapi/qualtrics-api.types";
 import {
-  QualtricsSurvey,
-  QualtricsSurveyResponse,
-} from "@qapi/qualtrics-api.types";
-import { QualtricsImportedResponse } from "@server/src/survey/survey.types";
+  QualtricsImportedResponse,
+  QualtricsResponseImportStats,
+} from "@server/src/survey/survey.types";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyService } from "@server/src/survey/services";
 import { getManager } from "typeorm";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
 import { GroupService } from "@server/src/group/group.service";
+import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
+import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 
 const debug = getDebugger("qualtrics");
 
 @Injectable()
 export class QualtricsService {
   constructor(
+    private readonly qualtricsApiService: QualtricsApiService,
     private readonly surveyService: SurveyService,
     private readonly groupService: GroupService
   ) {}
 
   /**
-   * Import details from a Qualtrics survey into Capernaum. Normally called
-   * from `importQualtricsSurvey` in the Qualtrics resolver.
-   *
-   * @param qualtricsSurvey Data fetched from Qualtrics.
+   * Import details from a Qualtrics survey into Capernaum.
    */
-  async importQualtricsSurvey(
-    qualtricsSurvey: QualtricsSurvey
-  ): Promise<Survey> {
-    // surveyDebug("QualtricsSurvey %O", qualtricsSurvey);
+  async importQualtricsSurvey(qualtricsId: QualtricsID): Promise<Survey> {
+    const qualtricsSurvey = await this.qualtricsApiService.getSurvey(
+      qualtricsId
+    );
 
     return getManager().transaction(async (manager) => {
       const surveyItemRepo = manager.getRepository(SurveyItem);
@@ -116,15 +116,49 @@ export class QualtricsService {
     });
   }
 
+  async importAllResponsesForQualtricsSurvey(qualtricsId: QualtricsID) {
+    debug("import all responses for '%s'", qualtricsId);
+
+    // Grab the (previously imported) survey.
+    const survey = await this.surveyService.findByQualtricsId(qualtricsId);
+    debug("survey id %d", survey.id);
+
+    // Get from Qualtrics all responses to this survey.
+    const zipFileEntries = await this.qualtricsApiService.getResponses(
+      qualtricsId
+    );
+    const allResponses = JSON.parse(zipFileEntries[0].content).responses;
+    debug("fetched %d responses from qualtrics %O", allResponses.length);
+
+    // For each response retrieved from Qualtrics, import it into the database.
+    const importStats = new QualtricsResponseImportStats();
+    for (const oneResponse of allResponses) {
+      const importResponse = await this.importOneResponseForQualtricsSurvey(
+        survey.id,
+        oneResponse
+      );
+
+      importStats.importCount += 1;
+      if (importResponse.isDuplicate) {
+        importStats.duplicateCount += 1;
+      }
+      importStats.surveyResponses.push(importResponse.surveyResponse);
+    }
+
+    return importStats;
+  }
+
   /**
    * Import from Qualtrics one respondent's response to a survey.
    * @param surveyId - database survey ID
    * @param createInput - details of the response from Qualtrics
    */
-  async importQualtricsSurveyResponse(
+  async importOneResponseForQualtricsSurvey(
     surveyId: number,
     createInput: QualtricsSurveyResponse
   ): Promise<QualtricsImportedResponse> {
+    debug("import response '%s'", createInput.responseId);
+
     return getManager().transaction(async (manager) => {
       const surveyResponseRepo = manager.getRepository(SurveyResponse);
       const surveyItemResponseRepo = manager.getRepository(SurveyItemResponse);
