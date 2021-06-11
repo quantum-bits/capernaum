@@ -10,8 +10,8 @@ import chalk from "chalk";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
 import { DateTime } from "luxon";
-import { SurveyService } from "@server/src/survey/services/survey.service";
 import { Survey } from "@server/src/survey/entities";
+import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 
 const debug = getDebugger("survey");
 
@@ -91,8 +91,8 @@ export async function importQualtricsSurvey(surveyId: string): Promise<Survey> {
   const qualtricsSurvey = await fetchQualtricsSurvey(surveyId);
 
   const nestContext = new NestContext();
-  const surveyService = await nestContext.get(SurveyService);
-  const survey = await surveyService.importQualtricsSurvey(qualtricsSurvey);
+  const qualtricsService = await nestContext.get(QualtricsService);
+  const survey = await qualtricsService.importQualtricsSurvey(qualtricsSurvey);
   await nestContext.close();
 
   return survey;

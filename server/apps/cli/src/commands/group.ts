@@ -1,11 +1,11 @@
 import { GroupService } from "@server/src/group/group.service";
 import { Group } from "@server/src/group/entities";
 import { table } from "table";
-import { SurveyService } from "@server/src/survey/services/survey.service";
 import { SurveyResponse } from "@server/src/survey/entities";
 import prettyFormat from "pretty-format";
 import NestContext from "../nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyResponseService } from "@server/src/survey/services";
 
 const debug = getDebugger("group");
 
@@ -31,14 +31,16 @@ export async function listGroups() {
 export async function getGroup(codeWord: string, options) {
   const nestContext = new NestContext();
   const groupService: GroupService = await nestContext.get(GroupService);
-  const surveyService = await nestContext.get(SurveyService);
+  const surveyResponseService = await nestContext.get(SurveyResponseService);
 
   const result = {} as { group: Group; responses: SurveyResponse[] };
 
   result.group = await groupService.findByCodeWord(codeWord);
 
   if (options.withResponses) {
-    result.responses = await surveyService.readSurveyResponses(result.group.id);
+    result.responses = await surveyResponseService.findByGroupId(
+      result.group.id
+    );
   }
 
   await nestContext.close();

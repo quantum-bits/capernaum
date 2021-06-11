@@ -17,7 +17,8 @@ export function getDebugger(name: string) {
 
 /**
  * Enable debugging output programmatically.
- * Note that this is on the debug module itself, not an instances.
+ * Note that this is on the debug module _itself_,
+ * not an instances.
  * @param namespaces namespaces to enable (same syntax as on the command line)
  */
 export function enableDebugOutput(namespaces: string) {

@@ -4,6 +4,8 @@ import { QualtricsResolver } from "@server/src/qualtrics/qualtrics.resolvers";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
 import prettyFormat from "pretty-format";
+import { SurveyResponseService } from "@server/src/survey/services";
+import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 
 const debug = getDebugger("response");
 
@@ -30,8 +32,10 @@ export function getResponse(surveyId: string, responseId: string, options) {
 
 export async function getGroupResponses(groupId: number) {
   const nestContext = new NestContext();
-  const surveyService: SurveyService = await nestContext.get(SurveyService);
-  const responses = surveyService.readSurveyResponses(groupId);
+  const surveyResponseService: SurveyResponseService = await nestContext.get(
+    SurveyResponseService
+  );
+  const responses = surveyResponseService.findByGroupId(groupId);
   await nestContext.close();
   console.log(JSON.stringify(responses));
 }
@@ -52,12 +56,14 @@ export async function importSurveyResponses(surveyId: string) {
 
 export async function predictEngagement(responseId: string) {
   const nestContext = new NestContext();
-  const surveyService = await nestContext.get(SurveyService);
-  const response = await surveyService.readComplete(
+  const surveyResponseService = await nestContext.get(SurveyResponseService);
+  const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
+  const response = await surveyResponseService.readComplete(
     parseInt(responseId)
   );
   debug("response %O", response);
-  const prediction = response.predictScriptureEngagement();
+  const prediction =
+    surveyAnalyticsService.predictScriptureEngagement(response);
   await nestContext.close();
   console.log(prettyFormat(prediction));
 }

@@ -1,8 +1,8 @@
 import { Model } from "objection";
 import { LetterTypeModel } from "./letter-type.model";
 import { LetterElementModel } from "./letter-element.model";
-import { PredictionTableEntryModel } from "./prediction-table-entry.model";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyLetterModel } from "@common/cli/src/models/survey-letter.model";
 
 const debug = getDebugger("model:letter");
 
@@ -20,13 +20,13 @@ export class LetterModel extends Model {
   static tableName = "letter";
 
   static async beforeDelete({ asFindQuery, transaction }) {
-    debug("Delete letter elements");
-    await LetterElementModel.query(transaction)
+    debug("Delete survey letters");
+    await SurveyLetterModel.query(transaction)
       .delete()
       .whereIn("letterId", asFindQuery().select("id"));
 
-    debug("Delete prediction table entries");
-    await PredictionTableEntryModel.query(transaction)
+    debug("Delete letter elements");
+    await LetterElementModel.query(transaction)
       .delete()
       .whereIn("letterId", asFindQuery().select("id"));
   }

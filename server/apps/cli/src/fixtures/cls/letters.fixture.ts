@@ -11,18 +11,17 @@ export class LettersFixture extends AbstractFixture {
     return LetterModel.query().delete();
   }
 
-  async insert(update) {
+  async insert() {
     debug("Insert letters");
 
-    const foo = await this.updateFromTypeModel(
+    const updatedFixture = await this.updateFromTypeModel(
       LetterTypeModel,
       letters,
       "_letterTypeName",
       "letterTypeId"
     );
-    debug("============= %O", foo);
 
-    return LetterModel.query().insert(this.updateFromOptions(letters, update));
+    return LetterModel.query().insert(updatedFixture);
   }
 }
 

@@ -36,6 +36,15 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
     });
   }
 
+  // TODO - Verify this!
+  findByGroupId(groupId: number) {
+    return this.repo.find({
+      where: {
+        group: { id: groupId },
+      },
+    });
+  }
+
   readComplete(responseId: number) {
     debug("get complete response %d", responseId);
 
