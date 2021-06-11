@@ -25,6 +25,7 @@ import {
   nuclearOption,
   calculateDimensions,
   summarizeResponse,
+  meanSurveyIndices,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -152,21 +153,24 @@ responseCommands
   .action(importSurveyResponses);
 
 responseCommands
-  .command("dimensions <survey-response-id>")
+  .command("dimensions <survey-response-pk>")
   .description("calculate dimensions")
   .action(calculateDimensions);
 
 responseCommands
-  .command("summarize <survey-response-id>")
+  .command("summarize <survey-response-pk>")
   .description("summarize response")
   .action(summarizeResponse);
 
 responseCommands
-  .command("predict <response-pk>")
-  .description("predict scripture engagement", {
-    "response-pk": "database id",
-  })
+  .command("predict <prediction-table-pk> <survey-response-pk>")
+  .description("predict scripture engagement")
   .action(predictEngagement);
+
+responseCommands
+  .command("msi <survey-response-pk>")
+  .description("calculate mean survey indices")
+  .action(meanSurveyIndices);
 
 // Fixture
 

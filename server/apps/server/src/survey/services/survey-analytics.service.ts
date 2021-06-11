@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { getDebugger } from "@helpers/debug-factory";
-import { mean } from "lodash";
 import { SurveyService } from "@server/src/survey/services/survey.service";
 import {
   Survey,
@@ -9,9 +8,11 @@ import {
 } from "@server/src/survey/entities";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
-import { ChartData, Prediction } from "@server/src/survey/survey.types";
+import { ChartData } from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, SelectQueryBuilder } from "typeorm";
+import { PredictionTable } from "@server/src/prediction/entities";
+import { printPretty } from "@helpers/formatting";
 
 const debug = getDebugger("analytics");
 
@@ -24,7 +25,9 @@ export class SurveyAnalyticsService {
     private readonly surveyService: SurveyService,
     private readonly surveyResponseService: SurveyResponseService,
     @InjectRepository(SurveyResponse)
-    private readonly surveyResponseRepo: Repository<SurveyResponse>
+    private readonly surveyResponseRepo: Repository<SurveyResponse>,
+    @InjectRepository(PredictionTable)
+    private readonly predictionTableRepo: Repository<PredictionTable>
   ) {}
 
   summarizeResponse(surveyResponseId: number) {
@@ -32,10 +35,69 @@ export class SurveyAnalyticsService {
       .createQueryBuilder("sr")
       .innerJoinAndSelect("sr.surveyItemResponses", "sir")
       .innerJoinAndSelect("sir.surveyItem", "sitem")
-      .innerJoinAndSelect("sitem.surveyIndex", "sindex")
-      .innerJoinAndSelect("sindex.surveyDimension", "sdim")
+      .innerJoinAndSelect("sitem.surveyIndex", "sidx")
+      .innerJoinAndSelect("sidx.surveyDimension", "sdim")
       .where("sr.id = :id", { id: surveyResponseId })
       .getOne();
+  }
+
+  predictScriptureEngagement(
+    predictionTableId: number,
+    surveyResponseId: number
+  ) {
+    debug(
+      "predict engagement from PT %d for survey response %d",
+      predictionTableId,
+      surveyResponseId
+    );
+    return this.predictionTableRepo
+      .createQueryBuilder("pt")
+      .innerJoin("pt.predictionTableEntries", "pte")
+      .innerJoin("pte.practice", "sep")
+      .innerJoin("pte.surveyIndex", "sidx")
+      .innerJoin(
+        (qb) => this.meanSurveyIndexSubQuery(qb, surveyResponseId),
+        "msi",
+        "msi.sidx_id = sidx.id"
+      )
+
+      .select("sep.title", "sep_title")
+      .addSelect("sep.id", "sep_id")
+      .addSelect("sidx.title", "sidx_title")
+      .addSelect("sidx.id", "sidx_id")
+      .addSelect("msi.mean_sidx", "mean_sidx")
+
+      .where("pt.id = :predictionTableId", { predictionTableId })
+      .andWhere("sidx.useForPredictions")
+      .orderBy("sep_title")
+
+      .getRawMany();
+  }
+
+  meanSurveyIndexSubQuery(
+    qb: SelectQueryBuilder<SurveyResponse>,
+    surveyResponseId: number
+  ) {
+    debug("Create MSI sub-query for %d", surveyResponseId);
+    return qb
+      .select("sidx.id", "sidx_id")
+      .addSelect("AVG(sir.value)", "mean_sidx")
+      .addSelect("sidx.title")
+      .from(SurveyResponse, "sr")
+
+      .innerJoin("sr.surveyItemResponses", "sir")
+      .innerJoin("sir.surveyItem", "sitem")
+      .innerJoin("sitem.surveyIndex", "sidx")
+
+      .where("sr.id = :surveyResponseId", { surveyResponseId })
+      .groupBy("sidx_id")
+      .addGroupBy("sidx.title");
+  }
+
+  async meanSurveyIndices(surveyResponseId: number) {
+    const qb = this.surveyResponseRepo.createQueryBuilder();
+    const msiSubQuery = this.meanSurveyIndexSubQuery(qb, surveyResponseId);
+    return msiSubQuery.getRawAndEntities();
   }
 
   calculateDimensions(surveyResponseId: number) {
@@ -43,27 +105,26 @@ export class SurveyAnalyticsService {
       .createQueryBuilder("sr")
 
       .select("sdim.title", "dimensionTitle")
-      .groupBy("sdim.title")
-      .orderBy("sdim.title")
-
       .addSelect("sdim.id", "dimensionId")
-      .addGroupBy("sdim.id")
-
-      .addSelect("sindex.title", "indexTitle")
-      .addGroupBy("sindex.title")
-      .addOrderBy("sindex.title")
-
-      .addSelect("sindex.id", "indexId")
-      .addGroupBy("sindex.id")
-
+      .addSelect("sidx.title", "indexTitle")
+      .addSelect("sidx.id", "indexId")
       .addSelect("AVG(sir.value)", "meanSurveyIndex")
 
       .innerJoin("sr.surveyItemResponses", "sir")
       .innerJoin("sir.surveyItem", "sitem")
-      .innerJoin("sitem.surveyIndex", "sindex")
-      .innerJoin("sindex.surveyDimension", "sdim")
+      .innerJoin("sitem.surveyIndex", "sidx")
+      .innerJoin("sidx.surveyDimension", "sdim")
+
+      .groupBy("sdim.title")
+      .addGroupBy("sdim.id")
+      .addGroupBy("sidx.title")
+      .addGroupBy("sidx.id")
 
       .where("sr.id = :id", { id: surveyResponseId })
+
+      .orderBy("sdim.title")
+      .addOrderBy("sidx.title")
+
       .getRawMany();
   }
 
@@ -97,12 +158,6 @@ export class SurveyAnalyticsService {
         resp.value,
       ])
     );
-  }
-
-  predictScriptureEngagement(surveyResponse: SurveyResponse) {
-    const predictions: Prediction[] = [];
-    throw Error("Unimplemented");
-    return predictions;
   }
 
   public chartData(surveyDimension: SurveyDimension): ChartData {

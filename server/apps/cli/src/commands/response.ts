@@ -1,11 +1,11 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
-import prettyFormat from "pretty-format";
 import { SurveyResponseService } from "@server/src/survey/services";
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
+import { printPretty } from "@helpers/formatting";
 
 const debug = getDebugger("cli:response");
 
@@ -66,7 +66,7 @@ export async function calculateDimensions(responseId: number) {
     responseId
   );
   await nestContext.close();
-  console.log(dimensions);
+  printPretty(dimensions);
 }
 
 export async function summarizeResponse(responseId: number) {
@@ -74,19 +74,27 @@ export async function summarizeResponse(responseId: number) {
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
   const summary = await surveyAnalysisService.summarizeResponse(responseId);
   await nestContext.close();
-  console.log(prettyFormat(summary, { highlight: true }));
+  printPretty(summary);
 }
 
-export async function predictEngagement(responseId: string) {
+export async function meanSurveyIndices(responseId: number) {
   const nestContext = new NestContext();
-  const surveyResponseService = await nestContext.get(SurveyResponseService);
-  const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
-  const response = await surveyResponseService.readComplete(
-    parseInt(responseId)
-  );
-  debug("response %O", response);
-  const prediction =
-    surveyAnalyticsService.predictScriptureEngagement(response);
+  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const msi = await surveyAnalysisService.meanSurveyIndices(responseId);
   await nestContext.close();
-  console.log(prettyFormat(prediction));
+  printPretty(msi);
+}
+
+export async function predictEngagement(
+  predictionTableId: number,
+  responseId: number
+) {
+  const nestContext = new NestContext();
+  const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
+  const prediction = await surveyAnalyticsService.predictScriptureEngagement(
+    predictionTableId,
+    responseId
+  );
+  await nestContext.close();
+  printPretty(prediction);
 }
