@@ -85,7 +85,15 @@ export async function meanSurveyIndices(responseId: number) {
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
   const msi = await surveyAnalysisService.meanSurveyIndices(responseId);
   await nestContext.close();
-  printPretty(msi);
+
+  printTable(
+    ["Index", "Mean"],
+    _.map(msi, (elt) => [
+      elt.surveyIndexTitle,
+      Number(elt.meanSurveyIndex).toFixed(2),
+    ]),
+    { header: { content: `MSI for ${responseId}` } }
+  );
 }
 
 export async function predictEngagement(
@@ -100,10 +108,10 @@ export async function predictEngagement(
   );
   await nestContext.close();
 
-  reportPrediction(predictions);
+  reportPrediction(predictions, `SEP Predictions for response ${responseId}`);
 }
 
-function reportPrediction(predictions: Prediction[]) {
+function reportPrediction(predictions: Prediction[], caption) {
   const headers = ["Predict?", "SE Practice", "Survey Index", "MSI"];
   const data = _.flatMap(predictions, (prediction) => {
     return _.map(prediction.details, (detail, idx) => [
@@ -118,6 +126,7 @@ function reportPrediction(predictions: Prediction[]) {
     ]);
   });
   printTable(headers, data, {
+    header: { content: caption },
     columns: [{ alignment: "right" }],
   });
 }

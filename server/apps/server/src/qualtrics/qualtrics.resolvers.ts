@@ -70,7 +70,10 @@ export class QualtricsResolver {
     description:
       "Import a survey from Qualtrics. Always use this to create a Capernaum survey.",
   })
-  async importQualtricsSurvey(@Args("qualtricsId") qualtricsId: QualtricsID) {
+  async importQualtricsSurvey(
+    @Args({ name: "qualtricsId", type: () => String })
+    qualtricsId: QualtricsID
+  ) {
     return this.qualtricsService.importQualtricsSurvey(qualtricsId);
   }
 

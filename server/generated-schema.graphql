@@ -390,8 +390,8 @@ type ChartEntry {
 }
 
 type PredictionDetails {
-  title: String!
-  abbreviation: String!
+  surveyIndexTitle: String!
+  surveyIndexAbbreviation: String!
   meanResponse: Float!
 }
 

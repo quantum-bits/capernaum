@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import PrettyError = require("pretty-error");
+PrettyError.start();
+
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 

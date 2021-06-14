@@ -7,15 +7,15 @@ import {
   SurveyResponse,
 } from "@server/src/survey/entities";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
-import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 import { ChartData, Prediction } from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, SelectQueryBuilder } from "typeorm";
+import { getManager, Repository, SelectQueryBuilder } from "typeorm";
 import {
   PredictionTable,
   ScriptureEngagementPractice,
 } from "@server/src/prediction/entities";
 import * as _ from "lodash";
+import { MeanSurveyIndexView } from "@server/src/survey/views/survey-mean-index.view";
 
 const debug = getDebugger("analytics");
 
@@ -26,6 +26,12 @@ interface RawPredictionData {
   sidx_title: string;
   sidx_abbreviation;
   mean_sidx: number;
+}
+
+interface MeanSurveyIndices {
+  mean_sidx: number;
+  sidx_id: number;
+  sidx_title: string;
 }
 
 @Injectable()
@@ -63,20 +69,19 @@ export class SurveyAnalyticsService {
         .innerJoin("pt.predictionTableEntries", "pte")
         .innerJoin("pte.practice", "sep")
         .innerJoin("pte.surveyIndex", "sidx")
-        .innerJoin(
-          (qb) => this.meanSurveyIndexSubQuery(qb, surveyResponseId),
-          "msi",
-          "msi.sidx_id = sidx.id"
-        )
+        .innerJoin(MeanSurveyIndexView, "msi", "msi.surveyIndexId = sidx.id")
 
         .select("sep.id", "sep_id")
         .addSelect("sep.title", "sep_title")
         .addSelect("sidx.id", "sidx_id")
         .addSelect("sidx.title", "sidx_title")
         .addSelect("sidx.abbreviation", "sidx_abbreviation")
-        .addSelect("msi.mean_sidx", "mean_sidx")
+        .addSelect("msi.meanSurveyIndex", "mean_sidx")
 
         .where("pt.id = :predictionTableId", { predictionTableId })
+        .andWhere("msi.surveyResponseId = :surveyResponseId", {
+          surveyResponseId,
+        })
         .andWhere("sidx.useForPredictions")
         .orderBy("sep_title")
 
@@ -141,9 +146,13 @@ export class SurveyAnalyticsService {
   }
 
   async meanSurveyIndices(surveyResponseId: number) {
-    const qb = this.surveyResponseRepo.createQueryBuilder();
-    const msiSubQuery = this.meanSurveyIndexSubQuery(qb, surveyResponseId);
-    return msiSubQuery.getRawAndEntities();
+    const resultSet = await getManager().find(MeanSurveyIndexView, {
+      where: {
+        surveyResponseId,
+      },
+    });
+    debug("result set %O", resultSet);
+    return resultSet;
   }
 
   calculateDimensions(surveyResponseId: number) {
@@ -172,38 +181,6 @@ export class SurveyAnalyticsService {
       .addOrderBy("sidx.title")
 
       .getRawMany();
-  }
-
-  // Make sure the survey with the given ID is cached.
-  private async ensureSurveyLoaded(surveyId: number) {
-    if (!this.surveyStructureCache.has(surveyId)) {
-      const survey = await this.surveyService.readStructure(surveyId);
-      this.surveyStructureCache.set(surveyId, survey);
-      debug(
-        "Cached survey %d (%s - %s)",
-        surveyId,
-        survey.qualtricsId,
-        survey.qualtricsName
-      );
-    }
-  }
-
-  async analyzeResponse(responseId: number) {
-    // Read the content of the response.
-    const response = await this.surveyResponseService.readForAnalysis(
-      responseId
-    );
-
-    // Make sure the associated survey is cached.
-    await this.ensureSurveyLoaded(response.survey.id);
-
-    // For each response it, map its Qualtrics ID to the respondent's numeric answer.
-    const responseByQualtricsId = new Map<QualtricsID, number>(
-      response.surveyItemResponses.map((resp) => [
-        resp.surveyItem.qualtricsId,
-        resp.value,
-      ])
-    );
   }
 
   public chartData(surveyDimension: SurveyDimension): ChartData {
