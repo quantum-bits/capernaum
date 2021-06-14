@@ -17,7 +17,7 @@ export class GroupModel extends Model {
   codeWord: string;
   created: number;
   type: GroupTypeModel;
-  otherTypeName: string;
+  otherTypeName?: string;
 
   static tableName = "group";
 

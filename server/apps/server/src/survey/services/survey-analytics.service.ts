@@ -8,13 +8,25 @@ import {
 } from "@server/src/survey/entities";
 import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
-import { ChartData } from "@server/src/survey/survey.types";
+import { ChartData, Prediction } from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, SelectQueryBuilder } from "typeorm";
-import { PredictionTable } from "@server/src/prediction/entities";
-import { printPretty } from "@helpers/formatting";
+import {
+  PredictionTable,
+  ScriptureEngagementPractice,
+} from "@server/src/prediction/entities";
+import * as _ from "lodash";
 
 const debug = getDebugger("analytics");
+
+interface RawPredictionData {
+  sep_id: number;
+  sep_title: string;
+  sidx_id: number;
+  sidx_title: string;
+  sidx_abbreviation;
+  mean_sidx: number;
+}
 
 @Injectable()
 export class SurveyAnalyticsService {
@@ -41,37 +53,71 @@ export class SurveyAnalyticsService {
       .getOne();
   }
 
-  predictScriptureEngagement(
+  async predictScriptureEngagement(
     predictionTableId: number,
     surveyResponseId: number
   ) {
+    const rawPredictionData: RawPredictionData[] =
+      await this.predictionTableRepo
+        .createQueryBuilder("pt")
+        .innerJoin("pt.predictionTableEntries", "pte")
+        .innerJoin("pte.practice", "sep")
+        .innerJoin("pte.surveyIndex", "sidx")
+        .innerJoin(
+          (qb) => this.meanSurveyIndexSubQuery(qb, surveyResponseId),
+          "msi",
+          "msi.sidx_id = sidx.id"
+        )
+
+        .select("sep.id", "sep_id")
+        .addSelect("sep.title", "sep_title")
+        .addSelect("sidx.id", "sidx_id")
+        .addSelect("sidx.title", "sidx_title")
+        .addSelect("sidx.abbreviation", "sidx_abbreviation")
+        .addSelect("msi.mean_sidx", "mean_sidx")
+
+        .where("pt.id = :predictionTableId", { predictionTableId })
+        .andWhere("sidx.useForPredictions")
+        .orderBy("sep_title")
+
+        .getRawMany();
     debug(
       "predict engagement from PT %d for survey response %d",
       predictionTableId,
       surveyResponseId
     );
-    return this.predictionTableRepo
-      .createQueryBuilder("pt")
-      .innerJoin("pt.predictionTableEntries", "pte")
-      .innerJoin("pte.practice", "sep")
-      .innerJoin("pte.surveyIndex", "sidx")
-      .innerJoin(
-        (qb) => this.meanSurveyIndexSubQuery(qb, surveyResponseId),
-        "msi",
-        "msi.sidx_id = sidx.id"
-      )
 
-      .select("sep.title", "sep_title")
-      .addSelect("sep.id", "sep_id")
-      .addSelect("sidx.title", "sidx_title")
-      .addSelect("sidx.id", "sidx_id")
-      .addSelect("msi.mean_sidx", "mean_sidx")
+    // Organize the raw prediction data into an object keyed by SEP ID.
+    // Each entry in the object contains an array of raw prediction data
+    // (i.e., the associated survey index data, including MSI) for that SEP.
+    const rawPredictionDataBySepId = _.groupBy(
+      rawPredictionData,
+      (elt) => elt.sep_id
+    );
+    debug("bySepId %O", rawPredictionDataBySepId);
 
-      .where("pt.id = :predictionTableId", { predictionTableId })
-      .andWhere("sidx.useForPredictions")
-      .orderBy("sep_title")
+    // Construct an array of `Prediction` objects corresponding to each SEP.
+    const predictions = _.map(rawPredictionDataBySepId, (rawPredictionData) => {
+      const prediction = new Prediction();
+      prediction.practice = new ScriptureEngagementPractice();
+      prediction.practice.id = rawPredictionData[0].sep_id;
+      prediction.practice.title = rawPredictionData[0].sep_title;
+      prediction.details = _.map(rawPredictionData, (datum) => ({
+        surveyIndexTitle: datum.sidx_title,
+        surveyIndexAbbreviation: datum.sidx_abbreviation,
+        meanResponse: datum.mean_sidx,
+      }));
+      prediction.predict = _.every(
+        rawPredictionData,
+        (rawPredictionDatum) =>
+          rawPredictionDatum.mean_sidx >=
+          parseInt(process.env.SEP_PREDICTION_THRESHOLD)
+      );
+      return prediction;
+    });
 
-      .getRawMany();
+    debug("predictions %O", predictions);
+    return predictions;
   }
 
   meanSurveyIndexSubQuery(

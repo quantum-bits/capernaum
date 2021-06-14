@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import { enableDebugOutput, getDebugger } from "@helpers/debug-factory";
 
-import { GroupTypesFixture } from "../fixtures/group-types.fixture";
+import { GroupsFixture } from "../fixtures/groups.fixture";
 import { ImagesFixture } from "../fixtures/cls/images.fixture";
 import { LetterElementsFixture } from "../fixtures/cls/letter-elements.fixture";
 import { LettersFixture } from "../fixtures/cls/letters.fixture";
@@ -16,7 +16,7 @@ import { SurveyLettersFixture } from "@common/cli/src/fixtures/cls/survey-letter
 
 const debug = getDebugger("fixture");
 
-const groupTypesFixture = new GroupTypesFixture();
+const groupTypesFixture = new GroupsFixture();
 const imagesFixture = new ImagesFixture();
 const letterElementsFixture = new LetterElementsFixture();
 const lettersFixture = new LettersFixture();

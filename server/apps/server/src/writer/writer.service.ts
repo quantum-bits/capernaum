@@ -285,7 +285,10 @@ export class WriterService {
     ].join("\n");
   }
 
-  private renderAllElements(letter: Letter, surveyResponse: SurveyResponse) {
+  private async renderAllElements(
+    letter: Letter,
+    surveyResponse: SurveyResponse
+  ) {
     const renderedElements: string[] = [];
 
     for (const letterElement of letter.letterElements) {
@@ -296,8 +299,9 @@ export class WriterService {
           break;
         case "scripture-engagement-prediction":
           const predictions: Prediction[] =
-            this.surveyAnalyticsService.predictScriptureEngagement(
-              surveyResponse
+            await this.surveyAnalyticsService.predictScriptureEngagement(
+              letterElement.predictionTableId,
+              surveyResponse.id
             );
           renderedElements.push(this.renderPredictions(predictions));
           break;
@@ -408,25 +412,28 @@ export class WriterService {
 
   async renderIndividualLetter(letterId: number, surveyResponseId: number) {
     const letter = await this.letterService.readOne(letterId);
-    const surveyResponse = await this.surveyResponseService.readComplete(
-      surveyResponseId
-    );
-
-    letterDebug("renderLetter - %O", letter);
-    letterDebug("renderLetter - ", surveyResponse);
-
     if (!letter) {
       return Promise.resolve(
         WriterService.constructOutput(false, "No letter found")
       );
-    } else if (!surveyResponse) {
+    }
+    letterDebug("renderLetter/letter %O", letter);
+
+    const surveyResponse = await this.surveyResponseService.readComplete(
+      surveyResponseId
+    );
+    if (!surveyResponse) {
       return Promise.resolve(
         WriterService.constructOutput(false, "No responses for this survey")
       );
-    } else {
-      const renderedElements = this.renderAllElements(letter, surveyResponse);
-      return await this.runLaTeX(renderedElements, letter, surveyResponse);
     }
+    letterDebug("renderLetter/surveyResponse %O", surveyResponse);
+
+    const renderedElements = await this.renderAllElements(
+      letter,
+      surveyResponse
+    );
+    return await this.runLaTeX(renderedElements, letter, surveyResponse);
   }
 
   async renderGroupLetter(letterId: number, groupId: number) {

@@ -71,10 +71,10 @@ export class ChartData {
 @ObjectType()
 export class PredictionDetails {
   @Field()
-  title: string;
+  surveyIndexTitle: string;
 
   @Field()
-  abbreviation: string;
+  surveyIndexAbbreviation: string;
 
   @Field(() => Float)
   meanResponse: number;
