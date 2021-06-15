@@ -33,7 +33,6 @@ import { SurveyItemService } from "@server/src/survey/services/survey-item.servi
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 import { LetterModule } from "@server/src/letter/letter.module";
 import { PredictionTable } from "@server/src/prediction/entities";
-import { MeanSurveyIndexView } from "@server/src/survey/views/survey-mean-index.view";
 
 @Module({
   imports: [
@@ -51,7 +50,6 @@ import { MeanSurveyIndexView } from "@server/src/survey/views/survey-mean-index.
     forwardRef(() => LetterModule),
   ],
   providers: [
-    MeanSurveyIndexView,
     SurveyDimensionResolver,
     SurveyDimensionService,
     SurveyIndexResolver,

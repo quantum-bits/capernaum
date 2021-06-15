@@ -2,7 +2,10 @@ import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyResponseService } from "@server/src/survey/services";
-import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
+import {
+  SurveyAnalyticsService,
+  SurveyRespondentType,
+} from "@server/src/survey/services/survey-analytics.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { printPretty, printTable } from "@helpers/formatting";
@@ -37,16 +40,6 @@ export function getQualtricsResponse(
   }
 }
 
-export async function getGroupResponses(groupId: number) {
-  const nestContext = new NestContext();
-  const surveyResponseService: SurveyResponseService = await nestContext.get(
-    SurveyResponseService
-  );
-  const responses = surveyResponseService.findByGroupId(groupId);
-  await nestContext.close();
-  console.log(JSON.stringify(responses));
-}
-
 /**
  * Import responses for a survey.
  * @param surveyId ID of survey
@@ -62,11 +55,42 @@ export async function importSurveyResponses(surveyId: QualtricsID) {
   console.log("RESULT", result);
 }
 
-export async function calculateDimensions(responseId: number) {
+export async function meanSurveyIndices(
+  responseOrGroupId: number,
+  respondentType: SurveyRespondentType
+) {
+  const nestContext = new NestContext();
+  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const msi = await surveyAnalysisService.meanSurveyIndices(
+    responseOrGroupId,
+    respondentType
+  );
+  await nestContext.close();
+
+  const caption =
+    respondentType === SurveyRespondentType.Individual
+      ? `MSI for Response ${responseOrGroupId}`
+      : `MSI for Group ${responseOrGroupId}`;
+
+  printTable(
+    ["Index", "Mean"],
+    _.map(msi, (elt) => [
+      elt.surveyIndexTitle,
+      Number(elt.meanSurveyIndex).toFixed(2),
+    ]),
+    { header: { content: caption } }
+  );
+}
+
+export async function calculateDimensions(
+  responseOrGroupId: number,
+  respondentType: SurveyRespondentType
+) {
   const nestContext = new NestContext();
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
   const dimensions = await surveyAnalysisService.calculateDimensions(
-    responseId
+    responseOrGroupId,
+    respondentType
   );
   await nestContext.close();
   printPretty(dimensions);
@@ -80,35 +104,24 @@ export async function summarizeResponse(responseId: number) {
   printPretty(summary);
 }
 
-export async function meanSurveyIndices(responseId: number) {
-  const nestContext = new NestContext();
-  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
-  const msi = await surveyAnalysisService.meanSurveyIndices(responseId);
-  await nestContext.close();
-
-  printTable(
-    ["Index", "Mean"],
-    _.map(msi, (elt) => [
-      elt.surveyIndexTitle,
-      Number(elt.meanSurveyIndex).toFixed(2),
-    ]),
-    { header: { content: `MSI for ${responseId}` } }
-  );
-}
-
 export async function predictEngagement(
   predictionTableId: number,
-  responseId: number
+  responseOrGroupId: number,
+  respondentType: SurveyRespondentType
 ) {
   const nestContext = new NestContext();
   const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
   const predictions = await surveyAnalyticsService.predictScriptureEngagement(
     predictionTableId,
-    responseId
+    responseOrGroupId,
+    respondentType
   );
   await nestContext.close();
 
-  reportPrediction(predictions, `SEP Predictions for response ${responseId}`);
+  reportPrediction(
+    predictions,
+    `SEP Predictions for response ${responseOrGroupId}`
+  );
 }
 
 function reportPrediction(predictions: Prediction[], caption) {

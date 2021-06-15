@@ -20,7 +20,12 @@ export function printTable(
   const config: TableUserConfig = {
     drawVerticalLine: () => false,
     drawHorizontalLine: (lineIndex, rowCount) => {
-      return lineIndex === 0 || lineIndex === 1 || lineIndex === rowCount;
+      return (
+        lineIndex === 0 ||
+        lineIndex === 1 ||
+        (userConfig?.header && lineIndex === 2) ||
+        lineIndex === rowCount
+      );
     },
     ...userConfig,
   };

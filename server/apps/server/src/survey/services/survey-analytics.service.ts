@@ -15,7 +15,10 @@ import {
   ScriptureEngagementPractice,
 } from "@server/src/prediction/entities";
 import * as _ from "lodash";
-import { MeanSurveyIndexView } from "@server/src/survey/views/survey-mean-index.view";
+import {
+  MeanSurveyIndexGroupView,
+  MeanSurveyIndexIndividualView,
+} from "@server/src/survey/views";
 
 const debug = getDebugger("analytics");
 
@@ -28,10 +31,9 @@ interface RawPredictionData {
   mean_sidx: number;
 }
 
-interface MeanSurveyIndices {
-  mean_sidx: number;
-  sidx_id: number;
-  sidx_title: string;
+export enum SurveyRespondentType {
+  Individual,
+  Group,
 }
 
 @Injectable()
@@ -45,7 +47,9 @@ export class SurveyAnalyticsService {
     @InjectRepository(SurveyResponse)
     private readonly surveyResponseRepo: Repository<SurveyResponse>,
     @InjectRepository(PredictionTable)
-    private readonly predictionTableRepo: Repository<PredictionTable>
+    private readonly predictionTableRepo: Repository<PredictionTable>,
+    @InjectRepository(SurveyDimension)
+    private readonly surveyDimensionRepo: Repository<SurveyDimension>
   ) {}
 
   summarizeResponse(surveyResponseId: number) {
@@ -59,9 +63,66 @@ export class SurveyAnalyticsService {
       .getOne();
   }
 
+  private static getMeanSurveyIndexView(respondentType: SurveyRespondentType) {
+    if (respondentType === SurveyRespondentType.Individual) {
+      return MeanSurveyIndexIndividualView;
+    } else {
+      return MeanSurveyIndexGroupView;
+    }
+  }
+
+  async meanSurveyIndices(
+    responseOrGroupId: number,
+    respondentType: SurveyRespondentType
+  ) {
+    const meanSurveyIndexView =
+      SurveyAnalyticsService.getMeanSurveyIndexView(respondentType);
+
+    const resultSet = await getManager().find(meanSurveyIndexView, {
+      where: {
+        meanSurveyIndexId: responseOrGroupId,
+      },
+    });
+    debug("result set %O", resultSet);
+    return resultSet;
+  }
+
+  calculateDimensions(
+    responseOrGroupId: number,
+    respondentType: SurveyRespondentType
+  ) {
+    const meanSurveyIndexView =
+      SurveyAnalyticsService.getMeanSurveyIndexView(respondentType);
+
+    return this.surveyDimensionRepo
+      .createQueryBuilder("sdim")
+      .innerJoin("sdim.surveyIndices", "sidx")
+      .innerJoin(meanSurveyIndexView, "msi", "msi.surveyIndexId = sidx.id")
+
+      .select("sdim.title", "dimensionTitle")
+      .addSelect("sdim.id", "dimensionId")
+      .addSelect("sidx.title", "indexTitle")
+      .addSelect("sidx.id", "indexId")
+      .addSelect("msi.mean_survey_index", "meanSurveyIndex")
+
+      .groupBy("sdim.title")
+      .addGroupBy("sdim.id")
+      .addGroupBy("sidx.title")
+      .addGroupBy("sidx.id")
+      .addGroupBy("msi.mean_survey_index")
+
+      .where("msi.survey_response_id = :id", { id: responseOrGroupId })
+
+      .orderBy("sdim.title")
+      .addOrderBy("sidx.title")
+
+      .getRawMany();
+  }
+
   async predictScriptureEngagement(
     predictionTableId: number,
-    surveyResponseId: number
+    responseOrGroupId: number,
+    respondentType: SurveyRespondentType
   ) {
     const rawPredictionData: RawPredictionData[] =
       await this.predictionTableRepo
@@ -69,7 +130,11 @@ export class SurveyAnalyticsService {
         .innerJoin("pt.predictionTableEntries", "pte")
         .innerJoin("pte.practice", "sep")
         .innerJoin("pte.surveyIndex", "sidx")
-        .innerJoin(MeanSurveyIndexView, "msi", "msi.surveyIndexId = sidx.id")
+        .innerJoin(
+          MeanSurveyIndexIndividualView,
+          "msi",
+          "msi.surveyIndexId = sidx.id"
+        )
 
         .select("sep.id", "sep_id")
         .addSelect("sep.title", "sep_title")
@@ -80,7 +145,7 @@ export class SurveyAnalyticsService {
 
         .where("pt.id = :predictionTableId", { predictionTableId })
         .andWhere("msi.surveyResponseId = :surveyResponseId", {
-          surveyResponseId,
+          surveyResponseId: responseOrGroupId,
         })
         .andWhere("sidx.useForPredictions")
         .orderBy("sep_title")
@@ -89,7 +154,7 @@ export class SurveyAnalyticsService {
     debug(
       "predict engagement from PT %d for survey response %d",
       predictionTableId,
-      surveyResponseId
+      responseOrGroupId
     );
 
     // Organize the raw prediction data into an object keyed by SEP ID.
@@ -143,44 +208,6 @@ export class SurveyAnalyticsService {
       .where("sr.id = :surveyResponseId", { surveyResponseId })
       .groupBy("sidx_id")
       .addGroupBy("sidx.title");
-  }
-
-  async meanSurveyIndices(surveyResponseId: number) {
-    const resultSet = await getManager().find(MeanSurveyIndexView, {
-      where: {
-        surveyResponseId,
-      },
-    });
-    debug("result set %O", resultSet);
-    return resultSet;
-  }
-
-  calculateDimensions(surveyResponseId: number) {
-    return this.surveyResponseRepo
-      .createQueryBuilder("sr")
-
-      .select("sdim.title", "dimensionTitle")
-      .addSelect("sdim.id", "dimensionId")
-      .addSelect("sidx.title", "indexTitle")
-      .addSelect("sidx.id", "indexId")
-      .addSelect("AVG(sir.value)", "meanSurveyIndex")
-
-      .innerJoin("sr.surveyItemResponses", "sir")
-      .innerJoin("sir.surveyItem", "sitem")
-      .innerJoin("sitem.surveyIndex", "sidx")
-      .innerJoin("sidx.surveyDimension", "sdim")
-
-      .groupBy("sdim.title")
-      .addGroupBy("sdim.id")
-      .addGroupBy("sidx.title")
-      .addGroupBy("sidx.id")
-
-      .where("sr.id = :id", { id: surveyResponseId })
-
-      .orderBy("sdim.title")
-      .addOrderBy("sidx.title")
-
-      .getRawMany();
   }
 
   public chartData(surveyDimension: SurveyDimension): ChartData {

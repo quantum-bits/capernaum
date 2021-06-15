@@ -1,13 +1,9 @@
 import { config } from "dotenv";
-config();
-
-import PrettyError = require("pretty-error");
-PrettyError.start();
-
 import { knex } from "./models/db";
 
 import { Command, Option } from "commander";
 import {
+  calculateDimensions,
   createSubscription,
   deleteSubscription,
   getGroup,
@@ -20,14 +16,20 @@ import {
   listGroups,
   listSubscriptions,
   listSurveys,
+  meanSurveyIndices,
+  nuclearOption,
   predictEngagement,
   showOrg,
-  nuclearOption,
-  calculateDimensions,
   summarizeResponse,
-  meanSurveyIndices,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
+import { SurveyRespondentType } from "@server/src/survey/services/survey-analytics.service";
+
+config();
+
+import PrettyError = require("pretty-error");
+
+PrettyError.start();
 
 const program = new Command();
 program.version("0.0.1");
@@ -152,10 +154,23 @@ responseCommands
   })
   .action(importSurveyResponses);
 
-responseCommands
-  .command("dimensions <survey-response-pk>")
-  .description("calculate dimensions")
-  .action(calculateDimensions);
+const dimensionCommands = responseCommands
+  .command("dimension")
+  .description("dimension commands");
+
+dimensionCommands
+  .command("individual <survey-response-pk>")
+  .description("calculate dimensions for one response")
+  .action((surveyResponsePk) =>
+    calculateDimensions(surveyResponsePk, SurveyRespondentType.Individual)
+  );
+
+dimensionCommands
+  .command("group <group-pk>")
+  .description("calculate dimensions for group responses")
+  .action((groupPk) =>
+    calculateDimensions(groupPk, SurveyRespondentType.Group)
+  );
 
 responseCommands
   .command("summarize <survey-response-pk>")
@@ -167,10 +182,21 @@ responseCommands
   .description("predict scripture engagement")
   .action(predictEngagement);
 
-responseCommands
-  .command("msi <survey-response-pk>")
-  .description("calculate mean survey indices")
-  .action(meanSurveyIndices);
+const msiCommands = responseCommands
+  .command("msi")
+  .description("mean survey index commands");
+
+msiCommands
+  .command("individual <survey-response-pk>")
+  .description("calculate mean survey indices for one response")
+  .action((surveyResponsePk) =>
+    meanSurveyIndices(surveyResponsePk, SurveyRespondentType.Individual)
+  );
+
+msiCommands
+  .command("group <group-pk>")
+  .description("calculate mean survey indices for a group")
+  .action((groupPk) => meanSurveyIndices(groupPk, SurveyRespondentType.Group));
 
 // Fixture
 

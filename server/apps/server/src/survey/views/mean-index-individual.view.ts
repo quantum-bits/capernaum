@@ -1,8 +1,9 @@
 import { ViewColumn, ViewEntity } from "typeorm";
 import { SurveyResponse } from "@server/src/survey/entities";
+import { MeanSurveyIndexView } from "@server/src/survey/views/index";
 
 @ViewEntity({
-  name: "mean_survey_index",
+  name: "mean_survey_index_individual",
   expression: (connection) =>
     connection
       .createQueryBuilder(SurveyResponse, "sr")
@@ -20,8 +21,8 @@ import { SurveyResponse } from "@server/src/survey/entities";
       .addGroupBy("survey_index_title")
       .orderBy("survey_index_title"),
 })
-export class MeanSurveyIndexView {
-  @ViewColumn({ name: "survey_response_id" }) surveyResponseId: number;
+export class MeanSurveyIndexIndividualView implements MeanSurveyIndexView {
+  @ViewColumn({ name: "survey_response_id" }) meanSurveyIndexId: number;
   @ViewColumn({ name: "survey_index_id" }) surveyIndexId: number;
   @ViewColumn({ name: "survey_index_title" }) surveyIndexTitle: string;
   @ViewColumn({ name: "mean_survey_index" }) meanSurveyIndex: number;
