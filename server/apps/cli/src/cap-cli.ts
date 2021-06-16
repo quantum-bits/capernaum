@@ -177,14 +177,23 @@ responseCommands
   .description("summarize response")
   .action(summarizeResponse);
 
-const predictCommands = responseCommands
-  .command("predict")
+const predictionCommands = responseCommands
+  .command("prediction")
   .description("predict scripture engagement commands");
 
-predictCommands
+predictionCommands
   .command("individual <survey-response-pk>")
   .description("scripture engagement for individual")
-  .action(predictEngagement);
+  .action((surveyResponsePk) =>
+    predictEngagement(surveyResponsePk, SurveyRespondentType.Individual)
+  );
+
+predictionCommands
+  .command("group <group-pk>")
+  .description("scripture engagement for group")
+  .action((surveyResponsePk) =>
+    predictEngagement(surveyResponsePk, SurveyRespondentType.Group)
+  );
 
 const msiCommands = responseCommands
   .command("msi")

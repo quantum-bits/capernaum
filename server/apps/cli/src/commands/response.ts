@@ -1,7 +1,6 @@
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
 import NestContext from "@common/cli/src/nest-helpers";
 import { getDebugger } from "@helpers/debug-factory";
-import { SurveyResponseService } from "@server/src/survey/services";
 import {
   SurveyAnalyticsService,
   SurveyRespondentType,
@@ -11,7 +10,7 @@ import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { printPretty, printTable } from "@helpers/formatting";
 import * as _ from "lodash";
 import chalk from "chalk";
-import { Prediction } from "@server/src/survey/survey.types";
+import { Dimension, Prediction } from "@server/src/survey/survey.types";
 
 const debug = getDebugger("cli:response");
 
@@ -61,7 +60,7 @@ export async function meanSurveyIndices(
 ) {
   const nestContext = new NestContext();
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
-  const msi = await surveyAnalysisService.meanSurveyIndices(
+  const msi = await surveyAnalysisService.calculateMeanSurveyIndices(
     responseOrGroupId,
     respondentType
   );
@@ -82,6 +81,14 @@ export async function meanSurveyIndices(
   );
 }
 
+export async function summarizeResponse(responseId: number) {
+  const nestContext = new NestContext();
+  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const summary = await surveyAnalysisService.summarizeResponse(responseId);
+  await nestContext.close();
+  printPretty(summary);
+}
+
 export async function calculateDimensions(
   responseOrGroupId: number,
   respondentType: SurveyRespondentType
@@ -93,51 +100,72 @@ export async function calculateDimensions(
     respondentType
   );
   await nestContext.close();
-  printPretty(dimensions);
+  reportDimension(
+    dimensions,
+    `Dimensions for ${
+      respondentType === SurveyRespondentType.Individual ? "response" : "group"
+    } ${responseOrGroupId}`
+  );
 }
 
-export async function summarizeResponse(responseId: number) {
-  const nestContext = new NestContext();
-  const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
-  const summary = await surveyAnalysisService.summarizeResponse(responseId);
-  await nestContext.close();
-  printPretty(summary);
+function reportDimension(dimensions: Dimension[], caption) {
+  const headers = ["Dimension", "Index", "MSI"];
+  const data = _.flatMap(
+    dimensions.sort((a, b) => a.title.localeCompare(b.title)),
+    (dimension) => {
+      return _.map(dimension.details, (detail, idx) => [
+        idx === 0 ? dimension.title : "",
+        detail.indexTitle,
+        Number(detail.meanSurveyIndex).toFixed(2),
+      ]);
+    }
+  );
+  printTable(headers, data, { header: { content: caption } });
 }
 
 export async function predictEngagement(
-  predictionTableId: number,
   responseOrGroupId: number,
   respondentType: SurveyRespondentType
 ) {
   const nestContext = new NestContext();
   const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
-  const predictions = await surveyAnalyticsService.predictScriptureEngagement(
-    predictionTableId,
-    responseOrGroupId,
-    respondentType
-  );
+  const predictions =
+    await surveyAnalyticsService.predictScriptureEngagementPractices(
+      responseOrGroupId,
+      respondentType
+    );
   await nestContext.close();
 
   reportPrediction(
     predictions,
-    `SEP Predictions for response ${responseOrGroupId}`
+    `SEP Predictions for ${
+      respondentType === SurveyRespondentType.Individual ? "response" : "group"
+    } ${responseOrGroupId}`
   );
+}
+
+function greenOrRed(condition: boolean, greenValue, redValue = greenValue) {
+  return condition ? chalk.green(greenValue) : chalk.red(redValue);
 }
 
 function reportPrediction(predictions: Prediction[], caption) {
   const headers = ["Predict?", "SE Practice", "Survey Index", "MSI"];
-  const data = _.flatMap(predictions, (prediction) => {
-    return _.map(prediction.details, (detail, idx) => [
-      idx === 0
-        ? prediction.predict
-          ? chalk.green("Yes")
-          : chalk.red("No")
-        : "",
-      idx === 0 ? prediction.practice.title : "",
-      detail.surveyIndexTitle,
-      Number(detail.meanResponse).toFixed(2),
-    ]);
-  });
+  const data = _.flatMap(
+    predictions.sort((a, b) => a.practiceTitle.localeCompare(b.practiceTitle)),
+    (prediction) => {
+      return _.map(prediction.details, (detail, idx) => [
+        idx === 0 ? greenOrRed(prediction.predict, "Yes", "No") : "",
+        idx === 0
+          ? greenOrRed(prediction.predict, prediction.practiceTitle)
+          : "",
+        detail.surveyIndexTitle,
+        greenOrRed(
+          detail.meanResponse >= parseInt(process.env.SEP_PREDICTION_THRESHOLD),
+          Number(detail.meanResponse).toFixed(2)
+        ),
+      ]);
+    }
+  );
   printTable(headers, data, {
     header: { content: caption },
     columns: [{ alignment: "right" }],

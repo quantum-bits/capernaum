@@ -70,26 +70,38 @@ export class ChartData {
 
 @ObjectType()
 export class PredictionDetails {
-  @Field()
-  surveyIndexTitle: string;
-
-  @Field()
-  surveyIndexAbbreviation: string;
-
-  @Field(() => Float)
-  meanResponse: number;
+  @Field() surveyIndexTitle: string;
+  @Field() surveyIndexAbbreviation: string;
+  @Field(() => Float) meanResponse: number;
 }
 
 @ObjectType()
 export class Prediction {
-  @Field(() => ScriptureEngagementPractice)
-  practice: ScriptureEngagementPractice;
+  @Field(() => Int)
+  practiceId: number;
+
+  @Field()
+  practiceTitle: string;
 
   @Field(() => [PredictionDetails])
   details: PredictionDetails[];
 
   @Field()
   predict: boolean;
+}
+
+@ObjectType()
+export class DimensionDetails {
+  @Field(() => Int) indexId: number;
+  @Field() indexTitle: string;
+  @Field(() => Float) meanSurveyIndex: number;
+}
+
+@ObjectType()
+export class Dimension {
+  @Field(() => Int) id: number;
+  @Field() title: string;
+  @Field(() => [DimensionDetails]) details: DimensionDetails[];
 }
 
 @ObjectType()

@@ -299,7 +299,7 @@ export class WriterService {
           break;
         case "scripture-engagement-prediction":
           const predictions: Prediction[] =
-            await this.surveyAnalyticsService.predictScriptureEngagement(
+            await this.surveyAnalyticsService.predictScriptureEngagementPractices(
               letterElement.predictionTableId,
               surveyResponse.id
             );
