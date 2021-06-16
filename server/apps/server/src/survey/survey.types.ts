@@ -1,71 +1,13 @@
 import { ScriptureEngagementPractice } from "../prediction/entities";
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyResponse } from "./entities";
-
-import numbro from "numbro";
+import { ChartData } from "@server/src/writer/writer.types";
 
 // Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
   All,
   WithIndex,
   WithoutIndex,
-}
-
-@ObjectType()
-export class ChartEntry {
-  @Field()
-  title: string;
-
-  @Field(() => Int)
-  value: number;
-}
-
-@ObjectType()
-export class ChartData {
-  @Field()
-  title: string;
-
-  @Field(() => [ChartEntry])
-  entries: ChartEntry[];
-
-  constructor(title: string, entries: ChartEntry[]) {
-    this.title = title;
-    this.entries = entries;
-  }
-
-  allTitles(): string {
-    return this.entries.map((entry) => entry.title).join(",");
-  }
-
-  allCoordinates(): string {
-    return this.entries
-      .map((entry) => `(${entry.value},${entry.title})`)
-      .join("\n");
-  }
-
-  allBarLabels(): string {
-    return this.entries
-      .map((entry) => {
-        if (entry.value >= 4) {
-          const horizCoord = entry.value - 0.35;
-          const value = numbro(entry.value).format({
-            thousandSeparated: false,
-            trimMantissa: true,
-            mantissa: 2,
-          });
-          return `\\node[text=white] at (axis cs:${horizCoord},${entry.title}) {${value}};`;
-        } else {
-          const horizCoord = entry.value + 0.35;
-          const value = numbro(entry.value).format({
-            thousandSeparated: false,
-            trimMantissa: true,
-            mantissa: 2,
-          });
-          return `\\node[text=black] at (axis cs:${horizCoord},${entry.title}) {${value}};`;
-        }
-      })
-      .join("\n");
-  }
 }
 
 @ObjectType()
@@ -77,16 +19,13 @@ export class PredictionDetails {
 
 @ObjectType()
 export class Prediction {
-  @Field(() => Int)
-  practiceId: number;
-
-  @Field()
-  practiceTitle: string;
+  @Field(() => ScriptureEngagementPractice)
+  practice: ScriptureEngagementPractice;
 
   @Field(() => [PredictionDetails])
   details: PredictionDetails[];
 
-  @Field()
+  @Field({ description: "Should we predict this practice?" })
   predict: boolean;
 }
 
@@ -102,6 +41,10 @@ export class Dimension {
   @Field(() => Int) id: number;
   @Field() title: string;
   @Field(() => [DimensionDetails]) details: DimensionDetails[];
+
+  asChartData(): ChartData {
+    return {} as ChartData;
+  }
 }
 
 @ObjectType()

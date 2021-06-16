@@ -395,6 +395,12 @@ type PredictionDetails {
   meanResponse: Float!
 }
 
+type DimensionDetails {
+  indexId: Int!
+  indexTitle: String!
+  meanSurveyIndex: Float!
+}
+
 type QualtricsResponseImportStats {
   importCount: Int!
   duplicateCount: Int!

@@ -1,15 +1,14 @@
 import { Letter, LetterElement } from "../letter/entities";
 import { exec } from "child_process";
 import { writeFile } from "fs";
-import { SurveyResponse } from "../survey/entities";
+import { ResponseSummary, SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Inject, Injectable } from "@nestjs/common";
 import * as assert from "assert";
-import { ChartData, Prediction } from "../survey/survey.types";
+import { Dimension, Prediction } from "../survey/survey.types";
 import { createHash } from "crypto";
 import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { DateTime } from "luxon";
-import { ResponseSummary } from "../survey/entities";
 import { WriterOutput } from "./entities";
 import { LetterElementService, LetterService } from "../letter/letter.service";
 import {
@@ -19,9 +18,14 @@ import {
 import { GroupService } from "../group/group.service";
 import * as IsEmail from "isemail";
 import { getDebugger } from "@helpers/debug-factory";
-import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
+import {
+  SurveyAnalyticsService,
+  SurveyRespondentType,
+} from "@server/src/survey/services/survey-analytics.service";
+import * as _ from "lodash";
+import { ChartData } from "@server/src/writer/writer.types";
 
-const letterDebug = getDebugger("letter");
+const debug = getDebugger("letter");
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
@@ -171,7 +175,7 @@ export class WriterService {
   }
 
   private static renderChart(chartData: ChartData) {
-    letterDebug("renderChart - %O", chartData);
+    debug("renderChart - %O", chartData);
 
     function chartHeight() {
       const height =
@@ -207,7 +211,7 @@ export class WriterService {
   }
 
   private renderPredictions(predictions: Prediction[]) {
-    letterDebug("renderPredictions - %O", predictions);
+    debug("renderPredictions - %O", predictions);
 
     return predictions
       .filter((prediction) => prediction.predict)
@@ -261,7 +265,7 @@ export class WriterService {
   }
 
   private static renderResponseDetails(surveyResponse: SurveyResponse) {
-    letterDebug("renderResponseDetails - %O", surveyResponse);
+    debug("renderResponseDetails - %O", surveyResponse);
 
     let validatedEmail = surveyResponse.email;
     if (
@@ -287,40 +291,28 @@ export class WriterService {
 
   private async renderAllElements(
     letter: Letter,
-    surveyResponse: SurveyResponse
+    dimensions: Dimension[],
+    predictions: Prediction[]
   ) {
     const renderedElements: string[] = [];
 
     for (const letterElement of letter.letterElements) {
-      letterDebug("render element - %O", letterElement);
+      debug("render element - %O", letterElement);
       switch (letterElement.letterElementType.key) {
         case "boilerplate-text":
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
         case "scripture-engagement-prediction":
-          const predictions: Prediction[] =
-            await this.surveyAnalyticsService.predictScriptureEngagementPractices(
-              letterElement.predictionTableId,
-              surveyResponse.id
-            );
           renderedElements.push(this.renderPredictions(predictions));
           break;
         case "dimension-chart":
-          const dimension =
-            this.letterElementService.resolveRelatedSurveyDimension(
-              letterElement
-            );
-          if (dimension) {
-            renderedElements.push(
-              WriterService.renderChart(
-                this.surveyAnalyticsService.chartData(dimension)
-              )
-            );
-          } else {
-            renderedElements.push(
-              WriterService.renderParagraph("No data for dimension")
-            );
-          }
+          const dimension: Dimension = _.find(
+            dimensions,
+            (dim) => dim.id === letterElement.surveyDimension.id
+          );
+          renderedElements.push(
+            WriterService.renderChart(dimension.asChartData())
+          );
           break;
         case "image":
           renderedElements.push(this.renderImage(letterElement));
@@ -331,9 +323,6 @@ export class WriterService {
           );
       }
     }
-
-    renderedElements.push(WriterService.renderResponseDetails(surveyResponse));
-
     return renderedElements;
   }
 
@@ -353,7 +342,7 @@ export class WriterService {
       pdfAbsolutePath,
       responseSummary,
     };
-    letterDebug("constructOutput - %O", writerOutput);
+    debug("constructOutput - %O", writerOutput);
     return writerOutput;
   }
 
@@ -372,12 +361,12 @@ export class WriterService {
 
       // Create the document.
       const renderedDocument = WriterService.renderDocument(renderedElements);
-      letterDebug("Rendered document %s", renderedDocument);
+      debug("Rendered document %s", renderedDocument);
 
       // Write the LaTeX source file.
       writeFile(texFilePath, renderedDocument, "utf8", (err) => {
         if (err) {
-          letterDebug("writeFile failed - %O", err);
+          debug("writeFile failed - %O", err);
           reject(err);
         }
 
@@ -387,11 +376,11 @@ export class WriterService {
           { cwd: this.pdfFileService.absoluteDir() },
           (err, stdout, stderr) => {
             if (err) {
-              letterDebug("lualatex exec failed - %O", err);
+              debug("lualatex exec failed - %O", err);
               reject(err);
             }
-            letterDebug("STDOUT %s", stdout);
-            letterDebug("STDERR %s", stderr);
+            debug("STDOUT %s", stdout);
+            debug("STDERR %s", stderr);
 
             const writerOutput = WriterService.constructOutput(
               true,
@@ -411,13 +400,18 @@ export class WriterService {
   }
 
   async renderIndividualLetter(letterId: number, surveyResponseId: number) {
+    debug(
+      "render individual letter %d for response %d",
+      letterId,
+      surveyResponseId
+    );
     const letter = await this.letterService.readOne(letterId);
     if (!letter) {
       return Promise.resolve(
         WriterService.constructOutput(false, "No letter found")
       );
     }
-    letterDebug("renderLetter/letter %O", letter);
+    debug("renderLetter/letter %O", letter);
 
     const surveyResponse = await this.surveyResponseService.readComplete(
       surveyResponseId
@@ -427,25 +421,41 @@ export class WriterService {
         WriterService.constructOutput(false, "No responses for this survey")
       );
     }
-    letterDebug("renderLetter/surveyResponse %O", surveyResponse);
+    debug("renderLetter/surveyResponse %O", surveyResponse);
+
+    const dimensions =
+      await this.surveyAnalyticsService.calculateSurveyDimensions(
+        surveyResponseId,
+        SurveyRespondentType.Individual
+      );
+
+    const predictions =
+      await this.surveyAnalyticsService.predictScriptureEngagementPractices(
+        surveyResponseId,
+        SurveyRespondentType.Individual
+      );
 
     const renderedElements = await this.renderAllElements(
       letter,
-      surveyResponse
+      dimensions,
+      predictions
     );
+
+    renderedElements.push(WriterService.renderResponseDetails(surveyResponse));
+
     return await this.runLaTeX(renderedElements, letter, surveyResponse);
   }
 
-  async renderGroupLetter(letterId: number, groupId: number) {
-    const letter = await this.letterService.readOne(letterId);
-    const group = await this.groupService.readOne(groupId);
-    const completeResponses: SurveyResponse[] = [];
-    for (const response of group.surveyResponses) {
-      const completeResponse = await this.surveyResponseService.readComplete(
-        response.id
-      );
-      completeResponses.push(completeResponse);
-    }
-    letterDebug("renderGroupLetter/completeResponses %O", completeResponses);
-  }
+  // async renderGroupLetter(letterId: number, groupId: number) {
+  //   const letter = await this.letterService.readOne(letterId);
+  //   const group = await this.groupService.readOne(groupId);
+  //   const completeResponses: SurveyResponse[] = [];
+  //   for (const response of group.surveyResponses) {
+  //     const completeResponse = await this.surveyResponseService.readComplete(
+  //       response.id
+  //     );
+  //     completeResponses.push(completeResponse);
+  //   }
+  //   letterDebug("renderGroupLetter/completeResponses %O", completeResponses);
+  // }
 }

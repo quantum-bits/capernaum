@@ -11,6 +11,8 @@ import { printPretty, printTable } from "@helpers/formatting";
 import * as _ from "lodash";
 import chalk from "chalk";
 import { Dimension, Prediction } from "@server/src/survey/survey.types";
+import { WriterService } from "@server/src/writer/writer.service";
+import { WriterOutput } from "@server/src/writer/entities";
 
 const debug = getDebugger("cli:response");
 
@@ -95,7 +97,7 @@ export async function calculateDimensions(
 ) {
   const nestContext = new NestContext();
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
-  const dimensions = await surveyAnalysisService.calculateDimensions(
+  const dimensions = await surveyAnalysisService.calculateSurveyDimensions(
     responseOrGroupId,
     respondentType
   );
@@ -151,12 +153,14 @@ function greenOrRed(condition: boolean, greenValue, redValue = greenValue) {
 function reportPrediction(predictions: Prediction[], caption) {
   const headers = ["Predict?", "SE Practice", "Survey Index", "MSI"];
   const data = _.flatMap(
-    predictions.sort((a, b) => a.practiceTitle.localeCompare(b.practiceTitle)),
+    predictions.sort((a, b) =>
+      a.practice.title.localeCompare(b.practice.title)
+    ),
     (prediction) => {
       return _.map(prediction.details, (detail, idx) => [
         idx === 0 ? greenOrRed(prediction.predict, "Yes", "No") : "",
         idx === 0
-          ? greenOrRed(prediction.predict, prediction.practiceTitle)
+          ? greenOrRed(prediction.predict, prediction.practice.title)
           : "",
         detail.surveyIndexTitle,
         greenOrRed(
@@ -170,4 +174,29 @@ function reportPrediction(predictions: Prediction[], caption) {
     header: { content: caption },
     columns: [{ alignment: "right" }],
   });
+}
+
+export async function renderLetter(
+  letterPk: number,
+  surveyResponsePk: number,
+  respondentType: SurveyRespondentType
+) {
+  let writerOutput: WriterOutput = null;
+
+  const nestContext = new NestContext();
+  const writerService = await nestContext.get(WriterService);
+  if (respondentType === SurveyRespondentType.Individual) {
+    writerOutput = await writerService.renderIndividualLetter(
+      letterPk,
+      surveyResponsePk
+    );
+    // } else {
+    //   writerOutput = await writerService.renderGroupLetter(
+    //     letterPk,
+    //     surveyResponsePk
+    //   );
+  }
+  await nestContext.close();
+
+  printPretty(writerOutput);
 }

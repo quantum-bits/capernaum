@@ -1,24 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { getDebugger } from "@helpers/debug-factory";
-import { SurveyService } from "@server/src/survey/services/survey.service";
-import {
-  Survey,
-  SurveyDimension,
-  SurveyResponse,
-} from "@server/src/survey/entities";
+import { SurveyResponse } from "@server/src/survey/entities";
 import { Group } from "@server/src/group/entities";
-import { SurveyResponseService } from "@server/src/survey/services/survey-response.service";
-import {
-  ChartData,
-  Dimension,
-  Prediction,
-} from "@server/src/survey/survey.types";
+import { Dimension, Prediction } from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, SelectQueryBuilder } from "typeorm";
-import {
-  PredictionTable,
-  ScriptureEngagementPractice,
-} from "@server/src/prediction/entities";
+import { ScriptureEngagementPractice } from "@server/src/prediction/entities";
 import * as _ from "lodash";
 
 const debug = getDebugger("analytics");
@@ -47,18 +34,9 @@ export enum SurveyRespondentType {
 
 @Injectable()
 export class SurveyAnalyticsService {
-  // Cache surveys as they are loaded.
-  private readonly surveyStructureCache = new Map<number, Survey>();
-
   constructor(
-    private readonly surveyService: SurveyService,
-    private readonly surveyResponseService: SurveyResponseService,
     @InjectRepository(SurveyResponse)
     private readonly surveyResponseRepo: Repository<SurveyResponse>,
-    @InjectRepository(PredictionTable)
-    private readonly predictionTableRepo: Repository<PredictionTable>,
-    @InjectRepository(SurveyDimension)
-    private readonly surveyDimensionRepo: Repository<SurveyDimension>,
     @InjectRepository(Group)
     private readonly groupRepo: Repository<Group>
   ) {}
@@ -78,7 +56,7 @@ export class SurveyAnalyticsService {
     responseOrGroupId: number,
     respondentType: SurveyRespondentType
   ) {
-    let qb: SelectQueryBuilder<SurveyResponse | Group> = null;
+    let qb: SelectQueryBuilder<SurveyResponse | Group>;
 
     if (respondentType === SurveyRespondentType.Group) {
       qb = this.groupRepo
@@ -114,7 +92,7 @@ export class SurveyAnalyticsService {
       .getRawMany();
   }
 
-  async calculateDimensions(
+  async calculateSurveyDimensions(
     responseOrGroupId: number,
     respondentType: SurveyRespondentType
   ) {
@@ -204,8 +182,9 @@ export class SurveyAnalyticsService {
     // Construct an array of `Prediction` objects corresponding to each SEP.
     const predictions = _.map(rawPredictionDataBySepId, (rawPredictionData) => {
       const prediction = new Prediction();
-      prediction.practiceId = rawPredictionData[0].sep_id;
-      prediction.practiceTitle = rawPredictionData[0].sep_title;
+      prediction.practice = new ScriptureEngagementPractice();
+      prediction.practice.id = rawPredictionData[0].sep_id;
+      prediction.practice.title = rawPredictionData[0].sep_title;
       prediction.details = _.map(rawPredictionData, (datum) => ({
         surveyIndexTitle: datum.sidx_title,
         surveyIndexAbbreviation: datum.sidx_abbreviation,
@@ -223,25 +202,4 @@ export class SurveyAnalyticsService {
     debug("predictions %O", predictions);
     return predictions;
   }
-
-  public chartData(surveyDimension: SurveyDimension): ChartData {
-    return undefined;
-  }
-
-  // TODO - Rewrite - Was in survey-dimension.ts
-  // /**
-  //  * The bar chart in the response letter corresponds to a survey dimension.
-  //  * Each bar represents a survey index within the survey dimension.
-  //  * The value of each bar is the mean of all the survey items (questions) associated with the index.
-  //  */
-  // public chartData(): ChartData {
-  //   const chartEntries = this.surveyIndices.map((surveyIndex) => {
-  //     return {
-  //       title: surveyIndex.title,
-  //       value: surveyIndex.meanResponse(),
-  //     };
-  //   });
-  //
-  //   return new ChartData(this.title, chartEntries);
-  // }
 }

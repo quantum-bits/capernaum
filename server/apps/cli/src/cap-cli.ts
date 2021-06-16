@@ -19,6 +19,7 @@ import {
   meanSurveyIndices,
   nuclearOption,
   predictEngagement,
+  renderLetter,
   showOrg,
   summarizeResponse,
 } from "./commands";
@@ -210,6 +211,20 @@ msiCommands
   .command("group <group-pk>")
   .description("calculate mean survey indices for a group")
   .action((groupPk) => meanSurveyIndices(groupPk, SurveyRespondentType.Group));
+
+// Letter
+
+const letterCommands = program.command("letter").description("letter commands");
+
+letterCommands
+  .command("individual <letter-pk> <survey_response-pk>")
+  .description("create letter for response", {
+    letterPk: "letter PK",
+    surveyResponsePk: "survey response PK",
+  })
+  .action((letterPk, surveyResponsePk) =>
+    renderLetter(letterPk, surveyResponsePk, SurveyRespondentType.Individual)
+  );
 
 // Fixture
 
