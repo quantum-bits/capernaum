@@ -177,9 +177,13 @@ responseCommands
   .description("summarize response")
   .action(summarizeResponse);
 
-responseCommands
-  .command("predict <prediction-table-pk> <survey-response-pk>")
-  .description("predict scripture engagement")
+const predictCommands = responseCommands
+  .command("predict")
+  .description("predict scripture engagement commands");
+
+predictCommands
+  .command("individual <survey-response-pk>")
+  .description("scripture engagement for individual")
   .action(predictEngagement);
 
 const msiCommands = responseCommands

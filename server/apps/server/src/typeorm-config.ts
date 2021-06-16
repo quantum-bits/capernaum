@@ -28,8 +28,6 @@ import { Event } from "./events/entities";
 import { Machine } from "./machine/entities";
 import { Group, GroupType } from "./group/entities";
 import { getDebugger } from "@helpers/debug-factory";
-import { MeanSurveyIndexIndividualView } from "@server/src/survey/views/mean-index-individual.view";
-import { MeanSurveyIndexGroupView } from "@server/src/survey/views/mean-index-group.view";
 
 const debug = getDebugger("orm");
 
@@ -55,8 +53,6 @@ export const entities = [
   UserRole,
   SurveyLetter,
   PredictionTable,
-  MeanSurveyIndexGroupView,
-  MeanSurveyIndexIndividualView,
 ];
 
 export const options: ConnectionOptions = {

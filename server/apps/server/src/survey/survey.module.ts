@@ -33,6 +33,7 @@ import { SurveyItemService } from "@server/src/survey/services/survey-item.servi
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 import { LetterModule } from "@server/src/letter/letter.module";
 import { PredictionTable } from "@server/src/prediction/entities";
+import { Group } from "@server/src/group/entities";
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { PredictionTable } from "@server/src/prediction/entities";
       SurveyItem,
       SurveyLetter,
       PredictionTable,
+      Group,
     ]),
     GroupModule,
     forwardRef(() => LetterModule),
