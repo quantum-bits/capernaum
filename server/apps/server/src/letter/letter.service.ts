@@ -48,10 +48,8 @@ export class LetterService extends BaseService<Letter> {
     return this.repo.findOne(id, {
       relations: [
         ...this.alwaysResolve,
-        "letterElements.textDelta",
         "letterElements.image",
         "letterElements.surveyDimension",
-        "letterElements.predictionTable",
       ],
     });
   }

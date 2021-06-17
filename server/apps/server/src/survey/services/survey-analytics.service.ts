@@ -10,21 +10,31 @@ import * as _ from "lodash";
 
 const debug = getDebugger("analytics");
 
-interface RawPredictionData {
-  sep_id: number;
-  sep_title: string;
-  sidx_id: number;
-  sidx_title: string;
-  sidx_abbreviation;
-  mean_sidx: number;
+// TODO - Look into whether there is a better way to convert these values
+// on their way in from the database, where they appear to be all strings.
+
+interface RawMeanSurveyIndices {
+  surveyIndexId: number;
+  surveyIndexTitle: string;
+  meanSurveyIndex: string;
 }
 
 interface RawDimensionData {
-  dimensionId: number;
+  dimensionId: string;
   dimensionTitle: string;
-  indexId: number;
+  indexId: string;
   indexTitle: string;
-  meanSurveyIndex: number;
+  meanSurveyIndex: string;
+}
+
+// TODO: Give the fields here better names (like the other interfaces).
+interface RawPredictionData {
+  sep_id: string;
+  sep_title: string;
+  sidx_id: string;
+  sidx_title: string;
+  sidx_abbreviation: string;
+  mean_sidx: string;
 }
 
 export enum SurveyRespondentType {
@@ -34,11 +44,14 @@ export enum SurveyRespondentType {
 
 @Injectable()
 export class SurveyAnalyticsService {
+  // TODO - Replace these injected repos with the corresponding services.
   constructor(
     @InjectRepository(SurveyResponse)
     private readonly surveyResponseRepo: Repository<SurveyResponse>,
     @InjectRepository(Group)
-    private readonly groupRepo: Repository<Group>
+    private readonly groupRepo: Repository<Group>,
+    @InjectRepository(ScriptureEngagementPractice)
+    private readonly scriptureEngagementPracticeRepo: Repository<ScriptureEngagementPractice>
   ) {}
 
   summarizeResponse(surveyResponseId: number) {
@@ -89,7 +102,7 @@ export class SurveyAnalyticsService {
 
       .orderBy("sidx.title")
 
-      .getRawMany();
+      .getRawMany<RawMeanSurveyIndices>();
   }
 
   async calculateSurveyDimensions(
@@ -114,7 +127,7 @@ export class SurveyAnalyticsService {
       .orderBy("sdim.title")
       .addOrderBy("sidx.title")
 
-      .getRawMany();
+      .getRawMany<RawDimensionData>();
     debug("dimensions for response/group %d", responseOrGroupId);
 
     const rawDimensionDataByDimId = _.groupBy(
@@ -124,12 +137,12 @@ export class SurveyAnalyticsService {
 
     const dimensions = _.map(rawDimensionDataByDimId, (rawDimData) => {
       const dimension = new Dimension();
-      dimension.id = rawDimData[0].dimensionId;
+      dimension.id = parseInt(rawDimData[0].dimensionId);
       dimension.title = rawDimData[0].dimensionTitle;
       dimension.details = _.map(rawDimData, (datum) => ({
-        indexId: datum.indexId,
+        indexId: parseInt(datum.indexId),
         indexTitle: datum.indexTitle,
-        meanSurveyIndex: datum.meanSurveyIndex,
+        meanSurveyIndex: parseFloat(datum.meanSurveyIndex),
       }));
       return dimension;
     });
@@ -167,7 +180,7 @@ export class SurveyAnalyticsService {
       .orderBy("sep_title")
       .addOrderBy("sidx_title")
 
-      .getRawMany();
+      .getRawMany<RawPredictionData>();
     debug("predict engagement for response/group %d", responseOrGroupId);
 
     // Organize the raw prediction data into an object keyed by SEP ID.
@@ -180,24 +193,32 @@ export class SurveyAnalyticsService {
     debug("bySepId %O", rawPredictionDataBySepId);
 
     // Construct an array of `Prediction` objects corresponding to each SEP.
-    const predictions = _.map(rawPredictionDataBySepId, (rawPredictionData) => {
-      const prediction = new Prediction();
-      prediction.practice = new ScriptureEngagementPractice();
-      prediction.practice.id = rawPredictionData[0].sep_id;
-      prediction.practice.title = rawPredictionData[0].sep_title;
-      prediction.details = _.map(rawPredictionData, (datum) => ({
-        surveyIndexTitle: datum.sidx_title,
-        surveyIndexAbbreviation: datum.sidx_abbreviation,
-        meanResponse: datum.mean_sidx,
-      }));
-      prediction.predict = _.every(
-        rawPredictionData,
-        (rawPredictionDatum) =>
-          rawPredictionDatum.mean_sidx >=
-          parseInt(process.env.SEP_PREDICTION_THRESHOLD)
-      );
-      return prediction;
-    });
+    // Need the `Promise.all()` because each iteration through the `map`
+    // function is asynchronous.
+    const predictions = Promise.all(
+      _.map(rawPredictionDataBySepId, async (rawData) => {
+        const prediction = new Prediction();
+
+        prediction.practice =
+          await this.scriptureEngagementPracticeRepo.findOne(
+            parseInt(rawData[0].sep_id)
+          );
+
+        prediction.details = _.map(rawData, (datum) => ({
+          surveyIndexTitle: datum.sidx_title,
+          surveyIndexAbbreviation: datum.sidx_abbreviation,
+          meanResponse: parseFloat(datum.mean_sidx),
+        }));
+
+        prediction.predict = _.every(
+          rawData,
+          (rawDatum) =>
+            parseFloat(rawDatum.mean_sidx) >=
+            parseFloat(process.env.SEP_PREDICTION_THRESHOLD)
+        );
+        return prediction;
+      })
+    );
 
     debug("predictions %O", predictions);
     return predictions;

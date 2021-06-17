@@ -32,7 +32,10 @@ import { GroupModule } from "@server/src/group/group.module";
 import { SurveyItemService } from "@server/src/survey/services/survey-item.service";
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
 import { LetterModule } from "@server/src/letter/letter.module";
-import { PredictionTable } from "@server/src/prediction/entities";
+import {
+  PredictionTable,
+  ScriptureEngagementPractice,
+} from "@server/src/prediction/entities";
 import { Group } from "@server/src/group/entities";
 
 @Module({
@@ -47,6 +50,7 @@ import { Group } from "@server/src/group/entities";
       SurveyLetter,
       PredictionTable,
       Group,
+      ScriptureEngagementPractice,
     ]),
     GroupModule,
     forwardRef(() => LetterModule),

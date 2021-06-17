@@ -1,7 +1,8 @@
 import { ScriptureEngagementPractice } from "../prediction/entities";
 import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyResponse } from "./entities";
-import { ChartData } from "@server/src/writer/writer.types";
+import { ChartData, ChartEntry } from "@server/src/writer/writer.types";
+import * as _ from "lodash";
 
 // Used to filter which survey items are retrieved for a survey.
 export enum WhichItems {
@@ -43,7 +44,13 @@ export class Dimension {
   @Field(() => [DimensionDetails]) details: DimensionDetails[];
 
   asChartData(): ChartData {
-    return {} as ChartData;
+    return new ChartData(
+      this.title,
+      _.map(
+        this.details,
+        (detail) => new ChartEntry(detail.indexTitle, detail.meanSurveyIndex)
+      )
+    );
   }
 }
 

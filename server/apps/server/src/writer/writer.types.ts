@@ -1,13 +1,18 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, Float, ObjectType } from "@nestjs/graphql";
 import numbro from "numbro";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("writer");
 
 @ObjectType()
 export class ChartEntry {
-  @Field()
-  title: string;
+  @Field() title: string;
+  @Field(() => Float) value: number;
 
-  @Field(() => Int)
-  value: number;
+  constructor(title: string, value: number) {
+    this.title = title;
+    this.value = value;
+  }
 }
 
 @ObjectType()
@@ -36,6 +41,7 @@ export class ChartData {
   allBarLabels(): string {
     return this.entries
       .map((entry) => {
+        debug("ENTRY", entry);
         if (entry.value >= 4) {
           const horizCoord = entry.value - 0.35;
           const value = numbro(entry.value).format({

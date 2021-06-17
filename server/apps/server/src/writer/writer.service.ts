@@ -1,6 +1,5 @@
 import { Letter, LetterElement } from "../letter/entities";
-import { exec } from "child_process";
-import { writeFile } from "fs";
+import { writeFile } from "fs/promises";
 import { ResponseSummary, SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Inject, Injectable } from "@nestjs/common";
@@ -24,8 +23,9 @@ import {
 } from "@server/src/survey/services/survey-analytics.service";
 import * as _ from "lodash";
 import { ChartData } from "@server/src/writer/writer.types";
+import execa from "execa";
 
-const debug = getDebugger("letter");
+const debug = getDebugger("writer");
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
@@ -49,6 +49,10 @@ function formatHref(url: string, text: string) {
 
 function formatVerbose(text: string) {
   return `\\verb|${text}|`;
+}
+
+function formatComment(text: string) {
+  return `%%%%% ${text}`;
 }
 
 // Generate a hash digest for the file.
@@ -265,7 +269,7 @@ export class WriterService {
   }
 
   private static renderResponseDetails(surveyResponse: SurveyResponse) {
-    debug("renderResponseDetails - %O", surveyResponse);
+    debug("renderResponseDetails %O", surveyResponse);
 
     let validatedEmail = surveyResponse.email;
     if (
@@ -281,10 +285,10 @@ export class WriterService {
         "flushright",
         [
           "\\scriptsize",
-          `Response ID: ${surveyResponse.id}`,
-          `Email: ${formatVerbose(validatedEmail)}`,
+          `Response ID: ${surveyResponse.id}\\\\`,
+          `Email: ${formatVerbose(validatedEmail)}\\\\`,
           `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`,
-        ].join("\n\n")
+        ].join("\n")
       ),
     ].join("\n");
   }
@@ -297,7 +301,12 @@ export class WriterService {
     const renderedElements: string[] = [];
 
     for (const letterElement of letter.letterElements) {
-      debug("render element - %O", letterElement);
+      renderedElements.push(
+        formatComment(
+          `id ${letterElement.id} (${letterElement.letterElementType.key})`
+        )
+      );
+      debug("render element %O", letterElement);
       switch (letterElement.letterElementType.key) {
         case "boilerplate-text":
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
@@ -310,6 +319,7 @@ export class WriterService {
             dimensions,
             (dim) => dim.id === letterElement.surveyDimension.id
           );
+          debug("selected dimension %O", dimension);
           renderedElements.push(
             WriterService.renderChart(dimension.asChartData())
           );
@@ -346,57 +356,52 @@ export class WriterService {
     return writerOutput;
   }
 
-  private runLaTeX(
+  private async runLaTeX(
     renderedElements: string[],
     letter: Letter,
     surveyResponse: SurveyResponse
-  ): Promise<WriterOutput> {
-    return new Promise((resolve, reject) => {
-      // Set up paths.
-      const baseName = generateBaseName(letter.id, surveyResponse.id);
-      const texFileName = baseName + ".tex";
-      const texFilePath = this.pdfFileService.absolutePath(texFileName);
-      const pdfFileName = baseName + ".pdf";
-      const pdfAbsolutePath = this.pdfFileService.absolutePath(pdfFileName);
+  ) {
+    // Set up paths.
+    const baseName = generateBaseName(letter.id, surveyResponse.id);
+    const texFileName = baseName + ".tex";
+    const texFilePath = this.pdfFileService.absolutePath(texFileName);
+    const pdfFileName = baseName + ".pdf";
+    const pdfAbsolutePath = this.pdfFileService.absolutePath(pdfFileName);
 
-      // Create the document.
-      const renderedDocument = WriterService.renderDocument(renderedElements);
-      debug("Rendered document %s", renderedDocument);
+    // Create the document.
+    const renderedDocument = WriterService.renderDocument(renderedElements);
+    debug("rendered document");
 
-      // Write the LaTeX source file.
-      writeFile(texFilePath, renderedDocument, "utf8", (err) => {
-        if (err) {
-          debug("writeFile failed - %O", err);
-          reject(err);
-        }
+    // Write the LaTeX source file.
+    try {
+      await writeFile(texFilePath, renderedDocument);
+      debug("wrote document to '%s'", texFilePath);
+    } catch (error) {
+      debug("writeFile failed %O", error);
+      throw error;
+    }
 
-        // Create the PDF.
-        exec(
-          `lualatex ${texFilePath}`,
-          { cwd: this.pdfFileService.absoluteDir() },
-          (err, stdout, stderr) => {
-            if (err) {
-              debug("lualatex exec failed - %O", err);
-              reject(err);
-            }
-            debug("STDOUT %s", stdout);
-            debug("STDERR %s", stderr);
-
-            const writerOutput = WriterService.constructOutput(
-              true,
-              "Letter created successfully",
-              pdfFileName,
-              this.pdfFileService.relativePath(pdfFileName),
-              pdfAbsolutePath
-              // TODO - Not sure we want this any longer.
-              // surveyResponse.summarize()
-            );
-
-            resolve(writerOutput);
-          }
-        );
+    // Run LaTeX to create the PDF.
+    try {
+      const result = await execa("lualatex", ["--halt-on-error", texFilePath], {
+        cwd: this.pdfFileService.absoluteDir(),
       });
-    });
+      debug("ran LaTeX %O", result);
+    } catch (errorResult) {
+      debug("failed to run LaTeX %O", errorResult.shortMessage);
+      throw errorResult;
+    }
+
+    const writerOutput = WriterService.constructOutput(
+      true,
+      "Letter created successfully",
+      pdfFileName,
+      this.pdfFileService.relativePath(pdfFileName),
+      pdfAbsolutePath
+    );
+
+    debug("writer output %O", writerOutput);
+    return writerOutput;
   }
 
   async renderIndividualLetter(letterId: number, surveyResponseId: number) {
@@ -411,7 +416,7 @@ export class WriterService {
         WriterService.constructOutput(false, "No letter found")
       );
     }
-    debug("renderLetter/letter %O", letter);
+    debug("renderIndividualLetter/letter %O", letter);
 
     const surveyResponse = await this.surveyResponseService.readComplete(
       surveyResponseId
@@ -442,7 +447,6 @@ export class WriterService {
     );
 
     renderedElements.push(WriterService.renderResponseDetails(surveyResponse));
-
     return await this.runLaTeX(renderedElements, letter, surveyResponse);
   }
 
