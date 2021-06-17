@@ -178,7 +178,7 @@ function reportPrediction(predictions: Prediction[], caption) {
 
 export async function renderLetter(
   letterPk: number,
-  surveyResponsePk: number,
+  groupOrResponsePk: number,
   respondentType: SurveyRespondentType
 ) {
   let writerOutput: WriterOutput = null;
@@ -188,13 +188,13 @@ export async function renderLetter(
   if (respondentType === SurveyRespondentType.Individual) {
     writerOutput = await writerService.renderIndividualLetter(
       letterPk,
-      surveyResponsePk
+      groupOrResponsePk
     );
-    // } else {
-    //   writerOutput = await writerService.renderGroupLetter(
-    //     letterPk,
-    //     surveyResponsePk
-    //   );
+  } else {
+    writerOutput = await writerService.renderGroupLetter(
+      letterPk,
+      groupOrResponsePk
+    );
   }
   await nestContext.close();
 

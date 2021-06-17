@@ -1,31 +1,32 @@
 import { Letter, LetterElement } from "../letter/entities";
-import { writeFile } from "fs/promises";
-import { ResponseSummary, SurveyResponse } from "../survey/entities";
 import { FileService } from "../file/file.service";
 import { Inject, Injectable } from "@nestjs/common";
 import * as assert from "assert";
 import { Dimension, Prediction } from "../survey/survey.types";
 import { createHash } from "crypto";
 import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
-import { DateTime } from "luxon";
-import { WriterOutput } from "./entities";
 import { LetterElementService, LetterService } from "../letter/letter.service";
 import {
   SurveyResponseService,
   SurveyService,
 } from "@server/src/survey/services";
 import { GroupService } from "../group/group.service";
-import * as IsEmail from "isemail";
 import { getDebugger } from "@helpers/debug-factory";
 import {
   SurveyAnalyticsService,
   SurveyRespondentType,
 } from "@server/src/survey/services/survey-analytics.service";
-import * as _ from "lodash";
 import { ChartData } from "@server/src/writer/writer.types";
+import { DateTime } from "luxon";
+import * as _ from "lodash";
+import { ResponseSummary } from "@server/src/survey/entities";
+import { WriterOutput } from "@server/src/writer/entities";
+import { writeFile } from "fs/promises";
 import execa from "execa";
 
 const debug = getDebugger("writer");
+
+type ResponseDetail = [string, string | number];
 
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
@@ -47,7 +48,7 @@ function formatHref(url: string, text: string) {
   return `\\href{${url}}{\\underline{${text}}}`;
 }
 
-function formatVerbose(text: string) {
+function formatVerbatim(text: string) {
   return `\\verb|${text}|`;
 }
 
@@ -56,8 +57,14 @@ function formatComment(text: string) {
 }
 
 // Generate a hash digest for the file.
-function generateBaseName(letterId: number, responseId: number) {
-  return createHash("sha1").update(`${letterId}-${responseId}`).digest("hex");
+function generateBaseName(
+  letterId: number,
+  respondentType: SurveyRespondentType,
+  groupOrResponseId: number
+) {
+  return createHash("sha1")
+    .update(`${letterId}-${respondentType}-${groupOrResponseId}`)
+    .digest("hex");
 }
 
 export class LineBuffer {
@@ -113,10 +120,6 @@ export class WriterService {
       "flushleft",
       formatLaTeX("includegraphics", fullPath, "width=\\textwidth")
     );
-  }
-
-  private static renderParagraph(content: string) {
-    return ["", content, ""].join("\n");
   }
 
   private static renderBoilerplate(letterElement: LetterElement) {
@@ -268,25 +271,18 @@ export class WriterService {
     `;
   }
 
-  private static renderResponseDetails(surveyResponse: SurveyResponse) {
-    debug("renderResponseDetails %O", surveyResponse);
-
-    let validatedEmail = surveyResponse.email;
-    if (
-      !IsEmail.validate(surveyResponse.email) ||
-      surveyResponse.email.indexOf("|") >= 0
-    ) {
-      validatedEmail = "<invalid>";
-    }
-
+  private static renderResponseDetails(details: ResponseDetail[]) {
+    const formattedDetails = _.map(
+      details,
+      (detail) => `${detail[0]}: ${detail[1]}\\\\`
+    );
     return [
       "\\vfill",
       formatEnvironment(
         "flushright",
         [
           "\\scriptsize",
-          `Response ID: ${surveyResponse.id}\\\\`,
-          `Email: ${formatVerbose(validatedEmail)}\\\\`,
+          ...formattedDetails,
           `Generated: ${DateTime.local().toFormat("y-MM-dd tt")}`,
         ].join("\n")
       ),
@@ -356,13 +352,8 @@ export class WriterService {
     return writerOutput;
   }
 
-  private async runLaTeX(
-    renderedElements: string[],
-    letter: Letter,
-    surveyResponse: SurveyResponse
-  ) {
+  private async runLaTeX(renderedElements: string[], baseName: string) {
     // Set up paths.
-    const baseName = generateBaseName(letter.id, surveyResponse.id);
     const texFileName = baseName + ".tex";
     const texFilePath = this.pdfFileService.absolutePath(texFileName);
     const pdfFileName = baseName + ".pdf";
@@ -405,38 +396,23 @@ export class WriterService {
   }
 
   async renderIndividualLetter(letterId: number, surveyResponseId: number) {
-    debug(
-      "render individual letter %d for response %d",
-      letterId,
-      surveyResponseId
-    );
-    const letter = await this.letterService.readOne(letterId);
-    if (!letter) {
-      return Promise.resolve(
-        WriterService.constructOutput(false, "No letter found")
-      );
-    }
-    debug("renderIndividualLetter/letter %O", letter);
+    debug("letter %d for response %d", letterId, surveyResponseId);
 
-    const surveyResponse = await this.surveyResponseService.readComplete(
+    const letter = await this.letterService.readOne(letterId);
+
+    const surveyResponse = await this.surveyResponseService.readOne(
       surveyResponseId
     );
-    if (!surveyResponse) {
-      return Promise.resolve(
-        WriterService.constructOutput(false, "No responses for this survey")
-      );
-    }
-    debug("renderLetter/surveyResponse %O", surveyResponse);
 
     const dimensions =
       await this.surveyAnalyticsService.calculateSurveyDimensions(
-        surveyResponseId,
+        surveyResponse.id,
         SurveyRespondentType.Individual
       );
 
     const predictions =
       await this.surveyAnalyticsService.predictScriptureEngagementPractices(
-        surveyResponseId,
+        surveyResponse.id,
         SurveyRespondentType.Individual
       );
 
@@ -446,20 +422,59 @@ export class WriterService {
       predictions
     );
 
-    renderedElements.push(WriterService.renderResponseDetails(surveyResponse));
-    return await this.runLaTeX(renderedElements, letter, surveyResponse);
+    renderedElements.push(
+      WriterService.renderResponseDetails([
+        ["Response ID", surveyResponse.id],
+        ["Email", formatVerbatim(surveyResponse.email)],
+      ])
+    );
+
+    const baseName = generateBaseName(
+      letter.id,
+      SurveyRespondentType.Individual,
+      surveyResponse.id
+    );
+    return await this.runLaTeX(renderedElements, baseName);
   }
 
-  // async renderGroupLetter(letterId: number, groupId: number) {
-  //   const letter = await this.letterService.readOne(letterId);
-  //   const group = await this.groupService.readOne(groupId);
-  //   const completeResponses: SurveyResponse[] = [];
-  //   for (const response of group.surveyResponses) {
-  //     const completeResponse = await this.surveyResponseService.readComplete(
-  //       response.id
-  //     );
-  //     completeResponses.push(completeResponse);
-  //   }
-  //   letterDebug("renderGroupLetter/completeResponses %O", completeResponses);
-  // }
+  async renderGroupLetter(letterId: number, groupId: number) {
+    debug("letter %d for group %d", letterId, groupId);
+
+    const letter = await this.letterService.readOne(letterId);
+
+    const group = await this.groupService.readOne(groupId);
+
+    const dimensions =
+      await this.surveyAnalyticsService.calculateSurveyDimensions(
+        group.id,
+        SurveyRespondentType.Group
+      );
+
+    const predictions =
+      await this.surveyAnalyticsService.predictScriptureEngagementPractices(
+        group.id,
+        SurveyRespondentType.Group
+      );
+
+    const renderedElements = await this.renderAllElements(
+      letter,
+      dimensions,
+      predictions
+    );
+
+    renderedElements.push(
+      WriterService.renderResponseDetails([
+        ["Group ID", group.id],
+        ["Group Code", group.codeWord],
+        ["Admin Email", formatVerbatim(group.adminEmail)],
+      ])
+    );
+
+    const baseName = generateBaseName(
+      letter.id,
+      SurveyRespondentType.Individual,
+      group.id
+    );
+    return await this.runLaTeX(renderedElements, baseName);
+  }
 }

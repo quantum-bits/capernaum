@@ -226,6 +226,16 @@ letterCommands
     renderLetter(letterPk, surveyResponsePk, SurveyRespondentType.Individual)
   );
 
+letterCommands
+  .command("group <letter-pk> <group-pk>")
+  .description("create letter for group", {
+    letterPk: "letter PK",
+    groupPk: "group PK",
+  })
+  .action((letterPk, groupPk) =>
+    renderLetter(letterPk, groupPk, SurveyRespondentType.Group)
+  );
+
 // Fixture
 
 const fixtureCommands = program
