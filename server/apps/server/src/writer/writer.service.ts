@@ -2,7 +2,7 @@ import { Letter, LetterElement } from "../letter/entities";
 import { FileService } from "../file/file.service";
 import { Inject, Injectable } from "@nestjs/common";
 import * as assert from "assert";
-import { Dimension, Prediction } from "../survey/survey.types";
+import { Dimension, Prediction, SurveyRespondentType } from '../survey/survey.types'
 import { createHash } from "crypto";
 import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
 import { LetterElementService, LetterService } from "../letter/letter.service";
@@ -14,7 +14,7 @@ import { GroupService } from "../group/group.service";
 import { getDebugger } from "@helpers/debug-factory";
 import {
   SurveyAnalyticsService,
-  SurveyRespondentType,
+
 } from "@server/src/survey/services/survey-analytics.service";
 import { ChartData } from "@server/src/writer/writer.types";
 import { DateTime } from "luxon";

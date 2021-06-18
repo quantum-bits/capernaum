@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyResponse } from "@server/src/survey/entities";
 import { Group } from "@server/src/group/entities";
-import { Dimension, Prediction } from "@server/src/survey/survey.types";
+import {
+  Dimension,
+  Prediction,
+  SurveyRespondentType,
+} from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, SelectQueryBuilder } from "typeorm";
 import { ScriptureEngagementPractice } from "@server/src/prediction/entities";
@@ -37,14 +41,9 @@ interface RawPredictionData {
   mean_sidx: string;
 }
 
-export enum SurveyRespondentType {
-  Individual,
-  Group,
-}
-
 @Injectable()
 export class SurveyAnalyticsService {
-  // TODO - Replace these injected repos with the corresponding services.
+  // TODO - Replace these injected repos with the corresponding services. Here and throughout!
   constructor(
     @InjectRepository(SurveyResponse)
     private readonly surveyResponseRepo: Repository<SurveyResponse>,

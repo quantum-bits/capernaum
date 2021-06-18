@@ -1,18 +1,13 @@
-import { QualtricsApiService } from "@qapi/qualtrics-api.service";
-import NestContext from "@common/cli/src/nest-helpers";
-import { getDebugger } from "@helpers/debug-factory";
-import {
-  SurveyAnalyticsService,
-  SurveyRespondentType,
-} from "@server/src/survey/services/survey-analytics.service";
-import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
-import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
-import { printPretty, printTable } from "@helpers/formatting";
-import * as _ from "lodash";
-import chalk from "chalk";
-import { Dimension, Prediction } from "@server/src/survey/survey.types";
-import { WriterService } from "@server/src/writer/writer.service";
-import { WriterOutput } from "@server/src/writer/entities";
+import { QualtricsApiService } from '@qapi/qualtrics-api.service'
+import NestContext from '@common/cli/src/nest-helpers'
+import { getDebugger } from '@helpers/debug-factory'
+import { SurveyAnalyticsService } from '@server/src/survey/services/survey-analytics.service'
+import { QualtricsID } from '@server/src/qualtrics/qualtrics.types'
+import { QualtricsService } from '@server/src/qualtrics/qualtrics.service'
+import { printPretty, printTable } from '@helpers/formatting'
+import * as _ from 'lodash'
+import chalk from 'chalk'
+import { Dimension, Prediction, SurveyRespondentType } from '@server/src/survey/survey.types'
 
 const debug = getDebugger("cli:response");
 
@@ -176,27 +171,3 @@ function reportPrediction(predictions: Prediction[], caption) {
   });
 }
 
-export async function renderLetter(
-  letterPk: number,
-  groupOrResponsePk: number,
-  respondentType: SurveyRespondentType
-) {
-  let writerOutput: WriterOutput = null;
-
-  const nestContext = new NestContext();
-  const writerService = await nestContext.get(WriterService);
-  if (respondentType === SurveyRespondentType.Individual) {
-    writerOutput = await writerService.renderIndividualLetter(
-      letterPk,
-      groupOrResponsePk
-    );
-  } else {
-    writerOutput = await writerService.renderGroupLetter(
-      letterPk,
-      groupOrResponsePk
-    );
-  }
-  await nestContext.close();
-
-  printPretty(writerOutput);
-}

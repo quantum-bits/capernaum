@@ -3,6 +3,7 @@ import {
   AfterLoad,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   UpdateDateColumn,
@@ -41,8 +42,8 @@ export class Letter extends AbstractEntity {
   isFrozen: boolean;
 
   @Field(() => Survey)
-  @ManyToOne(() => Survey, (survey) => survey.letters)
-  survey?: Survey;
+  @ManyToMany(() => Survey, (survey) => survey.letters)
+  surveys: Survey[];
 
   @Field(() => LetterType)
   @ManyToOne(() => LetterType)
@@ -54,9 +55,12 @@ export class Letter extends AbstractEntity {
 
   @AfterLoad()
   sortLetterElements() {
-    this.letterElements = this.letterElements.sort(
-      (a, b) => b.sequence - a.sequence
-    );
+    // If we loaded elements, sort 'em.
+    if (this.letterElements) {
+      this.letterElements = this.letterElements.sort(
+        (a, b) => b.sequence - a.sequence
+      );
+    }
   }
 }
 

@@ -71,3 +71,11 @@ export interface QualtricsImportedResponse {
   isDuplicate: boolean;
   surveyResponse: SurveyResponse;
 }
+
+// N.B., the values of this enum are used elsewhere (e.g., in fixtures
+// that create the LetterType table) where they are used as `string`s.
+// Change with caution.
+export enum SurveyRespondentType {
+  Individual = "individual",
+  Group = "group",
+}

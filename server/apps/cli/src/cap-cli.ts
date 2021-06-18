@@ -9,26 +9,28 @@ import {
   getGroup,
   getQualtricsResponse,
   getSubscription,
-  getSurvey,
   graphQLQuery,
   importSurvey,
   importSurveyResponses,
   listGroups,
   listSubscriptions,
-  listSurveys,
+  listQualtricsSurveys,
   meanSurveyIndices,
   nuclearOption,
   predictEngagement,
   renderLetter,
   showOrg,
   summarizeResponse,
+  getQualtricsSurvey,
+  listSurveys,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
-import { SurveyRespondentType } from "@server/src/survey/services/survey-analytics.service";
 
 config();
 
 import PrettyError = require("pretty-error");
+import { SurveyRespondentType } from "@server/src/survey/survey.types";
+import { listLetters } from "@common/cli/src/commands/letter";
 
 PrettyError.start();
 
@@ -55,14 +57,14 @@ qualtricsSurveyCommands
   .option("--by-date", "sort by date")
   .option("--all", "show all, active and inactive")
   .description("list all surveys")
-  .action(listSurveys);
+  .action(listQualtricsSurveys);
 
 qualtricsSurveyCommands
   .command("get <survey-id>")
   .description("get survey by ID", {
     "survey-id": "survey ID (SV_...)",
   })
-  .action(getSurvey);
+  .action(getQualtricsSurvey);
 
 const qualtricsResponseCommands = qualtricsCommands
   .command("response")
@@ -122,6 +124,11 @@ qualtricsSubscriptionCommands
 // Survey
 
 const surveyCommands = program.command("survey").description("survey commands");
+
+surveyCommands
+  .command("list")
+  .description("list all surveys")
+  .action(listSurveys);
 
 surveyCommands
   .command("import <survey-id>")
@@ -235,6 +242,11 @@ letterCommands
   .action((letterPk, groupPk) =>
     renderLetter(letterPk, groupPk, SurveyRespondentType.Group)
   );
+
+letterCommands
+  .command("list")
+  .description("list letters and related info")
+  .action(listLetters);
 
 // Fixture
 

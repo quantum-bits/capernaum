@@ -87,9 +87,10 @@ type Letter {
 
   """Is this letter frozen?"""
   isFrozen: Boolean!
-  survey: Survey!
+  surveys: Survey!
   letterType: LetterType!
   letterElements: [LetterElement!]!
+  survey: Survey!
 }
 
 """
@@ -122,11 +123,15 @@ type Image {
 type LetterElement {
   """Unique ID for this entity"""
   id: Int!
-  sequence: Int!
-  textDelta: String
-  image: Image
   letter: Letter!
   letterElementType: LetterElementType!
+
+  """sequence number"""
+  sequence: Int!
+
+  """Quill text delta"""
+  textDelta: String
+  image: Image
   surveyDimension: SurveyDimension
   predictionTable: PredictionTable
 }
@@ -386,7 +391,7 @@ enum WhichItems {
 
 type ChartEntry {
   title: String!
-  value: Int!
+  value: Float!
 }
 
 type PredictionDetails {
@@ -457,14 +462,6 @@ type ResponseSummary {
   surveySummary: SurveySummary!
   dimensionSummaries: [DimensionSummary!]!
   predictionSummaries: [PredictionSummary!]!
-}
-
-type SurveyLetter {
-  """Unique ID for this entity"""
-  id: Int!
-  survey: Survey!
-  letter: Letter!
-  letterType: LetterType!
 }
 
 type Envelope {
@@ -607,7 +604,6 @@ type Query {
     """Limit to one group"""
     groupId: Int
   ): [SurveyResponse!]!
-  readSurveyLetters: [SurveyLetter!]!
   readGroups: [Group!]!
   readGroup(id: Int!): Group
   findGroupByCodeWord(codeWord: String!): Group
@@ -662,9 +658,6 @@ type Mutation {
 
   """Delete a survey response"""
   deleteSurveyResponse(id: Int!): Int!
-  surveyLetterCreate(createInput: SurveyLetterCreateInput!): SurveyLetter!
-  surveyLetterUpdate(updateInput: SurveyLetterUpdateInput!): SurveyLetter!
-  surveyLetterDelete(id: Int!): Int!
   createGroup(createInput: GroupCreateInput!): Group!
   updateGroup(updateInput: GroupUpdateInput!): Group!
   deleteGroup(id: Int!): Int!
@@ -769,19 +762,6 @@ input SurveyUpdateInput {
   okayForGroup: Boolean
   publicName: String
   detailedDescription: String
-}
-
-input SurveyLetterCreateInput {
-  surveyId: Int!
-  letterId: Int!
-  letterTypeId: Int!
-}
-
-input SurveyLetterUpdateInput {
-  id: Int!
-  surveyId: Int
-  letterId: Int
-  letterTypeId: Int
 }
 
 input GroupCreateInput {

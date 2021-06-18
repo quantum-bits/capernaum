@@ -41,7 +41,7 @@ export class LetterService extends BaseService<Letter> {
   ];
 
   readAll() {
-    this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysResolve });
   }
 
   readOne(id: number) {

@@ -5,4 +5,3 @@ export * from "./survey-item";
 export * from "./survey-response";
 export * from "./survey-item-response";
 export * from "./survey-response-summary";
-export * from "./survey-letter";

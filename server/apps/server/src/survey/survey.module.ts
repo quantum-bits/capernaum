@@ -5,7 +5,6 @@ import {
   SurveyIndexResolver,
   SurveyItemResolver,
   SurveyItemResponseResolver,
-  SurveyLetterResolver,
   SurveyResolver,
   SurveyResponseResolver,
 } from "./resolvers/";
@@ -13,7 +12,6 @@ import {
   SurveyDimensionService,
   SurveyIndexService,
   SurveyItemResponseService,
-  SurveyLetterService,
   SurveyResponseService,
   SurveyService,
 } from "./services/";
@@ -23,7 +21,6 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
-  SurveyLetter,
   SurveyResponse,
 } from "./entities";
 import { registerEnumType } from "@nestjs/graphql";
@@ -47,7 +44,6 @@ import { Group } from "@server/src/group/entities";
       SurveyResponse,
       SurveyItemResponse,
       SurveyItem,
-      SurveyLetter,
       PredictionTable,
       Group,
       ScriptureEngagementPractice,
@@ -68,8 +64,6 @@ import { Group } from "@server/src/group/entities";
     SurveyService,
     SurveyResponseResolver,
     SurveyResponseService,
-    SurveyLetterResolver,
-    SurveyLetterService,
     SurveyAnalyticsService,
   ],
   exports: [SurveyService, SurveyResponseService, SurveyAnalyticsService],

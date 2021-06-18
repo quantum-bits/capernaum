@@ -14,7 +14,6 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
-  SurveyLetter,
   SurveyResponse,
 } from "./survey/entities";
 import {
@@ -51,7 +50,6 @@ export const entities = [
   SurveyResponse,
   User,
   UserRole,
-  SurveyLetter,
   PredictionTable,
 ];
 

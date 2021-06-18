@@ -11,7 +11,7 @@ export function printPretty(val: unknown) {
 
 export function printTable(
   headers: string[],
-  data: string[][],
+  data: Array<Array<string | number>>,
   userConfig?: TableUserConfig
 ) {
   data.unshift(headers.map((header) => chalk.blue(header)));

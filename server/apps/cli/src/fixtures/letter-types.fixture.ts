@@ -2,6 +2,7 @@ import { AbstractFixture } from "./abstract-fixture";
 import { LetterTypeModel } from "../models/letter-type.model";
 import { LetterElementTypeModel } from "../models/letter-element-type.model";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyRespondentType } from "@server/src/survey/survey.types";
 
 const debug = getDebugger("fixture:letter-type");
 
@@ -21,7 +22,7 @@ export class LetterTypesFixture extends AbstractFixture {
     return LetterTypeModel.query().insertGraph(
       [
         {
-          key: "individual",
+          key: SurveyRespondentType.Individual,
           description: "Individual Letter",
           elementTypes: [
             {
@@ -47,7 +48,7 @@ export class LetterTypesFixture extends AbstractFixture {
           ],
         },
         {
-          key: "group",
+          key: SurveyRespondentType.Group,
           description: "Group Letter",
           // These element types are identical to the individual letter.
           // This was not always the case, and I'm leaving this in place

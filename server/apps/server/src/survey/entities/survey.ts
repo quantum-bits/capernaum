@@ -1,5 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Entity, OneToMany } from "typeorm";
+import { Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -15,7 +15,8 @@ import { FieldColumn } from "@server/src/decorators";
 })
 export class Survey extends AbstractEntity {
   @Field(() => [Letter])
-  @OneToMany(() => Letter, (letter) => letter.survey)
+  @ManyToMany(() => Letter, (letter) => letter.surveys)
+  @JoinTable({ name: "survey_letter" })
   letters: Letter[];
 
   @Field(() => [SurveyItem])

@@ -34,7 +34,7 @@ export class SurveyService extends BaseService<Survey> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOne();
   }
 
   /**
