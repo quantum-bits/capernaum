@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { QualtricsModule } from "@server/src/qualtrics/qualtrics.module";
 import { options as typeORMConfig } from "@server/src/typeorm-config";
 import { WriterModule } from "@server/src/writer/writer.module";
+import { ReportModule } from "@reporter/src/report/report.module";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { WriterModule } from "@server/src/writer/writer.module";
     QualtricsModule,
     GroupModule,
     WriterModule,
+    ReportModule,
   ],
 })
 export class CliModule {}

@@ -23,7 +23,8 @@ import {
   summarizeResponse,
   getQualtricsSurvey,
   listSurveys,
-  queueReportRequest,
+  queueIndividualReport,
+  sendGroupReport,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -249,19 +250,26 @@ letterCommands
   .description("list letters and related info")
   .action(listLetters);
 
-// Reporter
+// Report
 
 const reporterCommands = program
-  .command("reporter")
-  .description("reporter job queue commands");
+  .command("report")
+  .description("report (create and email) commands");
 
 reporterCommands
-  .command("queue <qualtrics-survey-id> <qualtrics-response-id>")
-  .description("queue a reporter job", {
+  .command("individual <qualtrics-survey-id> <qualtrics-response-id>")
+  .description("queue an individual report job", {
     qualtricsSurveyId: "Qualtrics survey ID (SV_...)",
     qualtricsResponseId: "Qualtrics response ID (R_...)",
   })
-  .action(queueReportRequest);
+  .action(queueIndividualReport);
+
+reporterCommands
+  .command("group <group-pk>")
+  .description("create and email group report", {
+    groupPk: "group PK",
+  })
+  .action(sendGroupReport);
 
 // Fixture
 

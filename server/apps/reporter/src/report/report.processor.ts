@@ -19,6 +19,7 @@ import { LetterService } from "@server/src/letter/letter.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { Logger } from "@nestjs/common";
 import { MultiTimer } from "@helpers/multi-timer";
+import { GroupService } from "@server/src/group/group.service";
 
 const debug = getDebugger("reporter");
 
@@ -34,6 +35,7 @@ export class ReportProcessor {
     private readonly eventService: EventService,
     private readonly letterService: LetterService,
     private readonly surveyService: SurveyService,
+    private readonly groupService: GroupService,
     @InjectMetric(PROM_METRIC_EMAILS_SENT)
     private emails_sent_counter: Counter<string>
   ) {}
@@ -44,7 +46,7 @@ export class ReportProcessor {
   }
 
   @Process()
-  async processReport(job: Job) {
+  async processIndividualReport(job: Job) {
     const qualtricsSurveyId = job.data.qualtricsSurveyId;
     const qualtricsResponseId = job.data.qualtricsResponseId;
     this.doubleDebug(
@@ -114,5 +116,51 @@ export class ReportProcessor {
     debug(mt.report());
 
     this.doubleDebug(`Finished processing response ${qualtricsResponseId}`);
+  }
+
+  async processGroupReport(groupId: number) {
+    this.doubleDebug(`Processing group ${groupId}`);
+
+    // Fetch the group.
+    const group = await this.groupService.readOne(groupId);
+    debug("group %O", group);
+
+    // Fetch the letter.
+    const letter = await this.letterService.findForSurvey(
+      group.id,
+      SurveyRespondentType.Group
+    );
+    debug("letter %O", letter);
+
+    // Write a letter.
+    const writerOutput = await this.writerService.renderGroupLetter(
+      letter.id,
+      group.id
+    );
+    debug("rendered letter %O", writerOutput);
+
+    // Convert Quill deltas to HTML and text.
+    const htmlContent = quillDeltaToHtml(letter.emailMessage);
+    const textContent = quillHtmlToText(htmlContent);
+
+    // Send an email.
+    const mailInfo = await this.mailService.sendMail({
+      to: group.adminEmail,
+      subject: "Your Christian Life Group Survey Results",
+      textContent,
+      htmlContent,
+      attachmentPath: writerOutput.pdfAbsolutePath,
+    });
+    this.emails_sent_counter.inc();
+    debug("sent mail %O", mailInfo);
+
+    // Create event.
+    await this.eventService.createEvent({
+      type: "Completed",
+      details: `Sent group ${group.id} report to ${group.adminEmail}`,
+    });
+    debug("created event");
+
+    this.doubleDebug(`Finished processing group ${group.id}`);
   }
 }

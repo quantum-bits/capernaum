@@ -25,6 +25,7 @@ import { Group, GroupType } from "@server/src/group/entities";
 import { Image } from "@server/src/image/entities";
 import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { ReportModule } from "@reporter/src/report/report.module";
+import { BullModule } from "@nestjs/bull";
 
 @Module({
   imports: [
@@ -49,6 +50,12 @@ import { ReportModule } from "@reporter/src/report/report.module";
         SurveyItemResponse,
         SurveyResponse,
       ],
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: "localhost",
+        port: 6379,
+      },
     }),
     PrometheusModule.register({
       defaultMetrics: {

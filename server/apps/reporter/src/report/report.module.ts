@@ -9,6 +9,7 @@ import { makeCounterProvider } from "@willsoto/nestjs-prometheus";
 import { PROM_METRIC_EMAILS_SENT } from "@common/common.constants";
 import { SurveyModule } from "@server/src/survey/survey.module";
 import { ReportProcessor } from "@reporter/src/report/report.processor";
+import { GroupModule } from "@server/src/group/group.module";
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReportProcessor } from "@reporter/src/report/report.processor";
     EventModule,
     LetterModule,
     SurveyModule,
+    GroupModule,
   ],
   providers: [
     makeCounterProvider({
@@ -27,5 +29,6 @@ import { ReportProcessor } from "@reporter/src/report/report.processor";
     }),
     ReportProcessor,
   ],
+  exports: [ReportProcessor],
 })
 export class ReportModule {}
