@@ -6,14 +6,14 @@ import { EventModule } from "../events/event.module";
 import { QualtricsApiModule } from "@qapi/qualtrics-api.module";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { GroupModule } from "@server/src/group/group.module";
-import { ReportModule } from "@reporter/src/queue/report.module";
+import { QueueModule } from "@reporter/src/queue/queue.module";
 
 @Module({
   imports: [
     EventModule,
     SurveyModule,
     QualtricsApiModule,
-    ReportModule,
+    QueueModule,
     GroupModule,
   ],
   controllers: [QualtricsController],

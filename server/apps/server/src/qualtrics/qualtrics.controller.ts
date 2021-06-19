@@ -6,14 +6,14 @@ import {
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
 import { getDebugger } from "@helpers/debug-factory";
-import { ReportService } from "@reporter/src/queue/report.service";
+import { QueueService } from "@reporter/src/queue/queue.service";
 
 const qualtricsDebug = getDebugger("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {
   constructor(
-    private readonly reportService: ReportService,
+    private readonly reportService: QueueService,
     private readonly eventService: EventService
   ) {}
 

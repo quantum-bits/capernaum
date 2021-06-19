@@ -105,12 +105,12 @@ export class ReportProcessor {
     this.emails_sent_counter.inc();
     debug("sent mail %O", mailInfo);
 
-    // // Create event.
-    // await this.eventService.createEvent({
-    //   type: "Completed",
-    //   details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`,
-    // });
-    // debug("created event");
+    // Create event.
+    await this.eventService.createEvent({
+      type: "Completed",
+      details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`,
+    });
+    debug("created event");
     debug(mt.report());
 
     this.doubleDebug(`Finished processing response ${qualtricsResponseId}`);

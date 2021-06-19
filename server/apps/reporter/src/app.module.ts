@@ -23,7 +23,8 @@ import {
 } from "@server/src/survey/entities";
 import { Group, GroupType } from "@server/src/group/entities";
 import { Image } from "@server/src/image/entities";
-import { ReportModule } from "@reporter/src/queue/report.module";
+import { PrometheusModule } from "@willsoto/nestjs-prometheus";
+import { ReportModule } from "@reporter/src/report/report.module";
 
 @Module({
   imports: [
@@ -49,15 +50,13 @@ import { ReportModule } from "@reporter/src/queue/report.module";
         SurveyResponse,
       ],
     }),
-    // PrometheusModule.register({
-    //   defaultMetrics: {
-    //     enabled: false,
-    //   },
-    // }),
+    PrometheusModule.register({
+      defaultMetrics: {
+        enabled: false,
+      },
+    }),
     ReportModule,
   ],
-  providers: [
-
-  ],
+  providers: [],
 })
 export class AppModule {}

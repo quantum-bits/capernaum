@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { ReportProcessor } from "@reporter/src/queue/report.processor";
 import { QualtricsApiModule } from "@qapi/qualtrics-api.module";
 import { QualtricsModule } from "@server/src/qualtrics/qualtrics.module";
 import { WriterModule } from "@server/src/writer/writer.module";
@@ -9,12 +8,10 @@ import { LetterModule } from "@server/src/letter/letter.module";
 import { makeCounterProvider } from "@willsoto/nestjs-prometheus";
 import { PROM_METRIC_EMAILS_SENT } from "@common/common.constants";
 import { SurveyModule } from "@server/src/survey/survey.module";
+import { ReportProcessor } from "@reporter/src/report/report.processor";
 
 @Module({
   imports: [
-    // BullModule.registerQueue({
-    //   name: REPORTER_QUEUE_NAME,
-    // }),
     QualtricsApiModule,
     QualtricsModule,
     WriterModule,
