@@ -1,7 +1,7 @@
 import { importQualtricsSurvey } from "@common/cli/src/commands/qualtrics";
 import NestContext from "@common/cli/src/nest-helpers";
 import { SurveyService } from "@server/src/survey/services";
-import { printPretty } from "@helpers/formatting";
+import { printPretty, printTable } from "@helpers/formatting";
 import * as _ from "lodash";
 
 /**
@@ -28,6 +28,16 @@ export async function listSurveys() {
     "Description",
   ];
   const data = _.flatMap(surveys, (survey) =>
-    _.map(survey.surveyLetters, (letter) => [letter.id])
+    _.map(survey.letters, (letter) => [
+      survey.id,
+      survey.detailedDescription,
+      letter.id,
+      letter.letterType.description,
+      letter.description,
+    ])
   );
+  printPretty({ headers, data });
+  printTable(headers, data, {
+    drawVerticalLine: (idx) => idx === 2,
+  });
 }

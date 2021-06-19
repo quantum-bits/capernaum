@@ -1,80 +1,94 @@
-import { Logger } from "@nestjs/common";
 import { Process, Processor } from "@nestjs/bull";
-import { REPORTER_QUEUE_NAME } from "@common/common.constants";
+import {
+  PROM_METRIC_EMAILS_SENT,
+  REPORTER_QUEUE_NAME,
+} from "@common/common.constants";
 import { Job } from "bull";
 import { QualtricsSurveyResponse } from "@qapi/qualtrics-api.types";
 import { quillDeltaToHtml, quillHtmlToText } from "@helpers/quill";
-import { EventCreateInput } from "@server/src/events/entities";
 import { EventService } from "@server/src/events/event.service";
 import { QualtricsApiService } from "@qapi/qualtrics-api.service";
+import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { SurveyService } from "@server/src/survey/services/survey.service";
 import { WriterService } from "@server/src/writer/writer.service";
 import { MailService } from "@server/src/mail/mail.service";
-
-import debug from "debug";
-import { PROM_METRIC_EMAILS_SENT } from "@reporter/src/common";
 import { InjectMetric } from "@willsoto/nestjs-prometheus";
 import { Counter } from "prom-client";
-const qualtricsDebug = debug("qualtrics");
+import { getDebugger } from "@helpers/debug-factory";
+import { LetterService } from "@server/src/letter/letter.service";
+import { SurveyRespondentType } from "@server/src/survey/survey.types";
+import { Logger } from "@nestjs/common";
+import { MultiTimer } from "@helpers/multi-timer";
+
+const debug = getDebugger("reporter");
 
 @Processor(REPORTER_QUEUE_NAME)
-export class ReportQueueConsumer {
-  private readonly logger = new Logger(ReportQueueConsumer.name);
+export class ReportProcessor {
+  private readonly logger = new Logger(ReportProcessor.name);
 
   constructor(
-    private readonly eventService: EventService,
     private readonly qualtricsApiService: QualtricsApiService,
-    private readonly surveyService: SurveyService,
+    private readonly qualtricsService: QualtricsService,
     private readonly writerService: WriterService,
     private readonly mailService: MailService,
+    private readonly eventService: EventService,
+    private readonly letterService: LetterService,
+    private readonly surveyService: SurveyService,
     @InjectMetric(PROM_METRIC_EMAILS_SENT)
     private emails_sent_counter: Counter<string>
   ) {}
+
+  private doubleDebug(message: string) {
+    debug(message);
+    this.logger.debug(message);
+  }
 
   @Process()
   async processReport(job: Job) {
     const qualtricsSurveyId = job.data.qualtricsSurveyId;
     const qualtricsResponseId = job.data.qualtricsResponseId;
-
-    this.logger.debug(
+    this.doubleDebug(
       `Processing response ${qualtricsResponseId} to survey ${qualtricsSurveyId}`
     );
 
+    const mt = new MultiTimer();
+
     // Find the survey
-    const survey = await this.surveyService.findSurveyByQualtricsId(
+    const survey = await this.surveyService.findByQualtricsId(
       qualtricsSurveyId
     );
-    qualtricsDebug("survey - %O", survey);
+    debug("survey - %O", survey);
 
     // Grab the response from Qualtrics
     const qualtricsResponse = await this.qualtricsApiService.getOneResponse(
       qualtricsSurveyId,
       qualtricsResponseId
     );
-    qualtricsDebug("qualtricsResponse - %O", qualtricsResponse);
+    debug("qualtricsResponse - %O", qualtricsResponse);
 
     // Store it locally.
     const importedResponse =
-      await this.surveyService.importQualtricsSurveyResponse(
+      await this.qualtricsService.importOneResponseForQualtricsSurvey(
         survey.id,
         qualtricsResponse as QualtricsSurveyResponse
       );
-    this.logger.debug("Imported response");
-    qualtricsDebug("importedResponse - %O", importedResponse);
+    debug("importedResponse %O", importedResponse);
+    mt.record("got response from qualtrics");
 
     // Fetch the letter.
-    // TODO: Sort out how to pass stuff to `renderLetter`.
-    // Currently we're getting the letter to get it's ID in order to pass it to renderLetter,
-    // which turns around and gets the letter.
-    const letter = await this.surveyService.findLetter(survey.id);
+    const letter = await this.letterService.findForSurvey(
+      survey.id,
+      SurveyRespondentType.Individual
+    );
+    debug("letter %O", letter);
 
     // Write a letter.
     const writerOutput = await this.writerService.renderIndividualLetter(
       letter.id,
       importedResponse.surveyResponse.id
     );
-    this.logger.debug("Rendered letter");
-    qualtricsDebug("writerOutput - %O", writerOutput);
+    debug("rendered letter %O", writerOutput);
+    mt.record("wrote the letter");
 
     // Convert Quill deltas to HTML and text.
     const htmlContent = quillDeltaToHtml(letter.emailMessage);
@@ -88,15 +102,17 @@ export class ReportQueueConsumer {
       htmlContent,
       attachmentPath: writerOutput.pdfAbsolutePath,
     });
-    this.logger.debug("Sent email");
     this.emails_sent_counter.inc();
-    qualtricsDebug("mailInfo - %O", mailInfo);
+    debug("sent mail %O", mailInfo);
 
-    // Create event.
-    const createInput: EventCreateInput = {
-      type: "Completed",
-      details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`,
-    };
-    return this.eventService.createEvent(createInput);
+    // // Create event.
+    // await this.eventService.createEvent({
+    //   type: "Completed",
+    //   details: `Survey '${qualtricsSurveyId}' completed; response '${qualtricsResponseId}'`,
+    // });
+    // debug("created event");
+    debug(mt.report());
+
+    this.doubleDebug(`Finished processing response ${qualtricsResponseId}`);
   }
 }

@@ -90,7 +90,6 @@ type Letter {
   surveys: Survey!
   letterType: LetterType!
   letterElements: [LetterElement!]!
-  survey: Survey!
 }
 
 """

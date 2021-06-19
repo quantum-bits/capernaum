@@ -5,15 +5,15 @@ import {
 } from "@qapi/qualtrics-api.types";
 import { EventService } from "../events/event.service";
 import { EventCreateInput } from "../events/entities";
-import { ReportQueueProducer } from "@reporter/src/producer/report-queue-producer";
 import { getDebugger } from "@helpers/debug-factory";
+import { ReportService } from "@reporter/src/queue/report.service";
 
 const qualtricsDebug = getDebugger("qualtrics");
 
 @Controller("qualtrics")
 export class QualtricsController {
   constructor(
-    private readonly reporterProducer: ReportQueueProducer,
+    private readonly reportService: ReportService,
     private readonly eventService: EventService
   ) {}
 
@@ -63,6 +63,9 @@ export class QualtricsController {
     const qualtricsSurveyId = reply.SurveyID;
     const qualtricsResponseId = reply.ResponseID;
 
-    this.reporterProducer.requestReport(qualtricsSurveyId, qualtricsResponseId);
+    return this.reportService.requestIndividualReport(
+      qualtricsSurveyId,
+      qualtricsResponseId
+    );
   }
 }

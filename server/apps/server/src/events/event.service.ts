@@ -7,7 +7,7 @@ import { PubSub } from "graphql-subscriptions";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 
-const eventDebug = getDebugger("events");
+const debug = getDebugger("events");
 
 @Injectable()
 export class EventService extends BaseService<Event> {
@@ -20,9 +20,9 @@ export class EventService extends BaseService<Event> {
 
   async createEvent(createInput: EventCreateInput) {
     const newEvent = await this.repo.save(this.repo.create(createInput));
-    eventDebug("createEvent %O", newEvent);
+    debug("createEvent %O", newEvent);
     await this.pubSub.publish(NEW_EVENT_TRIGGER_NAME, { newEvent });
-    eventDebug(`createdEvent triggered ${NEW_EVENT_TRIGGER_NAME}`);
+    debug("triggered %s", NEW_EVENT_TRIGGER_NAME);
   }
 
   readAll() {

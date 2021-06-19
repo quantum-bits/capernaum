@@ -18,7 +18,7 @@ import { SurveyDimension } from "@server/src/survey/entities";
 import { Image } from "@server/src/image/entities";
 import { PredictionTable } from "@server/src/prediction/entities";
 
-const debug = getDebugger("letter:service");
+const debug = getDebugger("letter");
 
 @Injectable()
 export class LetterService extends BaseService<Letter> {
@@ -54,8 +54,25 @@ export class LetterService extends BaseService<Letter> {
     });
   }
 
-  resolveRelatedSurvey(letter: Letter) {
-    return this.resolveOne(letter, "survey");
+  async findForSurvey(surveyId: number, respondentType: string) {
+    debug("Find %s letter for survey %s", respondentType, surveyId);
+
+    const letters = await this.repo
+      .createQueryBuilder("letter")
+      .innerJoinAndSelect("letter.letterType", "letterType")
+      .innerJoinAndSelect("letter.surveys", "survey")
+      .where("letterType.key = :type", { type: respondentType })
+      .getMany();
+    debug("Fetched %O", letters);
+
+    if (letters.length !== 1) {
+      throw Error(`Expected 1 letter, found ${letters.length}`);
+    }
+    return letters[0];
+  }
+
+  resolveRelatedSurveys(letter: Letter) {
+    return this.resolveMany(letter, "surveys");
   }
 
   update(updateInput: LetterUpdateInput) {

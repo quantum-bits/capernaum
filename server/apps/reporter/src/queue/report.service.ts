@@ -4,12 +4,14 @@ import { REPORTER_QUEUE_NAME } from "@common/common.constants";
 import { Job, Queue } from "bull";
 
 @Injectable()
-export class ReportQueueProducer {
-  private readonly logger = new Logger(ReportQueueProducer.name);
+export class ReportService {
+  private readonly logger = new Logger(ReportService.name);
 
-  constructor(@InjectQueue(REPORTER_QUEUE_NAME) private reporterQueue: Queue) {}
+  constructor(
+    @InjectQueue(REPORTER_QUEUE_NAME) private readonly reporterQueue: Queue
+  ) {}
 
-  async requestReport(
+  async requestIndividualReport(
     qualtricsSurveyId: string,
     qualtricsResponseId: string
   ): Promise<Job> {

@@ -23,6 +23,7 @@ import {
   summarizeResponse,
   getQualtricsSurvey,
   listSurveys,
+  queueReportRequest,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -247,6 +248,20 @@ letterCommands
   .command("list")
   .description("list letters and related info")
   .action(listLetters);
+
+// Reporter
+
+const reporterCommands = program
+  .command("reporter")
+  .description("reporter job queue commands");
+
+reporterCommands
+  .command("queue <qualtrics-survey-id> <qualtrics-response-id>")
+  .description("queue a reporter job", {
+    qualtricsSurveyId: "Qualtrics survey ID (SV_...)",
+    qualtricsResponseId: "Qualtrics response ID (R_...)",
+  })
+  .action(queueReportRequest);
 
 // Fixture
 

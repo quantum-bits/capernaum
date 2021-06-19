@@ -62,14 +62,6 @@ export class MultiTimer {
     return this.timeStamps.some((ts) => ts.flags > 0);
   }
 
-  /**
-   * Provide read access to the underlying list of time stamps.
-   * @deprecated Was meant only for debugging.
-   */
-  get rawData(): TimeStamp[] {
-    return this.timeStamps;
-  }
-
   private static formatPercentage(val: number): string {
     return Number(val).toFixed(2);
   }
@@ -91,29 +83,29 @@ export class MultiTimer {
     const haveFlags = this.haveFlags();
 
     const rows = _.map(this.timeStamps, (ts, idx) => {
-      const segments: Array<number | string> = [];
+      const columns: Array<number | string> = [];
       if (prefix) {
-        segments.push(prefix);
+        columns.push(prefix);
       }
-      segments.push(ts.label, ts.dt.toFormat("hh:mm:ss.SSS"));
+      columns.push(ts.label, ts.dt.toFormat("hh:mm:ss.SSS"));
 
       if (idx < recordCount - 1) {
         const elapsed = ts.elapsed(this.timeStamps[idx + 1]);
-        segments.push(elapsed);
+        columns.push(elapsed);
 
         const percentage = (elapsed / this.totalTime()) * 100.0;
-        segments.push(MultiTimer.formatPercentage(percentage));
+        columns.push(MultiTimer.formatPercentage(percentage));
 
         if (haveFlags) {
-          segments.push("*".repeat(ts.flags));
+          columns.push("*".repeat(ts.flags));
         }
       } else {
-        segments.push(this.totalTime(), MultiTimer.formatPercentage(100.0));
+        columns.push(this.totalTime(), MultiTimer.formatPercentage(100.0));
         if (haveFlags) {
-          segments.push("");
+          columns.push("");
         }
       }
-      return segments;
+      return columns;
     });
 
     return table(rows, {

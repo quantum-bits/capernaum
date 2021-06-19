@@ -60,9 +60,9 @@ export class LetterResolver {
     return this.letterService.delete(id);
   }
 
-  @ResolveField("survey", () => Survey)
+  @ResolveField("surveys", () => Survey)
   resolveSurvey(@Parent() letter: Letter) {
-    return this.letterService.resolveRelatedSurvey(letter);
+    return this.letterService.resolveRelatedSurveys(letter);
   }
 }
 

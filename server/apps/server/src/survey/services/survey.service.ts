@@ -18,7 +18,6 @@ const debug = getDebugger("survey");
 export class SurveyService extends BaseService<Survey> {
   constructor(
     private readonly groupService: GroupService,
-
     @InjectRepository(Survey)
     private readonly repo: Repository<Survey>
   ) {
@@ -29,12 +28,14 @@ export class SurveyService extends BaseService<Survey> {
     return this.repo.save(this.repo.create(createInput));
   }
 
+  private alwaysRelate = ["letters", "letters.letterType"];
+
   readAll() {
-    return this.repo.find();
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   readOne(id: number) {
-    return this.repo.findOne();
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   /**
