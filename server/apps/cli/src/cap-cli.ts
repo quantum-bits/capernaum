@@ -25,6 +25,8 @@ import {
   listSurveys,
   queueIndividualReport,
   sendGroupReport,
+  closeGroup,
+  forceGroupReport,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -33,6 +35,8 @@ config();
 import PrettyError = require("pretty-error");
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { listLetters } from "@common/cli/src/commands/letter";
+import { doc } from "prettier";
+import group = doc.builders.group;
 
 PrettyError.start();
 
@@ -141,7 +145,12 @@ surveyCommands
 
 const groupCommands = program.command("group").description("group commands");
 
-groupCommands.command("list").description("list all groups").action(listGroups);
+groupCommands
+  .command("list")
+  .option("--open", "only groups with future close date")
+  .option("--ready", "only closed groups ready for report")
+  .description("list groups")
+  .action(listGroups);
 
 groupCommands
   .command("get <code-word>")
@@ -150,6 +159,18 @@ groupCommands
     "code-word": "code word for group",
   })
   .action(getGroup);
+
+groupCommands
+  .command("close <group-pk>")
+  .description("close group", {
+    groupPk: "group PK",
+  })
+  .action(closeGroup);
+
+groupCommands
+  .command("force-report <group-pk>")
+  .description("force report", { groupPk: "group PK" })
+  .action(forceGroupReport);
 
 // Response
 

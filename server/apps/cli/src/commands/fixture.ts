@@ -12,7 +12,6 @@ import { SurveyDimensionsFixture } from "../fixtures/cls/survey-dimensions.fixtu
 import { SurveyIndexesFixture } from "../fixtures/cls/survey-indexes.fixture";
 import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
-import { SurveyLettersFixture } from "@common/cli/src/fixtures/cls/survey-letters.fixture";
 
 const debug = getDebugger("fixture");
 
@@ -26,7 +25,6 @@ const sePracticesFixture = new ScriptureEngagementPracticeFixture();
 const surveyDimensionsFixture = new SurveyDimensionsFixture();
 const surveyIndexesFixture = new SurveyIndexesFixture();
 const surveyItemsFixture = new SurveyItemsFixture();
-const surveyLettersFixture = new SurveyLettersFixture();
 const surveysFixture = new SurveysFixture();
 
 export async function nuclearOption(options) {
@@ -62,7 +60,6 @@ export async function nuclearOption(options) {
   await predictionTablesFixture.load();
   await lettersFixture.load();
   await letterElementsFixture.load();
-  await surveyLettersFixture.load();
 }
 
 // async function replaceSurvey(qualtricsSurveyId) {

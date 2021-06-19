@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { LessThan, MoreThan, Repository } from "typeorm";
 import {
   Group,
   GroupCreateInput,
@@ -13,9 +13,9 @@ import { readFileSync } from "fs";
 import { SendMailInput } from "@server/src/mail/entities";
 import { MailService } from "@server/src/mail/mail.service";
 import * as path from "path";
-import { DateTime } from "luxon";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
+import { DateTime } from "luxon";
 
 const debug = getDebugger("group");
 
@@ -27,7 +27,7 @@ export class GroupService {
   constructor(
     private readonly mailService: MailService,
     @InjectRepository(Group)
-    private readonly groupRepo: Repository<Group>
+    private readonly repo: Repository<Group>
   ) {
     this.groupAdminTextTemplate = GroupService.compileTemplate(
       "server/group/letters/group-admin.txt"
@@ -53,7 +53,7 @@ export class GroupService {
     let tries = 100;
     while (tries--) {
       const codeWord = CodeWord.generate();
-      const existingGroup = await this.groupRepo.findOne({ codeWord });
+      const existingGroup = await this.repo.findOne({ codeWord });
       if (existingGroup) {
         console.warn(
           `Code word '${codeWord}' already exists; ${tries} more tries`
@@ -65,20 +65,17 @@ export class GroupService {
     throw new Error("Failed to generate unique code word");
   }
 
-  async create(createInput: GroupCreateInput): Promise<Group> {
+  async create(createInput: GroupCreateInput) {
     // Create the new group, including a code word that hasn't been used.
-    const group = await this.groupRepo.save(
-      this.groupRepo.create({
+    const group = await this.repo.save(
+      this.repo.create({
         ...createInput,
-        closedAfter: DateTime.fromISO(createInput.closedAfter).toLocaleString(
-          DateTime.DATE_FULL
-        ),
         codeWord: await this.generateUniqueCodeWord(),
       })
     );
 
     // Fetch the new group and related data for the admin email.
-    const groupPlus = await this.groupRepo.findOneOrFail(group.id, {
+    const groupPlus = await this.repo.findOneOrFail(group.id, {
       relations: ["survey"],
     });
 
@@ -113,30 +110,75 @@ export class GroupService {
   private alwaysResolve = ["type", "survey", "surveyResponses"];
 
   readAll() {
-    return this.groupRepo.find({
+    return this.repo.find({
       relations: this.alwaysResolve,
     });
   }
 
   readOne(id: number): Promise<Group> {
-    return this.groupRepo.findOne(id, {
+    return this.repo.findOne(id, {
       relations: this.alwaysResolve,
     });
   }
 
   findByCodeWord(codeWord: string) {
-    return this.groupRepo.findOne({ codeWord });
+    return this.repo.findOne({ codeWord });
+  }
+
+  /**
+   * Find all "open" groups -- those with a close date in the future
+   * and whose group report has not been sent.
+   */
+  findOpen() {
+    const now = DateTime.now().toString();
+    debug("Check for groups open as of %s", now);
+    return this.repo.find({
+      closedAfter: MoreThan(now),
+      reportSent: null,
+    });
+  }
+
+  /**
+   * Find groups ready to have a group report created and sent.
+   */
+  findReadyForReport() {
+    const now = DateTime.now().toString();
+    debug("Check for ready to report groups as of %s", now);
+    return this.repo.find({
+      closedAfter: LessThan(now),
+      reportSent: null,
+    });
+  }
+
+  /**
+   * Force group `groupId` into a state where it's ready to report.
+   * @param groupId
+   */
+  forceReport(groupId: number) {
+    const now = DateTime.now();
+    debug("Set 'closed after' to %s", now);
+    return this.repo.update(groupId, { closedAfter: now });
+  }
+
+  /**
+   * Close group `groupId` completely. No report generated.
+   * @param groupId
+   */
+  closeGroup(groupId: number) {
+    const now = DateTime.now().toString();
+    debug("Mark group %d as closed as of %s", groupId, now);
+    return this.repo.update(groupId, { reportSent: now });
   }
 
   update(updateInput: GroupUpdateInput): Promise<Group> {
-    return this.groupRepo
+    return this.repo
       .preload(updateInput)
-      .then((result) => this.groupRepo.save(result));
+      .then((result) => this.repo.save(result));
   }
 
   delete(id: number) {
     debug("deleting group %d", id);
-    return this.groupRepo.delete(id);
+    return this.repo.delete(id);
   }
 }
 

@@ -20,6 +20,8 @@ import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { Logger } from "@nestjs/common";
 import { MultiTimer } from "@helpers/multi-timer";
 import { GroupService } from "@server/src/group/group.service";
+import { Cron } from "@nestjs/schedule";
+import pluralize from "pluralize";
 
 const debug = getDebugger("reporter");
 
@@ -118,6 +120,24 @@ export class ReportProcessor {
     this.doubleDebug(`Finished processing response ${qualtricsResponseId}`);
   }
 
+  // @Cron(process.env.CRON_TIME)
+  async maybeProcessGroupReport() {
+    debug("Check for groups ready to report");
+
+    const readyGroups = await this.groupService.findReadyForReport();
+    debug("Ready groups %O", readyGroups);
+    this.logger.log(
+      `${readyGroups.length} ${pluralize(
+        "group",
+        readyGroups.length
+      )} ready to report`
+    );
+
+    for (const group of readyGroups) {
+      this.processGroupReport(group.id);
+    }
+  }
+
   async processGroupReport(groupId: number) {
     this.doubleDebug(`Processing group ${groupId}`);
 
@@ -160,6 +180,10 @@ export class ReportProcessor {
       details: `Sent group ${group.id} report to ${group.adminEmail}`,
     });
     debug("created event");
+
+    // Make group closed.
+    await this.groupService.closeGroup(group.id);
+    debug("closed group");
 
     this.doubleDebug(`Finished processing group ${group.id}`);
   }

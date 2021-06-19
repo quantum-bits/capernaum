@@ -14,23 +14,6 @@ export class LetterElementsFixture extends AbstractFixture {
   async insert() {
     debug("Load element IDs");
 
-    // const typeNameToId = new Map<string, number>();
-    // const elementTypes = await LetterElementTypeModel.query();
-    // elementTypes.forEach((element) =>
-    //   typeNameToId.set(element.key, element.id)
-    // );
-    // debug("element types %O", elementTypes);
-    // debug("element map %O", typeNameToId);
-    //
-    // const fixed = letterElements.map((element) => {
-    //   element["letterElementTypeId"] = typeNameToId.get(
-    //     element._letterElementName
-    //   );
-    //   delete element._letterElementName;
-    //   return element;
-    // });
-    // debug("updated elements %O", fixed);
-
     const fixed = await this.updateFromTypeModel(
       LetterElementTypeModel,
       letterElements,
@@ -55,11 +38,21 @@ const letterElements = [
     surveyDimensionId: null,
   },
   {
+    id: 1001,
+    sequence: 1,
+    textDelta:
+      '{"ops":[{"attributes":{"bold":true},"insert":"Thank you!"},{"insert":"\\n\\nWe hope that the Christian Life Survey has provided you with a way to revisit who you are as a Christian. We at the Center for Scripture Engagement at Taylor University wish you the very best as you continue your spiritual journey!\\n"}]}',
+    imageId: null,
+    letterId: 10,
+    _letterElementName: "boilerplate-text",
+    surveyDimensionId: null,
+  },
+  {
     id: 129,
     sequence: 12,
     textDelta: '{"ops":[]}',
     imageId: null,
-    letterId: 10,
+    letterId: 11,
     _letterElementName: "dimension-chart",
     surveyDimensionId: 30,
   },

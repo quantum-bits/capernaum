@@ -195,10 +195,13 @@ type Group {
   otherTypeName: String
 
   """Date when survey created"""
-  created: String!
+  created: DateTime!
 
   """Date when survey closes"""
-  closedAfter: String!
+  closedAfter: DateTime!
+
+  """Group report sent"""
+  reportSent: DateTime
 
   """Group administrator first name"""
   adminFirstName: String!
@@ -518,14 +521,6 @@ type LoginResponse {
   user: UserPayload!
 }
 
-type Event {
-  """Unique ID for this entity"""
-  id: Int!
-  date: String!
-  type: String!
-  details: String!
-}
-
 type Machine {
   """Unique ID for this entity"""
   id: Int!
@@ -621,7 +616,6 @@ type Query {
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   subscriptions: [QualtricsSubscription!]!
-  events: [Event!]!
   machines: [Machine!]!
 }
 
@@ -694,7 +688,6 @@ type Mutation {
   importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
   createSubscription(createInput: QualtricsSubscriptionCreateInput!): QualtricsSubscription!
   deleteSubscription(subscriptionId: String!): String!
-  createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
 }
@@ -774,7 +767,7 @@ input GroupCreateInput {
   otherTypeName: String
 
   """Date when survey closes"""
-  closedAfter: String!
+  closedAfter: DateTime!
 
   """Group administrator first name"""
   adminFirstName: String!
@@ -806,7 +799,7 @@ input GroupUpdateInput {
   otherTypeName: String
 
   """Date when survey closes"""
-  closedAfter: String
+  closedAfter: DateTime
 
   """Group administrator first name"""
   adminFirstName: String
@@ -969,17 +962,8 @@ input QualtricsSubscriptionCreateInput {
   surveyId: String
 }
 
-input EventCreateInput {
-  type: String!
-  details: String!
-}
-
 input MachineCreateInput {
   name: String!
   hostName: String!
   active: Boolean!
-}
-
-type Subscription {
-  newEvent: Event!
 }

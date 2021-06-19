@@ -6,7 +6,7 @@ interface FieldColumnOptions {
   nullable?: boolean;
   default?: string | number | boolean;
   unique?: boolean;
-  type?: "integer" | "text";
+  type?: "integer" | "text" | "timestamp without time zone";
 }
 
 export function FieldColumn(

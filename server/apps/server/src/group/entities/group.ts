@@ -1,14 +1,11 @@
-import {
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-} from "typeorm";
+import { CreateDateColumn, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { Survey, SurveyResponse } from "../../survey/entities";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { GroupType } from ".";
 import { FieldColumn } from "@server/src/decorators";
+import { DateTime } from "luxon";
+import numbro from "numbro";
 
 @Entity()
 @ObjectType()
@@ -25,10 +22,16 @@ export class Group extends AbstractEntity {
 
   @Field({ description: "Date when survey created" })
   @CreateDateColumn()
-  created: string;
+  created: Date;
 
   @FieldColumn("Date when survey closes")
-  closedAfter: string;
+  closedAfter: Date;
+
+  @FieldColumn("Group report sent", {
+    type: "timestamp without time zone",
+    nullable: true,
+  })
+  reportSent: Date;
 
   @FieldColumn("Group administrator first name")
   adminFirstName: string;
@@ -60,6 +63,20 @@ export class Group extends AbstractEntity {
   })
   @OneToMany(() => SurveyResponse, (sr) => sr.group)
   surveyResponses: SurveyResponse[];
+
+  get isClosed() {
+    return !!this.reportSent;
+  }
+
+  get daysRemaining() {
+    if (this.isClosed) {
+      return 0;
+    }
+    const now = DateTime.now();
+    const closing = DateTime.fromJSDate(this.closedAfter);
+    const days = closing.diff(now, "days").days;
+    return numbro(days).format({ mantissa: 0, thousandSeparated: true });
+  }
 }
 
 @InputType()
@@ -74,7 +91,7 @@ export class GroupCreateInput {
   otherTypeName?: string;
 
   @Field({ description: "Date when survey closes" })
-  closedAfter: string;
+  closedAfter: Date;
 
   @Field({ description: "Group administrator first name" })
   adminFirstName: string;
@@ -110,7 +127,7 @@ export class GroupUpdateInput implements Partial<Group> {
   otherTypeName?: string;
 
   @Field({ description: "Date when survey closes", nullable: true })
-  closedAfter?: string;
+  closedAfter?: Date;
 
   @Field({ description: "Group administrator first name", nullable: true })
   adminFirstName?: string;

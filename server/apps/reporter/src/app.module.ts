@@ -26,6 +26,7 @@ import { Image } from "@server/src/image/entities";
 import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { ReportModule } from "@reporter/src/report/report.module";
 import { BullModule } from "@nestjs/bull";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { BullModule } from "@nestjs/bull";
         enabled: false,
       },
     }),
+    ScheduleModule.forRoot(),
     ReportModule,
   ],
   providers: [],
