@@ -35,6 +35,7 @@ config();
 import PrettyError = require("pretty-error");
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { listLetters } from "@common/cli/src/commands/letter";
+import { sendTestEmail } from "@common/cli/src/commands/mail";
 
 PrettyError.start();
 
@@ -302,6 +303,14 @@ fixtureCommands
   .option("--force", "force nuclear option (no confirmation)")
   .option("--survey-id <survey-id>", "qualtrics ID of survey to import")
   .action(nuclearOption);
+
+// Email
+const emailCommands = program.command("email").description("email commands");
+
+emailCommands
+  .command("test")
+  .description("send test email")
+  .action(sendTestEmail);
 
 program
   .command("gql <query-string>")

@@ -1,9 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { SentMessageInfo, Transporter, createTransport } from "nodemailer";
+import { Transporter, createTransport } from "nodemailer";
 import Mail = require("nodemailer/lib/mailer");
 import SMTPTransport = require("nodemailer/lib/smtp-transport");
 import { SendMailInput } from "./entities";
 import { getDebugger } from "@helpers/debug-factory";
+import prettyFormat from "pretty-format";
 
 const debug = getDebugger("mail");
 
@@ -15,8 +16,9 @@ export class MailService {
   constructor() {
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
-      // logger: true,
+      logger: debug.enabled,
       debug: debug.enabled,
+      connectionTimeout: 15 * 1000,
     };
 
     if (process.env.MAIL_PORT) {
@@ -36,9 +38,10 @@ export class MailService {
 
     debug("transport options %O", options);
     this.transporter = createTransport(options);
+    debug("transporter %O", this.transporter);
   }
 
-  sendMail(mailInput: SendMailInput): Promise<SentMessageInfo> {
+  async sendMail(mailInput: SendMailInput) {
     if (!mailInput.from) {
       if (!process.env.MAIL_FROM) {
         throw Error("No MAIL_FROM configured");
@@ -67,8 +70,16 @@ export class MailService {
       ];
     }
 
-    this.logger.debug(`Sending email to ${mailInput.to}`);
-    debug("sendMail options %O", options);
-    return this.transporter.sendMail(options);
+    try {
+      this.logger.log(`Sending email to ${mailInput.to}`);
+      debug("sending mail %O", options);
+      const result = await this.transporter.sendMail(options);
+      debug("result %O", result);
+      return true;
+    } catch (error) {
+      debug("error %O", error);
+      this.logger.error(`Email failed to send ${prettyFormat(error)}`);
+      return false;
+    }
   }
 }
