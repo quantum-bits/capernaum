@@ -35,8 +35,6 @@ config();
 import PrettyError = require("pretty-error");
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { listLetters } from "@common/cli/src/commands/letter";
-import { doc } from "prettier";
-import group = doc.builders.group;
 
 PrettyError.start();
 

@@ -5,7 +5,7 @@ import SMTPTransport = require("nodemailer/lib/smtp-transport");
 import { SendMailInput } from "./entities";
 import { getDebugger } from "@helpers/debug-factory";
 
-const mailDebug = getDebugger("mail");
+const debug = getDebugger("mail");
 
 @Injectable()
 export class MailService {
@@ -16,7 +16,7 @@ export class MailService {
     const options: SMTPTransport.Options = {
       host: process.env.MAIL_HOST,
       // logger: true,
-      debug: mailDebug.enabled,
+      debug: debug.enabled,
     };
 
     if (process.env.MAIL_PORT) {
@@ -34,7 +34,7 @@ export class MailService {
       };
     }
 
-    mailDebug("transport options %O", options);
+    debug("transport options %O", options);
     this.transporter = createTransport(options);
   }
 
@@ -45,7 +45,7 @@ export class MailService {
       }
       mailInput.from = process.env.MAIL_FROM;
     }
-    mailDebug("sendMail mailInput - %O", mailInput);
+    debug("sendMail mailInput - %O", mailInput);
 
     const options: Mail.Options = {
       from: mailInput.from,
@@ -68,7 +68,7 @@ export class MailService {
     }
 
     this.logger.debug(`Sending email to ${mailInput.to}`);
-    mailDebug("sendMail options %O", options);
+    debug("sendMail options %O", options);
     return this.transporter.sendMail(options);
   }
 }

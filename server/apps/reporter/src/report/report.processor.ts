@@ -52,7 +52,7 @@ export class ReportProcessor {
     const qualtricsSurveyId = job.data.qualtricsSurveyId;
     const qualtricsResponseId = job.data.qualtricsResponseId;
     this.doubleDebug(
-      `Processing response ${qualtricsResponseId} to survey ${qualtricsSurveyId}`
+      `Processing response ${qualtricsResponseId} (survey ${qualtricsSurveyId})`
     );
 
     const mt = new MultiTimer();
@@ -117,10 +117,10 @@ export class ReportProcessor {
     debug("created event");
     debug(mt.report());
 
-    this.doubleDebug(`Finished processing response ${qualtricsResponseId}`);
+    this.doubleDebug(`Finished response ${qualtricsResponseId}`);
   }
 
-  // @Cron(process.env.CRON_TIME)
+  @Cron(process.env.CRON_TIME)
   async maybeProcessGroupReport() {
     debug("Check for groups ready to report");
 
@@ -134,7 +134,7 @@ export class ReportProcessor {
     );
 
     for (const group of readyGroups) {
-      this.processGroupReport(group.id);
+      await this.processGroupReport(group.id);
     }
   }
 

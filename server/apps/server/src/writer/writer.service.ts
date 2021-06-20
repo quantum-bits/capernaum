@@ -381,7 +381,7 @@ export class WriterService {
       debug("ran LaTeX %O", result);
     } catch (errorResult) {
       debug("failed to run LaTeX %O", errorResult.shortMessage);
-      throw errorResult;
+      throw new Error("FAILED TO RUN LaTeX");
     }
 
     const writerOutput = WriterService.constructOutput(
