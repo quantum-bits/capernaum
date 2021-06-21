@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { BaseService } from "@server/src/shared/base.service";
 import {
-  ResponseSummary,
   SurveyItemResponse,
   SurveyResponse,
 } from "@server/src/survey/entities";

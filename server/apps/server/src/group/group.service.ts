@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LessThan, MoreThan, Repository } from "typeorm";
 import {
@@ -16,8 +16,27 @@ import * as path from "path";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 import { DateTime } from "luxon";
+import { SurveyService } from "@server/src/survey/services";
 
 const debug = getDebugger("group");
+
+@Injectable()
+export class GroupTypeService extends BaseService<GroupType> {
+  constructor(
+    @InjectRepository(GroupType)
+    private readonly repo: Repository<GroupType>
+  ) {
+    super(repo);
+  }
+
+  readAll(): Promise<GroupType[]> {
+    return this.repo.find({ order: { seq: "ASC" } });
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id);
+  }
+}
 
 @Injectable()
 export class GroupService {
@@ -26,6 +45,9 @@ export class GroupService {
 
   constructor(
     private readonly mailService: MailService,
+    private readonly groupTypeService: GroupTypeService,
+    @Inject(forwardRef(() => SurveyService))
+    private readonly surveyService: SurveyService,
     @InjectRepository(Group)
     private readonly repo: Repository<Group>
   ) {
@@ -66,18 +88,26 @@ export class GroupService {
   }
 
   async create(createInput: GroupCreateInput) {
+    debug("createInput %O", createInput);
+
     // Create the new group, including a code word that hasn't been used.
+    const survey = await this.surveyService.readOne(createInput.surveyId);
+    const groupType = await this.groupTypeService.readOne(createInput.typeId);
     const group = await this.repo.save(
       this.repo.create({
         ...createInput,
+        survey,
+        type: groupType,
         codeWord: await this.generateUniqueCodeWord(),
       })
     );
+    debug("group %O", group);
 
     // Fetch the new group and related data for the admin email.
     const groupPlus = await this.repo.findOneOrFail(group.id, {
-      relations: ["survey"],
+      relations: ["survey", "type"],
     });
+    debug("groupPlus %O", groupPlus);
 
     if (!process.env.TU_C4SE_URL) {
       console.error("No C4SE URL configured");
@@ -103,7 +133,7 @@ export class GroupService {
     await this.mailService.sendMail(mailDetails);
     debug("sent email");
 
-    return groupDetails;
+    return groupPlus;
   }
 
   // Always resolve these relations.
@@ -170,6 +200,17 @@ export class GroupService {
     return this.repo.update(groupId, { reportSent: now });
   }
 
+  async countResponses(groupId: number) {
+    const result = await this.repo
+      .createQueryBuilder("grp")
+      .innerJoin("grp.surveyResponses", "sr")
+      .where("grp.id = :groupId", { groupId })
+      .select("COUNT(*) AS response_count")
+      .getRawOne();
+    debug("countResponses %O", result);
+    return parseInt(result.response_count);
+  }
+
   update(updateInput: GroupUpdateInput): Promise<Group> {
     return this.repo
       .preload(updateInput)
@@ -179,23 +220,5 @@ export class GroupService {
   delete(id: number) {
     debug("deleting group %d", id);
     return this.repo.delete(id);
-  }
-}
-
-@Injectable()
-export class GroupTypeService extends BaseService<GroupType> {
-  constructor(
-    @InjectRepository(GroupType)
-    private readonly repo: Repository<GroupType>
-  ) {
-    super(repo);
-  }
-
-  readAll(): Promise<GroupType[]> {
-    return this.repo.find({ order: { seq: "ASC" } });
-  }
-
-  readOne(id: number) {
-    return this.repo.findOne(id);
   }
 }

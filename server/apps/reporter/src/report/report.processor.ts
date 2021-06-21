@@ -145,6 +145,16 @@ export class ReportProcessor {
     const group = await this.groupService.readOne(groupId);
     debug("group %O", group);
 
+    // Make sure this group has responses.
+    const count = await this.groupService.countResponses(group.id);
+    debug("group %d has %d responses", group.id, count);
+    if (count < 1) {
+      this.logger.error(
+        `Group ${groupId} has ${count} responses; nothing to report`
+      );
+      return;
+    }
+
     // Fetch the letter.
     const letter = await this.letterService.findForSurvey(
       group.id,

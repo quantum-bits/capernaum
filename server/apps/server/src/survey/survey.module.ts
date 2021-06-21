@@ -48,7 +48,7 @@ import { Group } from "@server/src/group/entities";
       Group,
       ScriptureEngagementPractice,
     ]),
-    GroupModule,
+    forwardRef(() => GroupModule),
     forwardRef(() => LetterModule),
   ],
   providers: [

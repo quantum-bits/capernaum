@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import {
   Survey,
   SurveyCreateInput,
@@ -17,6 +17,7 @@ const debug = getDebugger("survey");
 @Injectable()
 export class SurveyService extends BaseService<Survey> {
   constructor(
+    @Inject(forwardRef(() => GroupService))
     private readonly groupService: GroupService,
     @InjectRepository(Survey)
     private readonly repo: Repository<Survey>
