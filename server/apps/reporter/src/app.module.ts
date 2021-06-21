@@ -27,6 +27,7 @@ import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { ReportModule } from "@reporter/src/report/report.module";
 import { BullModule } from "@nestjs/bull";
 import { ScheduleModule } from "@nestjs/schedule";
+import { DaemonModule } from "@reporter/src/daemon/daemon.module";
 
 @Module({
   imports: [
@@ -65,7 +66,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     }),
     ScheduleModule.forRoot(),
     ReportModule,
+    DaemonModule,
   ],
-  providers: [],
 })
 export class AppModule {}

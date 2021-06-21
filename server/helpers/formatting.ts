@@ -1,10 +1,7 @@
 import prettyFormat from "pretty-format";
 import { table, TableUserConfig } from "table";
-import { getDebugger } from "@helpers/debug-factory";
 import chalk from "chalk";
 import * as _ from "lodash";
-
-const debug = getDebugger("helpers");
 
 export function printPretty(val: unknown) {
   console.log(prettyFormat(val));
@@ -27,7 +24,6 @@ export function printTable(
     data.unshift(empty);
   }
   data.unshift(headers.map((header) => chalk.blue(header)));
-  debug("table data %O", data);
 
   const config: TableUserConfig = {
     drawVerticalLine: () => false,

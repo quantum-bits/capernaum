@@ -1,9 +1,4 @@
-import { Process, Processor } from "@nestjs/bull";
-import {
-  PROM_METRIC_EMAILS_SENT,
-  REPORTER_QUEUE_NAME,
-} from "@common/common.constants";
-import { Job } from "bull";
+import { PROM_METRIC_EMAILS_SENT } from "@common/common.constants";
 import { QualtricsSurveyResponse } from "@qapi/qualtrics-api.types";
 import { quillDeltaToHtml, quillHtmlToText } from "@helpers/quill";
 import { EventService } from "@server/src/events/event.service";
@@ -17,17 +12,15 @@ import { Counter } from "prom-client";
 import { getDebugger } from "@helpers/debug-factory";
 import { LetterService } from "@server/src/letter/letter.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
-import { Logger } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { MultiTimer } from "@helpers/multi-timer";
 import { GroupService } from "@server/src/group/group.service";
-import { Cron } from "@nestjs/schedule";
-import pluralize from "pluralize";
 
 const debug = getDebugger("reporter");
 
-@Processor(REPORTER_QUEUE_NAME)
-export class ReportProcessor {
-  private readonly logger = new Logger(ReportProcessor.name);
+@Injectable()
+export class ReportService {
+  private readonly logger = new Logger(ReportService.name);
 
   constructor(
     private readonly qualtricsApiService: QualtricsApiService,
@@ -42,16 +35,16 @@ export class ReportProcessor {
     private emails_sent_counter: Counter<string>
   ) {}
 
-  private doubleDebug(message: string) {
+  private logMaybeDebug(message: string) {
+    this.logger.log(message);
     debug(message);
-    this.logger.debug(message);
   }
 
-  @Process()
-  async processIndividualReport(job: Job) {
-    const qualtricsSurveyId = job.data.qualtricsSurveyId;
-    const qualtricsResponseId = job.data.qualtricsResponseId;
-    this.doubleDebug(
+  async processIndividualReport(
+    qualtricsSurveyId: string,
+    qualtricsResponseId: string
+  ) {
+    this.logMaybeDebug(
       `Processing response ${qualtricsResponseId} (survey ${qualtricsSurveyId})`
     );
 
@@ -117,29 +110,11 @@ export class ReportProcessor {
     debug("created event");
     debug(mt.report());
 
-    this.doubleDebug(`Finished response ${qualtricsResponseId}`);
-  }
-
-  @Cron(process.env.CRON_TIME)
-  async maybeProcessGroupReport() {
-    debug("Check for groups ready to report");
-
-    const readyGroups = await this.groupService.findReadyForReport();
-    debug("Ready groups %O", readyGroups);
-    this.logger.log(
-      `${readyGroups.length} ${pluralize(
-        "group",
-        readyGroups.length
-      )} ready to report`
-    );
-
-    for (const group of readyGroups) {
-      await this.processGroupReport(group.id);
-    }
+    this.logMaybeDebug(`Finished response ${qualtricsResponseId}`);
   }
 
   async processGroupReport(groupId: number) {
-    this.doubleDebug(`Processing group ${groupId}`);
+    this.logMaybeDebug(`Processing group ${groupId}`);
 
     // Fetch the group.
     const group = await this.groupService.readOne(groupId);
@@ -195,6 +170,6 @@ export class ReportProcessor {
     await this.groupService.closeGroup(group.id);
     debug("closed group");
 
-    this.doubleDebug(`Finished processing group ${group.id}`);
+    this.logMaybeDebug(`Finished processing group ${group.id}`);
   }
 }

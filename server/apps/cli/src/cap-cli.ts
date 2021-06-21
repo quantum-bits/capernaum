@@ -36,6 +36,7 @@ import PrettyError = require("pretty-error");
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { listLetters } from "@common/cli/src/commands/letter";
 import { sendTestEmail } from "@common/cli/src/commands/mail";
+import { dumpDebugCache } from "@helpers/debug-factory";
 
 PrettyError.start();
 
@@ -318,4 +319,7 @@ program
   .action(graphQLQuery);
 
 // Do it.
-program.parseAsync().then(() => knex.destroy());
+program.parseAsync().then(() => {
+  dumpDebugCache();
+  knex.destroy();
+});

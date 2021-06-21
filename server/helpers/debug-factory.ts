@@ -1,18 +1,34 @@
 import debug from "debug";
+import * as _ from "lodash";
+import chalk from "chalk";
+import { printTable } from "@helpers/formatting";
 
-const PREFIX = "cap";
+const BASE_NAMESPACE = "cap";
 
-interface DebugCache {
-  [name: string]: debug.Debugger;
-}
+const debugCache = new Map<string, debug.Debugger>();
 
-const debugCache: DebugCache = {};
+const baseDebug = debug(BASE_NAMESPACE);
+debugCache.set(BASE_NAMESPACE, baseDebug);
 
 export function getDebugger(name: string) {
-  if (!debugCache[name]) {
-    debugCache[name] = debug(`${PREFIX}:${name}`);
+  if (!debugCache.has(name)) {
+    debugCache.set(name, baseDebug.extend(name));
   }
-  return debugCache[name];
+  return debugCache.get(name);
+}
+
+export function dumpDebugCache() {
+  const keys = Array.from(debugCache.keys());
+
+  const headers = ["Namespace", "Enabled"];
+  const data = _.map(keys.sort(), (key) => {
+    const debug = debugCache.get(key);
+    return [
+      debug.namespace,
+      debug.enabled ? chalk.green("Yes") : chalk.red("No"),
+    ];
+  });
+  printTable(headers, data);
 }
 
 /**
