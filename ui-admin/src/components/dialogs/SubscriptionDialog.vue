@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="600">
+  <v-dialog persistent max-width="600">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="theForm" v-model="formValid" lazy-validation>
@@ -25,7 +25,7 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="$emit('action', false)">
+          <v-btn color="success" text @click="$emit('input', false)">
             Cancel
           </v-btn>
 
@@ -55,14 +55,9 @@ interface StringStringChoice {
 export default Vue.extend({
   name: "SubscriptionDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
     dialogTitle: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
+    value: { type: Boolean, required: true, default: false },
 
     hostName: { type: String, required: true },
     subscriptionType: { type: String, required: true },
@@ -122,13 +117,13 @@ export default Vue.extend({
         subscriptionType: this.dialogState.subscriptionType as SubscriptionType,
         surveyId: this.dialogState.surveyId,
       };
-      this.$emit("action", false);
+      this.$emit("input", false);
       this.$emit("ready", result);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         if (newValue) {
           this.dialogState.hostName = this.hostName;
@@ -136,9 +131,11 @@ export default Vue.extend({
           this.dialogState.surveyId = this.surveyId;
 
           if (this.$refs.theForm) {
-            (this.$refs.theForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.theForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

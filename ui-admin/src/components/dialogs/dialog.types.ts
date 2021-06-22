@@ -6,7 +6,7 @@ import {
 import { SubscriptionType } from "@/types/qualtrics.types";
 
 export type DimensionDialogResponse = Pick<SurveyDimensionCreateInput, "title">;
-export type SurveyDialogResponse = Omit<SurveyUpdateInput, "id">
+export type SurveyDialogResponse = Omit<SurveyUpdateInput, "id">;
 
 export interface SurveyItemSelection {
   id: number;

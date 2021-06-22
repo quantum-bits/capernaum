@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="600">
+  <v-dialog persistent max-width="600">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="theForm" v-model="formValid" lazy-validation>
@@ -22,7 +22,7 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="$emit('action', false)">
+          <v-btn color="success" text @click="$emit('input', false)">
             Cancel
           </v-btn>
 
@@ -42,14 +42,9 @@ import { MachineCreateInput } from "@/graphql/types/globalTypes";
 export default Vue.extend({
   name: "MachineDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
+    value: { type: Boolean, required: true, default: false },
     dialogTitle: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
 
     machineName: { type: String, required: true },
     hostName: { type: String, required: true },
@@ -79,12 +74,12 @@ export default Vue.extend({
         active: this.dialogState.isActive,
       };
       this.$emit("ready", result);
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         if (newValue) {
           this.dialogState.machineName = this.machineName;
@@ -92,9 +87,11 @@ export default Vue.extend({
           this.dialogState.isActive = this.isActive;
 
           if (this.$refs.theForm) {
-            (this.$refs.theForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.theForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

@@ -559,12 +559,16 @@ export default class Compose extends Vue {
   cancelChartSelection(): void {
     if (this.$refs.chartForm) {
       console.log("canceling chart selection....");
-      (this.$refs.chartForm as Vue & {
-        resetValidation: () => boolean;
-      }).resetValidation();
-      (this.$refs.chartForm as Vue & {
-        reset: () => boolean;
-      }).reset();
+      (
+        this.$refs.chartForm as Vue & {
+          resetValidation: () => boolean;
+        }
+      ).resetValidation();
+      (
+        this.$refs.chartForm as Vue & {
+          reset: () => boolean;
+        }
+      ).reset();
     } else {
       console.log("no form! ", this.$refs.chartForm);
     }
@@ -577,12 +581,16 @@ export default class Compose extends Vue {
   cancelImageSelection(): void {
     console.log("inside cancel image...", this.$refs.form);
     if (this.$refs.form) {
-      (this.$refs.form as Vue & {
-        resetValidation: () => boolean;
-      }).resetValidation();
-      (this.$refs.form as Vue & {
-        reset: () => boolean;
-      }).reset();
+      (
+        this.$refs.form as Vue & {
+          resetValidation: () => boolean;
+        }
+      ).resetValidation();
+      (
+        this.$refs.form as Vue & {
+          reset: () => boolean;
+        }
+      ).reset();
     } else {
       console.log("no form! ", this.$refs.form);
     }

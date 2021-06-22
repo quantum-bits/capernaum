@@ -152,9 +152,11 @@ export default class LetterInfoForm extends Vue {
     //console.log(typeof this.surveySelect.value);
     if (this.isNew) {
       if (
-        (this.$refs.form as Vue & {
-          validate: () => boolean;
-        }).validate()
+        (
+          this.$refs.form as Vue & {
+            validate: () => boolean;
+          }
+        ).validate()
       ) {
         console.log("title is: ", this.title);
         this.$apollo
@@ -185,9 +187,11 @@ export default class LetterInfoForm extends Vue {
       }
     } else {
       if (
-        (this.$refs.form as Vue & {
-          validate: () => boolean;
-        }).validate()
+        (
+          this.$refs.form as Vue & {
+            validate: () => boolean;
+          }
+        ).validate()
       ) {
         console.log("title is: ", this.title);
         this.$apollo

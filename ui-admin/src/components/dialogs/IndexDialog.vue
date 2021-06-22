@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="800">
+  <v-dialog persistent max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="indexForm" v-model="formValid" lazy-validation>
@@ -61,9 +61,7 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="onCancel">
-            Cancel
-          </v-btn>
+          <v-btn color="success" text @click="onCancel"> Cancel </v-btn>
 
           <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
             Submit
@@ -84,16 +82,11 @@ import {
 export default Vue.extend({
   name: "IndexDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
     abbreviationHint: { type: String, required: true },
-    visible: { type: Boolean, required: true },
+    value: { type: Boolean, required: true },
     availableItems: {
       type: Array as () => SurveyItemSelection[],
       required: true,
@@ -126,7 +119,7 @@ export default Vue.extend({
 
   methods: {
     onCancel() {
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
 
     onSubmit() {
@@ -137,12 +130,12 @@ export default Vue.extend({
         itemIds: this.dialogState.selectedItems.map((item) => item.id),
       };
       this.$emit("ready", response);
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         if (newValue) {
           this.dialogState.title = this.title;
@@ -152,9 +145,11 @@ export default Vue.extend({
 
           if (this.$refs.indexForm) {
             // FIXME: Replace the `as any` hack.
-            (this.$refs.indexForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.indexForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

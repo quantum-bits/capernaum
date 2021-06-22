@@ -180,7 +180,8 @@ export default Vue.extend({
         },
         { text: "Actions", sortable: false },
       ],
-      scriptureEngagementPracticeData: [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
+      scriptureEngagementPracticeData:
+        [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
       createUpdateSEPracticeDialog: false as boolean,
       valid: true as boolean,
       scriptureEngagementPracticeTitle: "" as string,
@@ -212,9 +213,11 @@ export default Vue.extend({
     newSEPractice() {
       console.log("new SE practice!");
       if (this.$refs.form) {
-        (this.$refs.form as Vue & {
-          resetValidation: () => boolean;
-        }).resetValidation();
+        (
+          this.$refs.form as Vue & {
+            resetValidation: () => boolean;
+          }
+        ).resetValidation();
       }
       this.resetForm();
       this.createUpdateSEPracticeDialog = true;
@@ -255,9 +258,11 @@ export default Vue.extend({
 
     cancelDialog(): void {
       if (this.$refs.form) {
-        (this.$refs.form as Vue & {
-          resetValidation: () => boolean;
-        }).resetValidation();
+        (
+          this.$refs.form as Vue & {
+            resetValidation: () => boolean;
+          }
+        ).resetValidation();
       }
       this.resetForm();
       this.createUpdateSEPracticeDialog = false;
@@ -305,9 +310,11 @@ export default Vue.extend({
             })
             .catch((error) => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as Vue & {
-                resetValidation: () => boolean;
-              }).resetValidation();
+              (
+                this.$refs.form as Vue & {
+                  resetValidation: () => boolean;
+                }
+              ).resetValidation();
               //this.serverError = true;
               //this.serverError = true
             });
@@ -334,9 +341,11 @@ export default Vue.extend({
             })
             .catch((error) => {
               console.log("there appears to have been an error: ", error);
-              (this.$refs.form as Vue & {
-                resetValidation: () => boolean;
-              }).resetValidation();
+              (
+                this.$refs.form as Vue & {
+                  resetValidation: () => boolean;
+                }
+              ).resetValidation();
             });
         }
       }

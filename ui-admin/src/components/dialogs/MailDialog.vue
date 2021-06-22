@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="600">
+  <v-dialog persistent max-width="600">
     <v-card>
       <v-card-title>Send Results by Email</v-card-title>
       <v-card-text>
@@ -27,9 +27,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn text color="success" @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn text color="success" @click="onCancel"> Cancel </v-btn>
         <v-btn text color="success" :disabled="!formValid" @click="onSend">
           Send
         </v-btn>
@@ -46,13 +44,8 @@ import { SendLetter, SendLetterVariables } from "@/graphql/types/SendLetter";
 export default Vue.extend({
   name: "MailDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
-    visible: { type: Boolean, required: true },
+    value: { type: Boolean, required: true },
     respondentEmail: { type: String, required: true },
     adminEmail: { type: String, required: true },
     attachmentPath: { type: String, required: true },
@@ -83,7 +76,7 @@ export default Vue.extend({
 
   methods: {
     onCancel() {
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
 
     sendHelper: function (to: string, subject: string) {
@@ -120,12 +113,12 @@ export default Vue.extend({
         );
       }
 
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         if (newValue) {
           this.recipients.respondent = false;
@@ -134,9 +127,11 @@ export default Vue.extend({
           this.otherEmail = "";
 
           if (this.$refs.dimensionForm) {
-            (this.$refs.dimensionForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.dimensionForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

@@ -102,7 +102,7 @@
             v-model="selectedResponses"
             class="elevation-1"
           >
-            <template v-slot:item.action="{ item }">
+            <template v-slot:[`item.action`]="{ item }">
               <v-icon class="ml-2" @click="fetchGroupResponses(item)">
                 mdi-download
               </v-icon>
@@ -144,7 +144,7 @@
       </v-col>
     </v-row>
 
-    <v-row v-if="isGroupLetter & groupSelected || isIndividualLetter">
+    <v-row v-if="(isGroupLetter && groupSelected) || isIndividualLetter">
       <v-col>
         <v-card>
           <v-card-title>
@@ -173,13 +173,13 @@
             show-select
             class="elevation-1"
           >
-            <template v-slot:item.letter="{ item }">
+            <template v-slot:[`item.letter`]="{ item }">
               {{ letterTitle(item) }}
             </template>
-            <template v-slot:item.date="{ item }">
+            <template v-slot:[`item.date`]="{ item }">
               {{ item.endDate | sensibleDate }}
             </template>
-            <template v-slot:item.action="{ item }">
+            <template v-slot:[`item.action`]="{ item }">
               <v-icon
                 :disabled="!hasIndividualLetter(item)"
                 @click="sendEmail(item)"
@@ -263,10 +263,6 @@ import { ALL_GROUPS } from "@/graphql/groups.graphql";
 
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { AllResponses_surveyResponses as SurveyResponse } from "@/graphql/types/AllResponses";
-//import { GroupResponses_groupResponses as GroupResponses } from "@/graphql/types/GroupResponses";
-
-//import { GroupResponsesQueryVariables } from "./survey.types";
-
 import {
   WriteLetter,
   WriteLetter_writeLetter as LetterWriterOutput,
@@ -280,12 +276,7 @@ import { AllGroups_allGroups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
 import { LetterTypeEnum } from "@/types/letter.types";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
-
-// FIXME: This cross application include is an abomination.
-import {
-  quillDeltaToHtml,
-  quillHtmlToText,
-} from "../../../server/helpers/quill";
+import { quillDeltaToHtml } from "@/helpers/quill";
 
 interface ImportedSurvey {
   id: number;
@@ -521,7 +512,8 @@ export default Vue.extend({
       this.mailDialog.respondentEmail = surveyResponse.email;
       this.mailDialog.adminEmail = this.$store.state.user.email;
       this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
-      this.mailDialog.textContent = quillHtmlToText(htmlContent);
+      alert("this.mailDialog.textContent = quillHtmlToText(htmlContent);");
+      this.mailDialog.textContent = htmlContent;
       this.mailDialog.htmlContent = htmlContent;
       this.mailDialog.visible = true;
     },
@@ -574,13 +566,13 @@ export default Vue.extend({
     },
 
     hasIndividualLetter(item: SurveyResponse) {
-      let hasIndivLetter = false;
+      let hasIndividualLetter = false;
       item.survey.letters.forEach((letter) => {
         if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          hasIndivLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
+          hasIndividualLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
         }
       });
-      return hasIndivLetter;
+      return hasIndividualLetter;
     },
 
     confirmDelete(item: SurveyResponse) {

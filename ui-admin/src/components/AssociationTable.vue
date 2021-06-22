@@ -67,9 +67,7 @@
         <v-btn class="mr-2" color="primary" dark @click="cancelEdits">
           Cancel
         </v-btn>
-        <v-btn color="success" dark @click="saveTableEdits">
-          Save Edits
-        </v-btn>
+        <v-btn color="success" dark @click="saveTableEdits"> Save Edits </v-btn>
       </v-flex>
       <v-flex xs12>
         <v-data-table :headers="headers" :items="tableData" class="elevation-1">
@@ -147,10 +145,8 @@ interface IdDict {
           sortable: true,
           value: "practice",
         });
-        let surveyDimensions: OneLetter_letter_survey_surveyDimensions[] = orderBy(
-          oneLetter.letter.survey.surveyDimensions,
-          "sequence"
-        );
+        let surveyDimensions: OneLetter_letter_survey_surveyDimensions[] =
+          orderBy(oneLetter.letter.survey.surveyDimensions, "sequence");
         surveyDimensions.forEach((dimension) => {
           dimension.surveyIndices.forEach((index) => {
             if (index.useForPredictions) {
@@ -165,10 +161,8 @@ interface IdDict {
           });
         });
 
-        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[] = orderBy(
-          oneLetter.letter.scriptureEngagementPractices,
-          "sequence"
-        );
+        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[] =
+          orderBy(oneLetter.letter.scriptureEngagementPractices, "sequence");
 
         let tableEntriesDict: { [key: number]: string[] } = {};
         scriptureEngagementPractices.forEach((practice) => {

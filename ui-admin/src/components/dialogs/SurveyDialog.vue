@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="800">
+  <v-dialog persistent max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-card-subtitle>{{ qualtricsName }}</v-card-subtitle>
@@ -30,7 +30,7 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="$emit('action', false)">
+          <v-btn color="success" text @click="$emit('input', false)">
             Cancel
           </v-btn>
 
@@ -50,14 +50,9 @@ import { SurveyDialogResponse } from "@/components/dialogs/dialog.types";
 export default Vue.extend({
   name: "SurveyDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
     dialogTitle: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
+    value: { type: Boolean, required: true, default: false },
     detailedDescription: { type: String, required: true },
     qualtricsName: { type: String, required: true },
     okayForGroup: { type: Boolean, required: true },
@@ -87,12 +82,12 @@ export default Vue.extend({
         publicName: this.dialogState.publicName,
       };
       this.$emit("ready", response);
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         //KK: deleted oldValue here because it was not being used (typescript warning)
         if (newValue) {
@@ -101,9 +96,11 @@ export default Vue.extend({
           this.dialogState.publicName = this.publicName;
           console.log("dialog state: ", this.dialogState);
           if (this.$refs.surveyForm) {
-            (this.$refs.surveyForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.surveyForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog persistent v-model="visible" max-width="800">
+  <v-dialog persistent max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="dimensionForm" v-model="formValid" lazy-validation>
@@ -17,7 +17,7 @@
         <v-card-actions>
           <v-spacer />
 
-          <v-btn color="success" text @click="$emit('action', false)">
+          <v-btn color="success" text @click="$emit('input', false)">
             Cancel
           </v-btn>
 
@@ -37,15 +37,10 @@ import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
 export default Vue.extend({
   name: "DimensionDialog",
 
-  model: {
-    prop: "visible",
-    event: "action",
-  },
-
   props: {
+    value: { type: Boolean, required: true, default: false },
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
-    visible: { type: Boolean, required: true, default: false },
 
     initialTitle: String,
   },
@@ -67,21 +62,23 @@ export default Vue.extend({
         title: this.dimensionTitle,
       };
       this.$emit("ready", response);
-      this.$emit("action", false);
+      this.$emit("input", false);
     },
   },
 
   watch: {
-    visible: {
+    value: {
       handler: function (newValue) {
         //KK: deleted oldValue here because it was not being used (typescript warning)
         if (newValue) {
           this.dimensionTitle = this.initialTitle;
 
           if (this.$refs.dimensionForm) {
-            (this.$refs.dimensionForm as Vue & {
-              resetValidation: () => boolean;
-            }).resetValidation();
+            (
+              this.$refs.dimensionForm as Vue & {
+                resetValidation: () => boolean;
+              }
+            ).resetValidation();
           }
         }
       },

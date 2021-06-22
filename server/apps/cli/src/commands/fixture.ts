@@ -12,10 +12,12 @@ import { SurveyDimensionsFixture } from "../fixtures/cls/survey-dimensions.fixtu
 import { SurveyIndexesFixture } from "../fixtures/cls/survey-indexes.fixture";
 import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
+import { GroupTypesFixture } from "../fixtures/group-types.fixture";
 
 const debug = getDebugger("fixture");
 
-const groupTypesFixture = new GroupsFixture();
+const groupTypesFixture = new GroupTypesFixture();
+const groupsFixture = new GroupsFixture();
 const imagesFixture = new ImagesFixture();
 const letterElementsFixture = new LetterElementsFixture();
 const lettersFixture = new LettersFixture();
@@ -56,6 +58,8 @@ export async function nuclearOption(options) {
   await surveyDimensionsFixture.load();
   await surveyIndexesFixture.load();
   await surveyItemsFixture.load();
+
+  await groupsFixture.load();
 
   await predictionTablesFixture.load();
   await lettersFixture.load();

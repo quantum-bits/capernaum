@@ -26,7 +26,7 @@ export class SurveyResponseModel extends Model {
   static relationMappings = () => ({
     group: {
       modelClass: GroupModel,
-      relation: Model.HasOneRelation,
+      relation: Model.BelongsToOneRelation,
       join: {
         from: "survey_response.groupId",
         to: "group.id",

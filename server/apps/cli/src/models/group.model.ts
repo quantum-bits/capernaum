@@ -2,6 +2,7 @@ import { Model } from "objection";
 import { GroupTypeModel } from "./group-type.model";
 import { SurveyResponseModel } from "./survey-response.model";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyModel } from "@common/cli/src/models/survey.model";
 
 const debug = getDebugger("model:group");
 
@@ -18,16 +19,25 @@ export class GroupModel extends Model {
   created: number;
   type: GroupTypeModel;
   otherTypeName?: string;
+  survey: SurveyModel;
 
   static tableName = "group";
 
   static relationMappings = () => ({
     type: {
       modelClass: GroupTypeModel,
-      relation: Model.HasOneRelation,
+      relation: Model.BelongsToOneRelation,
       join: {
         from: "group.typeId",
         to: "group_type.id",
+      },
+    },
+    survey: {
+      modelClass: SurveyModel,
+      relation: Model.BelongsToOneRelation,
+      join: {
+        from: "group.surveyId",
+        to: "survey.id",
       },
     },
   });

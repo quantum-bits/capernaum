@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-tooltip v-if="surveyIndex.useForPredictions" top>
-      <span>
-        Items for this index used in Boolean Association Table.
-      </span>
+      <span> Items for this index used in Boolean Association Table. </span>
       <template v-slot:activator="{ on }">
         <v-icon class="mx-2" v-on="on">
           {{ "mdi-table" }}

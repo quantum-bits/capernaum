@@ -55,9 +55,7 @@
               />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_ITEM" />
-            <span v-else>
-              Something went horribly wrong.
-            </span>
+            <span v-else> Something went horribly wrong. </span>
           </template>
         </v-treeview>
       </v-col>
