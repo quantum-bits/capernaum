@@ -11,7 +11,7 @@ import { SurveyDimensionUpdateInput } from "./globalTypes";
 
 export interface UpdateDimension_updateSurveyDimension_surveyIndices_surveyItems {
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -34,13 +34,16 @@ export interface UpdateDimension_updateSurveyDimension {
    */
   title: string;
   /**
-   * Sequence number; dimension are displayed in this order.
+   * Sequence number
    */
   sequence: number;
   surveyIndices: UpdateDimension_updateSurveyDimension_surveyIndices[];
 }
 
 export interface UpdateDimension {
+  /**
+   * Update an existing survey dimension
+   */
   updateSurveyDimension: UpdateDimension_updateSurveyDimension;
 }
 

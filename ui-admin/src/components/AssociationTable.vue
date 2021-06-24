@@ -71,7 +71,6 @@
       </v-flex>
       <v-flex xs12>
         <v-data-table :headers="headers" :items="tableData" class="elevation-1">
-          <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
               <td
@@ -102,24 +101,15 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { orderBy } from "lodash";
-
 import {
   AssociationTableHeader,
   SpiritualFocusOrientation,
   TableData,
-} from "../types/association-table.types";
-
+} from "@/types/association-table.types";
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
-
-import {
-  OneLetter,
-  OneLetter_letter,
-  OneLetter_letter_scriptureEngagementPractices,
-  OneLetter_letter_survey_surveyDimensions,
-} from "@/graphql/types/OneLetter";
+import { OneLetter, OneLetter_letter } from "@/graphql/types/OneLetter";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
-
 interface IdDict {
   [key: string]: boolean;
 }
@@ -145,8 +135,11 @@ interface IdDict {
           sortable: true,
           value: "practice",
         });
-        let surveyDimensions: OneLetter_letter_survey_surveyDimensions[] =
-          orderBy(oneLetter.letter.survey.surveyDimensions, "sequence");
+
+        let surveyDimensions = orderBy(
+          oneLetter.letter.survey.surveyDimensions,
+          "sequence"
+        );
         surveyDimensions.forEach((dimension) => {
           dimension.surveyIndices.forEach((index) => {
             if (index.useForPredictions) {
@@ -161,8 +154,10 @@ interface IdDict {
           });
         });
 
-        let scriptureEngagementPractices: OneLetter_letter_scriptureEngagementPractices[] =
-          orderBy(oneLetter.letter.scriptureEngagementPractices, "sequence");
+        let scriptureEngagementPractices = orderBy(
+          oneLetter.letter.scriptureEngagementPractices,
+          "sequence"
+        );
 
         let tableEntriesDict: { [key: number]: string[] } = {};
         scriptureEngagementPractices.forEach((practice) => {
@@ -279,4 +274,7 @@ export default class AssociationTable extends Vue {
     });
   }
 }
+
+// Credits:
+//   https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table
 </script>

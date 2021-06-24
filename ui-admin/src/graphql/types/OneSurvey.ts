@@ -15,15 +15,15 @@ export interface OneSurvey_survey_surveyItems {
    */
   id: number;
   /**
-   * Sequence number; items will be displayed in this order
+   * Sequence number; items displayed in order
    */
   sequence: number;
   /**
-   * Qualtrics identifier for this question
+   * Qualtrics identifier (value of key in `questions` object)
    */
   qualtricsId: string;
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -41,11 +41,11 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems {
    */
   id: number;
   /**
-   * Qualtrics identifier for this question
+   * Qualtrics identifier (value of key in `questions` object)
    */
   qualtricsId: string;
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -81,7 +81,7 @@ export interface OneSurvey_survey_surveyDimensions {
    */
   title: string;
   /**
-   * Sequence number; dimension are displayed in this order.
+   * Sequence number
    */
   sequence: number;
   surveyIndices: OneSurvey_survey_surveyDimensions_surveyIndices[];

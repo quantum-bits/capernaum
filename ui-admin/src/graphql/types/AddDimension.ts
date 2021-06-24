@@ -11,11 +11,11 @@ import { SurveyDimensionCreateInput } from "./globalTypes";
 
 export interface AddDimension_createSurveyDimension_surveyIndices_surveyItems {
   /**
-   * Qualtrics identifier for this question
+   * Qualtrics identifier (value of key in `questions` object)
    */
   qualtricsId: string;
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -46,7 +46,7 @@ export interface AddDimension_createSurveyDimension {
    */
   title: string;
   /**
-   * Sequence number; dimension are displayed in this order.
+   * Sequence number
    */
   sequence: number;
   surveyIndices: AddDimension_createSurveyDimension_surveyIndices[];

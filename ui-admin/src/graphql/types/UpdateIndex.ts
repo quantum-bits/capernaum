@@ -15,11 +15,11 @@ export interface UpdateIndex_updateSurveyIndex_surveyItems {
    */
   id: number;
   /**
-   * Qualtrics identifier for this question
+   * Qualtrics identifier (value of key in `questions` object)
    */
   qualtricsId: string;
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -47,7 +47,7 @@ export interface UpdateIndex_updateSurveyIndex {
 export interface UpdateIndex {
   /**
    * Update an index. Field values will replaces existing values in the object.
-   *       (e.g., if you give a value for itemIds, it will replace the current list.
+   *       (e.g., if you give a value for itemIds, it will replace the current list.)
    */
   updateSurveyIndex: UpdateIndex_updateSurveyIndex;
 }

@@ -4,6 +4,7 @@ import { Event } from "./entities";
 import { PUB_SUB_PROVIDER } from "./event.types";
 import { PubSub } from "graphql-subscriptions";
 import { EventService } from "@server/src/events/event.service";
+import { EventResolver } from "@server/src/events/event.resolvers";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Event])],
@@ -12,7 +13,7 @@ import { EventService } from "@server/src/events/event.service";
       provide: PUB_SUB_PROVIDER,
       useValue: new PubSub(),
     },
-    // EventResolver,
+    EventResolver,
     EventService,
   ],
   exports: [EventService],

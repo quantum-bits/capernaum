@@ -14,9 +14,21 @@ export interface AddScriptureEngagementPractice_createScriptureEngagementPractic
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Practice title
+   */
   title: string;
+  /**
+   * Description of this practice
+   */
   description: string;
+  /**
+   * Sequence number
+   */
   sequence: number;
+  /**
+   * URL for more information on practice
+   */
   moreInfoUrl: string;
 }
 

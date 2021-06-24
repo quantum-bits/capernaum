@@ -1,30 +1,26 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col>
-        <h1 class="headline">Groups</h1>
-      </v-col>
-    </v-row>
+    <page-header title="Groups" />
     <v-row>
       <v-col>
         <v-data-table class="elevation-1" :headers="headers" :items="groups">
-          <template v-slot:item.groupType="{ item }">
-            {{ groupTypeName(item) }}
-          </template>
-          <template v-slot:item.responses="{ item }">
+          <template v-slot:[`item.responses`]="{ item }">
             {{ item.surveyResponses.length }}
           </template>
-          <template v-slot:item.adminFullName="{ item }">
+          <template v-slot:[`item.adminFullName`]="{ item }">
             {{ item.adminFirstName }} {{ item.adminLastName }}
           </template>
-          <template v-slot:item.codeWord="{ item }">
+          <template v-slot:[`item.codeWord`]="{ item }">
             <samp>{{ item.codeWord }}</samp>
           </template>
-          <template v-slot:item.created="{ item }">
-            {{ item.created | epochToISO }}
-          </template>
-          <template v-slot:item.actions="{ item }">
+          <template v-slot:[`item.actions`]="{ item }">
             <v-icon small @click="confirmDelete(item)"> mdi-delete </v-icon>
+          </template>
+          <template v-slot:[`item.closedAfter`]="{ item }">
+            {{ item.closedAfter | standardDate }}
+          </template>
+          <template v-slot:[`item.status`]="{ item }">
+            {{ item.closedAfter }}
           </template>
         </v-data-table>
       </v-col>
@@ -40,42 +36,43 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { ALL_GROUPS, DELETE_GROUP } from "@/graphql/groups.graphql";
-import ConfirmDialog from "@/components/dialogs/ConfirmDialog";
+import { DateTime } from "luxon";
+import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
+import PageHeader from "@/pages/PageHeader.vue";
+import { AllGroups, AllGroups_groups } from "@/graphql/types/AllGroups";
 
 export default Vue.extend({
   name: "Groups",
 
-  components: { ConfirmDialog },
+  components: { ConfirmDialog, PageHeader },
 
   data() {
     return {
-      groups: [],
+      groups: [] as unknown as AllGroups,
 
       headers: [
         { text: "Group Name", value: "name" },
-        { text: "Group Type", value: "groupType" },
         { text: "Group Code", value: "codeWord" },
-        { text: "Responses", value: "responses" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
-        { text: "Survey", value: "survey.qualtricsName" },
-        { text: "Created", value: "created" },
-        { text: "Closed", value: "closedAfter" },
+        { text: "Responses", value: "responses", align: "end" },
+        { text: "Status", value: "status" },
+        { text: "Closed After", value: "closedAfter" },
         { text: "Actions", value: "actions", sortable: false },
       ],
 
       deleteDialog: {
-        group: null,
+        group: null as unknown as AllGroups_groups,
         visible: false,
       },
     };
   },
 
   computed: {
-    deleteDialogText() {
+    deleteDialogText(): string {
       return `Delete group '${this.deleteDialog.group?.name}'?  This can't be undone!`;
     },
   },
@@ -83,20 +80,23 @@ export default Vue.extend({
   apollo: {
     groups: {
       query: ALL_GROUPS,
-      update: (data) => {
-        return data.allGroups;
-      },
     },
   },
 
   methods: {
-    groupTypeName(group) {
+    groupTypeName(group: AllGroups_groups) {
       return group.type.code === "OTHER"
         ? `Other (${group.otherTypeName})`
         : group.type.name;
     },
 
-    confirmDelete(group) {
+    isClosed(closedAfterDate: string): boolean {
+      const now = DateTime.now();
+      const closedAfter = DateTime.fromISO(closedAfterDate);
+      return closedAfter < now;
+    },
+
+    confirmDelete(group: AllGroups_groups) {
       this.deleteDialog.group = group;
       this.deleteDialog.visible = true;
     },
@@ -111,7 +111,7 @@ export default Vue.extend({
         },
       });
 
-      this.groups = this.groups.filter((grp) => grp.id !== id);
+      this.groups.groups = this.groups.groups.filter((grp) => grp.id !== id);
     },
   },
 });

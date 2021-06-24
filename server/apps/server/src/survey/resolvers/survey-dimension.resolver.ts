@@ -42,8 +42,12 @@ export class SurveyDimensionResolver {
     return this.surveyDimensionService.readOne(id);
   }
 
-  @Query(() => SurveyDimension)
-  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput) {
+  @Mutation(() => SurveyDimension, {
+    description: "Update an existing survey dimension",
+  })
+  updateSurveyDimension(
+    @Args("updateInput") updateInput: SurveyDimensionUpdateInput
+  ) {
     return this.surveyDimensionService.update(updateInput);
   }
 

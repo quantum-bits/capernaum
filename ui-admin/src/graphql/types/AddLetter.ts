@@ -14,9 +14,18 @@ export interface AddLetter_createLetter {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter title
+   */
   title: string;
+  /**
+   * Description of letter
+   */
   description: string;
   updated: any;
+  /**
+   * Is this letter frozen?
+   */
   isFrozen: boolean;
 }
 

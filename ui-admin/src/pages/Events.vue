@@ -1,10 +1,6 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col>
-        <h1 class="headline">Events</h1>
-      </v-col>
-    </v-row>
+    <page-header title="Events" />
     <v-row>
       <v-col>
         <v-card>
@@ -26,7 +22,7 @@
             :search="search"
             class="elevation-1"
           >
-            <template v-slot:item.date="{ item }">
+            <template v-slot:[`item.date`]="{ item }">
               {{ item.date | formatDate }}
             </template>
           </v-data-table>
@@ -44,10 +40,11 @@ import {
 } from "@/graphql/events.graphql";
 import { DateTime } from "luxon";
 import { AllEvents_events as Event } from "@/graphql/types/AllEvents";
+import PageHeader from "@/pages/PageHeader.vue";
 
 export default Vue.extend({
   name: "Events",
-
+  components: { PageHeader },
   data() {
     return {
       allEvents: [] as Event[],

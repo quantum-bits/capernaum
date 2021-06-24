@@ -10,7 +10,7 @@ export const CREATE_GROUP = gql`
 
 export const ALL_GROUPS = gql`
   query AllGroups {
-    allGroups: readGroups {
+    groups: readGroups {
       id
       name
       type {

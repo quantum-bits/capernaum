@@ -14,7 +14,13 @@ export interface Login_login_user_roles {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Role name
+   */
   name: string;
+  /**
+   * Role description
+   */
   description: string;
 }
 

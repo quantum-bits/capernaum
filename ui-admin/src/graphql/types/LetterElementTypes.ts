@@ -12,7 +12,13 @@ export interface LetterElementTypes_letterElementTypes {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter element type name
+   */
   key: string;
+  /**
+   * Letter element type description
+   */
   description: string;
 }
 

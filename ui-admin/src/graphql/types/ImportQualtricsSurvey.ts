@@ -9,7 +9,7 @@
 
 export interface ImportQualtricsSurvey_importQualtricsSurvey_surveyItems {
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
@@ -48,5 +48,4 @@ export interface ImportQualtricsSurvey {
 
 export interface ImportQualtricsSurveyVariables {
   qualtricsId: string;
-  updateOk: boolean;
 }

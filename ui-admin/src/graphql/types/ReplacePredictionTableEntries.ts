@@ -9,13 +9,6 @@ import { PredictionTableEntryReplaceInput } from "./globalTypes";
 // GraphQL mutation operation: ReplacePredictionTableEntries
 // ====================================================
 
-export interface ReplacePredictionTableEntries_replacePredictionTableEntries_letter {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-}
-
 export interface ReplacePredictionTableEntries_replacePredictionTableEntries_surveyIndex {
   /**
    * Unique ID for this entity
@@ -36,8 +29,17 @@ export interface ReplacePredictionTableEntries_replacePredictionTableEntries_pra
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Practice title
+   */
   title: string;
+  /**
+   * Sequence number
+   */
   sequence: number;
+  /**
+   * Description of this practice
+   */
   description: string;
 }
 
@@ -46,9 +48,11 @@ export interface ReplacePredictionTableEntries_replacePredictionTableEntries {
    * Unique ID for this entity
    */
   id: number;
-  letter: ReplacePredictionTableEntries_replacePredictionTableEntries_letter;
   surveyIndex: ReplacePredictionTableEntries_replacePredictionTableEntries_surveyIndex;
   practice: ReplacePredictionTableEntries_replacePredictionTableEntries_practice;
+  /**
+   * Sequence number
+   */
   sequence: number;
 }
 

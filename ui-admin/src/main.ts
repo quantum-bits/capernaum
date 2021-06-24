@@ -10,19 +10,12 @@ import { DateTime } from "luxon";
 
 Vue.config.productionTip = false;
 
-Vue.filter("sensibleDate", function (value: string) {
-  const dt = DateTime.fromISO(value);
-  return dt.toFormat("y-MM-dd");
+Vue.filter("standardDate", function (value: string) {
+  return DateTime.fromISO(value).toFormat("y-MM-dd");
 });
 
-Vue.filter("dateAndTime", function (value: string) {
-  const dt = DateTime.fromISO(value);
-  return dt.toFormat("y-M-d tt");
-});
-
-Vue.filter("epochToISO", function (value: string) {
-  const dt = DateTime.fromMillis(parseInt(value));
-  return dt.toFormat("y-MM-dd");
+Vue.filter("standardDateTime", function (value: string) {
+  return DateTime.fromISO(value).toFormat("y-MM-dd tt");
 });
 
 new Vue({

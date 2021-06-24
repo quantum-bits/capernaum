@@ -12,6 +12,9 @@ export interface OneUser_user_roles {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Role name
+   */
   name: string;
 }
 
@@ -20,8 +23,17 @@ export interface OneUser_user {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Email address
+   */
   email: string;
+  /**
+   * First name
+   */
   firstName: string;
+  /**
+   * Last name
+   */
   lastName: string;
   roles: OneUser_user_roles[];
 }

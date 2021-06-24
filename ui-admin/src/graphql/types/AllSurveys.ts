@@ -12,7 +12,13 @@ export interface AllSurveys_surveys_letters_letterType {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter type name
+   */
   key: string;
+  /**
+   * Letter type description
+   */
   description: string;
 }
 
@@ -21,6 +27,9 @@ export interface AllSurveys_surveys_letters {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter title
+   */
   title: string;
   letterType: AllSurveys_surveys_letters_letterType;
 }

@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: OneLetter
+// GraphQL query operation: AllLetters
 // ====================================================
 
-export interface OneLetter_letter_surveys {
+export interface AllLetters_letters_surveys {
   /**
    * Unique ID for this entity
    */
@@ -18,7 +18,7 @@ export interface OneLetter_letter_surveys {
   qualtricsName: string;
 }
 
-export interface OneLetter_letter_letterType_letterElementTypes {
+export interface AllLetters_letters_letterType_letterElementTypes {
   /**
    * Unique ID for this entity
    */
@@ -33,7 +33,7 @@ export interface OneLetter_letter_letterType_letterElementTypes {
   description: string;
 }
 
-export interface OneLetter_letter_letterType {
+export interface AllLetters_letters_letterType {
   /**
    * Unique ID for this entity
    */
@@ -46,10 +46,10 @@ export interface OneLetter_letter_letterType {
    * Letter type description
    */
   description: string;
-  letterElementTypes: OneLetter_letter_letterType_letterElementTypes[];
+  letterElementTypes: AllLetters_letters_letterType_letterElementTypes[];
 }
 
-export interface OneLetter_letter_letterElements_letterElementType {
+export interface AllLetters_letters_letterElements_letterElementType {
   /**
    * Unique ID for this entity
    */
@@ -64,7 +64,7 @@ export interface OneLetter_letter_letterElements_letterElementType {
   description: string;
 }
 
-export interface OneLetter_letter_letterElements_surveyDimension {
+export interface AllLetters_letters_letterElements_surveyDimension {
   /**
    * Unique ID for this entity
    */
@@ -79,20 +79,8 @@ export interface OneLetter_letter_letterElements_surveyDimension {
   sequence: number;
 }
 
-export interface OneLetter_letter_letterElements_image {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Image title from user
-   */
-  title: string;
-  url: string;
-}
-
-export interface OneLetter_letter_letterElements {
-  letterElementType: OneLetter_letter_letterElements_letterElementType;
+export interface AllLetters_letters_letterElements {
+  letterElementType: AllLetters_letters_letterElements_letterElementType;
   /**
    * Unique ID for this entity
    */
@@ -105,11 +93,10 @@ export interface OneLetter_letter_letterElements {
    * Quill text delta
    */
   textDelta: string | null;
-  surveyDimension: OneLetter_letter_letterElements_surveyDimension | null;
-  image: OneLetter_letter_letterElements_image | null;
+  surveyDimension: AllLetters_letters_letterElements_surveyDimension | null;
 }
 
-export interface OneLetter_letter {
+export interface AllLetters_letters {
   /**
    * Unique ID for this entity
    */
@@ -118,28 +105,20 @@ export interface OneLetter_letter {
    * Letter title
    */
   title: string;
-  updated: any;
   /**
    * Description of letter
    */
   description: string;
+  updated: any;
   /**
    * Is this letter frozen?
    */
   isFrozen: boolean;
-  /**
-   * Email message to go out with letter
-   */
-  emailMessage: string;
-  surveys: OneLetter_letter_surveys;
-  letterType: OneLetter_letter_letterType;
-  letterElements: OneLetter_letter_letterElements[];
+  surveys: AllLetters_letters_surveys;
+  letterType: AllLetters_letters_letterType;
+  letterElements: AllLetters_letters_letterElements[];
 }
 
-export interface OneLetter {
-  letter: OneLetter_letter;
-}
-
-export interface OneLetterVariables {
-  letterId: number;
+export interface AllLetters {
+  letters: AllLetters_letters[];
 }

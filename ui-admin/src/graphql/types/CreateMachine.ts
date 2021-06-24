@@ -14,8 +14,17 @@ export interface CreateMachine_createMachine {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Machine name
+   */
   name: string;
+  /**
+   * Host name (e.g., FQDN)
+   */
   hostName: string;
+  /**
+   * Is this machine active?
+   */
   active: boolean;
 }
 

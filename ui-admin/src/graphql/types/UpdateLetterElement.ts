@@ -14,6 +14,9 @@ export interface UpdateLetterElement_updateLetterElement {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * sequence number
+   */
   sequence: number;
 }
 

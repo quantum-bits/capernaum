@@ -1,13 +1,8 @@
 <template>
   <v-container>
-    <v-row class="align-baseline justify-space-between">
-      <v-col cols="6">
-        <h1 class="headline mb-5">Surveys</h1>
-      </v-col>
-      <v-col cols="2">
-        <v-switch v-model="showAllSurveys" label="Show All" />
-      </v-col>
-    </v-row>
+    <page-header title="Qualtrics">
+      <v-switch v-model="showAllSurveys" label="Show All" />
+    </page-header>
     <v-row>
       <v-col>
         <v-data-iterator
@@ -193,7 +188,7 @@
                     <v-list-item>
                       <v-list-item-content>Last Modified</v-list-item-content>
                       <v-list-item-content class="align-end">
-                        {{ item.qualtricsModDate | dateAndTime }}
+                        {{ item.qualtricsModDate | standardDateTime }}
                       </v-list-item-content>
                     </v-list-item>
                     <v-list-item v-show="item.isImported">
@@ -292,12 +287,14 @@ import SurveyDialog from "../components/dialogs/SurveyDialog.vue";
 import { SurveyDialogResponse } from "@/components/dialogs/dialog.types";
 
 import pluralize from "pluralize";
+import PageHeader from "@/pages/PageHeader.vue";
 
 export default Vue.extend({
   name: "Surveys",
 
   components: {
     SurveyDialog,
+    PageHeader,
   },
 
   apollo: {

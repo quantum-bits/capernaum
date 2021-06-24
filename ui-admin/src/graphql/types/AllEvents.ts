@@ -13,7 +13,13 @@ export interface AllEvents_events {
    */
   id: number;
   date: string;
+  /**
+   * event type
+   */
   type: string;
+  /**
+   * event details
+   */
   details: string;
 }
 

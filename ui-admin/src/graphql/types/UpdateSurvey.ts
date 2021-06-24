@@ -14,7 +14,13 @@ export interface UpdateSurvey_updateSurvey_letters_letterType {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter type name
+   */
   key: string;
+  /**
+   * Letter type description
+   */
   description: string;
 }
 
@@ -23,6 +29,9 @@ export interface UpdateSurvey_updateSurvey_letters {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter title
+   */
   title: string;
   letterType: UpdateSurvey_updateSurvey_letters_letterType;
 }

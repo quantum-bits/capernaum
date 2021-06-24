@@ -4,6 +4,7 @@ import {
   Letter,
   LetterCreateInput,
   LetterElement,
+  LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
   LetterType,
@@ -125,6 +126,10 @@ export class LetterElementService extends BaseService<LetterElement> {
     private readonly letterElementRepo: Repository<LetterElement>
   ) {
     super(letterElementRepo);
+  }
+
+  create(createInput: LetterElementCreateInput) {
+    return this.letterElementRepo.create(createInput);
   }
 
   update(updateInput: LetterElementUpdateInput) {

@@ -1,13 +1,10 @@
 <template>
   <v-container>
-    <v-row class="align-baseline justify-space-between">
-      <v-col>
-        <h1 class="headline">Web Hooks</h1>
-      </v-col>
+    <page-header title="Web Hooks">
       <v-col>
         <h1 class="body-1">{{ organization.name }}</h1>
       </v-col>
-    </v-row>
+    </page-header>
 
     <v-row class="align-baseline">
       <v-col>
@@ -105,13 +102,20 @@ import SubscriptionDialog from "@/components/dialogs/SubscriptionDialog.vue";
 import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
 import { CreateSubscription } from "@/graphql/types/CreateSubscription";
 import { QualtricsListSubscriptions_subscriptions as QualtricsSubscription } from "@/graphql/types/QualtricsListSubscriptions";
+import PageHeader from "@/pages/PageHeader.vue";
 
 type StringToStringMap = Map<string, string>;
 
 export default Vue.extend({
   name: "WebHooks",
 
-  components: { WebHookCards, MachineCards, MachineDialog, SubscriptionDialog },
+  components: {
+    WebHookCards,
+    MachineCards,
+    MachineDialog,
+    SubscriptionDialog,
+    PageHeader,
+  },
 
   apollo: {
     organization: {

@@ -10,6 +10,7 @@ import {
   Letter,
   LetterCreateInput,
   LetterElement,
+  LetterElementCreateInput,
   LetterElementType,
   LetterElementUpdateInput,
   LetterType,
@@ -70,6 +71,13 @@ export class LetterResolver {
 @UseGuards(GqlAuthGuard)
 export class LetterElementResolver {
   constructor(private readonly letterElementService: LetterElementService) {}
+
+  @Mutation(() => LetterElement)
+  createLetterElement(
+    @Args("createInput") createInput: LetterElementCreateInput
+  ) {
+    return this.letterElementService.create(createInput);
+  }
 
   @Mutation(() => LetterElement)
   updateLetterElement(

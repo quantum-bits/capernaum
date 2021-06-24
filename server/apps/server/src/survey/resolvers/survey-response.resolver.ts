@@ -11,6 +11,11 @@ export class SurveyResponseResolver {
     private readonly groupService: GroupService
   ) {}
 
+  @Query(() => [SurveyResponse])
+  surveyResponses() {
+    return this.surveyResponseService.readAll();
+  }
+
   @Query(() => SurveyResponse)
   surveyResponseById(@Args({ name: "id", type: () => Int }) id: number) {
     return this.surveyResponseService.readOne(id);

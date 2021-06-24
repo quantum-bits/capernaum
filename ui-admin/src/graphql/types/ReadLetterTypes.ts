@@ -12,7 +12,13 @@ export interface ReadLetterTypes_readLetterTypes {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter type name
+   */
   key: string;
+  /**
+   * Letter type description
+   */
   description: string;
 }
 

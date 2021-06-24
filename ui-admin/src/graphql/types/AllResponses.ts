@@ -12,7 +12,13 @@ export interface AllResponses_surveyResponses_survey_letters_letterType {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter type name
+   */
   key: string;
+  /**
+   * Letter type description
+   */
   description: string;
 }
 
@@ -21,8 +27,17 @@ export interface AllResponses_surveyResponses_survey_letters {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Letter title
+   */
   title: string;
+  /**
+   * Description of letter
+   */
   description: string;
+  /**
+   * Email message to go out with letter
+   */
   emailMessage: string;
   letterType: AllResponses_surveyResponses_survey_letters_letterType;
 }
@@ -47,11 +62,17 @@ export interface AllResponses_surveyResponses {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Qualtrics response ID (e.g., R_...)
+   */
   qualtricsResponseId: string;
   /**
    * Respondent's email address
    */
   email: string;
+  /**
+   * Survey for which this is a response
+   */
   survey: AllResponses_surveyResponses_survey;
   /**
    * When survey was started

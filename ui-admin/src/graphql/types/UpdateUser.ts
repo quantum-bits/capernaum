@@ -14,8 +14,17 @@ export interface UpdateUser_updateUser {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Email address
+   */
   email: string;
+  /**
+   * First name
+   */
   firstName: string;
+  /**
+   * Last name
+   */
   lastName: string;
 }
 

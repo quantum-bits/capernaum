@@ -25,10 +25,13 @@ export interface ChangePasswordInput {
 export interface GroupCreateInput {
   name: string;
   typeId: number;
-  closedAfter: string;
+  otherTypeName?: string | null;
+  closedAfter: any;
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
+  adminComments: string;
+  plannedInvitees: number;
   surveyId: number;
 }
 
@@ -36,11 +39,14 @@ export interface GroupUpdateInput {
   id: number;
   name?: string | null;
   typeId?: number | null;
-  closedAfter?: string | null;
+  otherTypeName?: string | null;
+  closedAfter?: any | null;
   adminFirstName?: string | null;
   adminLastName?: string | null;
   adminEmail?: string | null;
   codeWord?: string | null;
+  adminComments?: string | null;
+  plannedInvitees?: number | null;
   surveyId?: number | null;
 }
 

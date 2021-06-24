@@ -9,14 +9,14 @@ import { SurveyIndexCreateInput } from "./globalTypes";
 // GraphQL mutation operation: AddIndex
 // ====================================================
 
-export interface AddIndex_createSurveyIndex_surveyItems {
+export interface AddIndex_surveyIndexCreate_surveyItems {
   /**
-   * Text of this question from Qualtrics
+   * Qualtrics `questionText` field
    */
   qualtricsText: string;
 }
 
-export interface AddIndex_createSurveyIndex {
+export interface AddIndex_surveyIndexCreate {
   /**
    * Unique ID for this entity
    */
@@ -29,14 +29,14 @@ export interface AddIndex_createSurveyIndex {
    * Abbreviation for this index (e.g., 'FOG')
    */
   abbreviation: string;
-  surveyItems: AddIndex_createSurveyIndex_surveyItems[];
+  surveyItems: AddIndex_surveyIndexCreate_surveyItems[];
 }
 
 export interface AddIndex {
   /**
    * Create a survey index. Can add survey items directly by item ID.
    */
-  createSurveyIndex: AddIndex_createSurveyIndex;
+  surveyIndexCreate: AddIndex_surveyIndexCreate;
 }
 
 export interface AddIndexVariables {

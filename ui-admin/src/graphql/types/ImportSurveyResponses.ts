@@ -16,6 +16,9 @@ export interface ImportSurveyResponses_importQualtricsSurveyResponses_surveyResp
    * Respondent's email address
    */
   email: string;
+  /**
+   * Qualtrics response ID (e.g., R_...)
+   */
   qualtricsResponseId: string;
   /**
    * When survey was started

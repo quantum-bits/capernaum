@@ -1,15 +1,12 @@
 <template>
   <v-container>
-    <v-row>
+    <page-header title="Scripture Engagement Practices">
       <v-col>
-        <h1 class="headline">Scripture Engagement Practices</h1>
-      </v-col>
-      <v-col class="text-xs-right">
         <v-btn color="primary" dark @click="newSEPractice">
           New Practice
         </v-btn>
       </v-col>
-    </v-row>
+    </page-header>
     <v-row>
       <v-col>
         <v-data-table
@@ -142,6 +139,7 @@ import {
   ScriptureEngagementPractices,
   ScriptureEngagementPractices_scriptureEngagementPractices,
 } from "@/graphql/types/ScriptureEngagementPractices";
+import PageHeader from "@/pages/PageHeader.vue";
 
 //import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
 
@@ -162,6 +160,7 @@ export default Vue.extend({
   props: {},
   components: {
     //ConfirmDeleteDialog
+    PageHeader,
   },
   data() {
     return {

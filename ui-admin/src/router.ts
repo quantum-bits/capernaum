@@ -40,7 +40,7 @@ const router = new VueRouter({
     {
       path: "/surveys",
       name: "surveys",
-      component: () => import("./pages/Surveys.vue"),
+      component: () => import("./pages/Qualtrics.vue"),
     },
     {
       path: "/compose/:letterId?",

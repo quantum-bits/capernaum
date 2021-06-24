@@ -19,10 +19,22 @@ export interface OneImage_image {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Image title from user
+   */
   title: string;
   url: string;
+  /**
+   * Internal unique ID
+   */
   uuid: string;
+  /**
+   * Original name of image file
+   */
   originalName: string;
+  /**
+   * MIME encoding for this image
+   */
   mimeType: string;
   created: any;
   updated: any;

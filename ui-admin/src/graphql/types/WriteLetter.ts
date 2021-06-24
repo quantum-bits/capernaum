@@ -45,8 +45,8 @@ export interface WriteLetter_writeLetter_responseSummary_predictionSummaries_pra
 }
 
 export interface WriteLetter_writeLetter_responseSummary_predictionSummaries_predictionDetails {
-  title: string;
-  abbreviation: string;
+  surveyIndexTitle: string;
+  surveyIndexAbbreviation: string;
   meanResponse: number;
 }
 

@@ -31,7 +31,7 @@ export const ALL_RESPONSES_QUERY = gql`
 
 export const GROUP_RESPONSES_QUERY = gql`
   query GroupResponses($groupId: Int!) {
-    groupResponses: surveyResponses(groupId: $groupId) {
+    groupResponses: surveyResponsesForGroup(groupId: $groupId) {
       id
       qualtricsResponseId
       email

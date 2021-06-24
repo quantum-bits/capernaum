@@ -14,6 +14,9 @@ export interface CreateLetterElement_createLetterElement {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * sequence number
+   */
   sequence: number;
 }
 

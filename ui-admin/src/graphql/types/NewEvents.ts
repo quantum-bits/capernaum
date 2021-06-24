@@ -13,7 +13,13 @@ export interface NewEvents_newEvent {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * event type
+   */
   type: string;
+  /**
+   * event details
+   */
   details: string;
 }
 

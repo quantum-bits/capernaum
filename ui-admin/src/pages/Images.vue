@@ -4,7 +4,6 @@
       <v-col>
         <h1 class="headline">Uploaded Images</h1>
       </v-col>
-
       <v-col class="text-xs-right">
         <v-btn color="primary" dark @click.stop="openDialogForCreate">
           Upload New Image
@@ -18,7 +17,7 @@
           :items="imageDetails"
           class="elevation-1"
         >
-          <template v-slot:item.image="{ item }">
+          <template v-slot:[`item.image`]="{ item }">
             <v-img
               :src="item.url"
               :alt="item.title"
@@ -27,7 +26,7 @@
               :contain="true"
             />
           </template>
-          <template v-slot:item.action="{ item }">
+          <template v-slot:[`item.action`]="{ item }">
             <v-icon class="mr-2" @click.stop="openDialogForUpdate(item)">
               mdi-pencil
             </v-icon>

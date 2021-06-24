@@ -101,7 +101,7 @@ export const UPDATE_DIMENSION_MUTATION = gql`
 
 export const ADD_INDEX_MUTATION = gql`
   mutation AddIndex($createInput: SurveyIndexCreateInput!) {
-    createSurveyIndex(createInput: $createInput) {
+    surveyIndexCreate(createInput: $createInput) {
       id
       title
       abbreviation

@@ -39,11 +39,9 @@ export const ONE_LETTER_QUERY = gql`
       description
       isFrozen
       emailMessage
-      scriptureEngagementPractices {
+      surveys {
         id
-        title
-        description
-        sequence
+        qualtricsName
       }
       letterType {
         id
@@ -53,20 +51,6 @@ export const ONE_LETTER_QUERY = gql`
           id
           key
           description
-        }
-      }
-      tableEntries {
-        surveyIndex {
-          id
-          abbreviation
-          title
-          surveyItems {
-            qualtricsId
-            qualtricsText
-          }
-        }
-        practice {
-          id
         }
       }
       letterElements {
@@ -89,47 +73,21 @@ export const ONE_LETTER_QUERY = gql`
           url
         }
       }
-      survey {
-        id
-        qualtricsId
-        qualtricsName
-        surveyDimensions {
-          survey {
-            qualtricsName
-          }
-          id
-          sequence
-          title
-          surveyIndices {
-            id
-            abbreviation
-            title
-            useForPredictions
-            surveyItems {
-              id
-              qualtricsId
-              qualtricsText
-            }
-          }
-        }
-      }
     }
   }
 `;
 
 export const ALL_LETTERS_QUERY = gql`
-  query Letters {
+  query AllLetters {
     letters {
       id
       title
       description
       updated
       isFrozen
-      scriptureEngagementPractices {
+      surveys {
         id
-        title
-        description
-        sequence
+        qualtricsName
       }
       letterType {
         id
@@ -139,19 +97,6 @@ export const ALL_LETTERS_QUERY = gql`
           id
           key
           description
-        }
-      }
-      tableEntries {
-        id
-        surveyIndex {
-          id
-          abbreviation
-          title
-          surveyItems {
-            id
-            qualtricsId
-            qualtricsText
-          }
         }
       }
       letterElements {
@@ -167,29 +112,6 @@ export const ALL_LETTERS_QUERY = gql`
           id
           title
           sequence
-        }
-      }
-      survey {
-        id
-        qualtricsId
-        qualtricsName
-        surveyDimensions {
-          id
-          survey {
-            qualtricsName
-          }
-          sequence
-          title
-          surveyIndices {
-            abbreviation
-            title
-            useForPredictions
-            surveyItems {
-              id
-              qualtricsId
-              qualtricsText
-            }
-          }
         }
       }
     }
@@ -283,8 +205,8 @@ export const WRITE_LETTER_MUTATION = gql`
             title
           }
           predictionDetails {
-            title
-            abbreviation
+            surveyIndexTitle
+            surveyIndexAbbreviation
             meanResponse
           }
           predict

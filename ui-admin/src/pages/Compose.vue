@@ -114,7 +114,7 @@
           <h2 class="title font-weight-regular mb-5">
             Last Update:
             <span class="font-weight-light">{{
-              letter.updated | dateAndTime
+              letter.updated | standardDateTime
             }}</span>
           </h2>
         </v-flex>
@@ -256,35 +256,26 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { Route, RawLocation } from "vue-router";
-
 import LetterTextArea from "../components/LetterTextArea.vue";
 import StaticLetterElement from "../components/StaticLetterElement.vue";
 import LetterInfoForm from "../components/LetterInfoForm.vue";
-
-import { LetterElementEnum, LetterTypeEnum } from "../types/letter.types";
-
+import { LetterElementEnum, LetterTypeEnum } from "@/types/letter.types";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
-
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
   ONE_LETTER_QUERY,
   UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
-
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
-
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import AssociationTable from "../components/AssociationTable.vue";
 import SpinnerBtn from "@/components/SpinnerBtn.vue";
-
 import {
   OneLetter,
   OneLetter_letter,
   OneLetter_letter_letterElements,
   OneLetter_letter_letterElements_letterElementType,
-  OneLetter_letter_survey,
-  OneLetter_letter_survey_surveyDimensions,
 } from "@/graphql/types/OneLetter";
 
 import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
@@ -295,11 +286,6 @@ interface LetterElement extends OneLetter_letter_letterElements {
   editModeOn: boolean;
   isNew: boolean;
   key: string;
-}
-
-// https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
-interface Letter extends Omit<OneLetter_letter, "letterElements"> {
-  letterElements: LetterElement[];
 }
 
 interface SelectedItem {
@@ -376,14 +362,12 @@ export default class Compose extends Vue {
   letterExists = false;
   generatingPDF = false;
 
-  theLetter: Letter = {
+  theLetter = {
     id: -1,
     title: "",
     description: "",
-    scriptureEngagementPractices: [],
     updated: "",
     isFrozen: false,
-    tableEntries: [],
     letterElements: [],
     emailMessage: JSON.stringify({
       ops: [],
@@ -394,31 +378,7 @@ export default class Compose extends Vue {
       description: "",
       letterElementTypes: [],
     },
-    survey: {
-      id: -1,
-      qualtricsId: "",
-      qualtricsName: "",
-      surveyDimensions: [],
-    },
   };
-
-  //booleanAssociation: BooleanAssociationBriefType | null = null;
-
-  get predictionTableEntriesExist(): boolean {
-    if (this.theLetter) {
-      return this.theLetter.tableEntries.length > 0;
-    } else {
-      return false;
-    }
-  }
-
-  get letter(): OneLetter_letter {
-    if (this.theLetter) {
-      return this.theLetter;
-    } else {
-      throw Error("Survey letter not yet defined.");
-    }
-  }
 
   get surveyLetterElements(): LetterElement[] {
     if (this.theLetter) {
@@ -433,23 +393,6 @@ export default class Compose extends Vue {
       text: image.title,
       value: image.id,
     }));
-  }
-
-  get chartElements(): SelectedItem[] {
-    return this.theLetter.survey.surveyDimensions.map(
-      (surveyDimension: OneLetter_letter_survey_surveyDimensions) => ({
-        text: surveyDimension.title,
-        value: surveyDimension.id,
-      })
-    );
-  }
-
-  get survey(): OneLetter_letter_survey {
-    if (this.theLetter) {
-      return this.theLetter.survey;
-    } else {
-      throw Error("Survey letter not yet defined.");
-    }
   }
 
   get surveyLetterIsFrozen(): boolean {
@@ -993,4 +936,7 @@ export default class Compose extends Vue {
     }
   }
 }
+
+// Credits:
+//   https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
 </script>

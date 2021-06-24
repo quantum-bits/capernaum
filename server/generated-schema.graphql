@@ -524,6 +524,18 @@ type LoginResponse {
   user: UserPayload!
 }
 
+type Event {
+  """Unique ID for this entity"""
+  id: Int!
+  date: String!
+
+  """event type"""
+  type: String!
+
+  """event details"""
+  details: String!
+}
+
 type Machine {
   """Unique ID for this entity"""
   id: Int!
@@ -589,13 +601,13 @@ type QualtricsSubscription {
 type Query {
   readAllSurveyDimensions: [SurveyDimension!]!
   readOneSurveyDimension(id: Int!): SurveyDimension!
-  updateSurveyDimension: SurveyDimension!
   surveyIndexReadAll: [SurveyIndex!]!
 
   """Retrieve all survey items"""
   surveyItemsReadAll: [SurveyItem!]!
   surveys: [Survey!]!
   survey(id: Int!): Survey!
+  surveyResponses: [SurveyResponse!]!
   surveyResponseById(id: Int!): SurveyResponse!
   surveyResponsesForGroup(
     """Limit to one group"""
@@ -619,12 +631,16 @@ type Query {
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   subscriptions: [QualtricsSubscription!]!
+  events: [Event!]!
   machines: [Machine!]!
 }
 
 type Mutation {
   """Create a survey dimension."""
   createSurveyDimension(createInput: SurveyDimensionCreateInput!): SurveyDimension!
+
+  """Update an existing survey dimension"""
+  updateSurveyDimension(updateInput: SurveyDimensionUpdateInput!): SurveyDimension!
 
   """
   Delete a dimension. Also deletes indices associated with this dimension.
@@ -658,6 +674,7 @@ type Mutation {
   updateGroup(updateInput: GroupUpdateInput!): Group!
   deleteGroup(id: Int!): Int!
   sendLetter(mailInput: SendMailInput!): SendMailResponse!
+  createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
   deleteLetterElement(id: Int!): Int!
   createLetter(createInput: LetterCreateInput!): Letter!
@@ -691,6 +708,7 @@ type Mutation {
   importQualtricsSurveyResponses(qualtricsId: String!): QualtricsResponseImportStats!
   createSubscription(createInput: QualtricsSubscriptionCreateInput!): QualtricsSubscription!
   deleteSubscription(subscriptionId: String!): String!
+  createEvent(createInput: EventCreateInput!): Event!
   createMachine(createInput: MachineCreateInput!): Machine!
   deleteMachine(id: Int!): Int!
 }
@@ -702,6 +720,12 @@ input SurveyDimensionCreateInput {
   surveyId: Int!
   title: String!
   sequence: Int!
+}
+
+input SurveyDimensionUpdateInput {
+  id: Int!
+  title: String
+  sequence: Int
 }
 
 input SurveyIndexCreateInput {
@@ -831,6 +855,15 @@ input SendMailInput {
   textContent: String!
   htmlContent: String
   attachmentPath: String
+}
+
+input LetterElementCreateInput {
+  sequence: Int!
+  textDelta: String
+  imageId: Int
+  letterId: Int!
+  letterElementTypeId: Int!
+  surveyDimensionId: Int
 }
 
 input LetterElementUpdateInput {
@@ -965,8 +998,17 @@ input QualtricsSubscriptionCreateInput {
   surveyId: String
 }
 
+input EventCreateInput {
+  type: String!
+  details: String!
+}
+
 input MachineCreateInput {
   name: String!
   hostName: String!
   active: Boolean!
+}
+
+type Subscription {
+  newEvent: Event!
 }

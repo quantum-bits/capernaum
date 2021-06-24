@@ -22,7 +22,7 @@
         <h2 class="title font-weight-regular mb-5">
           Last Update:
           <span class="font-weight-light">{{
-            oneLetter.updated | dateAndTime
+            oneLetter.updated | standardDateTime
           }}</span>
         </h2>
       </v-flex>

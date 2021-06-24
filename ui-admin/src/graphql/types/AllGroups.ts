@@ -7,19 +7,22 @@
 // GraphQL query operation: AllGroups
 // ====================================================
 
-export interface AllGroups_allGroups_type {
+export interface AllGroups_groups_type {
+  /**
+   * Unique ID for this entity
+   */
   id: number;
   /**
    * Group name (e.g., 'Small Group')
    */
   name: string;
   /**
-   * Group code (e.g., 'SMALL_GROUP')
+   * Group code (e.g., 'small-group')
    */
   code: string;
 }
 
-export interface AllGroups_allGroups_survey {
+export interface AllGroups_groups_survey {
   /**
    * Unique ID for this entity
    */
@@ -46,7 +49,18 @@ export interface AllGroups_allGroups_survey {
   okayForGroup: boolean;
 }
 
-export interface AllGroups_allGroups {
+export interface AllGroups_groups_surveyResponses {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Respondent's email address
+   */
+  email: string;
+}
+
+export interface AllGroups_groups {
   /**
    * Unique ID for this entity
    */
@@ -55,15 +69,19 @@ export interface AllGroups_allGroups {
    * Group name
    */
   name: string;
-  type: AllGroups_allGroups_type;
+  type: AllGroups_groups_type;
+  /**
+   * Name for 'other' type 
+   */
+  otherTypeName: string | null;
   /**
    * Date when survey created
    */
-  created: string;
+  created: any;
   /**
    * Date when survey closes
    */
-  closedAfter: string;
+  closedAfter: any;
   /**
    * Group administrator first name
    */
@@ -80,9 +98,13 @@ export interface AllGroups_allGroups {
    * Survey code word used by group
    */
   codeWord: string;
-  survey: AllGroups_allGroups_survey;
+  survey: AllGroups_groups_survey;
+  /**
+   * Responses by this group
+   */
+  surveyResponses: AllGroups_groups_surveyResponses[] | null;
 }
 
 export interface AllGroups {
-  allGroups: AllGroups_allGroups[];
+  groups: AllGroups_groups[];
 }

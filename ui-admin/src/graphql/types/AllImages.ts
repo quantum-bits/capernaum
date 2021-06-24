@@ -19,10 +19,22 @@ export interface AllImages_images {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Image title from user
+   */
   title: string;
   url: string;
+  /**
+   * Internal unique ID
+   */
   uuid: string;
+  /**
+   * MIME encoding for this image
+   */
   mimeType: string;
+  /**
+   * Original name of image file
+   */
   originalName: string;
   created: any;
   updated: any;

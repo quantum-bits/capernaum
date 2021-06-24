@@ -177,7 +177,7 @@
               {{ letterTitle(item) }}
             </template>
             <template v-slot:[`item.date`]="{ item }">
-              {{ item.endDate | sensibleDate }}
+              {{ item.endDate | standardDate }}
             </template>
             <template v-slot:[`item.action`]="{ item }">
               <v-icon
@@ -272,7 +272,7 @@ import MailDialog from "@/components/dialogs/MailDialog.vue";
 import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
-import { AllGroups_allGroups } from "@/graphql/types/AllGroups";
+import { AllGroups, AllGroups_groups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
 import { LetterTypeEnum } from "@/types/letter.types";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
@@ -298,14 +298,14 @@ export default Vue.extend({
   data() {
     return {
       surveys: [] as ImportedSurvey[],
-      groups: [] as AllGroups_allGroups[],
+      groups: {} as AllGroups,
       letterTypes: [] as ReadLetterTypes_readLetterTypes[],
       chosenLetterType: {
         id: -Infinity,
         key: "",
         description: "",
       } as ReadLetterTypes_readLetterTypes,
-      chosenGroup: null as AllGroups_allGroups | null,
+      chosenGroup: null as AllGroups_groups | null,
       // surveySelection: {} as SurveySelection, // Selection from allSurveys
       selectedQualtricsId: "",
       responseSearch: "",
@@ -462,7 +462,7 @@ export default Vue.extend({
         });
     },
 
-    fetchGroupResponses(group: AllGroups_allGroups) {
+    fetchGroupResponses(group: AllGroups_groups) {
       console.log("inside fetch group responses: ", group);
       this.chosenGroup = group;
       let chosenGroupId = group.id;

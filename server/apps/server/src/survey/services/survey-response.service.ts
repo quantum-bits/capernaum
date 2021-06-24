@@ -19,9 +19,15 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
     super(repo);
   }
 
+  private alwaysResolve = ["survey", "surveyItemResponses"];
+
+  readAll() {
+    return this.repo.find({ relations: this.alwaysResolve });
+  }
+
   readOne(id: number) {
     return this.repo.findOne(id, {
-      relations: ["survey", "surveyItemResponses"],
+      relations: this.alwaysResolve,
     });
   }
 

@@ -25,10 +25,6 @@ import {
   AllSurveys_surveys_letters,
 } from "@/graphql/types/AllSurveys";
 
-//interface LetterType extends ReadLetterTypes_readLetterTypes {
-//  allowAddLetter: boolean;
-//}
-
 export default Vue.extend({
   name: "LetterTypeMenu",
 
