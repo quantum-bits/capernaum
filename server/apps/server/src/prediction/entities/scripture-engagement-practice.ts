@@ -15,6 +15,9 @@ export class ScriptureEngagementPractice extends AbstractEntity {
   @FieldColumn("URL for more information on practice")
   moreInfoUrl: string;
 
+  @FieldColumn("Include this SEP in prediction counts?", { default: true })
+  forPredictionCounts: boolean;
+
   @FieldColumn("Sequence number", () => Int)
   sequence: number;
 }

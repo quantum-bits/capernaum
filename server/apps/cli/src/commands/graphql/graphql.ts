@@ -4,7 +4,7 @@ import { Command } from "commander";
 import { graphqlClient } from "./graphql-client";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("graphql");
+const debug = getDebugger("cli");
 
 export function graphQLQuery(queryString: string, options, command: Command) {
   debug("queryString '%s'", queryString);

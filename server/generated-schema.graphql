@@ -41,6 +41,9 @@ type ScriptureEngagementPractice {
   """URL for more information on practice"""
   moreInfoUrl: String!
 
+  """Include this SEP in prediction counts?"""
+  forPredictionCounts: Boolean!
+
   """Sequence number"""
   sequence: Int!
   predictionTableEntries: [PredictionTableEntry!]!

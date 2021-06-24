@@ -50,14 +50,21 @@ export class LetterTypesFixture extends AbstractFixture {
         {
           key: SurveyRespondentType.Group,
           description: "Group Letter",
-          // These element types are identical to the individual letter.
-          // This was not always the case, and I'm leaving this in place
-          // in case it is again in the future.
           elementTypes: [
             { "#ref": "boilerplate-text" },
             { "#ref": "scripture-engagement-prediction" },
             { "#ref": "dimension-chart" },
             { "#ref": "image" },
+            {
+              "#id": "scripture-engagement-count",
+              key: "scripture-engagement-count",
+              description: "Scripture Engagement Counts",
+            },
+            {
+              "#id": "demographics",
+              key: "demographics",
+              description: "Group Demographics",
+            },
           ],
         },
       ],

@@ -9,7 +9,7 @@ import { printTable } from "@helpers/formatting";
 import { DateTime } from "luxon";
 import { UpdateResult } from "typeorm";
 
-const debug = getDebugger("group");
+const debug = getDebugger("cli");
 
 export async function listGroups(options) {
   const nestContext = new NestContext();

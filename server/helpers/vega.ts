@@ -1,12 +1,13 @@
-import Debug from "debug";
 import { compile, TopLevelSpec } from "vega-lite";
-import vega from "vega";
+import * as vega from "vega";
 import { createWriteStream, PathLike } from "fs";
 import { Canvas } from "canvas";
+import { getDebugger } from "@helpers/debug-factory";
 
-const debug = Debug("vega-lite");
+const debug = getDebugger("vega");
 
 export function makeChart(vegaLiteSpec: TopLevelSpec, outputPath: PathLike) {
+  debug("makeChart %O to %s", vegaLiteSpec, outputPath);
   const { spec, normalized } = compile(vegaLiteSpec);
   debug("normalized %O", normalized);
 

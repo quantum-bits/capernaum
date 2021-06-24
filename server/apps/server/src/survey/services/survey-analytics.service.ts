@@ -5,6 +5,7 @@ import { Group } from "@server/src/group/entities";
 import {
   Dimension,
   Prediction,
+  PredictionCount,
   SurveyRespondentType,
 } from "@server/src/survey/survey.types";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -221,5 +222,56 @@ export class SurveyAnalyticsService {
 
     debug("predictions %O", predictions);
     return predictions;
+  }
+
+  /**
+   * Return `PredictionCount` objects for a group.
+   * @param groupId
+   */
+  async countPredictionsPerGroup(groupId: number) {
+    const summaryByPracticeId = new Map<number, PredictionCount>();
+
+    // Get the group and all its responses.
+    const group = await this.groupRepo.findOneOrFail(groupId, {
+      relations: ["surveyResponses"],
+    });
+    debug("group details %O", group);
+
+    // Process all responses for this group.
+    for (const response of group.surveyResponses) {
+      // Run the individual prediction for SEP's
+      const predictions = await this.predictScriptureEngagementPractices(
+        response.id,
+        SurveyRespondentType.Individual
+      );
+
+      // Handle all the SEP predictions for this individual.
+      for (const prediction of predictions) {
+        // Skip practices that we don't want in the group count summary.
+        if (!prediction.practice.forPredictionCounts) {
+          continue;
+        }
+
+        // Make sure the map has a null entry for this SEP.
+        if (!summaryByPracticeId.has(prediction.practice.id)) {
+          summaryByPracticeId.set(prediction.practice.id, {
+            practiceId: prediction.practice.id,
+            practiceTitle: prediction.practice.title,
+            predictCount: 0,
+          });
+        }
+
+        // If this SEP is predicted for this individual, bump the count.
+        if (prediction.predict) {
+          const predictionCount = summaryByPracticeId.get(
+            prediction.practice.id
+          );
+          predictionCount.predictCount += 1;
+          summaryByPracticeId.set(prediction.practice.id, predictionCount);
+        }
+      }
+    }
+    debug("%O", summaryByPracticeId);
+    return summaryByPracticeId.values();
   }
 }

@@ -6,7 +6,7 @@ import { TypeKind } from "graphql";
 import prettyFormat from "pretty-format";
 import { getDebugger } from "@helpers/debug-factory";
 
-const debug = getDebugger("query");
+const debug = getDebugger("cli");
 
 export default class Query {
   //extends Command {

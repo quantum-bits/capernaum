@@ -27,6 +27,7 @@ import {
   sendGroupReport,
   closeGroup,
   forceGroupReport,
+  countGroupPredictions,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 
@@ -191,16 +192,24 @@ const dimensionCommands = responseCommands
 
 dimensionCommands
   .command("individual <survey-response-pk>")
+  .option("--pdf <pdf-file-name>", "save as PDF")
+  .option("--dimension <dimension-pk>", "specific dimension (else all)")
   .description("calculate dimensions for one response")
-  .action((surveyResponsePk) =>
-    calculateDimensions(surveyResponsePk, SurveyRespondentType.Individual)
+  .action((surveyResponsePk, options) =>
+    calculateDimensions(
+      surveyResponsePk,
+      options,
+      SurveyRespondentType.Individual
+    )
   );
 
 dimensionCommands
   .command("group <group-pk>")
+  .option("---pdf <pdf-file-name>", "Save as PDF")
+  .option("--dimension <dimension-pk>", "specific dimension (else all)")
   .description("calculate dimensions for group responses")
-  .action((groupPk) =>
-    calculateDimensions(groupPk, SurveyRespondentType.Group)
+  .action((groupPk, options) =>
+    calculateDimensions(groupPk, options, SurveyRespondentType.Group)
   );
 
 responseCommands
@@ -225,6 +234,12 @@ predictionCommands
   .action((surveyResponsePk) =>
     predictEngagement(surveyResponsePk, SurveyRespondentType.Group)
   );
+
+predictionCommands
+  .command("count <group-pk>")
+  .option("--pdf <pdf-file-name>", "save as PDF")
+  .description("count recommendations for group")
+  .action(countGroupPredictions);
 
 const msiCommands = responseCommands
   .command("msi")
@@ -314,12 +329,16 @@ emailCommands
   .action(sendTestEmail);
 
 program
+  .command("debug-cache")
+  .description("show debug cache")
+  .action(dumpDebugCache);
+
+program
   .command("gql <query-string>")
   .description("Run a GraphQL query")
   .action(graphQLQuery);
 
 // Do it.
 program.parseAsync().then(() => {
-  dumpDebugCache();
   knex.destroy();
 });

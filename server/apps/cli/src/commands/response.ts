@@ -1,15 +1,24 @@
-import { QualtricsApiService } from '@qapi/qualtrics-api.service'
-import NestContext from '@common/cli/src/nest-helpers'
-import { getDebugger } from '@helpers/debug-factory'
-import { SurveyAnalyticsService } from '@server/src/survey/services/survey-analytics.service'
-import { QualtricsID } from '@server/src/qualtrics/qualtrics.types'
-import { QualtricsService } from '@server/src/qualtrics/qualtrics.service'
-import { printPretty, printTable } from '@helpers/formatting'
-import * as _ from 'lodash'
-import chalk from 'chalk'
-import { Dimension, Prediction, SurveyRespondentType } from '@server/src/survey/survey.types'
+import { QualtricsApiService } from "@qapi/qualtrics-api.service";
+import NestContext from "@common/cli/src/nest-helpers";
+import { getDebugger } from "@helpers/debug-factory";
+import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
+import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
+import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
+import { printPretty, printTable } from "@helpers/formatting";
+import * as _ from "lodash";
+import chalk from "chalk";
+import {
+  Dimension,
+  Prediction,
+  PredictionCount,
+  SurveyRespondentType,
+} from "@server/src/survey/survey.types";
+import { OptionValues } from "commander";
+import { TopLevelSpec } from "vega-lite";
+import { makeChart } from "@helpers/vega";
+import { VisualizationService } from "@server/src/visualization/visualization.service";
 
-const debug = getDebugger("cli:response");
+const debug = getDebugger("cli");
 
 export function getQualtricsResponse(
   surveyId: string,
@@ -88,15 +97,32 @@ export async function summarizeResponse(responseId: number) {
 
 export async function calculateDimensions(
   responseOrGroupId: number,
+  options: OptionValues,
   respondentType: SurveyRespondentType
 ) {
   const nestContext = new NestContext();
   const surveyAnalysisService = await nestContext.get(SurveyAnalyticsService);
+  const visualizationService = await nestContext.get(VisualizationService);
   const dimensions = await surveyAnalysisService.calculateSurveyDimensions(
     responseOrGroupId,
     respondentType
   );
   await nestContext.close();
+
+  if (options.pdf) {
+    if (!options.dimension) {
+      throw new Error("Need dimension PK for graphical output");
+    }
+    const dimension = dimensions.find(
+      (dim) => dim.id === parseInt(options.dimension)
+    );
+    if (!dimension) {
+      throw new Error(`Failed to find dimension ${options.dimension}`);
+    }
+    console.log("DIMENSION", dimension);
+    visualizationService.visualizeDimension(dimension, options.pdf);
+  }
+
   reportDimension(
     dimensions,
     `Dimensions for ${
@@ -159,7 +185,8 @@ function reportPrediction(predictions: Prediction[], caption) {
           : "",
         detail.surveyIndexTitle,
         greenOrRed(
-          detail.meanResponse >= parseInt(process.env.SEP_PREDICTION_THRESHOLD),
+          detail.meanResponse >=
+            parseFloat(process.env.SEP_PREDICTION_THRESHOLD),
           Number(detail.meanResponse).toFixed(2)
         ),
       ]);
@@ -171,3 +198,32 @@ function reportPrediction(predictions: Prediction[], caption) {
   });
 }
 
+export async function countGroupPredictions(
+  groupId: number,
+  options: OptionValues
+) {
+  const nestContext = new NestContext();
+  const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
+  const visualizationService = await nestContext.get(VisualizationService);
+  const predictionCountsIterator =
+    await surveyAnalyticsService.countPredictionsPerGroup(groupId);
+  await nestContext.close();
+
+  const predictionCounts = Array.from(predictionCountsIterator);
+  debug("predictionCounts %O", predictionCounts);
+
+  if (options.pdf) {
+    visualizationService.visualizePredictionCounts(
+      predictionCounts,
+      options.pdf
+    );
+  }
+
+  const headers = ["ID", "Title", "Count"];
+  const data = _.map(predictionCounts, (predictionCount) => [
+    predictionCount.practiceId,
+    predictionCount.practiceTitle,
+    predictionCount.predictCount,
+  ]);
+  printTable(headers, data);
+}

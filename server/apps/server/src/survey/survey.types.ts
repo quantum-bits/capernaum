@@ -30,6 +30,15 @@ export class Prediction {
   predict: boolean;
 }
 
+/**
+ * Summary of the number of times a given practice has been predicted.
+ */
+export interface PredictionCount {
+  practiceId: number;
+  practiceTitle: string;
+  predictCount: number;
+}
+
 @ObjectType()
 export class DimensionDetails {
   @Field(() => Int) indexId: number;

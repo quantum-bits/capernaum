@@ -83,3 +83,18 @@ WHERE sr.id = $1
   AND sidx."useForPredictions"
 GROUP BY sep.id, sep.title, sidx.id, sidx.title, sidx.abbreviation
 ORDER BY sep.title;
+
+-- Summarize a qualtrics survey.
+SELECT survey."qualtricsName" as survey_name,
+       sdim.id AS sdim_id,
+       sdim.title,
+       sidx.id AS sidx_id,
+       sidx.title,
+       sitem.id as sitem_id,
+       sitem."qualtricsId",
+       sitem."qualtricsText"
+FROM survey
+         INNER JOIN survey_dimension sdim ON survey.id = sdim."surveyId"
+         INNER JOIN survey_index sidx ON sdim.id = sidx."surveyDimensionId"
+         INNER JOIN survey_item sitem ON sidx.id = sitem."surveyIndexId"
+order by sdim_id, sidx_id, sitem_id;

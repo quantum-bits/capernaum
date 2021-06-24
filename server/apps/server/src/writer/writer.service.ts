@@ -311,6 +311,10 @@ export class WriterService {
         case "scripture-engagement-prediction":
           renderedElements.push(this.renderPredictions(predictions));
           break;
+        case "scripture-engagement-count":
+          break;
+        case "demographics":
+          break;
         case "dimension-chart":
           const dimension: Dimension = _.find(
             dimensions,

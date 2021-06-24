@@ -14,7 +14,7 @@ import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
 import { GroupTypesFixture } from "../fixtures/group-types.fixture";
 
-const debug = getDebugger("fixture");
+const debug = getDebugger("cli");
 
 const groupTypesFixture = new GroupTypesFixture();
 const groupsFixture = new GroupsFixture();

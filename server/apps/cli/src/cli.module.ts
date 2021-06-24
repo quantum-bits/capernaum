@@ -5,6 +5,7 @@ import { options as typeORMConfig } from "@server/src/typeorm-config";
 import { WriterModule } from "@server/src/writer/writer.module";
 import { QueueModule } from "@reporter/src/queue/queue.module";
 import { ReportModule } from "@reporter/src/report/report.module";
+import { VisualizationModule } from "@server/src/visualization/visualization.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ReportModule } from "@reporter/src/report/report.module";
     WriterModule,
     QueueModule,
     ReportModule,
+    VisualizationModule,
   ],
 })
 export class CliModule {}

@@ -5,7 +5,7 @@ import { printPretty } from "@helpers/formatting";
 import { getDebugger } from "@helpers/debug-factory";
 import { SendMailInput } from "@server/src/mail/entities";
 
-const debug = getDebugger("mail");
+const debug = getDebugger("cli");
 
 export async function sendTestEmail() {
   const nestContext = new NestContext();
