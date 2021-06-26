@@ -6,23 +6,34 @@
     <v-row>
       <v-col>
         <v-data-table :headers="headers" :items="filteredSurveys">
-          <template v-slot:[`item.qualtricsModDate`]="{ item }">
-            {{ item.qualtricsModDate | standardDate }}
-          </template>
-          <template v-slot:[`item.qualtricsIsActive`]="{ item }">
-            {{ item.qualtricsIsActive ? "Yes" : "No" }}
-          </template>
-          <template v-slot:[`item.importStatus`]="{ item }">
-            {{ importStatus(item) }}
-          </template>
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-btn
-              small
-              v-if="!isImported(item)"
-              @click="importQualtricsSurvey(item.qualtricsId)"
-            >
-              Import
-            </v-btn>
+          <template v-slot:item="{ item: survey }">
+            <tr>
+              <td>{{ survey.qualtricsId }}</td>
+              <td>{{ survey.qualtricsName }}</td>
+              <td>
+                <v-chip small>
+                  {{ survey.qualtricsIsActive ? "Yes" : "No" }}
+                </v-chip>
+              </td>
+              <td>{{ survey.qualtricsModDate | standardDate }}</td>
+              <td>{{ importStatus(survey) }}</td>
+              <td>{{ importDate(survey) }}</td>
+              <td>
+                <v-chip small color="primary">
+                  {{ isSurveyOutOfDate(survey) }}
+                </v-chip>
+              </td>
+              <td>
+                <v-btn
+                  small
+                  v-if="!isImported(survey)"
+                  @click="importQualtricsSurvey(survey.qualtricsId)"
+                >
+                  Import
+                </v-btn>
+                <v-btn small>Update</v-btn>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-col>
@@ -44,6 +55,7 @@ import {
 } from "@/graphql/surveys.graphql";
 import PageHeader from "@/pages/PageHeader.vue";
 import { CombinedSurveys_combinedSurveys } from "@/graphql/types/CombinedSurveys";
+import { DateTime } from "luxon";
 
 export default Vue.extend({
   name: "Qualtrics",
@@ -61,12 +73,13 @@ export default Vue.extend({
   data() {
     return {
       headers: [
-        { text: "Q ID", value: "qualtricsId" },
-        { text: "Q Name", value: "qualtricsName" },
-        { text: "Q Mod Date", value: "qualtricsModDate" },
-        { text: "Q Active", value: "qualtricsIsActive" },
-        { text: "Imported", value: "importStatus" },
-        { text: "Import Date", value: "capernaumSurvey.createdDate" },
+        { text: "Q ID", value: "qId" },
+        { text: "Q Name", value: "qName" },
+        { text: "Q Active", value: "qIsActive" },
+        { text: "Q Mod Date", value: "qModDate" },
+        { text: "Imported", value: "isImported" },
+        { text: "Import Date", value: "capCreatedDate" },
+        { text: "Out of Date", value: "outOfDate" },
         { text: "Actions", value: "actions" },
       ],
       combinedSurveys: [] as CombinedSurveys_combinedSurveys[],
@@ -96,6 +109,23 @@ export default Vue.extend({
       return this.isImported(survey)
         ? `Yes (PK=${survey.capernaumSurvey?.id})`
         : "No";
+    },
+
+    importDate(survey: CombinedSurveys_combinedSurveys) {
+      const standardDate = Vue.filter("standardDate");
+      if (survey.capernaumSurvey) {
+        return standardDate(survey.capernaumSurvey.createdDate);
+      }
+      return "";
+    },
+
+    isSurveyOutOfDate(survey: CombinedSurveys_combinedSurveys) {
+      if (!survey.capernaumSurvey) {
+        return false;
+      }
+      const qDateTime = DateTime.fromISO(survey.qualtricsModDate);
+      const capDateTime = DateTime.fromISO(survey.capernaumSurvey.createdDate);
+      return qDateTime > capDateTime;
     },
 
     importQualtricsSurvey(qualtricsSurveyId: string) {
