@@ -1,6 +1,10 @@
 import { config } from "dotenv";
-import { knex } from "./models/db";
+config();
 
+import PrettyError = require("pretty-error");
+PrettyError.start();
+
+import { knex } from "./models/db";
 import { Command, Option } from "commander";
 import {
   calculateDimensions,
@@ -28,18 +32,13 @@ import {
   closeGroup,
   forceGroupReport,
   countGroupPredictions,
+  showHierarchy,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
-
-config();
-
-import PrettyError = require("pretty-error");
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
 import { listLetters } from "@common/cli/src/commands/letter";
 import { sendTestEmail } from "@common/cli/src/commands/mail";
 import { dumpDebugCache } from "@helpers/debug-factory";
-
-PrettyError.start();
 
 const program = new Command();
 program.version("0.0.1");
@@ -337,6 +336,12 @@ program
   .command("gql <query-string>")
   .description("Run a GraphQL query")
   .action(graphQLQuery);
+
+program
+  .command("hierarchy")
+  .description("show complete command hierarchy")
+  .option("--verbose", "show details of all commands", false)
+  .action((options) => showHierarchy(options, program));
 
 // Do it.
 program.parseAsync().then(() => {

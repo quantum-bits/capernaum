@@ -10,12 +10,9 @@ import chalk from "chalk";
 import {
   Dimension,
   Prediction,
-  PredictionCount,
   SurveyRespondentType,
 } from "@server/src/survey/survey.types";
 import { OptionValues } from "commander";
-import { TopLevelSpec } from "vega-lite";
-import { makeChart } from "@helpers/vega";
 import { VisualizationService } from "@server/src/visualization/visualization.service";
 
 const debug = getDebugger("cli");
