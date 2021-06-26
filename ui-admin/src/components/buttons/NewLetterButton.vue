@@ -26,12 +26,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
-import {
-  AllSurveys_surveys,
-  AllSurveys_surveys_letters,
-} from "@/graphql/types/AllSurveys";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "NewLetterButton",
@@ -41,39 +38,26 @@ export default Vue.extend({
       query: ALL_LETTER_TYPES_QUERY,
     },
     surveys: {
-      query: ALL_SURVEYS_QUERY,
-      //update(data: AllSurveys) {
-      //this.allSurveysHaveLetters = data.surveys.every(
-      //  (survey) => survey.letter !== null
-      //);
-      //  console.log("surveys! ", data.surveys);
-      //  return data.surveys;
-      //},
-      fetchPolicy: "network-only",
+      query: ALL_CAPERNAUM_SURVEYS,
     },
   },
 
   data() {
     return {
       readLetterTypes: [] as ReadLetterTypes_readLetterTypes[],
-      surveys: [] as AllSurveys_surveys[],
+      surveys: [] as AllCapernaumSurveys_surveys[],
     };
   },
 
   computed: {
     canCreateLetter(): boolean {
-      // https://stackoverflow.com/questions/38922998/add-property-to-an-array-of-objects
-      //let letterTypeArray: LetterType[] = this.readLetterTypes.map((obj) => ({
-      //  ...obj,
-      //  allowAddLetter: true,
-      //}));
       let allowAddLetter = false;
       this.readLetterTypes.forEach(
         (letterType: ReadLetterTypes_readLetterTypes) => {
           //let allowAddLetter = false;
           this.surveys.forEach((survey) => {
             let hasThisType = false;
-            survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
+            survey.letters.forEach((letter) => {
               if (letter.letterType.key === letterType.key) {
                 hasThisType = true;
                 console.log(

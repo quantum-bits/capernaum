@@ -13,13 +13,9 @@ import {
   ScriptureEngagementPracticeCreateInput,
   PredictionTableEntryReplaceInput,
   ScriptureEngagementPracticeUpdateInput,
-  PredictionTable,
-  PredictionTableCreateInput,
-  PredictionTableUpdateInput,
 } from "./entities";
 import {
   PredictionTableEntryService,
-  PredictionTableService,
   ScriptureEngagementPracticeService,
 } from "./prediction.service";
 import { SurveyIndex } from "../survey/entities";
@@ -116,36 +112,5 @@ export class ScriptureEngagementPracticeResolver {
     return this.scriptureEngagementPracticeService.resolvePredictionTableEntries(
       scriptureEngagementPractice
     );
-  }
-}
-
-@Resolver("PredictionTable")
-export class PredictionTableResolver {
-  constructor(
-    private readonly predictiontableService: PredictionTableService
-  ) {}
-
-  @Mutation(() => PredictionTable)
-  createPredictionTable(
-    @Args("createInput") createInput: PredictionTableCreateInput
-  ) {
-    return this.predictiontableService.create(createInput);
-  }
-
-  @Query(() => [PredictionTable])
-  readPredictionTables() {
-    return this.predictiontableService.readAll();
-  }
-
-  @Mutation(() => PredictionTable)
-  updatePredictionTable(
-    @Args("updateInput") updateInput: PredictionTableUpdateInput
-  ) {
-    return this.predictiontableService.update(updateInput);
-  }
-
-  @Mutation(() => Int)
-  deletePredictionTable(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.predictiontableService.delete(id);
   }
 }

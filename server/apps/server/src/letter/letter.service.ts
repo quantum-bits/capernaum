@@ -17,7 +17,6 @@ import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 import { SurveyDimension } from "@server/src/survey/entities";
 import { Image } from "@server/src/image/entities";
-import { PredictionTable } from "@server/src/prediction/entities";
 
 const debug = getDebugger("letter");
 
@@ -148,10 +147,6 @@ export class LetterElementService extends BaseService<LetterElement> {
 
   resolveRelatedSurveyDimension(letterElement: LetterElement): SurveyDimension {
     return this.resolveOne(letterElement, "surveyDimension");
-  }
-
-  resolveRelatedPredictionTable(letterElement: LetterElement): PredictionTable {
-    return this.resolveOne(letterElement, "predictionTable");
   }
 }
 

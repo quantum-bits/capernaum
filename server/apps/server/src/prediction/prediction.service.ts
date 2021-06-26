@@ -9,38 +9,7 @@ import {
 } from "./entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import {
-  PredictionTable,
-  PredictionTableCreateInput,
-  PredictionTableUpdateInput,
-} from "@server/src/prediction/entities/prediction-table";
 import { BaseService } from "@server/src/shared/base.service";
-
-@Injectable()
-export class PredictionTableService {
-  constructor(
-    @InjectRepository(PredictionTable)
-    private readonly repo: Repository<PredictionTable>
-  ) {}
-
-  create(createInput: PredictionTableCreateInput) {
-    return this.repo.save(this.repo.create(createInput));
-  }
-
-  readAll() {
-    return this.repo.find();
-  }
-
-  update(updateInput: PredictionTableUpdateInput) {
-    return this.repo
-      .preload(updateInput)
-      .then((result) => this.repo.save(result));
-  }
-
-  delete(id: number) {
-    return this.repo.delete(id).then((result) => result.affected);
-  }
-}
 
 @Injectable()
 export class PredictionTableEntryService extends BaseService<PredictionTableEntry> {

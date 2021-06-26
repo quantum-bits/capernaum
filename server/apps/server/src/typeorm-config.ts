@@ -17,7 +17,6 @@ import {
   SurveyResponse,
 } from "./survey/entities";
 import {
-  PredictionTable,
   PredictionTableEntry,
   ScriptureEngagementPractice,
 } from "./prediction/entities";
@@ -50,7 +49,6 @@ export const entities = [
   SurveyResponse,
   User,
   UserRole,
-  PredictionTable,
 ];
 
 export const options: ConnectionOptions = {

@@ -34,7 +34,6 @@
       </v-flex>
       <v-flex xs12>
         <v-data-table :headers="headers" :items="tableData" class="elevation-1">
-          <!-- https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table -->
           <template v-slot:item="{ item, headers }">
             <tr>
               <td
@@ -99,7 +98,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import Vue from "vue";
 import { orderBy } from "lodash";
 import {
   AssociationTableHeader,
@@ -108,172 +107,182 @@ import {
 } from "@/types/association-table.types";
 import { ONE_LETTER_QUERY } from "@/graphql/letters.graphql";
 import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
-import { OneLetter, OneLetter_letter } from "@/graphql/types/OneLetter";
+import { OneLetter } from "@/graphql/types/OneLetter";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 interface IdDict {
   [key: string]: boolean;
 }
 
-@Component({
-  //components: { AssociationTableInfoForm },
-  apollo: {
-    oneLetter: {
-      query: ONE_LETTER_QUERY,
-      variables() {
-        return {
-          letterId: parseInt(this.letterId),
-        };
-      },
-      update(oneLetter: OneLetter) {
-        console.log("inside update; letter data: ", oneLetter);
-        // construct headers
-        this.tableColumns = [];
-        this.headers = [];
-        this.headers.push({
-          text: "SE Practice",
-          align: "left",
-          sortable: true,
-          value: "practice",
-        });
+export default Vue.extend({
+  name: "AssociationTable",
 
-        let surveyDimensions = orderBy(
-          oneLetter.letter.survey.surveyDimensions,
-          "sequence"
-        );
-        surveyDimensions.forEach((dimension) => {
-          dimension.surveyIndices.forEach((index) => {
-            if (index.useForPredictions) {
-              //this.tableColumns.push(index);
-              this.headers.push({
-                text: index.abbreviation,
-                align: "left",
-                sortable: true,
-                value: "columnId-" + index.id, // unique id for this index
-              });
-            }
-          });
-        });
-
-        let scriptureEngagementPractices = orderBy(
-          oneLetter.letter.scriptureEngagementPractices,
-          "sequence"
-        );
-
-        let tableEntriesDict: { [key: number]: string[] } = {};
-        scriptureEngagementPractices.forEach((practice) => {
-          tableEntriesDict[practice.id] = [];
-        });
-        oneLetter.letter.tableEntries.forEach((entry) => {
-          tableEntriesDict[entry.practice.id].push(
-            "columnId-" + entry.surveyIndex.id
-          );
-        });
-
-        this.tableData = [];
-        scriptureEngagementPractices.forEach((practice) => {
-          let idDict: IdDict = {};
-          this.headers.forEach((header: AssociationTableHeader) => {
-            if (header.value !== "practice") {
-              idDict[header.value] = tableEntriesDict[practice.id].includes(
-                header.value
-              );
-            }
-          });
-          this.tableData.push({
-            practice: practice.title,
-            practiceId: practice.id, // added so that we can figure out which practice this is when we go to save the data
-            practiceOrder: practice.sequence, // added so we know the original ordering...not sure if we will allow this to change
-            spiritualFocusOrientationIdDict: idDict,
-          });
-        });
-        console.log("table data: ", this.tableData);
-        this.originalTableData = JSON.parse(JSON.stringify(this.tableData)); // this can be used later if the user clicks "cancel"
-
-        return oneLetter.letter; // return oneLetter, but in the end we are not actually using it anywhere....
-      },
-      skip() {
-        console.log("skipping fetch of letter data....");
-        return this.letterId === null;
-      },
-    },
+  props: {
+    letterId: { type: Number, default: null },
+    allowHideTable: { type: Boolean, default: false },
   },
-})
-export default class AssociationTable extends Vue {
-  @Prop({ default: null }) letterId!: number; // letter id
-  @Prop({ default: false }) allowHideTable!: boolean; // whether or not the table may be hidden
-  oneLetter: OneLetter_letter | null = null;
 
-  tableColumns: SpiritualFocusOrientation[] = [];
-  tableData: TableData[] = [];
-  originalTableData: TableData[] = [];
-  headers: AssociationTableHeader[] = [];
+  data() {
+    return {
+      oneLetter: {} as OneLetter,
+      tableColumns: [] as SpiritualFocusOrientation[],
+      tableData: [] as TableData[],
+      originalTableData: [] as TableData[],
+      headers: [] as AssociationTableHeader[],
+      tableEditModeOn: false,
+    };
+  },
 
-  tableEditModeOn = false;
-
-  hideTable(): void {
-    this.$emit("hide-table");
-  }
-
-  editTable(): void {
-    this.tableEditModeOn = true;
-  }
-
-  cancelEdits(): void {
-    this.tableData = JSON.parse(JSON.stringify(this.originalTableData));
-    this.tableEditModeOn = false;
-  }
-
-  saveTableEdits(): void {
-    // save edits to db....
-    this.tableEditModeOn = false;
-    let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
-    for (let tableRow of this.tableData) {
-      //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
-      Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
-        ([key, value]) => {
-          if (value) {
-            // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
-            // (e.g., "columnId-2" means the focus/orientation id is 2);
-            // if the value is true, the id is harvested from the key and saved to an array
-            let id: number = +key.split("columnId-")[1];
-            //spiritualFocusOrientationIds.push(id);
-            partialPredictionTableEntries.push({
-              surveyIndexId: id,
-              practiceId: tableRow.practiceId,
-              // hard-coding the sequence for now....
-              sequence: 10,
-            });
-          }
-        }
-      );
-    }
-    console.log("partialPredictionTableEntries", partialPredictionTableEntries);
-
-    this.$apollo
-      .mutate({
-        mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
-        variables: {
-          replaceInput: {
-            letterId: this.oneLetter?.id,
-            entries: partialPredictionTableEntries,
-          },
-        },
-      })
-      .then(({ data }) => {
-        console.log("done!", data);
-        this.refetchLetterData();
-      })
-      .catch((error) => {
-        console.log("there appears to have been an error: ", error);
-      });
-  }
-
-  refetchLetterData(): void {
-    this.$apollo.queries.oneLetter.refetch().then(({ data }) => {
-      console.log("survey data refetched! ", data);
-    });
-  }
-}
+  // apollo: {
+  //   oneLetter: {
+  //     query: ONE_LETTER_QUERY,
+  //     variables() {
+  //       return {
+  //         letterId: parseInt(this.letterId),
+  //       };
+  //     },
+  //     update(oneLetter: OneLetter) {
+  //       console.log("inside update; letter data: ", oneLetter);
+  //       // construct headers
+  //       this.tableColumns = [];
+  //       this.headers = [];
+  //       this.headers.push({
+  //         text: "SE Practice",
+  //         align: "left",
+  //         sortable: true,
+  //         value: "practice",
+  //       });
+  //
+  //       let surveyDimensions = orderBy(
+  //         oneLetter.letter.survey.surveyDimensions,
+  //         "sequence"
+  //       );
+  //       surveyDimensions.forEach((dimension) => {
+  //         dimension.surveyIndices.forEach((index) => {
+  //           if (index.useForPredictions) {
+  //             //this.tableColumns.push(index);
+  //             this.headers.push({
+  //               text: index.abbreviation,
+  //               align: "left",
+  //               sortable: true,
+  //               value: "columnId-" + index.id, // unique id for this index
+  //             });
+  //           }
+  //         });
+  //       });
+  //
+  //       let scriptureEngagementPractices = orderBy(
+  //         oneLetter.letter.scriptureEngagementPractices,
+  //         "sequence"
+  //       );
+  //
+  //       let tableEntriesDict: { [key: number]: string[] } = {};
+  //       scriptureEngagementPractices.forEach((practice) => {
+  //         tableEntriesDict[practice.id] = [];
+  //       });
+  //       oneLetter.letter.tableEntries.forEach((entry) => {
+  //         tableEntriesDict[entry.practice.id].push(
+  //           "columnId-" + entry.surveyIndex.id
+  //         );
+  //       });
+  //
+  //       this.tableData = [];
+  //       scriptureEngagementPractices.forEach((practice) => {
+  //         let idDict: IdDict = {};
+  //         this.headers.forEach((header: AssociationTableHeader) => {
+  //           if (header.value !== "practice") {
+  //             idDict[header.value] = tableEntriesDict[practice.id].includes(
+  //               header.value
+  //             );
+  //           }
+  //         });
+  //         this.tableData.push({
+  //           practice: practice.title,
+  //           practiceId: practice.id, // added so that we can figure out which practice this is when we go to save the data
+  //           practiceOrder: practice.sequence, // added so we know the original ordering...not sure if we will allow this to change
+  //           spiritualFocusOrientationIdDict: idDict,
+  //         });
+  //       });
+  //       console.log("table data: ", this.tableData);
+  //       this.originalTableData = JSON.parse(JSON.stringify(this.tableData)); // this can be used later if the user clicks "cancel"
+  //
+  //       return oneLetter.letter; // return oneLetter, but in the end we are not actually using it anywhere....
+  //     },
+  //     skip() {
+  //       console.log("skipping fetch of letter data....");
+  //       return this.letterId === null;
+  //     },
+  //   },
+  // },
+  //
+  // methods: {
+  //   hideTable(): void {
+  //     this.$emit("hide-table");
+  //   },
+  //
+  //   editTable(): void {
+  //     this.tableEditModeOn = true;
+  //   },
+  //
+  //   cancelEdits(): void {
+  //     this.tableData = JSON.parse(JSON.stringify(this.originalTableData));
+  //     this.tableEditModeOn = false;
+  //   },
+  //
+  //   saveTableEdits(): void {
+  //     // save edits to db....
+  //     this.tableEditModeOn = false;
+  //     let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
+  //     for (let tableRow of this.tableData) {
+  //       //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
+  //       Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
+  //         ([key, value]) => {
+  //           if (value) {
+  //             // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
+  //             // (e.g., "columnId-2" means the focus/orientation id is 2);
+  //             // if the value is true, the id is harvested from the key and saved to an array
+  //             let id: number = +key.split("columnId-")[1];
+  //             //spiritualFocusOrientationIds.push(id);
+  //             partialPredictionTableEntries.push({
+  //               surveyIndexId: id,
+  //               practiceId: tableRow.practiceId,
+  //               // hard-coding the sequence for now....
+  //               sequence: 10,
+  //             });
+  //           }
+  //         }
+  //       );
+  //     }
+  //     console.log(
+  //       "partialPredictionTableEntries",
+  //       partialPredictionTableEntries
+  //     );
+  //
+  //     this.$apollo
+  //       .mutate({
+  //         mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
+  //         variables: {
+  //           replaceInput: {
+  //             letterId: this.oneLetter?.id,
+  //             entries: partialPredictionTableEntries,
+  //           },
+  //         },
+  //       })
+  //       .then(({ data }) => {
+  //         console.log("done!", data);
+  //         this.refetchLetterData();
+  //       })
+  //       .catch((error) => {
+  //         console.log("there appears to have been an error: ", error);
+  //       });
+  //   },
+  //
+  //   refetchLetterData(): void {
+  //     this.$apollo.queries.oneLetter.refetch().then(({ data }) => {
+  //       console.log("survey data refetched! ", data);
+  //     });
+  //   },
+  // },
+});
 
 // Credits:
 //   https://stackoverflow.com/questions/49607082/dynamically-building-a-table-using-vuetifyjs-data-table

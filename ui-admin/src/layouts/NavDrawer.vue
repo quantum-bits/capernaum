@@ -88,7 +88,7 @@ export default Vue.extend({
       {
         heading: "SYS ADMIN",
         title: "Qualtrics",
-        route: "surveys",
+        route: "qualtrics",
         icon: "mdi-comment-question",
       },
       {

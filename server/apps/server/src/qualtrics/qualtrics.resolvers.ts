@@ -13,6 +13,10 @@ import {
 } from "./entities";
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
+import { getDebugger } from "@helpers/debug-factory";
+import is from "is";
+
+const debug = getDebugger("qualtrics");
 
 @Resolver()
 @UseGuards(GqlAuthGuard)
@@ -50,7 +54,7 @@ export class QualtricsResolver {
             qualtricsModDate: element.lastModified,
             qualtricsCreationDate: element.creationDate,
             qualtricsIsActive: element.isActive,
-            importedToCapernaum: survey !== null,
+            capernaumSurvey: survey,
           });
         }
       }

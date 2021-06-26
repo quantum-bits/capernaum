@@ -44,7 +44,7 @@ export default Vue.extend({
   name: "RegisterGroupCard",
 
   apollo: {
-    allSurveys: {
+    surveys: {
       query: ALL_SURVEYS_QUERY,
       update: (data) => {
         console.log("surveys! ", data);
@@ -57,13 +57,13 @@ export default Vue.extend({
 
   data() {
     return {
-      allSurveys: [],
+      surveys: [],
     };
   },
 
   computed: {
     noSurveys(): boolean {
-      return this.allSurveys.length === 0;
+      return this.surveys.length === 0;
     },
   },
 

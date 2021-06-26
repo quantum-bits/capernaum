@@ -4,17 +4,21 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: QualtricsSurveys
+// GraphQL query operation: CombinedSurveys
 // ====================================================
 
-export interface QualtricsSurveys_qualtricsSurveys_capernaumSurvey {
+export interface CombinedSurveys_combinedSurveys_capernaumSurvey {
   /**
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * When this survey was imported from Qualtrics
+   */
+  createdDate: any;
 }
 
-export interface QualtricsSurveys_qualtricsSurveys {
+export interface CombinedSurveys_combinedSurveys {
   qualtricsId: string;
   qualtricsOwnerId: string;
   qualtricsName: string;
@@ -24,13 +28,9 @@ export interface QualtricsSurveys_qualtricsSurveys {
   /**
    * Associated Capernaum survey, if any
    */
-  capernaumSurvey: QualtricsSurveys_qualtricsSurveys_capernaumSurvey | null;
+  capernaumSurvey: CombinedSurveys_combinedSurveys_capernaumSurvey | null;
 }
 
-export interface QualtricsSurveys {
-  qualtricsSurveys: QualtricsSurveys_qualtricsSurveys[];
-}
-
-export interface QualtricsSurveysVariables {
-  includeInactive?: boolean | null;
+export interface CombinedSurveys {
+  combinedSurveys: CombinedSurveys_combinedSurveys[];
 }

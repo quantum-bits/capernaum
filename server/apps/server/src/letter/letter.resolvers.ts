@@ -26,7 +26,6 @@ import {
 } from "./letter.service";
 import { Int } from "@nestjs/graphql";
 import { Survey, SurveyDimension } from "../survey/entities";
-import { PredictionTable } from "../prediction/entities";
 import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
@@ -101,13 +100,6 @@ export class LetterElementResolver {
   })
   resolveSurveyDimension(@Parent() letterElement: LetterElement) {
     return this.letterElementService.resolveRelatedSurveyDimension(
-      letterElement
-    );
-  }
-
-  @ResolveField("predictionTable", () => PredictionTable, { nullable: true })
-  resolvePredictionTable(@Parent() letterElement: LetterElement) {
-    return this.letterElementService.resolveRelatedPredictionTable(
       letterElement
     );
   }

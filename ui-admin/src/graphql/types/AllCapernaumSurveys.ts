@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: AllSurveys
+// GraphQL query operation: AllCapernaumSurveys
 // ====================================================
 
-export interface AllSurveys_surveys_letters_letterType {
+export interface AllCapernaumSurveys_surveys_letters_letterType {
   /**
    * Unique ID for this entity
    */
@@ -22,7 +22,7 @@ export interface AllSurveys_surveys_letters_letterType {
   description: string;
 }
 
-export interface AllSurveys_surveys_letters {
+export interface AllCapernaumSurveys_surveys_letters {
   /**
    * Unique ID for this entity
    */
@@ -31,31 +31,31 @@ export interface AllSurveys_surveys_letters {
    * Letter title
    */
   title: string;
-  letterType: AllSurveys_surveys_letters_letterType;
+  letterType: AllCapernaumSurveys_surveys_letters_letterType;
 }
 
-export interface AllSurveys_surveys_surveyDimensions {
+export interface AllCapernaumSurveys_surveys_surveyDimensions {
   /**
    * Unique ID for this entity
    */
   id: number;
 }
 
-export interface AllSurveys_surveys_surveyItems {
+export interface AllCapernaumSurveys_surveys_surveyItems {
   /**
    * Unique ID for this entity
    */
   id: number;
 }
 
-export interface AllSurveys_surveys_surveyResponses {
+export interface AllCapernaumSurveys_surveys_surveyResponses {
   /**
    * Unique ID for this entity
    */
   id: number;
 }
 
-export interface AllSurveys_surveys {
+export interface AllCapernaumSurveys_surveys {
   /**
    * Unique ID for this entity
    */
@@ -87,23 +87,23 @@ export interface AllSurveys_surveys {
   /**
    * Fetch the letters for this survey
    */
-  letters: AllSurveys_surveys_letters[];
+  letters: AllCapernaumSurveys_surveys_letters[];
   /**
    * Dimensions for this survey; groups indices, which group items.
    */
-  surveyDimensions: AllSurveys_surveys_surveyDimensions[];
+  surveyDimensions: AllCapernaumSurveys_surveys_surveyDimensions[];
   /**
    * All the Qualtrics items for this survey; 
    *     for groupings, see survey dimension and index.
    *     Pass 'whichItems' to choose which to return (default 'All')
    */
-  surveyItems: AllSurveys_surveys_surveyItems[];
+  surveyItems: AllCapernaumSurveys_surveys_surveyItems[];
   /**
    * Responses for this survey
    */
-  surveyResponses: AllSurveys_surveys_surveyResponses[];
+  surveyResponses: AllCapernaumSurveys_surveys_surveyResponses[];
 }
 
-export interface AllSurveys {
-  surveys: AllSurveys_surveys[];
+export interface AllCapernaumSurveys {
+  surveys: AllCapernaumSurveys_surveys[];
 }

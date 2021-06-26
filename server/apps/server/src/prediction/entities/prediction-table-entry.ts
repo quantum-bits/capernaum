@@ -3,20 +3,15 @@ import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { SurveyIndex } from "../../survey/entities";
 import { ScriptureEngagementPractice } from "./scripture-engagement-practice";
 import { AbstractEntity } from "../../shared/abstract-entity";
-import { PredictionTable } from "@server/src/prediction/entities/prediction-table";
 import { FieldColumn } from "@server/src/decorators";
 
 /**
  * This entity is a ternary association table.
  */
 @Entity()
-@Index(["predictionTable", "surveyIndex", "practice"], { unique: true })
+@Index(["surveyIndex", "practice"], { unique: true })
 @ObjectType({ description: "One entry in a prediction table" })
 export class PredictionTableEntry extends AbstractEntity {
-  @Field(() => PredictionTable)
-  @ManyToOne(() => PredictionTable, (pt) => pt.predictionTableEntries)
-  predictionTable: PredictionTable;
-
   @Field(() => SurveyIndex)
   @ManyToOne(() => SurveyIndex, { primary: true })
   surveyIndex: SurveyIndex;

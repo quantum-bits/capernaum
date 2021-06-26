@@ -1,4 +1,5 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
+import { Survey } from "@server/src/survey/entities";
 
 @ObjectType()
 export class QualtricsSurveyListItem {
@@ -8,5 +9,10 @@ export class QualtricsSurveyListItem {
   @Field() qualtricsModDate: string;
   @Field() qualtricsCreationDate: string;
   @Field() qualtricsIsActive: boolean;
-  @Field() importedToCapernaum: boolean;
+
+  @Field(() => Survey, {
+    description: "Associated Capernaum survey, if any",
+    nullable: true,
+  })
+  capernaumSurvey?: Survey;
 }

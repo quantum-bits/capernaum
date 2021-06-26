@@ -3,7 +3,6 @@ import { options } from "@server/src/typeorm-config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Event } from "@server/src/events/entities";
 import {
-  PredictionTable,
   PredictionTableEntry,
   ScriptureEngagementPractice,
 } from "@server/src/prediction/entities";
@@ -42,7 +41,6 @@ import { DaemonModule } from "@reporter/src/daemon/daemon.module";
         LetterElement,
         LetterElementType,
         LetterType,
-        PredictionTable,
         PredictionTableEntry,
         ScriptureEngagementPractice,
         Survey,

@@ -53,40 +53,23 @@
 
 <script lang="ts">
 import { Component, Emit, Prop, Vue } from "vue-property-decorator";
-
-//import axios, { AxiosResponse } from "axios";
-//import gql from "graphql-tag";
-
-//import { BooleanAssociationBriefType } from "@/types/association-table.types";
 import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
-
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
-
 import { SurveySelection } from "@/pages/survey.types";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { AllSurveys_surveys } from "@/graphql/types/AllSurveys";
 import {
   ADD_LETTER_MUTATION,
   UPDATE_LETTER_MUTATION,
 } from "@/graphql/letters.graphql";
-//import {
-//  LetterCreateInput,
-//  LetterUpdateInput,
-//} from "@/graphql/types/globalTypes";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
-// used for data returned from the db (for the list used in the drop-down)
-// interface BooleanAssociationType {
-//   id: number; // id of the association table in our db
-//   title: string; // e.g., "General (<2019)"
-//   [propName: string]: any; // several other properties will/may come back from the db, but they are unimportant here
-// }
 @Component({
   components: {
     LetterTypeMenu,
   },
   apollo: {
     surveys: {
-      query: ALL_SURVEYS_QUERY,
+      query: ALL_CAPERNAUM_SURVEYS,
       fetchPolicy: "network-only",
     },
   },
@@ -98,11 +81,9 @@ export default class LetterInfoForm extends Vue {
   @Prop({ default: null }) initialDescription!: string;
   @Prop({ default: null }) letterTypeDescription!: string;
   @Prop({ default: -Infinity }) surveyId!: number; // no id will be -Infinity, so this is presumably safe
-  //@Prop({ default: null })
-  //initialBooleanAssociation!: BooleanAssociationBriefType | null;
   @Prop() isNew!: boolean;
 
-  surveys: AllSurveys_surveys[] = [];
+  surveys: AllCapernaumSurveys_surveys[] = [];
   //booleanAssociations: BooleanAssociationType[] = [];
   title: string = this.initialTitle;
   description: string = this.initialDescription;

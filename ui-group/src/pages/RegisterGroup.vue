@@ -457,7 +457,7 @@ export default Vue.extend({
   //allSurveys: AllSurveys_surveys[] = []; // All surveys, listed in drop-down.
 
   apollo: {
-    allSurveys: {
+    surveys: {
       query: ALL_SURVEYS_QUERY,
       update: (data) => {
         console.log("surveys! ", data);
@@ -470,7 +470,7 @@ export default Vue.extend({
 
   data() {
     return {
-      allSurveys: [],
+      surveys: [],
       isValid: true,
       formStep: 1,
 
@@ -510,7 +510,7 @@ export default Vue.extend({
 
   computed: {
     noSurveys(): boolean {
-      return this.allSurveys.length === 0;
+      return this.surveys.length === 0;
     },
 
     isOtherGroupSelected(): boolean {
@@ -526,9 +526,9 @@ export default Vue.extend({
         description: ''
       } as ChosenSurveySummary;
 
-      if (this.allSurveys.length === 1) {
+      if (this.surveys.length === 1) {
           // TODO: use the auto-generated AllSurveys_surveys...not sure why that doesn't work here....
-        this.allSurveys.forEach( (survey: SelectedSurvey) => {
+        this.surveys.forEach( (survey: SelectedSurvey) => {
           // https://stackoverflow.com/questions/44147937/property-does-not-exist-on-type-never
           chosenSurvey.name = survey.publicName;
           chosenSurvey.description = survey.detailedDescription;
@@ -537,7 +537,7 @@ export default Vue.extend({
         return chosenSurvey;
       } else if ( this.selectedSurveyId !== null ){
         let numberSuccesses = 0;
-        this.allSurveys.forEach( (survey: SelectedSurvey) => {
+        this.surveys.forEach( (survey: SelectedSurvey) => {
           // https://stackoverflow.com/questions/44147937/property-does-not-exist-on-type-never
           if (this.selectedSurveyId === survey.id) {
             chosenSurvey.name = survey.publicName;
@@ -622,7 +622,7 @@ export default Vue.extend({
     },
 
     showSurveySelectionStep(): boolean {
-      return this.allSurveys.length > 1;
+      return this.surveys.length > 1;
     },
 
     commentStep(): number {
@@ -667,11 +667,11 @@ export default Vue.extend({
             validate: () => boolean;
           }
         ).validate() &&
-        ((this.selectedSurveyId !== null) || (this.allSurveys.length === 1))
+        ((this.selectedSurveyId !== null) || (this.surveys.length === 1))
       ) {
-        if (this.allSurveys.length === 1) {
+        if (this.surveys.length === 1) {
           // TODO: use the auto-generated AllSurveys_surveys...not sure why that doesn't work here....
-          this.allSurveys.forEach( (survey: SelectedSurvey) => {
+          this.surveys.forEach( (survey: SelectedSurvey) => {
             // https://stackoverflow.com/questions/44147937/property-does-not-exist-on-type-never
             this.selectedSurveyId = survey['id'];
           });

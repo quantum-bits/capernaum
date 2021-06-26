@@ -49,110 +49,10 @@ type ScriptureEngagementPractice {
   predictionTableEntries: [PredictionTableEntry!]!
 }
 
-type LetterType {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Letter type name"""
-  key: String!
-
-  """Letter type description"""
-  description: String!
-  letterElementTypes: [LetterElementType!]!
-}
-
-type LetterElementType {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Letter element type name"""
-  key: String!
-
-  """Letter element type description"""
-  description: String!
-  letterTypes: [LetterType!]!
-}
-
-type Letter {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Letter title"""
-  title: String!
-
-  """Description of letter"""
-  description: String!
-
-  """Email message to go out with letter"""
-  emailMessage: String!
-  created: DateTime!
-  updated: DateTime!
-
-  """Is this letter frozen?"""
-  isFrozen: Boolean!
-  surveys: Survey!
-  letterType: LetterType!
-  letterElements: [LetterElement!]!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Image {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Original name of image file"""
-  originalName: String!
-
-  """MIME encoding for this image"""
-  mimeType: String!
-
-  """Internal unique ID"""
-  uuid: String!
-
-  """Image title from user"""
-  title: String!
-  created: DateTime!
-  updated: DateTime!
-  url: String!
-  fullPath: String!
-  letterElements: [LetterElement!]!
-}
-
-type LetterElement {
-  """Unique ID for this entity"""
-  id: Int!
-  letter: Letter!
-  letterElementType: LetterElementType!
-
-  """sequence number"""
-  sequence: Int!
-
-  """Quill text delta"""
-  textDelta: String
-  image: Image
-  surveyDimension: SurveyDimension
-  predictionTable: PredictionTable
-}
-
-type PredictionTable {
-  """Unique ID for this entity"""
-  id: Int!
-
-  """Prediction table name"""
-  name: String!
-  predictionTableEntries: [PredictionTableEntry!]!
-  letterElements: [LetterElement!]!
-}
-
 """One entry in a prediction table"""
 type PredictionTableEntry {
   """Unique ID for this entity"""
   id: Int!
-  predictionTable: PredictionTable!
   surveyIndex: SurveyIndex!
   practice: ScriptureEngagementPractice!
 
@@ -228,6 +128,11 @@ type Group {
   """Responses by this group"""
   surveyResponses: [SurveyResponse!]
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type GroupType {
   """Unique ID for this entity"""
@@ -333,10 +238,96 @@ type SurveyItem {
   qualtricsText: String!
 }
 
+type LetterType {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Letter type name"""
+  key: String!
+
+  """Letter type description"""
+  description: String!
+  letterElementTypes: [LetterElementType!]!
+}
+
+type LetterElementType {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Letter element type name"""
+  key: String!
+
+  """Letter element type description"""
+  description: String!
+  letterTypes: [LetterType!]!
+}
+
+type Letter {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Letter title"""
+  title: String!
+
+  """Description of letter"""
+  description: String!
+
+  """Email message to go out with letter"""
+  emailMessage: String!
+  created: DateTime!
+  updated: DateTime!
+
+  """Is this letter frozen?"""
+  isFrozen: Boolean!
+  surveys: Survey!
+  letterType: LetterType!
+  letterElements: [LetterElement!]!
+}
+
+type Image {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """Original name of image file"""
+  originalName: String!
+
+  """MIME encoding for this image"""
+  mimeType: String!
+
+  """Internal unique ID"""
+  uuid: String!
+
+  """Image title from user"""
+  title: String!
+  created: DateTime!
+  updated: DateTime!
+  url: String!
+  fullPath: String!
+  letterElements: [LetterElement!]!
+}
+
+type LetterElement {
+  """Unique ID for this entity"""
+  id: Int!
+  letter: Letter!
+  letterElementType: LetterElementType!
+
+  """sequence number"""
+  sequence: Int!
+
+  """Quill text delta"""
+  textDelta: String
+  image: Image
+  surveyDimension: SurveyDimension
+}
+
 """All information about a survey imported from Qualtrics"""
 type Survey {
   """Unique ID for this entity"""
   id: Int!
+
+  """When this survey was imported from Qualtrics"""
+  createdDate: DateTime!
 
   """Fetch the letters for this survey"""
   letters: [Letter!]!
@@ -576,7 +567,9 @@ type QualtricsSurveyListItem {
   qualtricsModDate: String!
   qualtricsCreationDate: String!
   qualtricsIsActive: Boolean!
-  importedToCapernaum: Boolean!
+
+  """Associated Capernaum survey, if any"""
+  capernaumSurvey: Survey
 }
 
 type QualtricsOrganization {

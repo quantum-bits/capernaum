@@ -88,12 +88,11 @@ import {
   ALL_LETTERS_QUERY,
   DELETE_LETTER_MUTATION,
 } from "@/graphql/letters.graphql";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import LetterTypeMenu from "@/components/LetterTypeMenu.vue";
-import NewLetterButton from "@/components/NewLetterButton.vue";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
+import NewLetterButton from "@/components/buttons/NewLetterButton.vue";
 import PageHeader from "@/pages/PageHeader.vue";
-import { AllSurveys } from "@/graphql/types/AllSurveys";
-import { AllLetters, AllLetters_letters } from "@/graphql/types/AllLetters";
+import { AllLetters_letters } from "@/graphql/types/AllLetters";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "Letters",
@@ -110,7 +109,7 @@ export default Vue.extend({
     },
 
     surveys: {
-      query: ALL_SURVEYS_QUERY,
+      query: ALL_CAPERNAUM_SURVEYS,
       fetchPolicy: "network-only",
     },
   },
@@ -128,8 +127,8 @@ export default Vue.extend({
         { text: "Type", value: "letterType" },
         { text: "Actions", sortable: false },
       ],
-      letters: {} as AllLetters,
-      surveys: {} as AllSurveys,
+      letters: [] as AllLetters_letters[],
+      surveys: [] as AllCapernaumSurveys_surveys[],
     };
   },
 

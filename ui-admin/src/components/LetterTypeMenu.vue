@@ -17,13 +17,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_LETTER_TYPES_QUERY } from "@/graphql/letters.graphql";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
-import {
-  AllSurveys,
-  AllSurveys_surveys,
-  AllSurveys_surveys_letters,
-} from "@/graphql/types/AllSurveys";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "LetterTypeMenu",
@@ -33,14 +29,7 @@ export default Vue.extend({
       query: ALL_LETTER_TYPES_QUERY,
     },
     surveys: {
-      query: ALL_SURVEYS_QUERY,
-      update(data: AllSurveys) {
-        //this.allSurveysHaveLetters = data.surveys.every(
-        //  (survey) => survey.letter !== null
-        //);
-        console.log("surveys! ", data.surveys);
-        return data.surveys;
-      },
+      query: ALL_CAPERNAUM_SURVEYS,
       fetchPolicy: "network-only",
     },
   },
@@ -48,7 +37,7 @@ export default Vue.extend({
   data() {
     return {
       readLetterTypes: [] as ReadLetterTypes_readLetterTypes[],
-      surveys: [] as AllSurveys_surveys[],
+      surveys: [] as AllCapernaumSurveys_surveys[],
       letterTypeSelect: {
         description: "",
         id: -Infinity,
@@ -64,11 +53,6 @@ export default Vue.extend({
 
   computed: {
     letterTypes(): ReadLetterTypes_readLetterTypes[] {
-      // https://stackoverflow.com/questions/38922998/add-property-to-an-array-of-objects
-      //let letterTypeArray: LetterType[] = this.readLetterTypes.map((obj) => ({
-      //  ...obj,
-      //  allowAddLetter: true,
-      //}));
       let allowedLetterTypes: ReadLetterTypes_readLetterTypes[] = [];
 
       this.readLetterTypes.forEach(
@@ -77,7 +61,7 @@ export default Vue.extend({
 
           this.surveys.forEach((survey) => {
             let hasThisType = false;
-            survey.letters.forEach((letter: AllSurveys_surveys_letters) => {
+            survey.letters.forEach((letter) => {
               if (letter.letterType.key === letterType.key) {
                 hasThisType = true;
               }

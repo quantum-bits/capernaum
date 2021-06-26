@@ -79,8 +79,7 @@ import {
 } from "@/graphql/qualtrics.graphql";
 
 import URLParse from "url-parse";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
 import WebHookCards from "@/components/WebHookCards.vue";
 import {
   CategoryType,
@@ -103,6 +102,7 @@ import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
 import { CreateSubscription } from "@/graphql/types/CreateSubscription";
 import { QualtricsListSubscriptions_subscriptions as QualtricsSubscription } from "@/graphql/types/QualtricsListSubscriptions";
 import PageHeader from "@/pages/PageHeader.vue";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 type StringToStringMap = Map<string, string>;
 
@@ -127,10 +127,10 @@ export default Vue.extend({
     },
 
     surveyNameById: {
-      query: ALL_SURVEYS_QUERY,
-      update: (data) => {
+      query: ALL_CAPERNAUM_SURVEYS,
+      update: (data: AllCapernaumSurveys_surveys[]) => {
         const nameById: StringToStringMap = new Map();
-        data.surveys.forEach((survey: Survey) =>
+        data.forEach((survey) =>
           nameById.set(survey.qualtricsId, survey.qualtricsName)
         );
         return nameById;

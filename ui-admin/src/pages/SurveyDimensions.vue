@@ -74,7 +74,7 @@
 import Vue from "vue";
 import {
   ADD_DIMENSION_MUTATION,
-  ALL_SURVEYS_QUERY,
+  COMBINED_SURVEYS_QUERY,
   ONE_SURVEY_QUERY,
 } from "@/graphql/surveys.graphql";
 
@@ -108,8 +108,8 @@ export default Vue.extend({
   },
 
   apollo: {
-    allSurveys: {
-      query: ALL_SURVEYS_QUERY,
+    surveys: {
+      query: COMBINED_SURVEYS_QUERY,
       update: (data) => data.surveys,
     },
 
@@ -137,7 +137,7 @@ export default Vue.extend({
     return {
       surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
 
-      allSurveys: [] as Survey[], // All surveys, listed in drop-down.
+      surveys: [] as Survey[], // All surveys, listed in drop-down.
       surveySelection: {} as SurveySelection, // Selection from allSurveys
       survey: {} as Survey,
 
@@ -189,7 +189,7 @@ export default Vue.extend({
 
   computed: {
     selections(): SurveySelection[] {
-      return this.allSurveys.map((survey) => ({
+      return this.surveys.map((survey) => ({
         text: survey.qualtricsName,
         value: survey.id,
       }));

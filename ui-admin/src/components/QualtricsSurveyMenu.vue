@@ -14,10 +14,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { isEmpty } from "lodash";
 import { ALL_QUALTRICS_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { QualtricsSurveys_qualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
+import { QualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
 import { QualtricsSurveySelection } from "@/pages/survey.types";
+import is from "is";
 
 export default Vue.extend({
   /**
@@ -32,7 +32,6 @@ export default Vue.extend({
   apollo: {
     availableQualtricsSurveys: {
       query: ALL_QUALTRICS_SURVEYS_QUERY,
-      update: (data) => data.qualtricsSurveys,
       fetchPolicy: "network-only",
     },
   },
@@ -46,11 +45,10 @@ export default Vue.extend({
 
   data() {
     return {
-      availableQualtricsSurveys: [] as Array<QualtricsSurveys_qualtricsSurveys>,
-      //https://stackoverflow.com/questions/679915/how-do-i-test-for-an-empty-javascript-object
+      availableQualtricsSurveys: {} as QualtricsSurveys,
       surveySelectionRules: [
         (): boolean | string =>
-          !isEmpty(this.value) ||
+          !is.defined(this.value) ||
           "Survey is required.  Note that each survey may only be imported once, so if the above list is empty, it may mean that all surveys have already been imported.",
       ],
     };
@@ -58,8 +56,8 @@ export default Vue.extend({
 
   computed: {
     selections(): QualtricsSurveySelection[] {
-      return this.availableQualtricsSurveys
-        .filter((survey) => survey.importedToCapernaum)
+      return this.availableQualtricsSurveys.qualtricsSurveys
+        .filter((survey) => is.defined(survey.capernaumSurvey))
         .map((survey) => ({
           text: survey.qualtricsName,
           value: survey.qualtricsId,

@@ -41,11 +41,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { ALL_MACHINES } from "@/graphql/machine.graphql";
-import { AllMachines_machines as Machine } from "@/graphql/types/AllMachines";
+import { AllMachines_machines } from "@/graphql/types/AllMachines";
 import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
 import { SubscriptionType } from "@/types/qualtrics.types";
-import { ALL_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
-import { AllSurveys_surveys as Survey } from "@/graphql/types/AllSurveys";
+import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 interface StringStringChoice {
   text: string;
@@ -70,14 +70,14 @@ export default Vue.extend({
     },
 
     surveys: {
-      query: ALL_SURVEYS_QUERY,
+      query: ALL_CAPERNAUM_SURVEYS,
     },
   },
 
   data() {
     return {
-      machines: [] as Machine[],
-      surveys: [] as Survey[],
+      machines: [] as AllMachines_machines[],
+      surveys: [] as AllCapernaumSurveys_surveys[],
       dialogState: {
         hostName: "",
         subscriptionType: "",

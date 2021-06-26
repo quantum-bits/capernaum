@@ -9,17 +9,15 @@ export const ALL_QUALTRICS_SURVEYS_QUERY = gql`
       qualtricsModDate
       qualtricsIsActive
       qualtricsCreationDate
-      importedToCapernaum
+      capernaumSurvey {
+        id
+      }
     }
   }
 `;
 
-/**
- * Get all surveys in the local database (as opposed to the ones coming from Qualtrics itself)
- * Fetch additional info so we can tell whether other entities refer to this survey.
- */
-export const ALL_SURVEYS_QUERY = gql`
-  query AllSurveys {
+export const ALL_CAPERNAUM_SURVEYS = gql`
+  query AllCapernaumSurveys {
     surveys {
       id
       qualtricsId
@@ -45,6 +43,23 @@ export const ALL_SURVEYS_QUERY = gql`
       }
       surveyResponses {
         id
+      }
+    }
+  }
+`;
+
+export const COMBINED_SURVEYS_QUERY = gql`
+  query CombinedSurveys {
+    combinedSurveys: qualtricsSurveys(includeInactive: true) {
+      qualtricsId
+      qualtricsOwnerId
+      qualtricsName
+      qualtricsModDate
+      qualtricsIsActive
+      qualtricsCreationDate
+      capernaumSurvey {
+        id
+        createdDate
       }
     }
   }
@@ -128,7 +143,7 @@ export const UPDATE_INDEX_MUTATION = gql`
   }
 `;
 
-export const UPDATE_SURVEY_MUTATION = gql`
+export const UPDATE_SURVEY = gql`
   mutation UpdateSurvey($updateInput: SurveyUpdateInput!) {
     updateSurvey(updateInput: $updateInput) {
       id

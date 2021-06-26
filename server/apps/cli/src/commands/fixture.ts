@@ -6,13 +6,13 @@ import { ImagesFixture } from "../fixtures/cls/images.fixture";
 import { LetterElementsFixture } from "../fixtures/cls/letter-elements.fixture";
 import { LettersFixture } from "../fixtures/cls/letters.fixture";
 import { LetterTypesFixture } from "../fixtures/letter-types.fixture";
-import { PredictionTablesFixture } from "../fixtures/cls/prediction-tables.fixture";
 import { ScriptureEngagementPracticeFixture } from "../fixtures/cls/se-practices.fixture";
 import { SurveyDimensionsFixture } from "../fixtures/cls/survey-dimensions.fixture";
 import { SurveyIndexesFixture } from "../fixtures/cls/survey-indexes.fixture";
 import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
 import { GroupTypesFixture } from "../fixtures/group-types.fixture";
+import { PredictionTableEntriesFixture } from "../fixtures/cls/prediction-table-entries.fixture";
 
 const debug = getDebugger("cli");
 
@@ -22,12 +22,12 @@ const imagesFixture = new ImagesFixture();
 const letterElementsFixture = new LetterElementsFixture();
 const lettersFixture = new LettersFixture();
 const letterTypesFixture = new LetterTypesFixture();
-const predictionTablesFixture = new PredictionTablesFixture();
 const sePracticesFixture = new ScriptureEngagementPracticeFixture();
 const surveyDimensionsFixture = new SurveyDimensionsFixture();
 const surveyIndexesFixture = new SurveyIndexesFixture();
 const surveyItemsFixture = new SurveyItemsFixture();
 const surveysFixture = new SurveysFixture();
+const predictionTableEntriesFixture = new PredictionTableEntriesFixture();
 
 export async function nuclearOption(options) {
   enableDebugOutput("cap:fixture:* cap:model:* -cap:fixture:abstract");
@@ -61,7 +61,7 @@ export async function nuclearOption(options) {
 
   await groupsFixture.load();
 
-  await predictionTablesFixture.load();
+  await predictionTableEntriesFixture.load();
   await lettersFixture.load();
   await letterElementsFixture.load();
 }

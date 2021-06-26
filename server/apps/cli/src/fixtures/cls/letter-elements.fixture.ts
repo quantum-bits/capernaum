@@ -147,7 +147,6 @@ const letterElements = [
     letterId: 10,
     _letterElementName: "scripture-engagement-prediction",
     surveyDimensionId: null,
-    predictionTableId: 1,
   },
   {
     id: 134,

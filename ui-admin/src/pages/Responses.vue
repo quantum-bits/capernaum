@@ -253,7 +253,7 @@ import {
   IMPORT_SURVEY_RESPONSES,
 } from "@/graphql/responses.graphql";
 import {
-  ALL_SURVEYS_QUERY,
+  ALL_CAPERNAUM_SURVEYS,
   DELETE_SURVEY_RESPONSE,
 } from "@/graphql/surveys.graphql";
 
@@ -272,19 +272,12 @@ import MailDialog from "@/components/dialogs/MailDialog.vue";
 import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
-import { AllGroups, AllGroups_groups } from "@/graphql/types/AllGroups";
+import { AllGroups_groups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
 import { LetterTypeEnum } from "@/types/letter.types";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 import { quillDeltaToHtml } from "@/helpers/quill";
-
-interface ImportedSurvey {
-  id: number;
-  title: string;
-  qualtricsId: string;
-  qualtricsName: string;
-  qualtricsModDate: string;
-}
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "Responses",
@@ -297,8 +290,8 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as ImportedSurvey[],
-      groups: {} as AllGroups,
+      surveys: [] as AllCapernaumSurveys_surveys[],
+      groups: [] as AllGroups_groups[],
       letterTypes: [] as ReadLetterTypes_readLetterTypes[],
       chosenLetterType: {
         id: -Infinity,
@@ -364,7 +357,7 @@ export default Vue.extend({
 
   apollo: {
     surveys: {
-      query: ALL_SURVEYS_QUERY,
+      query: ALL_CAPERNAUM_SURVEYS,
     },
 
     letterTypes: {
