@@ -31,7 +31,8 @@ export class QualtricsService {
   /**
    * Import details from a Qualtrics survey into Capernaum.
    */
-  async importQualtricsSurvey(qualtricsId: QualtricsID): Promise<Survey> {
+  async importFromQualtrics(qualtricsId: QualtricsID): Promise<Survey> {
+    debug("import survey %s from qualtrics", qualtricsId);
     const qualtricsSurvey = await this.qualtricsApiService.getSurvey(
       qualtricsId
     );
@@ -109,6 +110,9 @@ export class QualtricsService {
           }
         }
       }
+
+      workingSurvey.importedDate = new Date();
+      debug("Working survey %O", workingSurvey);
 
       // Save everything to the database.
       debug("Save to the database");

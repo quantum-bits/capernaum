@@ -1,11 +1,5 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import {
-  CreateDateColumn,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-} from "typeorm";
+import { Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -20,9 +14,10 @@ import { FieldColumn } from "@server/src/decorators";
   description: "All information about a survey imported from Qualtrics",
 })
 export class Survey extends AbstractEntity {
-  @Field({ description: "When this survey was imported from Qualtrics" })
-  @CreateDateColumn()
-  createdDate: Date;
+  @FieldColumn("When this survey was imported from Qualtrics", {
+    nullable: true,
+  })
+  importedDate: Date;
 
   @Field(() => [Letter])
   @ManyToMany(() => Letter, (letter) => letter.surveys)

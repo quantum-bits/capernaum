@@ -8,30 +8,45 @@
         <v-data-table :headers="headers" :items="filteredSurveys">
           <template v-slot:item="{ item: survey }">
             <tr>
-              <td>{{ survey.qualtricsId }}</td>
               <td>{{ survey.qualtricsName }}</td>
+              <td>{{ survey.qualtricsId }}</td>
               <td>
-                <v-chip small>
+                <v-chip small :color="isActive(survey) ? 'success' : ''">
                   {{ survey.qualtricsIsActive ? "Yes" : "No" }}
                 </v-chip>
               </td>
               <td>{{ survey.qualtricsModDate | standardDate }}</td>
-              <td>{{ importStatus(survey) }}</td>
+              <td>
+                <v-chip small :color="isImported(survey) ? 'success' : ''">
+                  {{ importStatus(survey) }}
+                </v-chip>
+              </td>
               <td>{{ importDate(survey) }}</td>
               <td>
-                <v-chip small color="primary">
-                  {{ isSurveyOutOfDate(survey) }}
+                <v-chip
+                  v-if="isImported(survey)"
+                  small
+                  :color="isOutOfDate(survey) ? 'error' : 'success'"
+                >
+                  {{ isOutOfDate(survey) ? "Yes" : "No" }}
                 </v-chip>
               </td>
               <td>
                 <v-btn
                   small
                   v-if="!isImported(survey)"
-                  @click="importQualtricsSurvey(survey.qualtricsId)"
+                  @click="importFromQualtrics(survey)"
                 >
                   Import
                 </v-btn>
-                <v-btn small>Update</v-btn>
+                <v-btn
+                  small
+                  color="error"
+                  v-if="isOutOfDate(survey)"
+                  @click="importFromQualtrics(survey)"
+                >
+                  Update
+                </v-btn>
               </td>
             </tr>
           </template>
@@ -56,6 +71,10 @@ import {
 import PageHeader from "@/pages/PageHeader.vue";
 import { CombinedSurveys_combinedSurveys } from "@/graphql/types/CombinedSurveys";
 import { DateTime } from "luxon";
+import {
+  ImportQualtricsSurvey,
+  ImportQualtricsSurveyVariables,
+} from "@/graphql/types/ImportQualtricsSurvey";
 
 export default Vue.extend({
   name: "Qualtrics",
@@ -73,12 +92,12 @@ export default Vue.extend({
   data() {
     return {
       headers: [
-        { text: "Q ID", value: "qId" },
         { text: "Q Name", value: "qName" },
+        { text: "Q ID", value: "qId" },
         { text: "Q Active", value: "qIsActive" },
         { text: "Q Mod Date", value: "qModDate" },
         { text: "Imported", value: "isImported" },
-        { text: "Import Date", value: "capCreatedDate" },
+        { text: "Import Date" },
         { text: "Out of Date", value: "outOfDate" },
         { text: "Actions", value: "actions" },
       ],
@@ -105,6 +124,19 @@ export default Vue.extend({
       return !!survey.capernaumSurvey?.id;
     },
 
+    isActive(survey: CombinedSurveys_combinedSurveys) {
+      return survey.qualtricsIsActive;
+    },
+
+    isOutOfDate(survey: CombinedSurveys_combinedSurveys) {
+      if (!survey.capernaumSurvey) {
+        return false;
+      }
+      const qDateTime = DateTime.fromISO(survey.qualtricsModDate);
+      const capDateTime = DateTime.fromISO(survey.capernaumSurvey.importedDate);
+      return qDateTime > capDateTime;
+    },
+
     importStatus(survey: CombinedSurveys_combinedSurveys) {
       return this.isImported(survey)
         ? `Yes (PK=${survey.capernaumSurvey?.id})`
@@ -114,32 +146,34 @@ export default Vue.extend({
     importDate(survey: CombinedSurveys_combinedSurveys) {
       const standardDate = Vue.filter("standardDate");
       if (survey.capernaumSurvey) {
-        return standardDate(survey.capernaumSurvey.createdDate);
+        return standardDate(survey.capernaumSurvey.importedDate);
       }
       return "";
     },
 
-    isSurveyOutOfDate(survey: CombinedSurveys_combinedSurveys) {
-      if (!survey.capernaumSurvey) {
-        return false;
-      }
-      const qDateTime = DateTime.fromISO(survey.qualtricsModDate);
-      const capDateTime = DateTime.fromISO(survey.capernaumSurvey.createdDate);
-      return qDateTime > capDateTime;
-    },
-
-    importQualtricsSurvey(qualtricsSurveyId: string) {
+    /**
+     * Import (or re-import) a survey from Qualtrics
+     * @param survey entry in `combinedSurveys`
+     */
+    importFromQualtrics(survey: CombinedSurveys_combinedSurveys) {
       this.$apollo
-        .mutate({
+        .mutate<ImportQualtricsSurvey, ImportQualtricsSurveyVariables>({
           mutation: IMPORT_QUALTRICS_SURVEY,
           variables: {
-            qualtricsId: qualtricsSurveyId,
+            qualtricsId: survey.qualtricsId,
           },
-          refetchQueries: ["AllSurveys", "QualtricsSurveys"],
+          fetchPolicy: "no-cache",
         })
         .then((result) => {
           console.log("IMPORT RESULT", result);
-          this.showSnackbar("Imported successfully");
+          if (result.data) {
+            // Vue.set(
+            //   survey,
+            //   "importedFOO",
+            //   result.data.importQualtricsSurvey.importedDate
+            // );
+            this.showSnackbar("Imported successfully");
+          }
         })
         .catch((error) => this.showSnackbar(error));
     },

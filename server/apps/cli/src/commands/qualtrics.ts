@@ -88,7 +88,7 @@ export async function importQualtricsSurvey(
 ): Promise<Survey> {
   const nestContext = new NestContext();
   const qualtricsService = await nestContext.get(QualtricsService);
-  const survey = await qualtricsService.importQualtricsSurvey(surveyId);
+  const survey = await qualtricsService.importFromQualtrics(surveyId);
   await nestContext.close();
 
   return survey;

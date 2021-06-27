@@ -15,7 +15,7 @@ export interface CombinedSurveys_combinedSurveys_capernaumSurvey {
   /**
    * When this survey was imported from Qualtrics
    */
-  createdDate: any;
+  importedDate: any | null;
 }
 
 export interface CombinedSurveys_combinedSurveys {

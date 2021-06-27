@@ -20,6 +20,10 @@ export interface ImportQualtricsSurvey_importQualtricsSurvey {
    */
   id: number;
   /**
+   * When this survey was imported from Qualtrics
+   */
+  importedDate: any | null;
+  /**
    * Unique identifier for this survey on Qualtrics
    */
   qualtricsId: string;

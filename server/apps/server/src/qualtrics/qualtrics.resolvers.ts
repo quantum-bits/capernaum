@@ -14,7 +14,6 @@ import {
 import { QualtricsService } from "@server/src/qualtrics/qualtrics.service";
 import { QualtricsID } from "@server/src/qualtrics/qualtrics.types";
 import { getDebugger } from "@helpers/debug-factory";
-import is from "is";
 
 const debug = getDebugger("qualtrics");
 
@@ -78,7 +77,8 @@ export class QualtricsResolver {
     @Args({ name: "qualtricsId", type: () => String })
     qualtricsId: QualtricsID
   ) {
-    return this.qualtricsService.importQualtricsSurvey(qualtricsId);
+    debug("import qualtrics survey %s", qualtricsId);
+    return this.qualtricsService.importFromQualtrics(qualtricsId);
   }
 
   @Mutation(() => QualtricsResponseImportStats, {

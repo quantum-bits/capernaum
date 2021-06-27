@@ -327,7 +327,7 @@ type Survey {
   id: Int!
 
   """When this survey was imported from Qualtrics"""
-  createdDate: DateTime!
+  importedDate: DateTime
 
   """Fetch the letters for this survey"""
   letters: [Letter!]!

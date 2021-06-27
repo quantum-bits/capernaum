@@ -59,7 +59,7 @@ export const COMBINED_SURVEYS_QUERY = gql`
       qualtricsCreationDate
       capernaumSurvey {
         id
-        createdDate
+        importedDate
       }
     }
   }
@@ -69,6 +69,7 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
   mutation ImportQualtricsSurvey($qualtricsId: String!) {
     importQualtricsSurvey(qualtricsId: $qualtricsId) {
       id
+      importedDate
       qualtricsId
       qualtricsName
       qualtricsModDate
