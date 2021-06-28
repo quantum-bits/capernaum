@@ -1,12 +1,3 @@
-/** type that specifies how scripture engagement practices are tied to spiritual foci and orientations; these come back from the db
- */
-export interface ScriptureEngagementPractice {
-  id: number; // id for this SE practice in the db
-  order: number; // order in which to display this SE practice in the association table
-  title: string; // e.g., "Journaling"
-  spiritualFocusOrientationIds: number[]; // list of ids of spiritual foci and orientations (presence in this list implies "true" for the association table)
-}
-
 /**
  * similar to ScriptureEngagementPractice type, but used to display data in the vuetify table; the format is
  * not ideal, but is set up to conform to what is expected in the vuetify table structure
@@ -22,7 +13,7 @@ export interface TableData {
  * type that specifies how Spiritual Foci/Orientations are returned from the db
  */
 export interface SpiritualFocusOrientation {
-  abbr: string; // e.g., "FOO"
+  abbreviation: string; // e.g., "FOO"
   id: number; // id for this spiritual focus/orientation
   order: number; // order in which to list this spiritual focus/orientation
   title: string; // e.g., "Focus on Others"

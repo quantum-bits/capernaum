@@ -33,11 +33,6 @@ const router = new VueRouter({
       component: () => import("./pages/Letters.vue"),
     },
     {
-      path: "/survey-dimensions",
-      name: "survey-dimensions",
-      component: () => import("./pages/SurveyDimensions.vue"),
-    },
-    {
       path: "/qualtrics",
       name: "qualtrics",
       component: () => import("./pages/Qualtrics.vue"),
@@ -45,17 +40,12 @@ const router = new VueRouter({
     {
       path: "/surveys/:surveyId?",
       name: "surveys",
-      component: () => import("./pages/Surveys.vue"),
+      component: () => import("./pages/surveys/Surveys.vue"),
     },
     {
       path: "/compose/:letterId?",
       name: "compose",
       component: () => import("./pages/Compose.vue"),
-    },
-    {
-      path: "/association-table/:letterId",
-      name: "association-table",
-      component: () => import("./pages/BooleanAssociations.vue"),
     },
     {
       path: "/responses",

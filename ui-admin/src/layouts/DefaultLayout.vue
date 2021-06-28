@@ -3,7 +3,9 @@
     <nav-drawer v-model="drawerVisible" />
     <app-bar @toggleDrawer="toggleNavDrawer" />
     <v-main>
-      <router-view />
+      <v-container>
+        <router-view />
+      </v-container>
     </v-main>
   </v-app>
 </template>

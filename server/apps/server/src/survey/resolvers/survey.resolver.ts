@@ -35,7 +35,7 @@ export class SurveyResolver {
     return this.surveyService.construct(createInput);
   }
 
-  @Query(() => [Survey])
+  @Query(() => [Survey], { description: "Fetch all surveys" })
   surveys() {
     return this.surveyService.readAll();
   }

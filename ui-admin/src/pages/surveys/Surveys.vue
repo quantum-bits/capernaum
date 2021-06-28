@@ -6,22 +6,19 @@
     <v-tabs v-model="currentTab" fixed-tabs>
       <v-tab>Details</v-tab>
       <v-tab>Dimensions</v-tab>
-      <v-tab>Indices</v-tab>
       <v-tab>Predictions</v-tab>
     </v-tabs>
 
     <v-tabs-items v-model="currentTab" v-if="isSurveySelected">
       <v-tab-item>
-        <v-card flat>
-          <v-card-title> Details </v-card-title>
-          <v-card-text>
-            {{ selectedSurvey }}
-          </v-card-text>
-        </v-card>
+        <survey-detail-tab :survey="selectedSurvey" />
       </v-tab-item>
-      <v-tab-item>X Dimensions</v-tab-item>
-      <v-tab-item>X Indices</v-tab-item>
-      <v-tab-item>X Prediction</v-tab-item>
+      <v-tab-item>
+        <survey-dimensions-tab :survey="selectedSurvey" />
+      </v-tab-item>
+      <v-tab-item>
+        <survey-predictions-tab />
+      </v-tab-item>
     </v-tabs-items>
     <v-row>
       <v-col> </v-col>
@@ -39,11 +36,20 @@ import {
   AllCapernaumSurveys_surveys,
 } from "@/graphql/types/AllCapernaumSurveys";
 import * as is from "is";
+import SurveyDetailTab from "./SurveyDetailTab.vue";
+import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
+import SurveyPredictionsTab from "./PredictionTableTab.vue";
 
 export default Vue.extend({
   name: "Surveys",
 
-  components: { PageHeader, SurveySelector },
+  components: {
+    PageHeader,
+    SurveySelector,
+    SurveyDetailTab,
+    SurveyDimensionsTab,
+    SurveyPredictionsTab,
+  },
 
   data() {
     return {

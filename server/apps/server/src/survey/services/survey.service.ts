@@ -29,7 +29,14 @@ export class SurveyService extends BaseService<Survey> {
     return this.repo.save(this.repo.create(createInput));
   }
 
-  private alwaysRelate = ["letters", "letters.letterType"];
+  private alwaysRelate = [
+    "letters",
+    "letters.letterType",
+    "surveyDimensions",
+    "surveyDimensions.surveyIndices",
+    "surveyDimensions.surveyIndices.surveyItems",
+    "surveyDimensions.surveyIndices.predictionTableEntries",
+  ];
 
   readAll() {
     return this.repo.find({ relations: this.alwaysRelate });

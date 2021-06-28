@@ -51,11 +51,6 @@ export default Vue.extend({
         icon: "mdi-comment-question",
       },
       {
-        title: "Dimensions",
-        route: "survey-dimensions",
-        icon: "mdi-file-tree",
-      },
-      {
         title: "Practices",
         route: "scripture-engagement-practices",
         icon: "mdi-book-open",

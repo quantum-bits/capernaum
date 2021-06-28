@@ -131,7 +131,7 @@
 import Vue from "vue";
 import {
   ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
-  ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
+  ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
   DELETE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
   UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
 } from "@/graphql/scripture-engagement-practices.graphql";
@@ -353,7 +353,7 @@ export default Vue.extend({
 
   apollo: {
     scriptureEngagementPracticeData: {
-      query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY,
+      query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
       update(
         scriptureEngagementPractices: ScriptureEngagementPractices
       ): ScriptureEngagementPractices_scriptureEngagementPractices[] {

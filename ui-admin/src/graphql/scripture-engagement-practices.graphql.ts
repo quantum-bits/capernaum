@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 
-export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY = gql`
+export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES = gql`
   query ScriptureEngagementPractices {
     scriptureEngagementPractices {
       id
@@ -8,9 +8,6 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES_QUERY = gql`
       description
       sequence
       moreInfoUrl
-      predictionTableEntries {
-        id
-      }
     }
   }
 `;

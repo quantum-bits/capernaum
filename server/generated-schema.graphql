@@ -598,6 +598,8 @@ type Query {
 
   """Retrieve all survey items"""
   surveyItemsReadAll: [SurveyItem!]!
+
+  """Fetch all surveys"""
   surveys: [Survey!]!
   survey(id: Int!): Survey!
   surveyResponses: [SurveyResponse!]!

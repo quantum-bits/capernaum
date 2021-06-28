@@ -1,21 +1,6 @@
 <template>
   <v-container>
     <v-row align="baseline" class="justify-space-around">
-      <h1 class="headline">Survey Dimensions</h1>
-
-      <v-col cols="4">
-        <v-select
-          v-model="surveySelection"
-          :items="selections"
-          :rules="[(v) => !!v || 'Survey is required']"
-          label="Survey"
-          required
-          persistent-hint
-          return-object
-          single-line
-        />
-      </v-col>
-
       <v-btn
         color="primary"
         :disabled="!isSurveySelected"
@@ -25,8 +10,8 @@
       </v-btn>
     </v-row>
 
-    <v-row v-if="surveySelection">
-      <v-col cols="10" offset="1" v-if="isSurveyDataValid">
+    <v-row>
+      <v-col cols="10" offset="1">
         <v-treeview dense rounded hoverable :items="surveyContent">
           <template v-slot:label="{ item }">
             <span v-html="item.name"></span>
@@ -72,34 +57,20 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  ADD_DIMENSION_MUTATION,
-  COMBINED_SURVEYS_QUERY,
-  ONE_SURVEY_QUERY,
-} from "@/graphql/surveys.graphql";
-
-import {
-  WhichItems,
-  SurveyDimensionEnum,
-  SurveyDimensionView,
-  SurveySelection,
-  SurveyQueryVariables,
-} from "./survey.types";
-
+import { ADD_DIMENSION_MUTATION } from "@/graphql/surveys.graphql";
+import { SurveyDimensionEnum, SurveyDimensionView } from "@/pages/survey.types";
 import {
   OneSurvey_survey as Survey,
   OneSurvey_survey_surveyDimensions as SurveyDimension,
   OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex,
 } from "@/graphql/types/OneSurvey";
-import DimensionBranch from "../components/DimensionBranch.vue";
-import isEmpty from "lodash/isEmpty";
-import DimensionDialog from "../components/dialogs/DimensionDialog.vue";
-import IndexBranch from "../components/IndexBranch.vue";
+import DimensionBranch from "./SurveyDimensionBranch.vue";
+import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
+import IndexBranch from "./SurveyIndexBranch.vue";
 import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
-  /** page to create/update survey dimensions and indexes */
-  name: "SurveyDimensions",
+  name: "SurveyDimensionsTab",
 
   components: {
     DimensionBranch,
@@ -107,40 +78,16 @@ export default Vue.extend({
     IndexBranch,
   },
 
-  apollo: {
-    surveys: {
-      query: COMBINED_SURVEYS_QUERY,
-      update: (data) => data.surveys,
-    },
-
-    // The following query runs automatically when this.surveySelection updates
-    // (i.e., when something is chosen from the drop-down)
+  props: {
     survey: {
-      query: ONE_SURVEY_QUERY,
-      variables(): SurveyQueryVariables {
-        return {
-          surveyId: this.surveySelection.value,
-          which: WhichItems.WITHOUT_INDEX,
-        };
-      },
-      update(data) {
-        return data.survey;
-      },
-      skip(): boolean {
-        return !this.isSurveySelected;
-      },
-      fetchPolicy: "network-only",
+      type: {} as () => Survey,
+      required: true,
     },
   },
 
   data() {
     return {
       surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
-
-      surveys: [] as Survey[], // All surveys, listed in drop-down.
-      surveySelection: {} as SurveySelection, // Selection from allSurveys
-      survey: {} as Survey,
-
       dimensionDialog: {
         visible: false,
       },
@@ -188,21 +135,6 @@ export default Vue.extend({
   },
 
   computed: {
-    selections(): SurveySelection[] {
-      return this.surveys.map((survey) => ({
-        text: survey.qualtricsName,
-        value: survey.id,
-      }));
-    },
-
-    isSurveySelected(): boolean {
-      return !isEmpty(this.surveySelection);
-    },
-
-    isSurveyDataValid(): boolean {
-      return !isEmpty(this.survey);
-    },
-
     surveyContent(): SurveyDimensionView[] {
       function compareStrings(a: string, b: string): number {
         return a < b ? -1 : a > b ? 1 : 0;

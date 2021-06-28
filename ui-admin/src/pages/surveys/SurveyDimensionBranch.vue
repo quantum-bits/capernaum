@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-card>
     <v-tooltip top>
       <span>Add a new survey index for this survey dimension.</span>
       <template v-slot:activator="{ on }">
@@ -71,7 +71,7 @@
       button-label="Delete"
       @confirmed="deleteDimension"
     />
-  </div>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -84,8 +84,8 @@ import {
 } from "@/graphql/surveys.graphql";
 import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
-import DimensionDialog from "./dialogs/DimensionDialog.vue";
-import IndexDialog from "./dialogs/IndexDialog.vue";
+import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
+import IndexDialog from "../../components/dialogs/IndexDialog.vue";
 import {
   DimensionDialogResponse,
   IndexDialogResponse,
@@ -93,7 +93,7 @@ import {
 } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
-  name: "DimensionBranch",
+  name: "SurveyDimensionBranch",
 
   components: {
     ConfirmDialog,

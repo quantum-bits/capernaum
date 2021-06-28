@@ -37,12 +37,24 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       }
       surveyDimensions {
         id
-      }
-      surveyItems {
-        id
-      }
-      surveyResponses {
-        id
+        title
+        surveyIndices {
+          id
+          title
+          abbreviation
+          useForPredictions
+          surveyItems {
+            id
+            qualtricsText
+          }
+          predictionTableEntries {
+            id
+            practice {
+              id
+              title
+            }
+          }
+        }
       }
     }
   }

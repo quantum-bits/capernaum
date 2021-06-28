@@ -34,25 +34,67 @@ export interface AllCapernaumSurveys_surveys_letters {
   letterType: AllCapernaumSurveys_surveys_letters_letterType;
 }
 
+export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Qualtrics `questionText` field
+   */
+  qualtricsText: string;
+}
+
+export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries_practice {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Practice title
+   */
+  title: string;
+}
+
+export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  practice: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries_practice;
+}
+
+export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Title of this index
+   */
+  title: string;
+  /**
+   * Abbreviation for this index (e.g., 'FOG')
+   */
+  abbreviation: string;
+  /**
+   * Use this index in prediction tables?
+   */
+  useForPredictions: boolean;
+  surveyItems: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems[];
+  predictionTableEntries: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries[];
+}
+
 export interface AllCapernaumSurveys_surveys_surveyDimensions {
   /**
    * Unique ID for this entity
    */
   id: number;
-}
-
-export interface AllCapernaumSurveys_surveys_surveyItems {
   /**
-   * Unique ID for this entity
+   * Title of this dimension (e.g., 'Focus on Prayer')
    */
-  id: number;
-}
-
-export interface AllCapernaumSurveys_surveys_surveyResponses {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
+  title: string;
+  surveyIndices: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices[];
 }
 
 export interface AllCapernaumSurveys_surveys {
@@ -92,18 +134,11 @@ export interface AllCapernaumSurveys_surveys {
    * Dimensions for this survey; groups indices, which group items.
    */
   surveyDimensions: AllCapernaumSurveys_surveys_surveyDimensions[];
-  /**
-   * All the Qualtrics items for this survey; 
-   *     for groupings, see survey dimension and index.
-   *     Pass 'whichItems' to choose which to return (default 'All')
-   */
-  surveyItems: AllCapernaumSurveys_surveys_surveyItems[];
-  /**
-   * Responses for this survey
-   */
-  surveyResponses: AllCapernaumSurveys_surveys_surveyResponses[];
 }
 
 export interface AllCapernaumSurveys {
+  /**
+   * Fetch all surveys
+   */
   surveys: AllCapernaumSurveys_surveys[];
 }
