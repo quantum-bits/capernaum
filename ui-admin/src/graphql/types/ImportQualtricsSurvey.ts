@@ -9,6 +9,10 @@
 
 export interface ImportQualtricsSurvey_importQualtricsSurvey_surveyItems {
   /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
    * Qualtrics `questionText` field
    */
   qualtricsText: string;

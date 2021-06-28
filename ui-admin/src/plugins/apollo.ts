@@ -1,4 +1,4 @@
-import { InMemoryCache } from "apollo-cache-inmemory";
+import { defaultDataIdFromObject, InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { setContext } from "apollo-link-context";
@@ -54,10 +54,24 @@ const splitLink = split(
   authLink.concat(httpLink)
 );
 
+// TODO: This should be updated when we migrate to Vue-Apollo 4.
+const cache = new InMemoryCache({
+  dataIdFromObject: (object) => {
+    switch (object.__typename) {
+      case "QualtricsSurveyListItem":
+        return `QualtricsSurveyListItem:${
+          (object as { qualtricsId: string }).qualtricsId
+        }`;
+      default:
+        return defaultDataIdFromObject(object); // fall back to default handling
+    }
+  },
+});
+
 // Create the apollo client
 const apolloClient = new ApolloClient({
   link: loggingLink.concat(splitLink),
-  cache: new InMemoryCache(),
+  cache,
   connectToDevTools: true,
 });
 

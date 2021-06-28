@@ -5,7 +5,12 @@
     </page-header>
     <v-row>
       <v-col>
-        <v-data-table :headers="headers" :items="filteredSurveys">
+        <v-data-table
+          :headers="headers"
+          :items="filteredSurveys"
+          :loading="loadingSurveys > 0"
+          loading-text="Loading surveys from Qualtrics"
+        >
           <template v-slot:item="{ item: survey }">
             <tr>
               <td>{{ survey.qualtricsName }}</td>
@@ -18,7 +23,7 @@
               <td>{{ survey.qualtricsModDate | standardDate }}</td>
               <td>
                 <v-chip small :color="isImported(survey) ? 'success' : ''">
-                  {{ importStatus(survey) }}
+                  {{ isImported(survey) ? "Yes" : "No" }}
                 </v-chip>
               </td>
               <td>{{ importDate(survey) }}</td>
@@ -86,6 +91,7 @@ export default Vue.extend({
   apollo: {
     combinedSurveys: {
       query: COMBINED_SURVEYS_QUERY,
+      loadingKey: "loadingSurveys",
     },
   },
 
@@ -96,12 +102,13 @@ export default Vue.extend({
         { text: "Q ID", value: "qId" },
         { text: "Q Active", value: "qIsActive" },
         { text: "Q Mod Date", value: "qModDate" },
-        { text: "Imported", value: "isImported" },
+        { text: "Imported?", value: "isImported" },
         { text: "Import Date" },
-        { text: "Out of Date", value: "outOfDate" },
+        { text: "Out of Date?", value: "outOfDate" },
         { text: "Actions", value: "actions" },
       ],
       combinedSurveys: [] as CombinedSurveys_combinedSurveys[],
+      loadingSurveys: 0,
       showInactive: false,
 
       snackbar: {
@@ -137,12 +144,6 @@ export default Vue.extend({
       return qDateTime > capDateTime;
     },
 
-    importStatus(survey: CombinedSurveys_combinedSurveys) {
-      return this.isImported(survey)
-        ? `Yes (PK=${survey.capernaumSurvey?.id})`
-        : "No";
-    },
-
     importDate(survey: CombinedSurveys_combinedSurveys) {
       const standardDate = Vue.filter("standardDate");
       if (survey.capernaumSurvey) {
@@ -162,7 +163,7 @@ export default Vue.extend({
           variables: {
             qualtricsId: survey.qualtricsId,
           },
-          fetchPolicy: "no-cache",
+          // fetchPolicy: "no-cache",
         })
         .then((result) => {
           console.log("IMPORT RESULT", result);

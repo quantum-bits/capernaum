@@ -74,6 +74,7 @@ export const IMPORT_QUALTRICS_SURVEY = gql`
       qualtricsName
       qualtricsModDate
       surveyItems {
+        id
         qualtricsText
       }
     }
