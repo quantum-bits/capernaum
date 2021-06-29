@@ -11,11 +11,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { orderBy } from "lodash";
+import * as _ from "lodash";
 import {
   AssociationTableHeader,
   SpiritualFocusOrientation,
-  TableData,
+  AssociationTableData,
 } from "./prediction-table.types";
 import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
@@ -24,8 +24,19 @@ import PredictionTableEdit from "./PredictionTableEdit.vue";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES } from "@/graphql/scripture-engagement-practices.graphql";
 import { ScriptureEngagementPractices_scriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
-interface IdDict {
-  [key: string]: boolean;
+
+interface AssociationTableHeader {
+  text: string; // text for the column
+  value: string; // "practice" for the first column; "columnId-id" for the rest, where id is the id of the spiritual focus/orientation in the db
+  align: string; // e.g., "left"
+  sortable: boolean; // whether or not the column is sortable
+}
+
+type AssociationTableDatum = { [key: string]: boolean };
+
+interface AssociationTableContent {
+  headers: AssociationTableHeader[];
+  data: AssociationTableDatum[];
 }
 
 export default Vue.extend({
@@ -45,14 +56,11 @@ export default Vue.extend({
 
   data() {
     return {
+      associationTable: {} as AssociationTableContent,
       scriptureEngagementPractices:
         [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
 
-      headers: [] as AssociationTableHeader[],
-      tableData: [] as TableData[],
-
-      tableColumns: [] as SpiritualFocusOrientation[],
-      originalTableData: [] as TableData[],
+      originalTableData: [],
       tableEditModeOn: false,
     };
   },
@@ -64,35 +72,45 @@ export default Vue.extend({
   },
 
   mounted() {
-    this.tableColumns = [];
-    this.headers = [];
-    this.headers.push({
-      text: "SE Practice",
-      align: "left",
-      sortable: true,
-      value: "practice",
-    });
+    this.associationTable = {
+      headers: [
+        {
+          text: "SE Practice",
+          align: "left",
+          sortable: true,
+          value: "practice",
+        },
+      ],
+      data: [],
+    };
 
-    let surveyDimensions = orderBy(this.survey.surveyDimensions, "sequence");
-    surveyDimensions.forEach((dimension) => {
-      dimension.surveyIndices.forEach((index) => {
-        if (index.useForPredictions) {
-          this.headers.push({
-            text: index.abbreviation,
-            align: "left",
-            sortable: true,
-            value: `columnId-${index.id}`,
+    const indexIdToColumnIdx = new Map<number, number>();
+
+    const sortedDimensions = _.orderBy(
+      this.survey.surveyDimensions,
+      "sequence"
+    );
+    sortedDimensions.forEach((dimension) => {
+      dimension.surveyIndices
+        .filter((sidx) => sidx.useForPredictions)
+        .forEach((surveyIndex, idx) => {
+          this.associationTable.headers.push({
+            text: surveyIndex.abbreviation,
+            value: surveyIndex.id.toFixed(),
+            align: "center",
+            sortable: false,
           });
-        }
-      });
+          indexIdToColumnIdx.set(surveyIndex.id, idx);
+        });
     });
 
-    let tableEntriesDict: { [key: number]: string[] } = {};
-    this.scriptureEngagementPractices.forEach((practice) => {
-      tableEntriesDict[practice.id] = [];
+    const practiceIdToRowIndex = new Map<number, number>();
+
+    this.scriptureEngagementPractices.forEach((practice, idx) => {
+      practiceIdToRowIndex.set(practice.id, idx);
     });
     oneLetter.letter.tableEntries.forEach((entry) => {
-      tableEntriesDict[entry.practice.id].push(
+      practiceIdToRowIndex[entry.practice.id].push(
         `columnId-${entry.surveyIndex.id}`
       );
     });
@@ -102,7 +120,7 @@ export default Vue.extend({
       let idDict: IdDict = {};
       this.headers.forEach((header: AssociationTableHeader) => {
         if (header.value !== "practice") {
-          idDict[header.value] = tableEntriesDict[practice.id].includes(
+          idDict[header.value] = practiceIdToRowIndex[practice.id].includes(
             header.value
           );
         }

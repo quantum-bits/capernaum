@@ -168,11 +168,7 @@ export default Vue.extend({
         .then((result) => {
           console.log("IMPORT RESULT", result);
           if (result.data) {
-            // Vue.set(
-            //   survey,
-            //   "importedFOO",
-            //   result.data.importQualtricsSurvey.importedDate
-            // );
+            // Data are automatically updated by the Apollo client/cache.
             this.showSnackbar("Imported successfully");
           }
         })

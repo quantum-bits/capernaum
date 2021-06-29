@@ -2,11 +2,7 @@
   <v-data-table :headers="headers" :items="tableData" class="elevation-1">
     <template v-slot:item="{ item, headers }">
       <tr>
-        <td
-          v-for="header in headers"
-          :key="header.value"
-          class="text-xs-center"
-        >
+        <td v-for="header in headers" :key="header.value">
           <span v-if="header.value === 'practice'">
             {{ item[header.value] }}
           </span>
@@ -26,7 +22,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AssociationTableHeader, TableData } from "./prediction-table.types";
+import {
+  AssociationTableHeader,
+  AssociationTableData,
+} from "./prediction-table.types";
 
 export default Vue.extend({
   name: "PredictionTableShow",
@@ -37,7 +36,7 @@ export default Vue.extend({
       required: true,
     },
     tableData: {
-      type: Array as () => TableData[],
+      type: Array as () => AssociationTableData[],
       required: true,
     },
   },

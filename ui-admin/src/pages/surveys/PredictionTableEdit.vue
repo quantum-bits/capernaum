@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AssociationTableHeader, TableData } from "./prediction-table.types";
+import { AssociationTableHeader, AssociationTableData } from "./prediction-table.types";
 
 export default Vue.extend({
   name: "PredictionTableEdit",
@@ -36,7 +36,7 @@ export default Vue.extend({
       required: true,
     },
     tableData: {
-      type: Array as () => TableData[],
+      type: Array as () => AssociationTableData[],
       required: true,
     },
   },
