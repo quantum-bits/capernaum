@@ -2,28 +2,22 @@
   <v-container>
     <prediction-table-edit
       v-if="tableEditModeOn"
-      :headers="headers"
-      :table-data="tableData"
+      :association-table="associationTable"
     />
-    <prediction-table-show v-else :headers="headers" :table-data="tableData" />
+    <prediction-table-show v-else :association-table="associationTable" />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import * as _ from "lodash";
-import {
-  AssociationTableHeader,
-  SpiritualFocusOrientation,
-  AssociationTableData,
-} from "./prediction-table.types";
 import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
 import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 import PredictionTableShow from "./PredictionTableShow.vue";
 import PredictionTableEdit from "./PredictionTableEdit.vue";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES } from "@/graphql/scripture-engagement-practices.graphql";
-import { ScriptureEngagementPractices_scriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
+import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
 
 interface AssociationTableHeader {
   text: string; // text for the column
@@ -32,15 +26,16 @@ interface AssociationTableHeader {
   sortable: boolean; // whether or not the column is sortable
 }
 
-type AssociationTableDatum = { [key: string]: boolean };
+type AssociationTableDatum = { [key: string]: boolean | number };
+type AssociationTableRow = AssociationTableDatum[];
 
-interface AssociationTableContent {
+export interface AssociationTableContent {
   headers: AssociationTableHeader[];
-  data: AssociationTableDatum[];
+  data: AssociationTableRow[];
 }
 
 export default Vue.extend({
-  name: "SurveyPredictionsTab",
+  name: "PredictionTableTab",
 
   components: {
     PredictionTableEdit,
@@ -57,21 +52,12 @@ export default Vue.extend({
   data() {
     return {
       associationTable: {} as AssociationTableContent,
-      scriptureEngagementPractices:
-        [] as ScriptureEngagementPractices_scriptureEngagementPractices[],
-
-      originalTableData: [],
+      originalTableData: [] as AssociationTableRow[],
       tableEditModeOn: false,
     };
   },
 
-  apollo: {
-    scriptureEngagementPractices: {
-      query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
-    },
-  },
-
-  mounted() {
+  async mounted() {
     this.associationTable = {
       headers: [
         {
@@ -84,56 +70,54 @@ export default Vue.extend({
       data: [],
     };
 
-    const indexIdToColumnIdx = new Map<number, number>();
+    const sepResult = await this.readScriptureEngagementPractices();
+    const scriptureEngagementPractices =
+      sepResult.data.scriptureEngagementPractices;
 
-    const sortedDimensions = _.orderBy(
-      this.survey.surveyDimensions,
-      "sequence"
-    );
-    sortedDimensions.forEach((dimension) => {
-      dimension.surveyIndices
-        .filter((sidx) => sidx.useForPredictions)
-        .forEach((surveyIndex, idx) => {
-          this.associationTable.headers.push({
-            text: surveyIndex.abbreviation,
-            value: surveyIndex.id.toFixed(),
-            align: "center",
-            sortable: false,
-          });
-          indexIdToColumnIdx.set(surveyIndex.id, idx);
-        });
+    const orderedActiveIndices = _.chain(this.survey.surveyDimensions)
+      .orderBy("sequence")
+      .flatMap((surveyDimension) => surveyDimension.surveyIndices)
+      .filter((surveyIndex) => surveyIndex.useForPredictions)
+      .value();
+
+    const indexIdToColumnIdx = new Map<number, number>();
+    _.forEach(orderedActiveIndices, (surveyIndex, idx) => {
+      this.associationTable.headers.push({
+        text: surveyIndex.abbreviation,
+        value: surveyIndex.id.toFixed(),
+        align: "center",
+        sortable: false,
+      });
+      indexIdToColumnIdx.set(surveyIndex.id, idx);
     });
+    const columnCount = indexIdToColumnIdx.size;
 
     const practiceIdToRowIndex = new Map<number, number>();
-
-    this.scriptureEngagementPractices.forEach((practice, idx) => {
+    _.forEach(scriptureEngagementPractices, (practice, idx) => {
+      const row: AssociationTableRow = [];
+      _.times(columnCount, () => row.push({ predict: false }));
+      this.associationTable.data.push(row);
       practiceIdToRowIndex.set(practice.id, idx);
     });
-    oneLetter.letter.tableEntries.forEach((entry) => {
-      practiceIdToRowIndex[entry.practice.id].push(
-        `columnId-${entry.surveyIndex.id}`
-      );
-    });
 
-    this.tableData = [];
-    this.scriptureEngagementPractices.forEach((practice) => {
-      let idDict: IdDict = {};
-      this.headers.forEach((header: AssociationTableHeader) => {
-        if (header.value !== "practice") {
-          idDict[header.value] = practiceIdToRowIndex[practice.id].includes(
-            header.value
-          );
+    _.forEach(orderedActiveIndices, (surveyIndex) => {
+      _.forEach(surveyIndex.predictionTableEntries, (pte) => {
+        const tableColumn = indexIdToColumnIdx.get(surveyIndex.id);
+        const tableRow = practiceIdToRowIndex.get(pte.practice.id);
+        if (tableRow && tableColumn) {
+          const datum = this.associationTable.data[tableRow][tableColumn];
+          datum.predict = true;
+          datum.indexId = surveyIndex.id;
+          datum.practiceId = pte.practice.id;
         }
       });
-      this.tableData.push({
-        practice: practice.title,
-        practiceId: practice.id, // added so that we can figure out which practice this is when we go to save the data
-        practiceOrder: practice.sequence, // added so we know the original ordering...not sure if we will allow this to change
-        spiritualFocusOrientationIdDict: idDict,
-      });
     });
-    console.log("table data: ", this.tableData);
-    this.originalTableData = JSON.parse(JSON.stringify(this.tableData)); // this can be used later if the user clicks "cancel"
+
+    console.log(JSON.stringify(this.associationTable, null, 2));
+    console.log(practiceIdToRowIndex);
+    console.log(indexIdToColumnIdx);
+
+    this.originalTableData = [...this.associationTable.data];
   },
 
   methods: {
@@ -146,34 +130,40 @@ export default Vue.extend({
     },
 
     cancelEdits(): void {
-      this.tableData = JSON.parse(JSON.stringify(this.originalTableData));
+      this.associationTable.data = this.originalTableData;
       this.tableEditModeOn = false;
+    },
+
+    readScriptureEngagementPractices() {
+      return this.$apollo.query<ScriptureEngagementPractices>({
+        query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
+      });
     },
 
     saveTableEdits(): void {
       // save edits to db....
       this.tableEditModeOn = false;
       let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
-      for (let tableRow of this.tableData) {
-        //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
-        Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
-          ([key, value]) => {
-            if (value) {
-              // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
-              // (e.g., "columnId-2" means the focus/orientation id is 2);
-              // if the value is true, the id is harvested from the key and saved to an array
-              let id: number = +key.split("columnId-")[1];
-              //spiritualFocusOrientationIds.push(id);
-              partialPredictionTableEntries.push({
-                surveyIndexId: id,
-                practiceId: tableRow.practiceId,
-                // hard-coding the sequence for now....
-                sequence: 10,
-              });
-            }
-          }
-        );
-      }
+      // for (let tableRow of this.tableData) {
+      //   //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
+      //   Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
+      //     ([key, value]) => {
+      //       if (value) {
+      //         // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
+      //         // (e.g., "columnId-2" means the focus/orientation id is 2);
+      //         // if the value is true, the id is harvested from the key and saved to an array
+      //         let id: number = +key.split("columnId-")[1];
+      //         //spiritualFocusOrientationIds.push(id);
+      //         partialPredictionTableEntries.push({
+      //           surveyIndexId: id,
+      //           practiceId: tableRow.practiceId,
+      //           // hard-coding the sequence for now....
+      //           sequence: 10,
+      //         });
+      //       }
+      //     }
+      //   );
+      // }
       console.log(
         "partialPredictionTableEntries",
         partialPredictionTableEntries
@@ -184,7 +174,7 @@ export default Vue.extend({
           mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
           variables: {
             replaceInput: {
-              letterId: this.oneLetter?.id,
+              letterId: 42, //this.oneLetter?.id,
               entries: partialPredictionTableEntries,
             },
           },

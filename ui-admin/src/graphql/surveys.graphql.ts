@@ -38,6 +38,7 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       surveyDimensions {
         id
         title
+        sequence
         surveyIndices {
           id
           title
@@ -52,6 +53,7 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
             practice {
               id
               title
+              sequence
             }
           }
         }

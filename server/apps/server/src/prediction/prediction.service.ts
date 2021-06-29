@@ -21,7 +21,7 @@ export class PredictionTableEntryService extends BaseService<PredictionTableEntr
   }
 
   construct(createInput: PredictionTableEntryCreateInput) {
-    this.repo.save(this.repo.create(createInput));
+    return this.repo.save(this.repo.create(createInput));
   }
 
   resolveSurveyIndex(predictionTableEntry: PredictionTableEntry) {

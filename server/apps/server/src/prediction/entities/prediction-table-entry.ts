@@ -12,12 +12,20 @@ import { FieldColumn } from "@server/src/decorators";
 @Index(["surveyIndex", "practice"], { unique: true })
 @ObjectType({ description: "One entry in a prediction table" })
 export class PredictionTableEntry extends AbstractEntity {
-  @Field(() => SurveyIndex)
+  @Field(() => SurveyIndex, {
+    description: "Index containing this entry",
+  })
   @ManyToOne(() => SurveyIndex, { primary: true })
   surveyIndex: SurveyIndex;
 
-  @Field(() => ScriptureEngagementPractice)
-  @ManyToOne(() => ScriptureEngagementPractice, { primary: true })
+  @Field(() => ScriptureEngagementPractice, {
+    description: "SE practice referred to by this entry",
+  })
+  @ManyToOne(
+    () => ScriptureEngagementPractice,
+    (sep) => sep.predictionTableEntries,
+    { primary: true }
+  )
   practice: ScriptureEngagementPractice;
 
   @FieldColumn("Sequence number", () => Int)

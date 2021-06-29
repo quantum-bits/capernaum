@@ -25,18 +25,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AssociationTableHeader, AssociationTableData } from "./prediction-table.types";
+import { AssociationTableContent } from "@/pages/surveys/PredictionTableTab.vue";
 
 export default Vue.extend({
   name: "PredictionTableEdit",
 
   props: {
-    headers: {
-      type: Array as () => AssociationTableHeader[],
-      required: true,
-    },
-    tableData: {
-      type: Array as () => AssociationTableData[],
+    associationTable: {
+      type: Object as () => AssociationTableContent,
       required: true,
     },
   },

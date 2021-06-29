@@ -54,6 +54,10 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_pred
    * Practice title
    */
   title: string;
+  /**
+   * Sequence number
+   */
+  sequence: number;
 }
 
 export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries {
@@ -94,6 +98,10 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
+  /**
+   * Sequence number
+   */
+  sequence: number;
   surveyIndices: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices[];
 }
 

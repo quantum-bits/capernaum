@@ -17,7 +17,7 @@
         <survey-dimensions-tab :survey="selectedSurvey" />
       </v-tab-item>
       <v-tab-item>
-        <survey-predictions-tab />
+        <prediction-table-tab :survey="selectedSurvey" />
       </v-tab-item>
     </v-tabs-items>
     <v-row>
@@ -38,7 +38,7 @@ import {
 import * as is from "is";
 import SurveyDetailTab from "./SurveyDetailTab.vue";
 import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
-import SurveyPredictionsTab from "./PredictionTableTab.vue";
+import PredictionTableTab from "@/pages/surveys/PredictionTableTab.vue";
 
 export default Vue.extend({
   name: "Surveys",
@@ -48,7 +48,7 @@ export default Vue.extend({
     SurveySelector,
     SurveyDetailTab,
     SurveyDimensionsTab,
-    SurveyPredictionsTab,
+    PredictionTableTab,
   },
 
   data() {

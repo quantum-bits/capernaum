@@ -36,6 +36,7 @@ export class SurveyService extends BaseService<Survey> {
     "surveyDimensions.surveyIndices",
     "surveyDimensions.surveyIndices.surveyItems",
     "surveyDimensions.surveyIndices.predictionTableEntries",
+    "surveyDimensions.surveyIndices.predictionTableEntries.practice",
   ];
 
   readAll() {

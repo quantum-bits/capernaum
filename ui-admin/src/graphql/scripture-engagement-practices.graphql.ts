@@ -8,6 +8,9 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES = gql`
       description
       sequence
       moreInfoUrl
+      predictionTableEntries {
+        id
+      }
     }
   }
 `;
