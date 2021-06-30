@@ -1,10 +1,17 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
 import { SurveyDimension } from "./survey-dimension";
 import { SurveyItem } from "./survey-item";
 import { AbstractEntity } from "../../shared/abstract-entity";
-import { PredictionTableEntry } from "../../prediction/entities";
 import { FieldColumn } from "@server/src/decorators";
+import { ScriptureEngagementPractice } from "@server/src/prediction/entities";
 
 @Entity()
 @ObjectType({ description: "Collection of survey items, grouped for analysis" })
@@ -20,9 +27,12 @@ export class SurveyIndex extends AbstractEntity {
   @OneToMany(() => SurveyItem, (item) => item.surveyIndex)
   surveyItems: SurveyItem[];
 
-  @Field(() => [PredictionTableEntry])
-  @OneToMany(() => PredictionTableEntry, (pte) => pte.surveyIndex)
-  predictionTableEntries: PredictionTableEntry[];
+  @Field(() => [ScriptureEngagementPractice], {
+    description: "Practices predicted by this index",
+  })
+  @ManyToMany(() => ScriptureEngagementPractice, (sep) => sep.surveyIndices)
+  @JoinTable({ name: "prediction_table_entry" })
+  scriptureEngagementPractices: ScriptureEngagementPractice[];
 
   @FieldColumn("Abbreviation for this index (e.g., 'FOG')")
   abbreviation: string;

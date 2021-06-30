@@ -6,7 +6,7 @@
     <v-tabs v-model="currentTab" fixed-tabs>
       <v-tab>Details</v-tab>
       <v-tab>Dimensions</v-tab>
-      <v-tab>Predictions</v-tab>
+      <v-tab>Associations</v-tab>
     </v-tabs>
 
     <v-tabs-items v-model="currentTab" v-if="isSurveySelected">

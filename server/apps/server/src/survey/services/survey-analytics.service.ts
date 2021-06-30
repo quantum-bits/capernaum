@@ -159,7 +159,6 @@ export class SurveyAnalyticsService {
       responseOrGroupId,
       respondentType
     )
-      .innerJoin("sidx.predictionTableEntries", "pte")
       .innerJoin("pte.practice", "sep")
 
       .select("sep.id", "sep_id")

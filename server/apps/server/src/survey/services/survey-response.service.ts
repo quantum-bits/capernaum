@@ -53,20 +53,22 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
   readComplete(responseId: number) {
     debug("get complete response %d", responseId);
 
-    return this.repo
-      .createQueryBuilder("surveyResponse")
-      .innerJoinAndSelect("surveyResponse.survey", "survey")
-      .innerJoinAndSelect("survey.surveyDimensions", "dimensions")
-      .innerJoinAndSelect("dimensions.surveyIndices", "indices")
-      .innerJoinAndSelect("indices.surveyItems", "items")
-      .innerJoinAndSelect("items.surveyItemResponses", "responseItems")
-      .leftJoinAndSelect("indices.predictionTableEntries", "tableEntries")
-      .leftJoinAndSelect("tableEntries.practice", "practice")
-      .where("surveyResponse.id = :responseId", { responseId })
-      .andWhere("responseItems.surveyResponseId = :responseId", {
-        responseId,
-      })
-      .getOne();
+    return (
+      this.repo
+        .createQueryBuilder("surveyResponse")
+        .innerJoinAndSelect("surveyResponse.survey", "survey")
+        .innerJoinAndSelect("survey.surveyDimensions", "dimensions")
+        .innerJoinAndSelect("dimensions.surveyIndices", "indices")
+        .innerJoinAndSelect("indices.surveyItems", "items")
+        .innerJoinAndSelect("items.surveyItemResponses", "responseItems")
+        .leftJoinAndSelect("indices.scriptureEngagementPractices", "practices")
+        // .leftJoinAndSelect("practices.practice", "practice")
+        .where("surveyResponse.id = :responseId", { responseId })
+        .andWhere("responseItems.surveyResponseId = :responseId", {
+          responseId,
+        })
+        .getOne()
+    );
   }
 
   static async _deleteHelper(manager: EntityManager, surveyResponseId: number) {

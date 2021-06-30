@@ -12,7 +12,6 @@ import { SurveyIndexesFixture } from "../fixtures/cls/survey-indexes.fixture";
 import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
 import { GroupTypesFixture } from "../fixtures/group-types.fixture";
-import { PredictionTableEntriesFixture } from "../fixtures/cls/prediction-table-entries.fixture";
 
 const debug = getDebugger("cli");
 
@@ -27,7 +26,6 @@ const surveyDimensionsFixture = new SurveyDimensionsFixture();
 const surveyIndexesFixture = new SurveyIndexesFixture();
 const surveyItemsFixture = new SurveyItemsFixture();
 const surveysFixture = new SurveysFixture();
-const predictionTableEntriesFixture = new PredictionTableEntriesFixture();
 
 export async function nuclearOption(options) {
   enableDebugOutput("cap:fixture:* cap:model:* -cap:fixture:abstract");
@@ -61,7 +59,6 @@ export async function nuclearOption(options) {
 
   await groupsFixture.load();
 
-  await predictionTableEntriesFixture.load();
   await lettersFixture.load();
   await letterElementsFixture.load();
 }

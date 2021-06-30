@@ -23,10 +23,6 @@ export interface UpdateScriptureEngagementPractice_updateScriptureEngagementPrac
    */
   description: string;
   /**
-   * Sequence number
-   */
-  sequence: number;
-  /**
    * URL for more information on practice
    */
   moreInfoUrl: string;

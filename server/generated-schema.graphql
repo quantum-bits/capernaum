@@ -44,20 +44,8 @@ type ScriptureEngagementPractice {
   """Include this SEP in prediction counts?"""
   forPredictionCounts: Boolean!
 
-  """Sequence number"""
-  sequence: Int!
-  predictionTableEntries: [PredictionTableEntry!]!
-}
-
-"""One entry in a prediction table"""
-type PredictionTableEntry {
-  """Unique ID for this entity"""
-  id: Int!
-  surveyIndex: SurveyIndex!
-  practice: ScriptureEngagementPractice!
-
-  """Sequence number"""
-  sequence: Int!
+  """Survey indices for this SEP"""
+  surveyIndices: [SurveyIndex!]!
 }
 
 """Collection of survey items, grouped for analysis"""
@@ -69,7 +57,9 @@ type SurveyIndex {
   """Use this index in prediction tables?"""
   useForPredictions: Boolean!
   surveyItems: [SurveyItem!]!
-  predictionTableEntries: [PredictionTableEntry!]!
+
+  """Practices predicted by this index"""
+  scriptureEngagementPractices: [ScriptureEngagementPractice!]!
 
   """Abbreviation for this index (e.g., 'FOG')"""
   abbreviation: String!
@@ -678,8 +668,6 @@ type Mutation {
   createLetterType(createInput: LetterTypeCreateInput!): LetterType!
   updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
   deleteLetterType(id: Int!): Int!
-  createPredictionTableEntry(createInput: PredictionTableEntryCreateInput!): PredictionTableEntry!
-  replacePredictionTableEntries(replaceInput: PredictionTableEntryReplaceInput!): [PredictionTableEntry!]!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
@@ -907,29 +895,10 @@ input LetterTypeUpdateInput {
   description: String
 }
 
-input PredictionTableEntryCreateInput {
-  surveyIndexId: Int!
-  practiceId: Int!
-  sequence: Int!
-  letterId: Int!
-}
-
-input PredictionTableEntryReplaceInput {
-  letterId: Int!
-  entries: [PartialPredictionTableEntry!]!
-}
-
-input PartialPredictionTableEntry {
-  surveyIndexId: Int!
-  practiceId: Int!
-  sequence: Int!
-}
-
 input ScriptureEngagementPracticeCreateInput {
   title: String!
   description: String!
   moreInfoUrl: String!
-  sequence: Int!
 }
 
 input ScriptureEngagementPracticeUpdateInput {
@@ -937,7 +906,6 @@ input ScriptureEngagementPracticeUpdateInput {
   title: String
   description: String
   moreInfoUrl: String
-  sequence: Int
 }
 
 input LoginCredentials {

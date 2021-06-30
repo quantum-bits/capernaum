@@ -16,10 +16,7 @@ import {
   SurveyItemResponse,
   SurveyResponse,
 } from "./survey/entities";
-import {
-  PredictionTableEntry,
-  ScriptureEngagementPractice,
-} from "./prediction/entities";
+import { ScriptureEngagementPractice } from "./prediction/entities";
 import { Image } from "./image/entities";
 import { User, UserRole } from "./user/entities";
 import { Event } from "./events/entities";
@@ -39,7 +36,6 @@ export const entities = [
   LetterElement,
   LetterElementType,
   Machine,
-  PredictionTableEntry,
   ScriptureEngagementPractice,
   Survey,
   SurveyDimension,

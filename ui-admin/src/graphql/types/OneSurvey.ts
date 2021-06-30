@@ -28,11 +28,15 @@ export interface OneSurvey_survey_surveyItems {
   qualtricsText: string;
 }
 
-export interface OneSurvey_survey_surveyDimensions_surveyIndices_predictionTableEntries {
+export interface OneSurvey_survey_surveyDimensions_surveyIndices_scriptureEngagementPractices {
   /**
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Practice title
+   */
+  title: string;
 }
 
 export interface OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems {
@@ -67,7 +71,10 @@ export interface OneSurvey_survey_surveyDimensions_surveyIndices {
    * Use this index in prediction tables?
    */
   useForPredictions: boolean;
-  predictionTableEntries: OneSurvey_survey_surveyDimensions_surveyIndices_predictionTableEntries[];
+  /**
+   * Practices predicted by this index
+   */
+  scriptureEngagementPractices: OneSurvey_survey_surveyDimensions_surveyIndices_scriptureEngagementPractices[];
   surveyItems: OneSurvey_survey_surveyDimensions_surveyIndices_surveyItems[];
 }
 

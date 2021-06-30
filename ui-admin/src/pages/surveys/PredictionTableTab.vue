@@ -1,18 +1,34 @@
 <template>
-  <v-container>
+  <v-card>
+    <v-card-title>
+      Scripture Engagement Associations
+      <v-spacer />
+      <v-btn color="primary" :disabled="inEditMode" @click="enterEditMode">
+        Edit
+      </v-btn>
+      <v-btn
+        color="warning"
+        class="mx-2"
+        :disabled="!inEditMode || noUnsavedChanges"
+        @click="saveTableEdits"
+      >
+        Save
+      </v-btn>
+      <v-btn :disabled="!inEditMode" @click="cancelEditMode"> Cancel </v-btn>
+    </v-card-title>
+
     <prediction-table-edit
-      v-if="tableEditModeOn"
+      v-if="inEditMode"
       :association-table="associationTable"
     />
+
     <prediction-table-show v-else :association-table="associationTable" />
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import * as _ from "lodash";
-import { REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION } from "@/graphql/prediction-tables.graphql";
-import { PartialPredictionTableEntry } from "@/graphql/types/globalTypes";
 import PredictionTableShow from "./PredictionTableShow.vue";
 import PredictionTableEdit from "./PredictionTableEdit.vue";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
@@ -21,17 +37,23 @@ import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagemen
 
 interface AssociationTableHeader {
   text: string; // text for the column
-  value: string; // "practice" for the first column; "columnId-id" for the rest, where id is the id of the spiritual focus/orientation in the db
-  align: string; // e.g., "left"
-  sortable: boolean; // whether or not the column is sortable
+  align: string; // e.g., "text-left"
 }
 
-type AssociationTableDatum = { [key: string]: boolean | number };
-type AssociationTableRow = AssociationTableDatum[];
+interface AssociationTableDatum {
+  indexId: number;
+  practiceId: number;
+  predict: boolean;
+}
+
+interface AssociationTableRow {
+  title: string;
+  columns: AssociationTableDatum[];
+}
 
 export interface AssociationTableContent {
   headers: AssociationTableHeader[];
-  data: AssociationTableRow[];
+  rows: AssociationTableRow[];
 }
 
 export default Vue.extend({
@@ -44,7 +66,7 @@ export default Vue.extend({
 
   props: {
     survey: {
-      type: {} as () => AllCapernaumSurveys_surveys,
+      type: Object as () => AllCapernaumSurveys_surveys,
       required: true,
     },
   },
@@ -52,86 +74,101 @@ export default Vue.extend({
   data() {
     return {
       associationTable: {} as AssociationTableContent,
-      originalTableData: [] as AssociationTableRow[],
-      tableEditModeOn: false,
+      savedTableRows: [] as AssociationTableRow[],
+      inEditMode: false,
     };
   },
 
+  computed: {
+    // Returns true iff the current `associationTable.rows` are the same as `savedTableRows`.
+    noUnsavedChanges(): boolean {
+      return _.isEqual(this.associationTable.rows, this.savedTableRows);
+    },
+  },
+
+  /**
+   * Do most of the heavy lifting in this lifecycle event. Using the `apollo` option
+   * was more trouble than it was worth.
+   */
   async mounted() {
     this.associationTable = {
-      headers: [
-        {
-          text: "SE Practice",
-          align: "left",
-          sortable: true,
-          value: "practice",
-        },
-      ],
-      data: [],
+      headers: [{ text: "SE Practice", align: "text-left" }],
+      rows: [],
     };
 
-    const sepResult = await this.readScriptureEngagementPractices();
+    // Read SE practices.
+    const _sepResult = await this.readScriptureEngagementPractices();
     const scriptureEngagementPractices =
-      sepResult.data.scriptureEngagementPractices;
+      _sepResult.data.scriptureEngagementPractices;
 
+    // Create array of survey indices that are ordered by dimension
+    // and filtered to include only those used for predictions.
     const orderedActiveIndices = _.chain(this.survey.surveyDimensions)
       .orderBy("sequence")
       .flatMap((surveyDimension) => surveyDimension.surveyIndices)
       .filter((surveyIndex) => surveyIndex.useForPredictions)
       .value();
 
+    // Set up all the table headers. Also create a map from the survey index ID
+    // to the column of the table where that index will appear.
     const indexIdToColumnIdx = new Map<number, number>();
     _.forEach(orderedActiveIndices, (surveyIndex, idx) => {
       this.associationTable.headers.push({
         text: surveyIndex.abbreviation,
-        value: surveyIndex.id.toFixed(),
-        align: "center",
-        sortable: false,
+        align: "text-center",
       });
       indexIdToColumnIdx.set(surveyIndex.id, idx);
     });
-    const columnCount = indexIdToColumnIdx.size;
 
+    // Create a row of the table for each of the SE practices. Also create a map
+    // from the practice ID to the row in which that practice will appear in the table.
     const practiceIdToRowIndex = new Map<number, number>();
     _.forEach(scriptureEngagementPractices, (practice, idx) => {
-      const row: AssociationTableRow = [];
-      _.times(columnCount, () => row.push({ predict: false }));
-      this.associationTable.data.push(row);
+      const row: AssociationTableRow = {
+        title: practice.title,
+        columns: _.map(orderedActiveIndices, (index) => ({
+          indexId: index.id,
+          practiceId: practice.id,
+          predict: false,
+        })),
+      };
+      this.associationTable.rows.push(row);
       practiceIdToRowIndex.set(practice.id, idx);
     });
 
+    // Iterate over the active indices again, updating those cells of the association
+    // table that are currently enabled for predictions.
     _.forEach(orderedActiveIndices, (surveyIndex) => {
-      _.forEach(surveyIndex.predictionTableEntries, (pte) => {
+      _.forEach(surveyIndex.scriptureEngagementPractices, (sePractice) => {
         const tableColumn = indexIdToColumnIdx.get(surveyIndex.id);
-        const tableRow = practiceIdToRowIndex.get(pte.practice.id);
+        const tableRow = practiceIdToRowIndex.get(sePractice.id);
         if (tableRow && tableColumn) {
-          const datum = this.associationTable.data[tableRow][tableColumn];
+          const datum =
+            this.associationTable.rows[tableRow].columns[tableColumn];
           datum.predict = true;
-          datum.indexId = surveyIndex.id;
-          datum.practiceId = pte.practice.id;
         }
       });
     });
 
-    console.log(JSON.stringify(this.associationTable, null, 2));
-    console.log(practiceIdToRowIndex);
-    console.log(indexIdToColumnIdx);
-
-    this.originalTableData = [...this.associationTable.data];
+    this.saveTableRows();
   },
 
   methods: {
-    hideTable(): void {
-      this.$emit("hide-table");
+    enterEditMode(): void {
+      this.inEditMode = true;
     },
 
-    editTable(): void {
-      this.tableEditModeOn = true;
+    cancelEditMode(): void {
+      this.restoreTableRows();
+      this.inEditMode = false;
     },
 
-    cancelEdits(): void {
-      this.associationTable.data = this.originalTableData;
-      this.tableEditModeOn = false;
+    saveTableRows() {
+      this.savedTableRows = _.cloneDeep(this.associationTable.rows);
+    },
+
+    restoreTableRows() {
+      this.associationTable.rows = _.cloneDeep(this.savedTableRows);
     },
 
     readScriptureEngagementPractices() {
@@ -140,52 +177,22 @@ export default Vue.extend({
       });
     },
 
-    saveTableEdits(): void {
-      // save edits to db....
-      this.tableEditModeOn = false;
-      let partialPredictionTableEntries: PartialPredictionTableEntry[] = [];
-      // for (let tableRow of this.tableData) {
-      //   //https://stackoverflow.com/questions/16174182/typescript-looping-through-a-dictionary
-      //   Object.entries(tableRow.spiritualFocusOrientationIdDict).forEach(
-      //     ([key, value]) => {
-      //       if (value) {
-      //         // the focus/orientation ids are part of the key in the spiritualFocusOrientationIdDict object
-      //         // (e.g., "columnId-2" means the focus/orientation id is 2);
-      //         // if the value is true, the id is harvested from the key and saved to an array
-      //         let id: number = +key.split("columnId-")[1];
-      //         //spiritualFocusOrientationIds.push(id);
-      //         partialPredictionTableEntries.push({
-      //           surveyIndexId: id,
-      //           practiceId: tableRow.practiceId,
-      //           // hard-coding the sequence for now....
-      //           sequence: 10,
-      //         });
-      //       }
-      //     }
-      //   );
-      // }
-      console.log(
-        "partialPredictionTableEntries",
-        partialPredictionTableEntries
-      );
+    // Return all data entries from an array of rows.
+    allEntries(rows: AssociationTableRow[]): AssociationTableDatum[] {
+      return _.flatMap(rows, (row) => row.columns);
+    },
 
-      this.$apollo
-        .mutate({
-          mutation: REPLACE_PREDICTION_TABLE_ENTRIES_MUTATION,
-          variables: {
-            replaceInput: {
-              letterId: 42, //this.oneLetter?.id,
-              entries: partialPredictionTableEntries,
-            },
-          },
-        })
-        .then(({ data }) => {
-          console.log("done!", data);
-          this.refetchLetterData();
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
+    saveTableEdits() {
+      // Fish out the entries that are different from the last-saved set of entries.
+      const changedEntries = _.differenceWith(
+        this.allEntries(this.associationTable.rows),
+        this.allEntries(this.savedTableRows),
+        _.isEqual // Deep comparison
+      );
+      console.log("CHANGED", JSON.stringify(changedEntries));
+
+      this.saveTableRows();
+      this.inEditMode = false;
     },
 
     refetchLetterData(): void {

@@ -55,7 +55,11 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
 
   readAll() {
     return this.repo.find({
-      relations: ["surveyItems", "surveyDimension", "predictionTableEntries"],
+      relations: [
+        "surveyItems",
+        "surveyDimension",
+        "scriptureEngagementPractices",
+      ],
     });
   }
 

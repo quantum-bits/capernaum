@@ -1,26 +1,25 @@
 <template>
-  <v-data-table :headers="headers" :items="tableData" class="elevation-1">
-    <template v-slot:item="{ item, headers }">
+  <v-simple-table>
+    <thead>
       <tr>
-        <td
-          v-for="header in headers"
-          :key="header.value"
-          class="text-xs-center"
+        <th
+          class="text-center"
+          v-for="(header, idx) in associationTable.headers"
+          :key="idx"
         >
-          <span v-if="header.value === 'practice'">
-            {{ item[header.value] }}
-          </span>
-          <span v-else>
-            <v-checkbox
-              v-model="item.spiritualFocusOrientationIdDict[header.value]"
-              color="primary"
-              hide-details
-            />
-          </span>
+          {{ header.text }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(row, idx) in associationTable.rows" :key="idx">
+        <td>{{ row.title }}</td>
+        <td class="text-center" v-for="(column, idx) in row.columns" :key="idx">
+          <v-simple-checkbox v-model="column.predict" color="primary" />
         </td>
       </tr>
-    </template>
-  </v-data-table>
+    </tbody>
+  </v-simple-table>
 </template>
 
 <script lang="ts">

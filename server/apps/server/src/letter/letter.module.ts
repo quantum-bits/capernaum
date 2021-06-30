@@ -18,7 +18,6 @@ import {
   LetterService,
   LetterTypeService,
 } from "./letter.service";
-import { PredictionTableEntry } from "../prediction/entities";
 import { SurveyModule } from "@server/src/survey/survey.module";
 
 @Module({
@@ -28,7 +27,6 @@ import { SurveyModule } from "@server/src/survey/survey.module";
       LetterType,
       LetterElement,
       LetterElementType,
-      PredictionTableEntry,
     ]),
     forwardRef(() => SurveyModule),
   ],

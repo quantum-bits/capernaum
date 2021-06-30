@@ -82,7 +82,6 @@ import {
   DELETE_DIMENSION,
   UPDATE_DIMENSION_MUTATION,
 } from "@/graphql/surveys.graphql";
-import { OneSurvey_survey as Survey } from "@/graphql/types/OneSurvey";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
 import IndexDialog from "../../components/dialogs/IndexDialog.vue";
@@ -91,6 +90,7 @@ import {
   IndexDialogResponse,
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
+import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "SurveyDimensionBranch",
@@ -103,7 +103,7 @@ export default Vue.extend({
 
   props: {
     survey: {
-      type: Object as () => Survey,
+      type: Object as () => AllCapernaumSurveys_surveys,
       required: true,
     },
     surveyDimension: {

@@ -35,6 +35,10 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
           description
         }
       }
+      surveyItems {
+        id
+        qualtricsText
+      }
       surveyDimensions {
         id
         title
@@ -48,13 +52,9 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
             id
             qualtricsText
           }
-          predictionTableEntries {
+          scriptureEngagementPractices {
             id
-            practice {
-              id
-              title
-              sequence
-            }
+            title
           }
         }
       }
@@ -211,8 +211,9 @@ export const ONE_SURVEY_QUERY = gql`
           title
           abbreviation
           useForPredictions
-          predictionTableEntries {
+          scriptureEngagementPractices {
             id
+            title
           }
           surveyItems {
             id

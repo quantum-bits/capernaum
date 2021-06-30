@@ -34,6 +34,17 @@ export interface AllCapernaumSurveys_surveys_letters {
   letterType: AllCapernaumSurveys_surveys_letters_letterType;
 }
 
+export interface AllCapernaumSurveys_surveys_surveyItems {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Qualtrics `questionText` field
+   */
+  qualtricsText: string;
+}
+
 export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems {
   /**
    * Unique ID for this entity
@@ -45,7 +56,7 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surv
   qualtricsText: string;
 }
 
-export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries_practice {
+export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_scriptureEngagementPractices {
   /**
    * Unique ID for this entity
    */
@@ -54,18 +65,6 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_pred
    * Practice title
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
-}
-
-export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  practice: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries_practice;
 }
 
 export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices {
@@ -86,7 +85,10 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices {
    */
   useForPredictions: boolean;
   surveyItems: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems[];
-  predictionTableEntries: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_predictionTableEntries[];
+  /**
+   * Practices predicted by this index
+   */
+  scriptureEngagementPractices: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_scriptureEngagementPractices[];
 }
 
 export interface AllCapernaumSurveys_surveys_surveyDimensions {
@@ -138,6 +140,12 @@ export interface AllCapernaumSurveys_surveys {
    * Fetch the letters for this survey
    */
   letters: AllCapernaumSurveys_surveys_letters[];
+  /**
+   * All the Qualtrics items for this survey; 
+   *     for groupings, see survey dimension and index.
+   *     Pass 'whichItems' to choose which to return (default 'All')
+   */
+  surveyItems: AllCapernaumSurveys_surveys_surveyItems[];
   /**
    * Dimensions for this survey; groups indices, which group items.
    */

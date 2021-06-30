@@ -103,17 +103,6 @@ export interface MachineCreateInput {
   active: boolean;
 }
 
-export interface PartialPredictionTableEntry {
-  surveyIndexId: number;
-  practiceId: number;
-  sequence: number;
-}
-
-export interface PredictionTableEntryReplaceInput {
-  letterId: number;
-  entries: PartialPredictionTableEntry[];
-}
-
 export interface QualtricsSubscriptionCreateInput {
   hostName: string;
   subscriptionType: string;
@@ -124,7 +113,6 @@ export interface ScriptureEngagementPracticeCreateInput {
   title: string;
   description: string;
   moreInfoUrl: string;
-  sequence: number;
 }
 
 export interface ScriptureEngagementPracticeUpdateInput {
@@ -132,7 +120,6 @@ export interface ScriptureEngagementPracticeUpdateInput {
   title?: string | null;
   description?: string | null;
   moreInfoUrl?: string | null;
-  sequence?: number | null;
 }
 
 export interface SendMailInput {

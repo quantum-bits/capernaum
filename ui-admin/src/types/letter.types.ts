@@ -24,16 +24,6 @@ export interface ScriptureEngagementPractice {
   sequence: number;
 }
 
-export interface PredictionTableEntry {
-  sequence: number;
-  practice: ScriptureEngagementPractice;
-}
-
-export interface PredictionTable {
-  entries: PredictionTableEntry[];
-  description: string;
-}
-
 export interface Letter {
   name: string;
   created: string;
@@ -44,7 +34,6 @@ export interface Letter {
 
 export interface SurveyLetter {
   survey: Survey;
-  predictionTable: PredictionTable;
   letter: Letter;
   isActive: boolean;
   isFrozen: boolean;

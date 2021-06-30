@@ -10,9 +10,15 @@ export class SurveyIndexesFixture extends AbstractFixture {
     return SurveyIndexModel.query().delete();
   }
 
-  insert() {
+  async insert() {
     debug("Insert survey indexes");
-    return SurveyIndexModel.query().insert(surveyIndexes);
+    await SurveyIndexModel.query().insert(surveyIndexes);
+    debug("Relate indexes to SE practices");
+    for (const pte of predictionTableEntries) {
+      await SurveyIndexModel.relatedQuery("scriptureEngagementPractices")
+        .for(pte.surveyIndexId)
+        .relate(pte.practiceId);
+    }
   }
 }
 
@@ -128,5 +134,100 @@ const surveyIndexes = [
     abbreviation: "Societal Application",
     title: "Societal Application",
     useForPredictions: true,
+  },
+];
+
+const predictionTableEntries = [
+  {
+    surveyIndexId: 88,
+    practiceId: 16,
+  },
+  {
+    surveyIndexId: 88,
+    practiceId: 17,
+  },
+  {
+    surveyIndexId: 73,
+    practiceId: 2,
+  },
+  {
+    surveyIndexId: 73,
+    practiceId: 4,
+  },
+  {
+    surveyIndexId: 73,
+    practiceId: 9,
+  },
+  {
+    surveyIndexId: 79,
+    practiceId: 7,
+  },
+  {
+    surveyIndexId: 79,
+    practiceId: 8,
+  },
+  {
+    surveyIndexId: 79,
+    practiceId: 13,
+  },
+  {
+    surveyIndexId: 75,
+    practiceId: 4,
+  },
+  {
+    surveyIndexId: 75,
+    practiceId: 8,
+  },
+  {
+    surveyIndexId: 75,
+    practiceId: 9,
+  },
+  {
+    surveyIndexId: 75,
+    practiceId: 10,
+  },
+  {
+    surveyIndexId: 75,
+    practiceId: 13,
+  },
+  {
+    surveyIndexId: 76,
+    practiceId: 1,
+  },
+  {
+    surveyIndexId: 76,
+    practiceId: 2,
+  },
+  {
+    surveyIndexId: 76,
+    practiceId: 6,
+  },
+  {
+    surveyIndexId: 76,
+    practiceId: 11,
+  },
+  {
+    surveyIndexId: 78,
+    practiceId: 2,
+  },
+  {
+    surveyIndexId: 78,
+    practiceId: 3,
+  },
+  {
+    surveyIndexId: 78,
+    practiceId: 10,
+  },
+  {
+    surveyIndexId: 74,
+    practiceId: 5,
+  },
+  {
+    surveyIndexId: 74,
+    practiceId: 8,
+  },
+  {
+    surveyIndexId: 74,
+    practiceId: 13,
   },
 ];

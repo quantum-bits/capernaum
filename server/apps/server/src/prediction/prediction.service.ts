@@ -1,8 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import {
-  PredictionTableEntry,
-  PredictionTableEntryCreateInput,
-  PredictionTableEntryReplaceInput,
   ScriptureEngagementPractice,
   ScriptureEngagementPracticeCreateInput,
   ScriptureEngagementPracticeUpdateInput,
@@ -10,50 +7,6 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { BaseService } from "@server/src/shared/base.service";
-
-@Injectable()
-export class PredictionTableEntryService extends BaseService<PredictionTableEntry> {
-  constructor(
-    @InjectRepository(PredictionTableEntry)
-    private readonly repo: Repository<PredictionTableEntry>
-  ) {
-    super(repo);
-  }
-
-  construct(createInput: PredictionTableEntryCreateInput) {
-    return this.repo.save(this.repo.create(createInput));
-  }
-
-  resolveSurveyIndex(predictionTableEntry: PredictionTableEntry) {
-    return super.resolveOne(predictionTableEntry, "surveyIndex");
-  }
-
-  resolveScriptureEngagementPractice(
-    predictionTableEntry: PredictionTableEntry
-  ) {
-    return super.resolveOne(predictionTableEntry, "practice");
-  }
-
-  replacePredictionTableEntries(
-    replaceInput: PredictionTableEntryReplaceInput
-  ): Promise<PredictionTableEntry[]> {
-    return this.repo.manager.transaction(async (manager) => {
-      const predictionTableEntryRepo =
-        manager.getRepository(PredictionTableEntry);
-
-      // Insert the replacement entries.
-      const newEntries: PredictionTableEntry[] = [];
-      for (const inputEntry of replaceInput.entries) {
-        const entry = predictionTableEntryRepo.create({
-          ...inputEntry,
-        });
-        newEntries.push(await predictionTableEntryRepo.save(entry));
-      }
-
-      return newEntries;
-    });
-  }
-}
 
 @Injectable()
 export class ScriptureEngagementPracticeService extends BaseService<ScriptureEngagementPractice> {
@@ -68,16 +21,14 @@ export class ScriptureEngagementPracticeService extends BaseService<ScriptureEng
     return this.repo.save(this.repo.create(createInput));
   }
 
+  alwaysResolve = ["surveyIndices"];
+
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOne(id, { relations: this.alwaysResolve });
   }
 
   readAll() {
-    return this.repo.find();
-  }
-
-  resolvePredictionTableEntries(practice: ScriptureEngagementPractice) {
-    return super.resolveMany(practice, "predictionTableEntries");
+    return this.repo.find({ relations: this.alwaysResolve });
   }
 
   update(

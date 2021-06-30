@@ -266,6 +266,7 @@ export default Vue.extend({
       this.resetForm();
       this.createUpdateSEPracticeDialog = false;
     },
+
     refetchSEPracticeData(): void {
       this.$apollo.queries.scriptureEngagementPracticeData
         .refetch()
@@ -273,28 +274,17 @@ export default Vue.extend({
           console.log("survey data refetched! ", data);
         });
     },
+
     submitSEPractice(): void {
       if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
         console.log("save info");
         if (!this.editOn) {
           // create new SE practice
-          let maxSequence = 0;
-          this.scriptureEngagementPracticeData.forEach(
-            (
-              practice: ScriptureEngagementPractices_scriptureEngagementPractices
-            ) => {
-              if (practice.sequence > maxSequence) {
-                maxSequence = practice.sequence;
-              }
-            }
-          );
-          let newSequence = maxSequence + 1;
           this.$apollo
             .mutate({
               mutation: ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION,
               variables: {
                 createInput: {
-                  sequence: newSequence,
                   title: this.scriptureEngagementPracticeTitle,
                   description: this.scriptureEngagementPracticeDescription,
                   moreInfoUrl: this.moreInfoUrl,
@@ -379,9 +369,8 @@ export default Vue.extend({
           id: practice.id,
           title: practice.title,
           description: practice.description,
-          sequence: practice.sequence,
           moreInfoUrl: practice.moreInfoUrl,
-          canDelete: practice.predictionTableEntries.length === 0,
+          canDelete: practice.surveyIndices.length === 0,
         })
       );
     },

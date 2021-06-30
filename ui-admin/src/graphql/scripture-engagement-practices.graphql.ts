@@ -6,10 +6,10 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES = gql`
       id
       title
       description
-      sequence
       moreInfoUrl
-      predictionTableEntries {
+      surveyIndices {
         id
+        title
       }
     }
   }
@@ -23,7 +23,6 @@ export const ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       id
       title
       description
-      sequence
       moreInfoUrl
     }
   }
@@ -37,7 +36,6 @@ export const UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       id
       title
       description
-      sequence
       moreInfoUrl
     }
   }

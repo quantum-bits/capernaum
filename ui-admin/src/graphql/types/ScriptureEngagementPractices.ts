@@ -7,11 +7,15 @@
 // GraphQL query operation: ScriptureEngagementPractices
 // ====================================================
 
-export interface ScriptureEngagementPractices_scriptureEngagementPractices_predictionTableEntries {
+export interface ScriptureEngagementPractices_scriptureEngagementPractices_surveyIndices {
   /**
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * Title of this index
+   */
+  title: string;
 }
 
 export interface ScriptureEngagementPractices_scriptureEngagementPractices {
@@ -28,14 +32,13 @@ export interface ScriptureEngagementPractices_scriptureEngagementPractices {
    */
   description: string;
   /**
-   * Sequence number
-   */
-  sequence: number;
-  /**
    * URL for more information on practice
    */
   moreInfoUrl: string;
-  predictionTableEntries: ScriptureEngagementPractices_scriptureEngagementPractices_predictionTableEntries[];
+  /**
+   * Survey indices for this SEP
+   */
+  surveyIndices: ScriptureEngagementPractices_scriptureEngagementPractices_surveyIndices[];
 }
 
 export interface ScriptureEngagementPractices {

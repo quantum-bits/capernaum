@@ -1,14 +1,12 @@
 <template>
-  <v-container>
-    <v-row align="baseline" class="justify-space-around">
-      <v-btn
-        color="primary"
-        :disabled="!isSurveySelected"
-        @click="dimensionDialog.visible = true"
-      >
+  <v-card>
+    <v-card-title>
+      Dimensions, Indices, Items
+      <v-spacer />
+      <v-btn color="primary" @click="dimensionDialog.visible = true">
         Add Survey Dimension
       </v-btn>
-    </v-row>
+    </v-card-title>
 
     <v-row>
       <v-col cols="10" offset="1">
@@ -52,22 +50,22 @@
       title-hint="e.g., 'Focal Dimension'"
       @ready="createDimension"
     />
-  </v-container>
+  </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { ADD_DIMENSION_MUTATION } from "@/graphql/surveys.graphql";
 import { SurveyDimensionEnum, SurveyDimensionView } from "@/pages/survey.types";
-import {
-  OneSurvey_survey as Survey,
-  OneSurvey_survey_surveyDimensions as SurveyDimension,
-  OneSurvey_survey_surveyDimensions_surveyIndices as SurveyIndex,
-} from "@/graphql/types/OneSurvey";
 import DimensionBranch from "./SurveyDimensionBranch.vue";
 import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
 import IndexBranch from "./SurveyIndexBranch.vue";
 import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
+import {
+  AllCapernaumSurveys_surveys,
+  AllCapernaumSurveys_surveys_surveyDimensions,
+  AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+} from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
   name: "SurveyDimensionsTab",
@@ -80,7 +78,7 @@ export default Vue.extend({
 
   props: {
     survey: {
-      type: {} as () => Survey,
+      type: Object as () => AllCapernaumSurveys_surveys,
       required: true,
     },
   },
@@ -95,14 +93,18 @@ export default Vue.extend({
   },
 
   methods: {
-    canDeleteSurveyDimension(surveyDimension: SurveyDimension) {
+    canDeleteSurveyDimension(
+      surveyDimension: AllCapernaumSurveys_surveys_surveyDimensions
+    ) {
       return surveyDimension.surveyIndices.every(
-        (surveyIndex) => surveyIndex.predictionTableEntries.length === 0
+        (surveyIndex) => surveyIndex.scriptureEngagementPractices.length === 0
       );
     },
 
-    canDeleteSurveyIndex(surveyIndex: SurveyIndex) {
-      return surveyIndex.predictionTableEntries.length === 0;
+    canDeleteSurveyIndex(
+      surveyIndex: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices
+    ) {
+      return surveyIndex.scriptureEngagementPractices.length === 0;
     },
 
     refetchSurveyData() {

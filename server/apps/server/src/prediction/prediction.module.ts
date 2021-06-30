@@ -1,25 +1,12 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { PredictionTableEntry, ScriptureEngagementPractice } from "./entities";
-import {
-  PredictionTableEntryResolver,
-  ScriptureEngagementPracticeResolver,
-} from "./prediction.resolvers";
-import {
-  PredictionTableEntryService,
-  ScriptureEngagementPracticeService,
-} from "./prediction.service";
+import { ScriptureEngagementPractice } from "./entities";
+import { ScriptureEngagementPracticeResolver } from "./prediction.resolvers";
+import { ScriptureEngagementPracticeService } from "./prediction.service";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      PredictionTableEntry,
-      ScriptureEngagementPractice,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([ScriptureEngagementPractice])],
   providers: [
-    PredictionTableEntryService,
-    PredictionTableEntryResolver,
     ScriptureEngagementPracticeService,
     ScriptureEngagementPracticeResolver,
   ],
