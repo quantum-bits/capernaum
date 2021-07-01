@@ -251,8 +251,15 @@ export const DELETE_SURVEY_RESPONSE = gql`
   }
 `;
 
-export const DELETE_SURVEY = gql`
-  mutation DeleteSurvey($id: Int!) {
-    deleteSurvey(id: $id)
+export const UPDATE_ASSOCIATION_TABLE = gql`
+  mutation UpdateAssociationTable($updates: [AssociationUpdateInput!]!) {
+    updateBooleanAssociations(updates: $updates) {
+      id
+      title
+      scriptureEngagementPractices {
+        id
+        title
+      }
+    }
   }
 `;

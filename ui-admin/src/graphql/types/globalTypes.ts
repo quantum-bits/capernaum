@@ -16,6 +16,15 @@ export enum WhichItems {
   WithoutIndex = "WithoutIndex",
 }
 
+/**
+ * Communicate updates to survey index-to-SE practice relationships
+ */
+export interface AssociationUpdateInput {
+  indexId: number;
+  practiceId: number;
+  predict: boolean;
+}
+
 export interface ChangePasswordInput {
   userId: number;
   currentPassword: string;
@@ -113,6 +122,7 @@ export interface ScriptureEngagementPracticeCreateInput {
   title: string;
   description: string;
   moreInfoUrl: string;
+  forPredictionCounts: boolean;
 }
 
 export interface ScriptureEngagementPracticeUpdateInput {
@@ -120,6 +130,7 @@ export interface ScriptureEngagementPracticeUpdateInput {
   title?: string | null;
   description?: string | null;
   moreInfoUrl?: string | null;
+  forPredictionCounts?: boolean | null;
 }
 
 export interface SendMailInput {

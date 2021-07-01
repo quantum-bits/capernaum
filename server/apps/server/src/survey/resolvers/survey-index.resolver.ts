@@ -6,6 +6,7 @@ import {
   SurveyIndexUpdateInput,
 } from "../entities";
 import { SurveyIndexService } from "../services";
+import { AssociationUpdateInput } from "@server/src/prediction/entities";
 
 @Resolver(() => SurveyIndex)
 export class SurveyIndexResolver {
@@ -22,6 +23,17 @@ export class SurveyIndexResolver {
   @Query(() => [SurveyIndex])
   surveyIndexReadAll() {
     return this.surveyIndexService.readAll();
+  }
+
+  @Mutation(() => [SurveyIndex], {
+    description:
+      "Make changes to SE practice associations; returns updated indices",
+  })
+  updateBooleanAssociations(
+    @Args("updates", { type: () => [AssociationUpdateInput] })
+    updates: AssociationUpdateInput[]
+  ) {
+    return this.surveyIndexService.updateBooleanAssociations(updates);
   }
 
   @Mutation(() => SurveyIndex, {

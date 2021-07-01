@@ -10,8 +10,12 @@ import {
 } from "@server/src/survey/entities";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
-import { assign, difference, pick } from "lodash";
+import * as _ from "lodash";
 import { getDebugger } from "@helpers/debug-factory";
+import {
+  AssociationUpdateInput,
+  ScriptureEngagementPractice,
+} from "@server/src/prediction/entities";
 
 const debug = getDebugger("survey-index");
 
@@ -63,6 +67,44 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     });
   }
 
+  /**
+   * Update all boolean associations. Do it in a transaction.
+   * @param updates
+   */
+  updateBooleanAssociations(updates: AssociationUpdateInput[]) {
+    return this.repo.manager.transaction(async (manager) => {
+      await Promise.all(
+        _.forEach(updates, async (update) => {
+          debug("one update %O", update);
+          if (update.predict) {
+            // Add a new prediction
+            await manager
+              .createQueryBuilder()
+              .relation(SurveyIndex, "scriptureEngagementPractices")
+              .of(update.indexId)
+              .add(update.practiceId);
+          } else {
+            // Remove an existing prediction
+            await manager
+              .createQueryBuilder()
+              .relation(SurveyIndex, "scriptureEngagementPractices")
+              .of(update.indexId)
+              .remove(update.practiceId);
+          }
+        })
+      );
+
+      const indexIds = _.uniq(_.map(updates, "indexId"));
+      debug("Index IDs %o", indexIds);
+
+      return manager
+        .createQueryBuilder(SurveyIndex, "sidx")
+        .innerJoinAndSelect("sidx.scriptureEngagementPractices", "sep")
+        .where("sidx.id IN (:...ids)", { ids: indexIds })
+        .getMany();
+    });
+  }
+
   update(updateInput: SurveyIndexUpdateInput): Promise<SurveyIndex> {
     return this.repo.manager.transaction(async (manager) => {
       // N.B., can also use the manager directly.
@@ -75,9 +117,9 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
 
       // Assign scalar updates, if any. Only those props listed will be updated,
       // and then only if present in updateInput.
-      assign(
+      _.assign(
         index,
-        pick(updateInput, ["title", "abbreviation", "useForPredictions"])
+        _.pick(updateInput, ["title", "abbreviation", "useForPredictions"])
       );
 
       // Fetch survey items specified by the update.
@@ -85,7 +127,10 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
       const validUpdateItemIds = updateItems.map((item) => item.id);
 
       // Check that all specified items actually exist.
-      const bogusItemIds = difference(updateInput.itemIds, validUpdateItemIds);
+      const bogusItemIds = _.difference(
+        updateInput.itemIds,
+        validUpdateItemIds
+      );
       if (bogusItemIds.length > 0) {
         throw new Error(
           `Survey items with these IDs don't exist: ${bogusItemIds

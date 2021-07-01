@@ -34,6 +34,11 @@ import PredictionTableEdit from "./PredictionTableEdit.vue";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES } from "@/graphql/scripture-engagement-practices.graphql";
 import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
+import {
+  UpdateAssociationTable,
+  UpdateAssociationTableVariables,
+} from "@/graphql/types/UpdateAssociationTable";
+import { UPDATE_ASSOCIATION_TABLE } from "@/graphql/surveys.graphql";
 
 interface AssociationTableHeader {
   text: string; // text for the column
@@ -92,14 +97,14 @@ export default Vue.extend({
    */
   async mounted() {
     this.associationTable = {
-      headers: [{ text: "SE Practice", align: "text-left" }],
+      headers: [
+        {
+          text: "SE Practice",
+          align: "text-left",
+        },
+      ],
       rows: [],
     };
-
-    // Read SE practices.
-    const _sepResult = await this.readScriptureEngagementPractices();
-    const scriptureEngagementPractices =
-      _sepResult.data.scriptureEngagementPractices;
 
     // Create array of survey indices that are ordered by dimension
     // and filtered to include only those used for predictions.
@@ -122,18 +127,20 @@ export default Vue.extend({
 
     // Create a row of the table for each of the SE practices. Also create a map
     // from the practice ID to the row in which that practice will appear in the table.
+    const scriptureEngagementPractices =
+      await this.getScriptureEngagementPractices();
     const practiceIdToRowIndex = new Map<number, number>();
-    _.forEach(scriptureEngagementPractices, (practice, idx) => {
+    _.forEach(scriptureEngagementPractices, (sePractice, idx) => {
       const row: AssociationTableRow = {
-        title: practice.title,
+        title: sePractice.title,
         columns: _.map(orderedActiveIndices, (index) => ({
           indexId: index.id,
-          practiceId: practice.id,
+          practiceId: sePractice.id,
           predict: false,
         })),
       };
       this.associationTable.rows.push(row);
-      practiceIdToRowIndex.set(practice.id, idx);
+      practiceIdToRowIndex.set(sePractice.id, idx);
     });
 
     // Iterate over the active indices again, updating those cells of the association
@@ -142,15 +149,22 @@ export default Vue.extend({
       _.forEach(surveyIndex.scriptureEngagementPractices, (sePractice) => {
         const tableColumn = indexIdToColumnIdx.get(surveyIndex.id);
         const tableRow = practiceIdToRowIndex.get(sePractice.id);
-        if (tableRow && tableColumn) {
+        if (tableRow !== undefined && tableColumn !== undefined) {
           const datum =
             this.associationTable.rows[tableRow].columns[tableColumn];
           datum.predict = true;
+          console.log(
+            `datum[${surveyIndex.id}/${tableRow}][${sePractice.id}/${tableColumn}] = true`
+          );
+        } else {
+          throw new Error(
+            `No mapping for [${surveyIndex.id}][${sePractice.id}]`
+          );
         }
       });
     });
 
-    this.saveTableRows();
+    this.saveTableContent();
   },
 
   methods: {
@@ -159,22 +173,16 @@ export default Vue.extend({
     },
 
     cancelEditMode(): void {
-      this.restoreTableRows();
+      this.restoreTableContent();
       this.inEditMode = false;
     },
 
-    saveTableRows() {
+    saveTableContent() {
       this.savedTableRows = _.cloneDeep(this.associationTable.rows);
     },
 
-    restoreTableRows() {
+    restoreTableContent() {
       this.associationTable.rows = _.cloneDeep(this.savedTableRows);
-    },
-
-    readScriptureEngagementPractices() {
-      return this.$apollo.query<ScriptureEngagementPractices>({
-        query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
-      });
     },
 
     // Return all data entries from an array of rows.
@@ -191,14 +199,28 @@ export default Vue.extend({
       );
       console.log("CHANGED", JSON.stringify(changedEntries));
 
-      this.saveTableRows();
-      this.inEditMode = false;
+      return this.$apollo
+        .mutate<UpdateAssociationTable, UpdateAssociationTableVariables>({
+          mutation: UPDATE_ASSOCIATION_TABLE,
+          variables: {
+            updates: changedEntries,
+          },
+        })
+        .then((result) => {
+          console.log(result);
+          this.saveTableContent();
+          this.inEditMode = false;
+        });
     },
 
-    refetchLetterData(): void {
-      this.$apollo.queries.oneLetter.refetch().then(({ data }) => {
-        console.log("survey data refetched! ", data);
-      });
+    getScriptureEngagementPractices() {
+      return this.$apollo
+        .query<ScriptureEngagementPractices>({
+          query: ALL_SCRIPTURE_ENGAGEMENT_PRACTICES,
+        })
+        .then((result) =>
+          _.sortBy(result.data.scriptureEngagementPractices, ["title"])
+        );
     },
   },
 });

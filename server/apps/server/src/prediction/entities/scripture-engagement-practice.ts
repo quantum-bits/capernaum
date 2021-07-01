@@ -25,16 +25,22 @@ export class ScriptureEngagementPractice extends AbstractEntity {
 }
 
 @InputType()
-export class ScriptureEngagementPracticeCreateInput {
+export class ScriptureEngagementPracticeCreateInput
+  implements Partial<ScriptureEngagementPractice>
+{
   @Field() title: string;
   @Field() description: string;
   @Field() moreInfoUrl: string;
+  @Field() forPredictionCounts: boolean;
 }
 
 @InputType()
-export class ScriptureEngagementPracticeUpdateInput {
+export class ScriptureEngagementPracticeUpdateInput
+  implements Partial<ScriptureEngagementPractice>
+{
   @Field(() => Int) id: number;
   @Field({ nullable: true }) title?: string;
   @Field({ nullable: true }) description?: string;
   @Field({ nullable: true }) moreInfoUrl: string;
+  @Field({ nullable: true }) forPredictionCounts: boolean;
 }
