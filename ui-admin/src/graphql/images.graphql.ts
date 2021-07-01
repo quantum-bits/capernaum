@@ -13,6 +13,10 @@ export const ALL_IMAGES_QUERY = gql`
       updated
       letterElements {
         id
+        letter {
+          id
+          title
+        }
       }
     }
   }
@@ -36,7 +40,7 @@ export const ONE_IMAGE_QUERY = gql`
   }
 `;
 
-export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
+export const UPDATE_IMAGE_DETAILS = gql`
   mutation UpdateImageDetails($updateInput: ImageUpdateInput!) {
     updateImage(updateInput: $updateInput) {
       id
@@ -49,12 +53,16 @@ export const UPDATE_IMAGE_DETAILS_MUTATION = gql`
       updated
       letterElements {
         id
+        letter {
+          id
+          title
+        }
       }
     }
   }
 `;
 
-export const DELETE_IMAGE_MUTATION = gql`
+export const DELETE_IMAGE = gql`
   mutation DeleteImage($id: Int!) {
     deleteImage(id: $id)
   }

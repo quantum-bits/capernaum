@@ -289,11 +289,17 @@ type Image {
 
   """Image title from user"""
   title: String!
+
+  """Date this image added"""
   created: DateTime!
+
+  """Date this image updated"""
   updated: DateTime!
+
+  """Letter elements that use this image"""
+  letterElements: [LetterElement!]!
   url: String!
   fullPath: String!
-  letterElements: [LetterElement!]!
 }
 
 type LetterElement {

@@ -1,7 +1,8 @@
-import { CreateDateColumn, Entity, UpdateDateColumn } from "typeorm";
+import { CreateDateColumn, Entity, OneToMany, UpdateDateColumn } from "typeorm";
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { FieldColumn } from "@server/src/decorators";
+import { LetterElement } from "@server/src/letter/entities";
 
 @Entity()
 @ObjectType()
@@ -18,13 +19,19 @@ export class Image extends AbstractEntity {
   @FieldColumn("Image title from user", { default: "Not yet set" })
   title: string;
 
-  @Field()
+  @Field({ description: "Date this image added" })
   @CreateDateColumn()
   created: Date;
 
-  @Field()
+  @Field({ description: "Date this image updated" })
   @UpdateDateColumn()
   updated: Date;
+
+  @Field(() => [LetterElement], {
+    description: "Letter elements that use this image",
+  })
+  @OneToMany(() => LetterElement, (elt) => elt.image)
+  letterElements: LetterElement[];
 
   private static extensionFromMimeType(mimeType: string) {
     return mimeType.replace(/\//g, ".");

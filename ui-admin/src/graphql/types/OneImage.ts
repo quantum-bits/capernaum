@@ -36,8 +36,17 @@ export interface OneImage_image {
    * MIME encoding for this image
    */
   mimeType: string;
+  /**
+   * Date this image added
+   */
   created: any;
+  /**
+   * Date this image updated
+   */
   updated: any;
+  /**
+   * Letter elements that use this image
+   */
   letterElements: OneImage_image_letterElements[];
 }
 

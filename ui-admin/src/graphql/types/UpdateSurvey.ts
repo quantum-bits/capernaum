@@ -9,33 +9,6 @@ import { SurveyUpdateInput } from "./globalTypes";
 // GraphQL mutation operation: UpdateSurvey
 // ====================================================
 
-export interface UpdateSurvey_updateSurvey_letters_letterType {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter type name
-   */
-  key: string;
-  /**
-   * Letter type description
-   */
-  description: string;
-}
-
-export interface UpdateSurvey_updateSurvey_letters {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter title
-   */
-  title: string;
-  letterType: UpdateSurvey_updateSurvey_letters_letterType;
-}
-
 export interface UpdateSurvey_updateSurvey_surveyDimensions {
   /**
    * Unique ID for this entity
@@ -86,10 +59,6 @@ export interface UpdateSurvey_updateSurvey {
    * Detailed description of this survey; mostly for group use
    */
   detailedDescription: string;
-  /**
-   * Fetch the letters for this survey
-   */
-  letters: UpdateSurvey_updateSurvey_letters[];
   /**
    * Dimensions for this survey; groups indices, which group items.
    */

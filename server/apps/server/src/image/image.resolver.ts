@@ -56,9 +56,4 @@ export class ImageResolver {
   fullPath(@Parent() image: Image) {
     return this.fileService.absolutePath(image.fileName());
   }
-
-  @ResolveField("letterElements", () => [LetterElement])
-  resolveLetterElements(@Parent() image: Image) {
-    return this.imageService.resolveLetterElements(image);
-  }
 }

@@ -7,11 +7,35 @@
 // GraphQL query operation: AllImages
 // ====================================================
 
+export interface AllImages_images_letterElements_letter {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter title
+   */
+  title: string;
+}
+
+export interface AllImages_images_letterElements_letterElementType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter element type name
+   */
+  key: string;
+}
+
 export interface AllImages_images_letterElements {
   /**
    * Unique ID for this entity
    */
   id: number;
+  letter: AllImages_images_letterElements_letter;
+  letterElementType: AllImages_images_letterElements_letterElementType;
 }
 
 export interface AllImages_images {
@@ -36,8 +60,17 @@ export interface AllImages_images {
    * Original name of image file
    */
   originalName: string;
+  /**
+   * Date this image added
+   */
   created: any;
+  /**
+   * Date this image updated
+   */
   updated: any;
+  /**
+   * Letter elements that use this image
+   */
   letterElements: AllImages_images_letterElements[];
 }
 

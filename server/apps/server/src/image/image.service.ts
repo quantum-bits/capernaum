@@ -24,22 +24,25 @@ export class ImageService extends BaseService<Image> {
     );
   }
 
+  private alwaysResolve = [
+    "letterElements",
+    "letterElements.letter",
+    "letterElements.letterElementType",
+  ];
+
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOne(id, { relations: this.alwaysResolve });
   }
 
   readAll() {
-    return this.repo.find();
-  }
-
-  resolveLetterElements(image: Image) {
-    return this.resolveMany(image, "letterElements");
+    return this.repo.find({ relations: this.alwaysResolve });
   }
 
   update(updateInput: ImageUpdateInput) {
     return this.repo
       .preload(updateInput)
-      .then((result) => this.repo.save(result));
+      .then((result) => this.repo.save(result))
+      .then(() => this.readOne(updateInput.id));
   }
 
   delete(id: number) {

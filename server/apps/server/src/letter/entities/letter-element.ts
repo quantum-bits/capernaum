@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { Entity, ManyToOne } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { Letter } from "./letter";
 import { LetterElementType } from "./letter-element-type";
@@ -30,8 +30,7 @@ export class LetterElement extends AbstractEntity {
   textDelta?: string;
 
   @Field(() => Image, { nullable: true })
-  @OneToOne(() => Image, { nullable: true })
-  @JoinColumn()
+  @ManyToOne(() => Image, { nullable: true })
   image?: Image;
 
   @Field(() => SurveyDimension, { nullable: true })

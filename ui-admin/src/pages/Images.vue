@@ -1,15 +1,10 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col>
-        <h1 class="headline">Uploaded Images</h1>
-      </v-col>
-      <v-col class="text-xs-right">
-        <v-btn color="primary" dark @click.stop="openDialogForCreate">
-          Upload New Image
-        </v-btn>
-      </v-col>
-    </v-row>
+    <page-header title="Uploaded Images">
+      <v-btn color="primary" @click.stop="openDialogForCreate">
+        Upload New Image
+      </v-btn>
+    </page-header>
     <v-row>
       <v-col>
         <v-data-table
@@ -17,7 +12,7 @@
           :items="imageDetails"
           class="elevation-1"
         >
-          <template v-slot:[`item.image`]="{ item }">
+          <template v-slot:item.image="{ item }">
             <v-img
               :src="item.url"
               :alt="item.title"
@@ -26,7 +21,10 @@
               :contain="true"
             />
           </template>
-          <template v-slot:[`item.action`]="{ item }">
+          <template v-slot:item.usedIn="{ item }">
+            {{ usedInLetters(item) || "(None)" }}
+          </template>
+          <template v-slot:item.action="{ item }">
             <v-icon class="mr-2" @click.stop="openDialogForUpdate(item)">
               mdi-pencil
             </v-icon>
@@ -73,24 +71,21 @@
               required
               persistent-hint
             />
-            <v-layout v-if="showFilePond">
-              <v-flex xs6 offset-xs3>
+            <v-row v-if="showFilePond">
+              <v-col>
                 <file-pond
                   name="filepondUpload"
-                  :server="{
-                    url: '/images/',
-                    process: 'process',
-                  }"
+                  :server="{ url: '/images/', process: 'process' }"
                   @processfile="fileProcessed"
                   @removefile="fileRemoved"
                 />
-              </v-flex>
-            </v-layout>
-            <v-layout v-if="fileNotUploadedMessage">
-              <v-flex class="text-center red--text" xs6 offset-xs3>
+              </v-col>
+            </v-row>
+            <v-row v-if="fileNotUploadedMessage">
+              <v-col class="text-center red--text">
                 {{ fileNotUploadedMessage }}
-              </v-flex>
-            </v-layout>
+              </v-col>
+            </v-row>
           </v-card-text>
 
           <v-card-actions>
@@ -115,22 +110,19 @@
 
 <script lang="ts">
 import Vue from "vue";
-//import { Route } from "vue-router";
-
 import {
   ALL_IMAGES_QUERY,
-  DELETE_IMAGE_MUTATION,
-  UPDATE_IMAGE_DETAILS_MUTATION,
+  DELETE_IMAGE,
+  UPDATE_IMAGE_DETAILS,
 } from "@/graphql/images.graphql";
 import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
-
 import vueFilePond from "vue-filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js";
-
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-
 import { FilePondFile } from "@/types/filepond.types";
+import PageHeader from "@/pages/PageHeader.vue";
+import * as _ from "lodash";
 
 enum DialogMode {
   CLOSED,
@@ -143,28 +135,16 @@ export default Vue.extend({
 
   components: {
     FilePond: vueFilePond(FilePondPluginImagePreview),
+    PageHeader,
   },
 
   data() {
     return {
       headers: [
-        {
-          text: "Title",
-          value: "title",
-          width: "35%",
-        },
-        {
-          text: "Image",
-          value: "image",
-          align: "center",
-          width: "50%",
-        },
-        {
-          text: "Action",
-          value: "action",
-          width: "15%",
-          sortable: false,
-        },
+        { text: "Title", value: "title" },
+        { text: "Image", value: "image", width: 650 },
+        { text: "Used In Letter(s)", value: "usedIn" },
+        { text: "Action", value: "action" },
       ],
 
       valid: false,
@@ -202,6 +182,14 @@ export default Vue.extend({
   },
 
   methods: {
+    usedInLetters(image: AllImages_images) {
+      return _.chain(image.letterElements)
+        .flatMap((elt) => elt.letter)
+        .map("title")
+        .value()
+        .join(", ");
+    },
+
     fileProcessed(err: Error, file: FilePondFile) {
       if (err) {
         this.fileUploaded = false;
@@ -211,8 +199,8 @@ export default Vue.extend({
       this.fileUploaded = true;
       this.fileNotUploadedMessage = "";
       if (!this.valid) {
-        // if the form is currently not valid (possibly because of an attempted submission
-        // with no file uploaded), recheck it....
+        // If the form is currently not valid (possibly because of an attempted submission
+        // with no file uploaded), recheck it.
         if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
           this.valid = true;
         }
@@ -232,14 +220,10 @@ export default Vue.extend({
     },
 
     createUploadDetails() {
-      //if (!this.fileUploaded) {
-      //  //!this.uploadFileDetails) {
-      //  throw Error("Upload file details not set");
-      //}
       if (this.fileUploaded) {
         this.$apollo
           .mutate({
-            mutation: UPDATE_IMAGE_DETAILS_MUTATION,
+            mutation: UPDATE_IMAGE_DETAILS,
             variables: {
               updateInput: {
                 id: parseInt(this.uploadFileDetails.serverId),
@@ -265,7 +249,7 @@ export default Vue.extend({
     updateUploadDetails() {
       this.$apollo
         .mutate({
-          mutation: UPDATE_IMAGE_DETAILS_MUTATION,
+          mutation: UPDATE_IMAGE_DETAILS,
           variables: {
             updateInput: {
               id: this.dialogState.itemForUpdate.id,
@@ -301,7 +285,7 @@ export default Vue.extend({
     deleteImage(id: number) {
       this.$apollo
         .mutate({
-          mutation: DELETE_IMAGE_MUTATION,
+          mutation: DELETE_IMAGE,
           variables: {
             id,
           },
@@ -319,7 +303,7 @@ export default Vue.extend({
     openDialogForCreate() {
       this.dialogState.heading = "Upload a new image";
       if (this.$refs.form) {
-        (this.$refs.form as Vue & { reset: () => boolean }).reset(); // FIXME - Don't cast to any.
+        (this.$refs.form as Vue & { reset: () => boolean }).reset();
       }
       this.dialogState.mode = DialogMode.OPEN_FOR_CREATE;
     },

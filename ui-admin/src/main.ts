@@ -18,6 +18,12 @@ Vue.filter("standardDateTime", function (value: string) {
   return DateTime.fromISO(value).toFormat("y-MM-dd tt");
 });
 
+Vue.filter("truncate", function (value: string, maxLength = 100) {
+  return value.length > maxLength
+    ? `${value.substring(0, maxLength)}...`
+    : value;
+});
+
 new Vue({
   router,
   store,

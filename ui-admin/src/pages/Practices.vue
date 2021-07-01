@@ -1,11 +1,7 @@
 <template>
   <v-container>
     <page-header title="Scripture Engagement Practices">
-      <v-col>
-        <v-btn color="primary" dark @click="newSEPractice">
-          New Practice
-        </v-btn>
-      </v-col>
+      <v-btn color="primary" @click="newSEPractice"> New Practice </v-btn>
     </page-header>
     <v-row>
       <v-col>
@@ -16,11 +12,11 @@
         >
           <template v-slot:item="{ item }">
             <tr>
-              <!--<td class="text-xs-right">{{ item.description }}</td>-->
               <td class="text-xs-right">{{ item.title }}</td>
-              <td class="text-xs-right">{{ item.description }}</td>
               <td class="text-xs-right">
-                <!-- https://stackoverflow.com/questions/40899532/how-to-pass-a-value-from-vue-data-to-href -->
+                {{ item.description | truncate(100) }}
+              </td>
+              <td class="text-xs-right">
                 <v-tooltip top>
                   <template v-slot:activator="{ on }">
                     <a
@@ -110,8 +106,8 @@
           </v-card-text>
           <v-card-actions>
             <div class="flex-grow-1"></div>
-            <v-btn color="green darken-1" text @click="cancelDialog()"
-              >Cancel
+            <v-btn color="green darken-1" text @click="cancelDialog()">
+              Cancel
             </v-btn>
             <v-btn
               color="green darken-1"
@@ -140,7 +136,6 @@ import {
   ScriptureEngagementPractices_scriptureEngagementPractices,
 } from "@/graphql/types/ScriptureEngagementPractices";
 import PageHeader from "@/pages/PageHeader.vue";
-
 //import ConfirmDeleteDialog from "../components/ConfirmDeleteDialog.vue";
 
 interface PartialPractice {
@@ -167,15 +162,13 @@ export default Vue.extend({
       headers: [
         {
           text: "Scripture Engagement Practice",
-          align: "left",
-          sortable: true,
           value: "title",
+          sortable: true,
         },
         {
           text: "Description",
-          align: "left",
-          sortable: false,
           value: "description",
+          sortable: false,
         },
         { text: "Actions", sortable: false },
       ],
@@ -381,6 +374,9 @@ export default Vue.extend({
     //this.refetchSEPracticeData();
   },
 });
+
+// Credits:
+//   https://stackoverflow.com/questions/40899532/how-to-pass-a-value-from-vue-data-to-href
 </script>
 
 <style scoped>

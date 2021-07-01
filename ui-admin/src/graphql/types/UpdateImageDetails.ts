@@ -9,13 +9,6 @@ import { ImageUpdateInput } from "./globalTypes";
 // GraphQL mutation operation: UpdateImageDetails
 // ====================================================
 
-export interface UpdateImageDetails_updateImage_letterElements {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-}
-
 export interface UpdateImageDetails_updateImage {
   /**
    * Unique ID for this entity
@@ -38,9 +31,14 @@ export interface UpdateImageDetails_updateImage {
    * MIME encoding for this image
    */
   mimeType: string;
+  /**
+   * Date this image added
+   */
   created: any;
+  /**
+   * Date this image updated
+   */
   updated: any;
-  letterElements: UpdateImageDetails_updateImage_letterElements[];
 }
 
 export interface UpdateImageDetails {
