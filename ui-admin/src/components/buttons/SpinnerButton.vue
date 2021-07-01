@@ -15,7 +15,7 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  name: "SpinnerBtn",
+  name: "SpinnerButton",
 
   props: {
     spinning: { type: Boolean, default: false },

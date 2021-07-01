@@ -169,15 +169,6 @@ export const UPDATE_SURVEY = gql`
       okayForGroup
       publicName
       detailedDescription
-      letters {
-        id
-        title
-        letterType {
-          id
-          key
-          description
-        }
-      }
       surveyDimensions {
         id
       }

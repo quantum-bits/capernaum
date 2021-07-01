@@ -10,7 +10,7 @@ import { ApolloLink, split } from "apollo-link";
 import { getMainDefinition } from "apollo-utilities";
 
 const loggingLink = new ApolloLink((operation, forward) => {
-  console.log("OPERATION", operation);
+  console.log("APOLLO", operation);
   return forward(operation);
 });
 

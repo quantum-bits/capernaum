@@ -270,7 +270,7 @@ import {
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
 import AssociationTable from "./surveys/PredictionTableTab.vue";
-import SpinnerBtn from "@/components/buttons/SpinnerBtn.vue";
+import SpinnerBtn from "@/components/buttons/SpinnerButton.vue";
 import {
   OneLetter,
   OneLetter_letter_letterElements,

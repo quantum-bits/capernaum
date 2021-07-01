@@ -1,28 +1,25 @@
 <template>
   <v-card>
-    <v-card-title>
-      Scripture Engagement Associations
-      <v-spacer />
-      <v-btn color="primary" :disabled="inEditMode" @click="enterEditMode">
-        Edit
-      </v-btn>
-      <v-btn
-        color="warning"
-        class="mx-2"
-        :disabled="!inEditMode || noUnsavedChanges"
-        @click="saveTableEdits"
-      >
-        Save
-      </v-btn>
-      <v-btn :disabled="!inEditMode" @click="cancelEditMode"> Cancel </v-btn>
-    </v-card-title>
+    <v-card-title> Scripture Engagement Associations </v-card-title>
 
     <prediction-table-edit
       v-if="inEditMode"
       :association-table="associationTable"
     />
-
     <prediction-table-show v-else :association-table="associationTable" />
+
+    <v-card-actions>
+      <v-spacer />
+      <edit-save-cancel-buttons
+        :is-data-dirty="isDataDirty"
+        :is-data-valid="true"
+        @enterEditMode="inEditMode = true"
+        @leaveEditMode="inEditMode = false"
+        @backupData="saveTableContent"
+        @restoreData="restoreTableContent"
+        @persistData="saveTableEdits"
+      />
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -39,6 +36,7 @@ import {
   UpdateAssociationTableVariables,
 } from "@/graphql/types/UpdateAssociationTable";
 import { UPDATE_ASSOCIATION_TABLE } from "@/graphql/surveys.graphql";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 interface AssociationTableHeader {
   text: string; // text for the column
@@ -67,6 +65,7 @@ export default Vue.extend({
   components: {
     PredictionTableEdit,
     PredictionTableShow,
+    EditSaveCancelButtons,
   },
 
   props: {
@@ -86,8 +85,8 @@ export default Vue.extend({
 
   computed: {
     // Returns true iff the current `associationTable.rows` are the same as `savedTableRows`.
-    noUnsavedChanges(): boolean {
-      return _.isEqual(this.associationTable.rows, this.savedTableRows);
+    isDataDirty(): boolean {
+      return !_.isEqual(this.associationTable.rows, this.savedTableRows);
     },
   },
 
@@ -153,9 +152,9 @@ export default Vue.extend({
           const datum =
             this.associationTable.rows[tableRow].columns[tableColumn];
           datum.predict = true;
-          console.log(
-            `datum[${surveyIndex.id}/${tableRow}][${sePractice.id}/${tableColumn}] = true`
-          );
+          // console.log(
+          //   `datum[${surveyIndex.id}/${tableRow}][${sePractice.id}/${tableColumn}] = true`
+          // );
         } else {
           throw new Error(
             `No mapping for [${surveyIndex.id}][${sePractice.id}]`
@@ -168,15 +167,6 @@ export default Vue.extend({
   },
 
   methods: {
-    enterEditMode(): void {
-      this.inEditMode = true;
-    },
-
-    cancelEditMode(): void {
-      this.restoreTableContent();
-      this.inEditMode = false;
-    },
-
     saveTableContent() {
       this.savedTableRows = _.cloneDeep(this.associationTable.rows);
     },

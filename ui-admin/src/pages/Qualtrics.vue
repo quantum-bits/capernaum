@@ -13,7 +13,19 @@
         >
           <template v-slot:item="{ item: survey }">
             <tr>
-              <td>{{ survey.qualtricsName }}</td>
+              <td v-if="isImported(survey)">
+                <router-link
+                  :to="{
+                    name: 'surveys',
+                    params: { surveyId: survey.capernaumSurvey.id },
+                  }"
+                >
+                  {{ survey.qualtricsName }}
+                </router-link>
+              </td>
+              <td v-else>
+                {{ survey.qualtricsName }}
+              </td>
               <td>{{ survey.qualtricsId }}</td>
               <td>
                 <v-chip small :color="isActive(survey) ? 'success' : ''">
@@ -68,7 +80,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-
 import {
   COMBINED_SURVEYS_QUERY,
   IMPORT_QUALTRICS_SURVEY,
