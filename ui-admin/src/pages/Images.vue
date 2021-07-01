@@ -24,6 +24,10 @@
           <template v-slot:item.usedIn="{ item }">
             {{ usedInLetters(item) || "(None)" }}
           </template>
+          <template v-slot:item.updated="{ item }">
+            {{ item.created | standardDate }} /
+            {{ item.updated | standardDate }}
+          </template>
           <template v-slot:item.action="{ item }">
             <v-icon class="mr-2" @click.stop="openDialogForUpdate(item)">
               mdi-pencil
@@ -44,10 +48,9 @@
                   {{ "mdi-close-circle" }}
                 </v-icon>
               </template>
-              <span
-                >This image is being used in a letter and cannot be
-                deleted.</span
-              >
+              <span>
+                This image is being used in a letter and cannot be deleted.
+              </span>
             </v-tooltip>
           </template>
         </v-data-table>
@@ -130,6 +133,13 @@ enum DialogMode {
   OPEN_FOR_EDIT,
 }
 
+interface DialogState {
+  heading: string;
+  mode: DialogMode;
+  title: string;
+  itemForUpdate: AllImages_images;
+}
+
 export default Vue.extend({
   name: "Images",
 
@@ -142,7 +152,8 @@ export default Vue.extend({
     return {
       headers: [
         { text: "Title", value: "title" },
-        { text: "Image", value: "image", width: 650 },
+        { text: "Image", value: "image", width: "40%" },
+        { text: "Created/Updated", value: "updated" },
         { text: "Used In Letter(s)", value: "usedIn" },
         { text: "Action", value: "action" },
       ],
@@ -155,7 +166,7 @@ export default Vue.extend({
         mode: DialogMode.CLOSED,
         title: "",
         itemForUpdate: {} as AllImages_images,
-      },
+      } as DialogState,
 
       titleRules: [
         (v: string) => !!v || "Title is required",
