@@ -65,7 +65,7 @@ export class SurveyService extends BaseService<Survey> {
   findByQualtricsId(qualtricsId: string): Promise<Survey> {
     return this.repo.findOne(
       { qualtricsId },
-      { relations: ["surveyItems", "letters"] }
+      { relations: ["surveyItems", "surveyLetters", "surveyLetters.letter"] }
     );
   }
 
