@@ -22,11 +22,10 @@ export interface AddLetter_createLetter {
    * Description of letter
    */
   description: string;
-  updated: any;
   /**
-   * Is this letter frozen?
+   * Date last updated
    */
-  isFrozen: boolean;
+  updated: any;
 }
 
 export interface AddLetter {

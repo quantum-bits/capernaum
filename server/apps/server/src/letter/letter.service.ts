@@ -38,6 +38,7 @@ export class LetterService extends BaseService<Letter> {
     "letterType.letterElementTypes",
     "letterElements",
     "letterElements.letterElementType",
+    "surveys",
   ];
 
   readAll() {

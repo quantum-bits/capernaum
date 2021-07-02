@@ -9,6 +9,25 @@ import { ImageUpdateInput } from "./globalTypes";
 // GraphQL mutation operation: UpdateImageDetails
 // ====================================================
 
+export interface UpdateImageDetails_updateImage_letterElements_letter {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter title
+   */
+  title: string;
+}
+
+export interface UpdateImageDetails_updateImage_letterElements {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  letter: UpdateImageDetails_updateImage_letterElements_letter;
+}
+
 export interface UpdateImageDetails_updateImage {
   /**
    * Unique ID for this entity
@@ -39,6 +58,10 @@ export interface UpdateImageDetails_updateImage {
    * Date this image updated
    */
   updated: any;
+  /**
+   * Letter elements that use this image
+   */
+  letterElements: UpdateImageDetails_updateImage_letterElements[];
 }
 
 export interface UpdateImageDetails {

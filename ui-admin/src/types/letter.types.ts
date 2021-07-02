@@ -28,7 +28,6 @@ export interface Letter {
   name: string;
   created: string;
   updated: string;
-  isFrozen: boolean;
   elements: LetterElement[];
 }
 
@@ -36,7 +35,6 @@ export interface SurveyLetter {
   survey: Survey;
   letter: Letter;
   isActive: boolean;
-  isFrozen: boolean;
 }
 
 /** related enum

@@ -109,13 +109,21 @@ export interface AllLetters_letters {
    * Description of letter
    */
   description: string;
+  /**
+   * Date last updated
+   */
   updated: any;
   /**
-   * Is this letter frozen?
+   * Surveys using this letter
    */
-  isFrozen: boolean;
-  surveys: AllLetters_letters_surveys;
+  surveys: AllLetters_letters_surveys[];
+  /**
+   * Type of this letter
+   */
   letterType: AllLetters_letters_letterType;
+  /**
+   * Elements that make up this letter
+   */
   letterElements: AllLetters_letters_letterElements[];
 }
 

@@ -39,6 +39,9 @@ export interface GroupResponses_groupResponses_survey_letters {
    * Email message to go out with letter
    */
   emailMessage: string;
+  /**
+   * Type of this letter
+   */
   letterType: GroupResponses_groupResponses_survey_letters_letterType;
 }
 
@@ -52,7 +55,7 @@ export interface GroupResponses_groupResponses_survey {
    */
   qualtricsName: string;
   /**
-   * Fetch the letters for this survey
+   * Letters for this survey
    */
   letters: GroupResponses_groupResponses_survey_letters[];
 }

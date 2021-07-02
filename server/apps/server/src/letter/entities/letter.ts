@@ -10,10 +10,10 @@ import {
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { LetterElement } from "./letter-element";
-import { Survey } from "../../survey/entities";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
 import { LetterType } from "./letter-type";
 import { FieldColumn } from "@server/src/decorators";
+import { Survey } from "@server/src/survey/entities";
 
 @Entity()
 @ObjectType()
@@ -30,26 +30,25 @@ export class Letter extends AbstractEntity {
   })
   emailMessage: string;
 
-  @Field()
+  @Field({ description: "Date created" })
   @CreateDateColumn()
   created: Date;
 
-  @Field()
+  @Field({ description: "Date last updated" })
   @UpdateDateColumn()
   updated: Date;
 
-  @FieldColumn("Is this letter frozen?", { default: false })
-  isFrozen: boolean;
-
-  @Field(() => Survey)
-  @ManyToMany(() => Survey, (survey) => survey.letters)
-  surveys: Survey[];
-
-  @Field(() => LetterType)
+  @Field(() => LetterType, { description: "Type of this letter" })
   @ManyToOne(() => LetterType)
   letterType: LetterType;
 
-  @Field(() => [LetterElement])
+  @Field(() => [Survey], { description: "Surveys using this letter" })
+  @ManyToMany(() => Survey, (survey) => survey.letters)
+  surveys: Survey[];
+
+  @Field(() => [LetterElement], {
+    description: "Elements that make up this letter",
+  })
   @OneToMany(() => LetterElement, (elt) => elt.letter)
   letterElements: LetterElement[];
 

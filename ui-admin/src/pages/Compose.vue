@@ -202,7 +202,6 @@
       </v-flex>
 
       <v-flex xs10 offset-xs1>
-        <!-- https://www.youtube.com/watch?v=Y3S7KShrRX0 -->
         <div
           class="form-group ma-4"
           v-for="(element, index) in surveyLetterElements"
@@ -292,10 +291,6 @@ interface SelectedItem {
   value: number;
 }
 
-/**
- * loading in components with tabs: https://jsfiddle.net/jjloneman/e5a6L27u/26/
- */
-
 @Component({
   components: {
     LetterTextArea,
@@ -366,7 +361,6 @@ export default class Compose extends Vue {
     title: "",
     description: "",
     updated: "",
-    isFrozen: false,
     letterElements: [],
     emailMessage: JSON.stringify({
       ops: [],
@@ -395,12 +389,14 @@ export default class Compose extends Vue {
   }
 
   get surveyLetterIsFrozen(): boolean {
-    return this.theLetter && this.theLetter.isFrozen;
+    // return this.theLetter && this.theLetter.isFrozen;
+    return false; /////////////////////////////////
   }
 
   get letterExistsAndIsFrozen(): boolean {
     if (this.letterExists) {
-      return this.theLetter.isFrozen;
+      // return this.theLetter.isFrozen;
+      return false; //////////////////////////////////////////
     } else {
       return false;
     }
@@ -497,7 +493,6 @@ export default class Compose extends Vue {
     this.tableIsHidden = true;
   }
 
-  // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   cancelChartSelection(): void {
     if (this.$refs.chartForm) {
       console.log("canceling chart selection....");
@@ -542,7 +537,6 @@ export default class Compose extends Vue {
     this.imageTypeElementId = -Infinity;
   }
 
-  // https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
   submitChartSelection(): void {
     //console.log("selected survey dimension: ", this.selectedSurveyDimension);
     console.log("chart form: ", this.$refs.chartForm);
@@ -567,7 +561,6 @@ export default class Compose extends Vue {
   }
 
   // Move code from
-  //   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
   moveUp(index: number): void {
     const letterElements = this.surveyLetterElements;
     let element: LetterElement = letterElements[index];
@@ -875,18 +868,14 @@ export default class Compose extends Vue {
     // letter information has been successfully created or updated....reload the page, but now with the appropriate letterId
     console.log("new letter created!");
     console.log("id: ", id);
-    //https://www.w3schools.com/jsref/jsref_tostring_number.asp
     let idString: string = id.toString();
     this.editModeOn = false;
     this.isNew = false;
     this.$router.push({ name: "compose", params: { letterId: idString } });
     // now need to refresh the page; this seems to work, but not sure if it's the right way to do this....
-    // https://router.vuejs.org/guide/essentials/navigation.html
     //this.$router.go(0);
   }
 
-  // https://github.com/vuejs/vue-class-component/issues/270
-  // https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
   beforeRouteUpdate(
     to: Route,
     from: Route,
@@ -899,9 +888,6 @@ export default class Compose extends Vue {
     next();
   }
 
-  // https://github.com/kaorun343/vue-property-decorator/issues/38
-  // https://github.com/vuejs/vue-class-component/blob/master/README.md#adding-custom-hooks
-  // https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
   beforeRouteLeave(
     to: Route,
     from: Route,
@@ -937,5 +923,14 @@ export default class Compose extends Vue {
 }
 
 // Credits:
+//   https://github.com/kaorun343/vue-property-decorator/issues/38
+//   https://jsfiddle.net/jjloneman/e5a6L27u/26/
 //   https://stackoverflow.com/questions/41285211/overriding-interface-property-type-defined-in-typescript-d-ts-file
+//   https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
+//   https://stackoverflow.com/questions/52109471/typescript-in-vue-property-validate-does-not-exist-on-type-vue-element/52109899
+//   https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
+//   https://stackoverflow.com/questions/56901736/vue-router-hooks-not-triggered-in-component-using-typescript
+//   https://www.freecodecamp.org/news/an-introduction-to-dynamic-list-rendering-in-vue-js-a70eea3e321/
+//   https://www.w3schools.com/jsref/jsref_tostring_number.asp
+//   https://www.youtube.com/watch?v=Y3S7KShrRX0
 </script>

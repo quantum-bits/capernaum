@@ -7,7 +7,6 @@ export const ADD_LETTER_MUTATION = gql`
       title
       description
       updated
-      isFrozen
     }
   }
 `;
@@ -19,7 +18,6 @@ export const UPDATE_LETTER_MUTATION = gql`
       title
       description
       updated
-      isFrozen
     }
   }
 `;
@@ -37,7 +35,6 @@ export const ONE_LETTER_QUERY = gql`
       title
       updated
       description
-      isFrozen
       emailMessage
       surveys {
         id
@@ -84,7 +81,6 @@ export const ALL_LETTERS_QUERY = gql`
       title
       description
       updated
-      isFrozen
       surveys {
         id
         qualtricsName

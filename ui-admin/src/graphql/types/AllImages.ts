@@ -18,24 +18,12 @@ export interface AllImages_images_letterElements_letter {
   title: string;
 }
 
-export interface AllImages_images_letterElements_letterElementType {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter element type name
-   */
-  key: string;
-}
-
 export interface AllImages_images_letterElements {
   /**
    * Unique ID for this entity
    */
   id: number;
   letter: AllImages_images_letterElements_letter;
-  letterElementType: AllImages_images_letterElements_letterElementType;
 }
 
 export interface AllImages_images {

@@ -55,13 +55,6 @@ export class SurveyResolver {
     return this.surveyService.delete(id);
   }
 
-  @ResolveField("letters", () => [Letter], {
-    description: "Fetch the letters for this survey",
-  })
-  resolveLetters(@Parent() survey: Survey) {
-    return this.surveyService.resolveRelatedLetters(survey);
-  }
-
   @ResolveField("surveyItems", () => [SurveyItem], {
     description: `All the Qualtrics items for this survey; 
     for groupings, see survey dimension and index.

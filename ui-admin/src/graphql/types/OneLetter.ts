@@ -118,21 +118,29 @@ export interface OneLetter_letter {
    * Letter title
    */
   title: string;
+  /**
+   * Date last updated
+   */
   updated: any;
   /**
    * Description of letter
    */
   description: string;
   /**
-   * Is this letter frozen?
-   */
-  isFrozen: boolean;
-  /**
    * Email message to go out with letter
    */
   emailMessage: string;
-  surveys: OneLetter_letter_surveys;
+  /**
+   * Surveys using this letter
+   */
+  surveys: OneLetter_letter_surveys[];
+  /**
+   * Type of this letter
+   */
   letterType: OneLetter_letter_letterType;
+  /**
+   * Elements that make up this letter
+   */
   letterElements: OneLetter_letter_letterElements[];
 }
 

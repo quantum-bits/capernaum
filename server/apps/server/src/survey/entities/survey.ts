@@ -19,7 +19,7 @@ export class Survey extends AbstractEntity {
   })
   importedDate: Date;
 
-  @Field(() => [Letter])
+  @Field(() => [Letter], { description: "Letters for this survey" })
   @ManyToMany(() => Letter, (letter) => letter.surveys)
   @JoinTable({ name: "survey_letter" })
   letters: Letter[];
@@ -82,14 +82,6 @@ export class Survey extends AbstractEntity {
    */
   findItem(qualtricsId: string): SurveyItem {
     return this.surveyItems.find((item) => item.qualtricsId === qualtricsId);
-  }
-
-  /**
-   * Check whether the survey has a qualtrics item with the given ID.
-   * @param qualtricsId - Id of item (Qualtrics question) to check
-   */
-  hasItem(qualtricsId: string): boolean {
-    return !!this.findItem(qualtricsId);
   }
 }
 

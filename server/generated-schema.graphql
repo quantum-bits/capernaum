@@ -264,13 +264,20 @@ type Letter {
 
   """Email message to go out with letter"""
   emailMessage: String!
+
+  """Date created"""
   created: DateTime!
+
+  """Date last updated"""
   updated: DateTime!
 
-  """Is this letter frozen?"""
-  isFrozen: Boolean!
-  surveys: Survey!
+  """Type of this letter"""
   letterType: LetterType!
+
+  """Surveys using this letter"""
+  surveys: [Survey!]!
+
+  """Elements that make up this letter"""
   letterElements: [LetterElement!]!
 }
 
@@ -325,7 +332,7 @@ type Survey {
   """When this survey was imported from Qualtrics"""
   importedDate: DateTime
 
-  """Fetch the letters for this survey"""
+  """Letters for this survey"""
   letters: [Letter!]!
 
   """

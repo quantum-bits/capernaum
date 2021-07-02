@@ -83,7 +83,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-
 import {
   ALL_LETTERS_QUERY,
   DELETE_LETTER_MUTATION,

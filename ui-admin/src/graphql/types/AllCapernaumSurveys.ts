@@ -31,6 +31,9 @@ export interface AllCapernaumSurveys_surveys_letters {
    * Letter title
    */
   title: string;
+  /**
+   * Type of this letter
+   */
   letterType: AllCapernaumSurveys_surveys_letters_letterType;
 }
 
@@ -137,7 +140,7 @@ export interface AllCapernaumSurveys_surveys {
    */
   detailedDescription: string;
   /**
-   * Fetch the letters for this survey
+   * Letters for this survey
    */
   letters: AllCapernaumSurveys_surveys_letters[];
   /**

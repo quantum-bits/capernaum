@@ -59,11 +59,6 @@ export class LetterResolver {
   deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterService.delete(id);
   }
-
-  @ResolveField("surveys", () => Survey)
-  resolveSurvey(@Parent() letter: Letter) {
-    return this.letterService.resolveRelatedSurveys(letter);
-  }
 }
 
 @Resolver(() => LetterElement)

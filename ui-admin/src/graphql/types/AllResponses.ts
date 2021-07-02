@@ -39,6 +39,9 @@ export interface AllResponses_surveyResponses_survey_letters {
    * Email message to go out with letter
    */
   emailMessage: string;
+  /**
+   * Type of this letter
+   */
   letterType: AllResponses_surveyResponses_survey_letters_letterType;
 }
 
@@ -52,7 +55,7 @@ export interface AllResponses_surveyResponses_survey {
    */
   qualtricsName: string;
   /**
-   * Fetch the letters for this survey
+   * Letters for this survey
    */
   letters: AllResponses_surveyResponses_survey_letters[];
 }

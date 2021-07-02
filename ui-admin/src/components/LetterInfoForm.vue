@@ -147,7 +147,6 @@ export default class LetterInfoForm extends Vue {
               createInput: {
                 title: this.title,
                 description: this.description,
-                isFrozen: false,
                 surveyId: this.surveySelect.value,
                 letterTypeId: this.letterTypeSelect.id,
                 emailMessage: JSON.stringify({
