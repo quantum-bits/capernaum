@@ -217,8 +217,8 @@ export default class LetterInfoForm extends Vue {
     let surveyOptions: { text: string; value: number }[] = [];
     this.surveys.forEach((survey) => {
       let includeSurvey = true;
-      survey.letters.forEach((letter) => {
-        if (letter.letterType.id === this.letterTypeSelect.id) {
+      survey.surveyLetters.forEach((surveyLetter) => {
+        if (surveyLetter.letterType.id === this.letterTypeSelect.id) {
           includeSurvey = false;
         }
       });

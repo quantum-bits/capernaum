@@ -268,9 +268,6 @@ type Letter {
   """Date last updated"""
   updated: DateTime!
 
-  """Type of this letter"""
-  letterType: LetterType!
-
   """Survey letters for this letter"""
   surveyLetters: [SurveyLetter!]!
 
@@ -605,6 +602,9 @@ type Query {
 
   """Retrieve all survey items"""
   surveyItemsReadAll: [SurveyItem!]!
+
+  """Retrieve all survey letters"""
+  surveyLetters: [SurveyLetter!]!
 
   """Fetch all surveys"""
   surveys: [Survey!]!

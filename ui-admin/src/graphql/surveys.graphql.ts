@@ -26,9 +26,11 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       okayForGroup
       publicName
       detailedDescription
-      letters {
-        id
-        title
+      surveyLetters {
+        letter {
+          id
+          title
+        }
         letterType {
           id
           key
@@ -42,7 +44,6 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       surveyDimensions {
         id
         title
-        sequence
         surveyIndices {
           id
           title
@@ -100,7 +101,6 @@ export const ADD_DIMENSION_MUTATION = gql`
     createSurveyDimension(createInput: $createInput) {
       id
       title
-      sequence
       surveyIndices {
         title
         abbreviation
@@ -118,7 +118,6 @@ export const UPDATE_DIMENSION_MUTATION = gql`
   mutation UpdateDimension($updateInput: SurveyDimensionUpdateInput!) {
     updateSurveyDimension(updateInput: $updateInput) {
       title
-      sequence
       surveyIndices {
         title
         useForPredictions
@@ -189,14 +188,12 @@ export const ONE_SURVEY_QUERY = gql`
       qualtricsName
       surveyItems(whichItems: $which) {
         id
-        sequence
         qualtricsId
         qualtricsText
       }
       surveyDimensions {
         id
         title
-        sequence
         surveyIndices {
           id
           title
@@ -250,6 +247,30 @@ export const UPDATE_ASSOCIATION_TABLE = gql`
       scriptureEngagementPractices {
         id
         title
+      }
+    }
+  }
+`;
+
+export const ALL_SURVEY_LETTERS = gql`
+  query AllSurveyLetters {
+    surveyLetters {
+      survey {
+        id
+        qualtricsName
+      }
+      letter {
+        id
+        title
+        updated
+        letterElements {
+          id
+        }
+      }
+      letterType {
+        id
+        key
+        description
       }
     }
   }

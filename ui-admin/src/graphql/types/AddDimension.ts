@@ -45,10 +45,6 @@ export interface AddDimension_createSurveyDimension {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
   surveyIndices: AddDimension_createSurveyDimension_surveyIndices[];
 }
 

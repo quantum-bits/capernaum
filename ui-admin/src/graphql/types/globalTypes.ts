@@ -148,13 +148,11 @@ export interface SendMailInput {
 export interface SurveyDimensionCreateInput {
   surveyId: number;
   title: string;
-  sequence: number;
 }
 
 export interface SurveyDimensionUpdateInput {
   id: number;
   title?: string | null;
-  sequence?: number | null;
 }
 
 export interface SurveyIndexCreateInput {

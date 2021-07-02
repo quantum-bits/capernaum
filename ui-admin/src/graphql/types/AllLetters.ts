@@ -7,7 +7,7 @@
 // GraphQL query operation: AllLetters
 // ====================================================
 
-export interface AllLetters_letters_surveys {
+export interface AllLetters_letters_surveyLetters_survey {
   /**
    * Unique ID for this entity
    */
@@ -18,7 +18,7 @@ export interface AllLetters_letters_surveys {
   qualtricsName: string;
 }
 
-export interface AllLetters_letters_letterType_letterElementTypes {
+export interface AllLetters_letters_surveyLetters_letterType_letterElementTypes {
   /**
    * Unique ID for this entity
    */
@@ -33,7 +33,7 @@ export interface AllLetters_letters_letterType_letterElementTypes {
   description: string;
 }
 
-export interface AllLetters_letters_letterType {
+export interface AllLetters_letters_surveyLetters_letterType {
   /**
    * Unique ID for this entity
    */
@@ -46,7 +46,12 @@ export interface AllLetters_letters_letterType {
    * Letter type description
    */
   description: string;
-  letterElementTypes: AllLetters_letters_letterType_letterElementTypes[];
+  letterElementTypes: AllLetters_letters_surveyLetters_letterType_letterElementTypes[];
+}
+
+export interface AllLetters_letters_surveyLetters {
+  survey: AllLetters_letters_surveyLetters_survey;
+  letterType: AllLetters_letters_surveyLetters_letterType;
 }
 
 export interface AllLetters_letters_letterElements_letterElementType {
@@ -73,10 +78,6 @@ export interface AllLetters_letters_letterElements_surveyDimension {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
 }
 
 export interface AllLetters_letters_letterElements {
@@ -114,13 +115,9 @@ export interface AllLetters_letters {
    */
   updated: any;
   /**
-   * Surveys using this letter
+   * Survey letters for this letter
    */
-  surveys: AllLetters_letters_surveys[];
-  /**
-   * Type of this letter
-   */
-  letterType: AllLetters_letters_letterType;
+  surveyLetters: AllLetters_letters_surveyLetters[];
   /**
    * Elements that make up this letter
    */

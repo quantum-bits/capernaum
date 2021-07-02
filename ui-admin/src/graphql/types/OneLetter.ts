@@ -7,7 +7,7 @@
 // GraphQL query operation: OneLetter
 // ====================================================
 
-export interface OneLetter_letter_surveys {
+export interface OneLetter_letter_surveyLetters_survey {
   /**
    * Unique ID for this entity
    */
@@ -18,7 +18,7 @@ export interface OneLetter_letter_surveys {
   qualtricsName: string;
 }
 
-export interface OneLetter_letter_letterType_letterElementTypes {
+export interface OneLetter_letter_surveyLetters_letterType_letterElementTypes {
   /**
    * Unique ID for this entity
    */
@@ -33,7 +33,7 @@ export interface OneLetter_letter_letterType_letterElementTypes {
   description: string;
 }
 
-export interface OneLetter_letter_letterType {
+export interface OneLetter_letter_surveyLetters_letterType {
   /**
    * Unique ID for this entity
    */
@@ -46,7 +46,12 @@ export interface OneLetter_letter_letterType {
    * Letter type description
    */
   description: string;
-  letterElementTypes: OneLetter_letter_letterType_letterElementTypes[];
+  letterElementTypes: OneLetter_letter_surveyLetters_letterType_letterElementTypes[];
+}
+
+export interface OneLetter_letter_surveyLetters {
+  survey: OneLetter_letter_surveyLetters_survey;
+  letterType: OneLetter_letter_surveyLetters_letterType;
 }
 
 export interface OneLetter_letter_letterElements_letterElementType {
@@ -73,10 +78,6 @@ export interface OneLetter_letter_letterElements_surveyDimension {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
 }
 
 export interface OneLetter_letter_letterElements_image {
@@ -131,13 +132,9 @@ export interface OneLetter_letter {
    */
   emailMessage: string;
   /**
-   * Surveys using this letter
+   * Survey letters for this letter
    */
-  surveys: OneLetter_letter_surveys[];
-  /**
-   * Type of this letter
-   */
-  letterType: OneLetter_letter_letterType;
+  surveyLetters: OneLetter_letter_surveyLetters[];
   /**
    * Elements that make up this letter
    */

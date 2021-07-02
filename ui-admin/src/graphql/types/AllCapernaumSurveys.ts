@@ -7,7 +7,18 @@
 // GraphQL query operation: AllCapernaumSurveys
 // ====================================================
 
-export interface AllCapernaumSurveys_surveys_letters_letterType {
+export interface AllCapernaumSurveys_surveys_surveyLetters_letter {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter title
+   */
+  title: string;
+}
+
+export interface AllCapernaumSurveys_surveys_surveyLetters_letterType {
   /**
    * Unique ID for this entity
    */
@@ -22,19 +33,9 @@ export interface AllCapernaumSurveys_surveys_letters_letterType {
   description: string;
 }
 
-export interface AllCapernaumSurveys_surveys_letters {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter title
-   */
-  title: string;
-  /**
-   * Type of this letter
-   */
-  letterType: AllCapernaumSurveys_surveys_letters_letterType;
+export interface AllCapernaumSurveys_surveys_surveyLetters {
+  letter: AllCapernaumSurveys_surveys_surveyLetters_letter;
+  letterType: AllCapernaumSurveys_surveys_surveyLetters_letterType;
 }
 
 export interface AllCapernaumSurveys_surveys_surveyItems {
@@ -103,10 +104,6 @@ export interface AllCapernaumSurveys_surveys_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
   surveyIndices: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices[];
 }
 
@@ -140,9 +137,9 @@ export interface AllCapernaumSurveys_surveys {
    */
   detailedDescription: string;
   /**
-   * Letters for this survey
+   * Survey letters for this survey
    */
-  letters: AllCapernaumSurveys_surveys_letters[];
+  surveyLetters: AllCapernaumSurveys_surveys_surveyLetters[];
   /**
    * All the Qualtrics items for this survey; 
    *     for groupings, see survey dimension and index.

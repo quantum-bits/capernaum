@@ -57,12 +57,12 @@ export default Vue.extend({
           //let allowAddLetter = false;
           this.surveys.forEach((survey) => {
             let hasThisType = false;
-            survey.letters.forEach((letter) => {
-              if (letter.letterType.key === letterType.key) {
+            survey.surveyLetters.forEach((surveyLetter) => {
+              if (surveyLetter.letterType.key === letterType.key) {
                 hasThisType = true;
                 console.log(
                   "this survey has this type of letter!",
-                  letter.letterType.key
+                  surveyLetter.letterType.key
                 );
               }
             });

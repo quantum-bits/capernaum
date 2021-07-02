@@ -61,8 +61,8 @@ export default Vue.extend({
 
           this.surveys.forEach((survey) => {
             let hasThisType = false;
-            survey.letters.forEach((letter) => {
-              if (letter.letterType.key === letterType.key) {
+            survey.surveyLetters.forEach((surveyLetter) => {
+              if (surveyLetter.letterType.key === letterType.key) {
                 hasThisType = true;
               }
             });

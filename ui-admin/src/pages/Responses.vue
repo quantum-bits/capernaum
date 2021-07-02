@@ -489,9 +489,9 @@ export default Vue.extend({
     sendEmail(surveyResponse: SurveyResponse) {
       let numIndividualLetters = 0;
       let htmlContent = "<p>Survey results</p>";
-      surveyResponse.survey.letters.forEach((letter) => {
-        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          htmlContent = quillDeltaToHtml(letter.emailMessage);
+      surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
+        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+          htmlContent = quillDeltaToHtml(surveyLetter.letter.emailMessage);
           numIndividualLetters += 1;
         }
       });
@@ -514,9 +514,9 @@ export default Vue.extend({
     generatePDF(surveyResponse: SurveyResponse) {
       let numIndividualLetters = 0;
       let letterId = -Infinity;
-      surveyResponse.survey.letters.forEach((letter) => {
-        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          letterId = letter.id;
+      surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
+        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+          letterId = surveyLetter.letter.id;
           numIndividualLetters += 1;
         }
       });
@@ -560,8 +560,8 @@ export default Vue.extend({
 
     hasIndividualLetter(item: SurveyResponse) {
       let hasIndividualLetter = false;
-      item.survey.letters.forEach((letter) => {
-        if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+      item.survey.surveyLetters.forEach((surveyLetter) => {
+        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
           hasIndividualLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
         }
       });
@@ -612,15 +612,15 @@ export default Vue.extend({
       let letterTitle = "No letter"; // default
       if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
         console.log("individual letter!", item);
-        item.survey.letters.forEach((letter) => {
-          if (letter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-            letterTitle = letter.title;
+        item.survey.surveyLetters.forEach((surveyLetter) => {
+          if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+            letterTitle = surveyLetter.letter.title;
           }
         });
       } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
-        item.survey.letters.forEach((letter) => {
-          if (letter.letterType.key === LetterTypeEnum.GROUP) {
-            letterTitle = letter.title;
+        item.survey.surveyLetters.forEach((surveyLetter) => {
+          if (surveyLetter.letterType.key === LetterTypeEnum.GROUP) {
+            letterTitle = surveyLetter.letter.title;
           }
         });
       }

@@ -15,10 +15,6 @@ export interface OneSurvey_survey_surveyItems {
    */
   id: number;
   /**
-   * Sequence number; items displayed in order
-   */
-  sequence: number;
-  /**
    * Qualtrics identifier (value of key in `questions` object)
    */
   qualtricsId: string;
@@ -87,10 +83,6 @@ export interface OneSurvey_survey_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  /**
-   * Sequence number
-   */
-  sequence: number;
   surveyIndices: OneSurvey_survey_surveyDimensions_surveyIndices[];
 }
 

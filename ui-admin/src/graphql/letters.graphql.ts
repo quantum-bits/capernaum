@@ -36,18 +36,20 @@ export const ONE_LETTER_QUERY = gql`
       updated
       description
       emailMessage
-      surveys {
-        id
-        qualtricsName
-      }
-      letterType {
-        id
-        key
-        description
-        letterElementTypes {
+      surveyLetters {
+        survey {
+          id
+          qualtricsName
+        }
+        letterType {
           id
           key
           description
+          letterElementTypes {
+            id
+            key
+            description
+          }
         }
       }
       letterElements {
@@ -62,7 +64,6 @@ export const ONE_LETTER_QUERY = gql`
         surveyDimension {
           id
           title
-          sequence
         }
         image {
           id
@@ -81,18 +82,20 @@ export const ALL_LETTERS_QUERY = gql`
       title
       description
       updated
-      surveys {
-        id
-        qualtricsName
-      }
-      letterType {
-        id
-        key
-        description
-        letterElementTypes {
+      surveyLetters {
+        survey {
+          id
+          qualtricsName
+        }
+        letterType {
           id
           key
           description
+          letterElementTypes {
+            id
+            key
+            description
+          }
         }
       }
       letterElements {
@@ -107,7 +110,6 @@ export const ALL_LETTERS_QUERY = gql`
         surveyDimension {
           id
           title
-          sequence
         }
       }
     }

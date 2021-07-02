@@ -17,30 +17,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-//import { ALL_LETTER_ELEMENT_TYPES_QUERY } from "@/graphql/letters.graphql";
 import {
-  OneLetter_letter_letterType,
-  OneLetter_letter_letterType_letterElementTypes,
   OneLetter_letter_letterElements_letterElementType,
+  OneLetter_letter_surveyLetters_letterType,
+  OneLetter_letter_surveyLetters_letterType_letterElementTypes,
 } from "@/graphql/types/OneLetter";
 
 export default Vue.extend({
   name: "ComposeMenu",
 
-  /*
-  apollo: {
-    letterElementTypes: {
-      query: ALL_LETTER_ELEMENT_TYPES_QUERY,
-    },
-  },
-  */
-
   props: {
-    letterType: Object as () => OneLetter_letter_letterType,
+    letterType: Object as () => OneLetter_letter_surveyLetters_letterType,
   },
 
   computed: {
-    filteredLetterElementTypes(): OneLetter_letter_letterType_letterElementTypes[] {
+    filteredLetterElementTypes(): OneLetter_letter_surveyLetters_letterType_letterElementTypes[] {
       console.log("inside computed!", this.letterType);
       //let returnArray: OneLetter_letter_letterType_letterElementTypes;
       if (this.letterType === undefined) {

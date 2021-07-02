@@ -9,11 +9,13 @@ export const ALL_RESPONSES_QUERY = gql`
       survey {
         qualtricsId
         qualtricsName
-        letters {
-          id
-          title
-          description
-          emailMessage
+        surveyLetters {
+          letter {
+            id
+            title
+            description
+            emailMessage
+          }
           letterType {
             id
             key
@@ -38,11 +40,13 @@ export const GROUP_RESPONSES_QUERY = gql`
       survey {
         qualtricsId
         qualtricsName
-        letters {
-          id
-          title
-          description
-          emailMessage
+        surveyLetters {
+          letter {
+            id
+            title
+            description
+            emailMessage
+          }
           letterType {
             id
             key

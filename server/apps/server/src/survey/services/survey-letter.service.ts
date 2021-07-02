@@ -13,7 +13,12 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
     super(repo);
   }
 
-  private alwaysRelate = ["survey", "letter", "letterType"];
+  private alwaysRelate = [
+    "survey",
+    "letter",
+    "letter.letterElements",
+    "letterType",
+  ];
 
   readAll() {
     return this.repo.find({ relations: this.alwaysRelate });

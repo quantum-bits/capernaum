@@ -7,22 +7,7 @@
 // GraphQL query operation: AllResponses
 // ====================================================
 
-export interface AllResponses_surveyResponses_survey_letters_letterType {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter type name
-   */
-  key: string;
-  /**
-   * Letter type description
-   */
-  description: string;
-}
-
-export interface AllResponses_surveyResponses_survey_letters {
+export interface AllResponses_surveyResponses_survey_surveyLetters_letter {
   /**
    * Unique ID for this entity
    */
@@ -39,10 +24,26 @@ export interface AllResponses_surveyResponses_survey_letters {
    * Email message to go out with letter
    */
   emailMessage: string;
+}
+
+export interface AllResponses_surveyResponses_survey_surveyLetters_letterType {
   /**
-   * Type of this letter
+   * Unique ID for this entity
    */
-  letterType: AllResponses_surveyResponses_survey_letters_letterType;
+  id: number;
+  /**
+   * Letter type name
+   */
+  key: string;
+  /**
+   * Letter type description
+   */
+  description: string;
+}
+
+export interface AllResponses_surveyResponses_survey_surveyLetters {
+  letter: AllResponses_surveyResponses_survey_surveyLetters_letter;
+  letterType: AllResponses_surveyResponses_survey_surveyLetters_letterType;
 }
 
 export interface AllResponses_surveyResponses_survey {
@@ -55,9 +56,9 @@ export interface AllResponses_surveyResponses_survey {
    */
   qualtricsName: string;
   /**
-   * Letters for this survey
+   * Survey letters for this survey
    */
-  letters: AllResponses_surveyResponses_survey_letters[];
+  surveyLetters: AllResponses_surveyResponses_survey_surveyLetters[];
 }
 
 export interface AllResponses_surveyResponses {
