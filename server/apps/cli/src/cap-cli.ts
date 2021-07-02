@@ -33,6 +33,7 @@ import {
   forceGroupReport,
   countGroupPredictions,
   showHierarchy,
+  listSurveyLetters,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
@@ -140,6 +141,11 @@ surveyCommands
   .command("import <survey-id>")
   .description("import survey by ID", { "survey-id": "survey ID (SV_...)" })
   .action(importSurvey);
+
+surveyCommands
+  .command("letters")
+  .description("list survey letters")
+  .action(listSurveyLetters);
 
 // Group
 

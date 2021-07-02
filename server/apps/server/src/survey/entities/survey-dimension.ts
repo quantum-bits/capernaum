@@ -20,9 +20,6 @@ export class SurveyDimension extends AbstractEntity {
 
   @FieldColumn("Title of this dimension (e.g., 'Focus on Prayer')")
   title: string;
-
-  @FieldColumn("Sequence number", () => Int)
-  sequence: number;
 }
 
 @InputType({
@@ -32,14 +29,12 @@ export class SurveyDimension extends AbstractEntity {
 export class SurveyDimensionCreateInput implements Partial<SurveyDimension> {
   @Field(() => Int) surveyId: number;
   @Field() title: string;
-  @Field(() => Int) sequence: number;
 }
 
 @InputType()
 export class SurveyDimensionUpdateInput implements Partial<SurveyDimension> {
   @Field(() => Int) id: number;
   @Field({ nullable: true }) title?: string;
-  @Field(() => Int, { nullable: true }) sequence?: number;
 }
 
 @ObjectType()

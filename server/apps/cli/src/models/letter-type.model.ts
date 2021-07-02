@@ -2,6 +2,7 @@ import { Model } from "objection";
 import { LetterElementTypeModel } from "./letter-element-type.model";
 import { LetterModel } from "./letter.model";
 import { getDebugger } from "@helpers/debug-factory";
+import { SurveyLetterModel } from "@common/cli/src/models/survey-letter.model";
 
 const debug = getDebugger("model:letter-type");
 
@@ -34,8 +35,8 @@ export class LetterTypeModel extends Model {
       .for(await asFindQuery().select("id"))
       .unrelate();
 
-    debug("Delete letter models");
-    await LetterModel.query(transaction)
+    debug("Delete survey letters");
+    await SurveyLetterModel.query(transaction)
       .delete()
       .whereIn("letterTypeId", asFindQuery().select("id"));
   }

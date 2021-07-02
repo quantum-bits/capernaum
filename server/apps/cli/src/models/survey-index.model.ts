@@ -8,7 +8,6 @@ export class SurveyIndexModel extends Model {
   useForPredictions: boolean;
   abbreviation: string;
   title: string;
-  scriptureEngagementPractices: ScriptureEngagementPracticeModel;
 
   static tableName = "survey_index";
 

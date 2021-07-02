@@ -14,6 +14,7 @@ import {
   SurveyItemResponseService,
   SurveyResponseService,
   SurveyService,
+  SurveyLetterService,
 } from "./services/";
 import {
   Survey,
@@ -21,6 +22,7 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
   SurveyResponse,
 } from "./entities";
 import { registerEnumType } from "@nestjs/graphql";
@@ -41,6 +43,7 @@ import { Group } from "@server/src/group/entities";
       SurveyResponse,
       SurveyItemResponse,
       SurveyItem,
+      SurveyLetter,
       Group,
       ScriptureEngagementPractice,
     ]),
@@ -56,13 +59,19 @@ import { Group } from "@server/src/group/entities";
     SurveyItemService,
     SurveyItemResponseResolver,
     SurveyItemResponseService,
+    SurveyLetterService,
     SurveyResolver,
     SurveyService,
     SurveyResponseResolver,
     SurveyResponseService,
     SurveyAnalyticsService,
   ],
-  exports: [SurveyService, SurveyResponseService, SurveyAnalyticsService],
+  exports: [
+    SurveyService,
+    SurveyResponseService,
+    SurveyAnalyticsService,
+    SurveyLetterService,
+  ],
 })
 export class SurveyModule {
   constructor() {

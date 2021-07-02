@@ -3,17 +3,14 @@ import {
   AfterLoad,
   CreateDateColumn,
   Entity,
-  ManyToMany,
-  ManyToOne,
   OneToMany,
   UpdateDateColumn,
 } from "typeorm";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { LetterElement } from "./letter-element";
 import { DEFAULT_QUILL_DELTA } from "../letter.types";
-import { LetterType } from "./letter-type";
 import { FieldColumn } from "@server/src/decorators";
-import { Survey } from "@server/src/survey/entities";
+import { SurveyLetter } from "@server/src/survey/entities";
 
 @Entity()
 @ObjectType()
@@ -38,13 +35,11 @@ export class Letter extends AbstractEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @Field(() => LetterType, { description: "Type of this letter" })
-  @ManyToOne(() => LetterType)
-  letterType: LetterType;
-
-  @Field(() => [Survey], { description: "Surveys using this letter" })
-  @ManyToMany(() => Survey, (survey) => survey.letters)
-  surveys: Survey[];
+  @Field(() => [SurveyLetter], {
+    description: "Survey letters for this letter",
+  })
+  @OneToMany(() => SurveyLetter, (surveyLetter) => surveyLetter.letter)
+  surveyLetters: SurveyLetter[];
 
   @Field(() => [LetterElement], {
     description: "Elements that make up this letter",

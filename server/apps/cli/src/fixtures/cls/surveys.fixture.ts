@@ -10,7 +10,7 @@ export class SurveysFixture extends AbstractFixture {
     return SurveyModel.query().delete();
   }
 
-  insert(update) {
+  insert() {
     debug("Insert survey");
     return SurveyModel.query().insert(surveys);
   }

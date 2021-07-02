@@ -37,13 +37,12 @@ export async function listLetters() {
   const letters = await letterService.readAll();
   await nestContext.close();
 
-  const headers = ["ID", "Type", "Description", "ID", "Seq", "Description"];
+  const headers = ["Ltr ID", "Description", "Elt ID", "Seq", "Description"];
   const data = _.flatMap(letters, (letter) =>
     _.map(
       letter.letterElements.sort((a, b) => a.sequence - b.sequence),
       (elt, idx) => [
         idx === 0 ? letter.id : "",
-        idx === 0 ? letter.letterType.key : "",
         idx === 0 ? letter.description : "",
         elt.id,
         elt.sequence,

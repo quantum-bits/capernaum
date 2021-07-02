@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from "@nestjs/graphql";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, ManyToOne, OneToMany } from "typeorm";
 import { SurveyIndex } from "./survey-index";
 import { Survey } from "./survey";
 import { AbstractEntity } from "../../shared/abstract-entity";
@@ -22,12 +22,6 @@ export class SurveyItem extends AbstractEntity {
   @Field(() => [SurveyItemResponse])
   @OneToMany(() => SurveyItemResponse, (siResp) => siResp.surveyItem)
   surveyItemResponses: SurveyItemResponse[];
-
-  @FieldColumn("Sequence number; items displayed in order", () => Int, {
-    type: "integer",
-    default: -1,
-  })
-  sequence: number;
 
   @FieldColumn("Qualtrics identifier (value of key in `questions` object)")
   qualtricsId: string;

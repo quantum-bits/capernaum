@@ -1,6 +1,9 @@
 import { importQualtricsSurvey } from "@common/cli/src/commands/qualtrics";
 import NestContext from "@common/cli/src/nest-helpers";
-import { SurveyService } from "@server/src/survey/services";
+import {
+  SurveyLetterService,
+  SurveyService,
+} from "@server/src/survey/services";
 import { printPretty, printTable } from "@helpers/formatting";
 import * as _ from "lodash";
 
@@ -18,26 +21,38 @@ export async function listSurveys() {
   const surveys = await surveyService.readAll();
   await nestContext.close();
 
-  printPretty(surveys);
+  const headers = ["Survey ID", "Description"];
+  const data = _.map(surveys, (survey) => [
+    survey.id,
+    survey.detailedDescription,
+  ]);
 
-  const headers = [
-    "Survey ID",
-    "Description",
-    "Letter ID",
-    "Type",
-    "Description",
-  ];
-  const data = _.flatMap(surveys, (survey) =>
-    _.map(survey.letters, (letter) => [
-      survey.id,
-      survey.detailedDescription,
-      letter.id,
-      letter.letterType.description,
-      letter.description,
-    ])
-  );
   printPretty({ headers, data });
+  printTable(headers, data);
+}
+
+export async function listSurveyLetters() {
+  const nestContext = new NestContext();
+  const surveyLetterService = await nestContext.get(SurveyLetterService);
+  const surveyLetters = await surveyLetterService.readAll();
+  await nestContext.close();
+
+  const headers = ["Survey ID", "Q Name", "Letter ID", "Title", "Type"];
+  const data = _.map(surveyLetters, (surveyLetter) => [
+    surveyLetter.survey.id,
+    surveyLetter.survey.qualtricsName,
+    surveyLetter.letter.id,
+    surveyLetter.letter.title,
+    surveyLetter.letterType.key,
+  ]);
+
   printTable(headers, data, {
-    drawVerticalLine: (idx) => idx === 2,
+    columns: {
+      0: { alignment: "right" },
+      2: { alignment: "right" },
+    },
+    drawVerticalLine(idx) {
+      return idx === 2 || idx === 4;
+    },
   });
 }

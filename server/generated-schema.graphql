@@ -11,9 +11,6 @@ type SurveyDimension {
 
   """Title of this dimension (e.g., 'Focus on Prayer')"""
   title: String!
-
-  """Sequence number"""
-  sequence: Int!
 }
 
 type SurveyDimensionDeleteOutput {
@@ -215,9 +212,6 @@ type SurveyItem {
   surveyIndex: SurveyIndex
   surveyItemResponses: [SurveyItemResponse!]!
 
-  """Sequence number; items displayed in order"""
-  sequence: Int!
-
   """Qualtrics identifier (value of key in `questions` object)"""
   qualtricsId: String!
 
@@ -237,6 +231,9 @@ type LetterType {
 
   """Letter type description"""
   description: String!
+
+  """Survey letters for this letter type"""
+  surveyLetters: [SurveyLetter!]!
   letterElementTypes: [LetterElementType!]!
 }
 
@@ -274,8 +271,8 @@ type Letter {
   """Type of this letter"""
   letterType: LetterType!
 
-  """Surveys using this letter"""
-  surveys: [Survey!]!
+  """Survey letters for this letter"""
+  surveyLetters: [SurveyLetter!]!
 
   """Elements that make up this letter"""
   letterElements: [LetterElement!]!
@@ -324,6 +321,13 @@ type LetterElement {
   surveyDimension: SurveyDimension
 }
 
+"""Associate survey, letter, and letter type"""
+type SurveyLetter {
+  survey: Survey!
+  letter: Letter!
+  letterType: LetterType!
+}
+
 """All information about a survey imported from Qualtrics"""
 type Survey {
   """Unique ID for this entity"""
@@ -332,8 +336,8 @@ type Survey {
   """When this survey was imported from Qualtrics"""
   importedDate: DateTime
 
-  """Letters for this survey"""
-  letters: [Letter!]!
+  """Survey letters for this survey"""
+  surveyLetters: [SurveyLetter!]!
 
   """
   All the Qualtrics items for this survey; 
@@ -718,13 +722,11 @@ Data to create a new dimension. Does not embed indices. Add them with createSurv
 input SurveyDimensionCreateInput {
   surveyId: Int!
   title: String!
-  sequence: Int!
 }
 
 input SurveyDimensionUpdateInput {
   id: Int!
   title: String
-  sequence: Int
 }
 
 input SurveyIndexCreateInput {

@@ -28,7 +28,6 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
       this.repo.create({
         survey,
         title: createInput.title,
-        sequence: createInput.sequence,
       })
     );
   }
@@ -70,7 +69,7 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
       };
 
       for (const index of dimension.surveyIndices) {
-        const indexDeleteOutput = await SurveyIndexService. _deleteHelper(
+        const indexDeleteOutput = await SurveyIndexService._deleteHelper(
           manager,
           index.id
         );

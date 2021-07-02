@@ -10,6 +10,7 @@ import { ScriptureEngagementPracticeFixture } from "../fixtures/cls/se-practices
 import { SurveyDimensionsFixture } from "../fixtures/cls/survey-dimensions.fixture";
 import { SurveyIndexesFixture } from "../fixtures/cls/survey-indexes.fixture";
 import { SurveyItemsFixture } from "../fixtures/cls/survey-items.fixture";
+import { SurveyLettersFixture } from "@common/cli/src/fixtures/cls/survey-letters.fixture";
 import { SurveysFixture } from "../fixtures/cls/surveys.fixture";
 import { GroupTypesFixture } from "../fixtures/group-types.fixture";
 
@@ -25,6 +26,7 @@ const sePracticesFixture = new ScriptureEngagementPracticeFixture();
 const surveyDimensionsFixture = new SurveyDimensionsFixture();
 const surveyIndexesFixture = new SurveyIndexesFixture();
 const surveyItemsFixture = new SurveyItemsFixture();
+const surveyLettersFixture = new SurveyLettersFixture();
 const surveysFixture = new SurveysFixture();
 
 export async function nuclearOption(options) {
@@ -60,6 +62,7 @@ export async function nuclearOption(options) {
   await groupsFixture.load();
 
   await lettersFixture.load();
+  await surveyLettersFixture.load();
   await letterElementsFixture.load();
 }
 

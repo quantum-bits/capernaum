@@ -22,7 +22,6 @@ const surveyItems = [
   {
     id: 471,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID7",
     qualtricsText: "I read the Bible",
     surveyId: 38,
@@ -30,7 +29,6 @@ const surveyItems = [
   {
     id: 553,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID118",
     qualtricsText:
       "Everyone should have the freedom to live in whatever ways express their unique identity.",
@@ -39,7 +37,6 @@ const surveyItems = [
   {
     id: 554,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID119",
     qualtricsText: "Everyone should have the same rights and freedoms.",
     surveyId: 38,
@@ -47,7 +44,6 @@ const surveyItems = [
   {
     id: 555,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID120",
     qualtricsText:
       "Everyone should obey the authority of the people in charge.",
@@ -56,7 +52,6 @@ const surveyItems = [
   {
     id: 556,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID121",
     qualtricsText:
       "Most of the time, we can be completely certain that we know how physical, social, and theological reality works.",
@@ -65,7 +60,6 @@ const surveyItems = [
   {
     id: 557,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID122",
     qualtricsText:
       "In general, what we think we know for certain about physical, social, or theological reality, might actually be wrong.",
@@ -74,7 +68,6 @@ const surveyItems = [
   {
     id: 558,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID123",
     qualtricsText: "Reality almost always works in a predictable, logical way.",
     surveyId: 38,
@@ -82,7 +75,6 @@ const surveyItems = [
   {
     id: 559,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID124",
     qualtricsText:
       "Reality works in complicated ways and often turns out differently than expected.",
@@ -91,7 +83,6 @@ const surveyItems = [
   {
     id: 560,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID125",
     qualtricsText:
       "We should only follow and support people who believe the things we know are true.",
@@ -100,7 +91,6 @@ const surveyItems = [
   {
     id: 475,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID11",
     qualtricsText: "I pray",
     surveyId: 38,
@@ -108,7 +98,6 @@ const surveyItems = [
   {
     id: 485,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID21",
     qualtricsText: "I have times of solitude to increase my spiritual life",
     surveyId: 38,
@@ -116,7 +105,6 @@ const surveyItems = [
   {
     id: 486,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID22",
     qualtricsText:
       "I practice important times of silence as part of my spiritual practices",
@@ -125,7 +113,6 @@ const surveyItems = [
   {
     id: 487,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID23",
     qualtricsText:
       "I intentionally practice submission of self to a spiritual purpose",
@@ -134,7 +121,6 @@ const surveyItems = [
   {
     id: 488,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID24",
     qualtricsText:
       "I make serious sacrifices in the ways I live so I can grow spiritually",
@@ -143,7 +129,6 @@ const surveyItems = [
   {
     id: 506,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID43",
     qualtricsText:
       "Jesus' death is the only way the penalty for sin could be removed",
@@ -152,7 +137,6 @@ const surveyItems = [
   {
     id: 507,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID44",
     qualtricsText:
       "Only accepting the grace provided by Jesus can lead to salvation",
@@ -161,7 +145,6 @@ const surveyItems = [
   {
     id: 494,
     surveyIndexId: 73,
-    sequence: -1,
     qualtricsId: "QID31",
     qualtricsText: "What God says is what is true, right, and good",
     surveyId: 38,
@@ -169,7 +152,6 @@ const surveyItems = [
   {
     id: 495,
     surveyIndexId: 73,
-    sequence: -1,
     qualtricsId: "QID32",
     qualtricsText: "I want God to be pleased with me",
     surveyId: 38,
@@ -177,7 +159,6 @@ const surveyItems = [
   {
     id: 496,
     surveyIndexId: 73,
-    sequence: -1,
     qualtricsId: "QID33",
     qualtricsText: "I believe God is actively involved in my life",
     surveyId: 38,
@@ -185,7 +166,6 @@ const surveyItems = [
   {
     id: 497,
     surveyIndexId: 73,
-    sequence: -1,
     qualtricsId: "QID34",
     qualtricsText: "I believe the God of the Bible is the one true God",
     surveyId: 38,
@@ -193,7 +173,6 @@ const surveyItems = [
   {
     id: 498,
     surveyIndexId: 74,
-    sequence: -1,
     qualtricsId: "QID35",
     qualtricsText: "I live in ways that help others as much as myself",
     surveyId: 38,
@@ -201,7 +180,6 @@ const surveyItems = [
   {
     id: 499,
     surveyIndexId: 74,
-    sequence: -1,
     qualtricsId: "QID36",
     qualtricsText:
       "I go out of my way to discover the people in need around me that I normally wouldn't see",
@@ -210,7 +188,6 @@ const surveyItems = [
   {
     id: 500,
     surveyIndexId: 74,
-    sequence: -1,
     qualtricsId: "QID37",
     qualtricsText: "I have tremendous love for people I don't know",
     surveyId: 38,
@@ -218,7 +195,6 @@ const surveyItems = [
   {
     id: 501,
     surveyIndexId: 74,
-    sequence: -1,
     qualtricsId: "QID38",
     qualtricsText:
       "I think about strangers' well-being and want what is best for them",
@@ -227,7 +203,6 @@ const surveyItems = [
   {
     id: 502,
     surveyIndexId: 75,
-    sequence: -1,
     qualtricsId: "QID39",
     qualtricsText:
       "I believe the Bible has decisive authority over what I say and do",
@@ -236,7 +211,6 @@ const surveyItems = [
   {
     id: 503,
     surveyIndexId: 75,
-    sequence: -1,
     qualtricsId: "QID40",
     qualtricsText:
       "As I go through a normal day I think of Bible passages relevant to what I am doing",
@@ -245,7 +219,6 @@ const surveyItems = [
   {
     id: 504,
     surveyIndexId: 75,
-    sequence: -1,
     qualtricsId: "QID41",
     qualtricsText: "I talk about Bible passages with my friends",
     surveyId: 38,
@@ -253,7 +226,6 @@ const surveyItems = [
   {
     id: 505,
     surveyIndexId: 75,
-    sequence: -1,
     qualtricsId: "QID42",
     qualtricsText: "The Bible is an important part of my daily life",
     surveyId: 38,
@@ -261,7 +233,6 @@ const surveyItems = [
   {
     id: 472,
     surveyIndexId: 76,
-    sequence: -1,
     qualtricsId: "QID8",
     qualtricsText: "I worship God",
     surveyId: 38,
@@ -269,7 +240,6 @@ const surveyItems = [
   {
     id: 473,
     surveyIndexId: 76,
-    sequence: -1,
     qualtricsId: "QID9",
     qualtricsText: "I attend worship services",
     surveyId: 38,
@@ -277,7 +247,6 @@ const surveyItems = [
   {
     id: 474,
     surveyIndexId: 76,
-    sequence: -1,
     qualtricsId: "QID10",
     qualtricsText: "I engage in fellowship with Christians",
     surveyId: 38,
@@ -285,7 +254,6 @@ const surveyItems = [
   {
     id: 476,
     surveyIndexId: 76,
-    sequence: -1,
     qualtricsId: "QID12",
     qualtricsText: "I meet with a spiritual small group or spiritual mentor",
     surveyId: 38,
@@ -293,7 +261,6 @@ const surveyItems = [
   {
     id: 477,
     surveyIndexId: 77,
-    sequence: -1,
     qualtricsId: "QID13",
     qualtricsText:
       "I talk to non-believers in ways that I think will help them come closer to Christ",
@@ -302,7 +269,6 @@ const surveyItems = [
   {
     id: 478,
     surveyIndexId: 77,
-    sequence: -1,
     qualtricsId: "QID14",
     qualtricsText:
       "I go out of my way to be in contact with people who don't share my beliefs",
@@ -311,7 +277,6 @@ const surveyItems = [
   {
     id: 479,
     surveyIndexId: 77,
-    sequence: -1,
     qualtricsId: "QID15",
     qualtricsText:
       "I act in specific ways around non-believers so they might come closer to Christ",
@@ -320,7 +285,6 @@ const surveyItems = [
   {
     id: 480,
     surveyIndexId: 77,
-    sequence: -1,
     qualtricsId: "QID16",
     qualtricsText: "I try to evangelize others so they will become Christians",
     surveyId: 38,
@@ -328,7 +292,6 @@ const surveyItems = [
   {
     id: 489,
     surveyIndexId: 78,
-    sequence: -1,
     qualtricsId: "QID25",
     qualtricsText: "I reflect on what it means for me to be a Christian",
     surveyId: 38,
@@ -336,7 +299,6 @@ const surveyItems = [
   {
     id: 490,
     surveyIndexId: 78,
-    sequence: -1,
     qualtricsId: "QID26",
     qualtricsText: "I reflect on the meaning of scripture in my life",
     surveyId: 38,
@@ -344,7 +306,6 @@ const surveyItems = [
   {
     id: 491,
     surveyIndexId: 78,
-    sequence: -1,
     qualtricsId: "QID27",
     qualtricsText: "I reflect on the meaning of prayer in my life",
     surveyId: 38,
@@ -352,7 +313,6 @@ const surveyItems = [
   {
     id: 492,
     surveyIndexId: 78,
-    sequence: -1,
     qualtricsId: "QID28",
     qualtricsText: "I reflect on what is good and right",
     surveyId: 38,
@@ -360,7 +320,6 @@ const surveyItems = [
   {
     id: 493,
     surveyIndexId: 78,
-    sequence: -1,
     qualtricsId: "QID29",
     qualtricsText: "I reflect on who God is",
     surveyId: 38,
@@ -368,7 +327,6 @@ const surveyItems = [
   {
     id: 481,
     surveyIndexId: 79,
-    sequence: -1,
     qualtricsId: "QID17",
     qualtricsText: "I serve those in need",
     surveyId: 38,
@@ -376,7 +334,6 @@ const surveyItems = [
   {
     id: 482,
     surveyIndexId: 79,
-    sequence: -1,
     qualtricsId: "QID18",
     qualtricsText: "I serve the people around me",
     surveyId: 38,
@@ -384,7 +341,6 @@ const surveyItems = [
   {
     id: 483,
     surveyIndexId: 79,
-    sequence: -1,
     qualtricsId: "QID19",
     qualtricsText: "I help people who are treated unjustly",
     surveyId: 38,
@@ -392,7 +348,6 @@ const surveyItems = [
   {
     id: 484,
     surveyIndexId: 79,
-    sequence: -1,
     qualtricsId: "QID20",
     qualtricsText: "I help others who are in difficulty",
     surveyId: 38,
@@ -400,7 +355,6 @@ const surveyItems = [
   {
     id: 508,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID45",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward sex",
@@ -409,7 +363,6 @@ const surveyItems = [
   {
     id: 509,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID46",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward food",
@@ -418,7 +371,6 @@ const surveyItems = [
   {
     id: 510,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID47",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward alcohol",
@@ -427,7 +379,6 @@ const surveyItems = [
   {
     id: 511,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID48",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward social approval",
@@ -436,7 +387,6 @@ const surveyItems = [
   {
     id: 512,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID49",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward wealth",
@@ -445,7 +395,6 @@ const surveyItems = [
   {
     id: 513,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID50",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward power and control",
@@ -454,7 +403,6 @@ const surveyItems = [
   {
     id: 514,
     surveyIndexId: 80,
-    sequence: -1,
     qualtricsId: "QID51",
     qualtricsText:
       "I make intentional disciplined efforts to maintain a healthy appetite toward fame",
@@ -463,7 +411,6 @@ const surveyItems = [
   {
     id: 526,
     surveyIndexId: 84,
-    sequence: -1,
     qualtricsId: "QID64",
     qualtricsText: "I let the passage redefine the story of my life",
     surveyId: 38,
@@ -471,7 +418,6 @@ const surveyItems = [
   {
     id: 539,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID94",
     qualtricsText: "Do you consider yourself to be spiritual?",
     surveyId: 38,
@@ -479,7 +425,6 @@ const surveyItems = [
   {
     id: 540,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID95",
     qualtricsText: "Do you consider yourself to be religious?",
     surveyId: 38,
@@ -487,7 +432,6 @@ const surveyItems = [
   {
     id: 542,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID109",
     qualtricsText:
       "Everyone should have the freedom to live in ways that express their unique identity.",
@@ -496,7 +440,6 @@ const surveyItems = [
   {
     id: 543,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID110",
     qualtricsText: "Everyone should have the same rights and freedoms.",
     surveyId: 38,
@@ -504,7 +447,6 @@ const surveyItems = [
   {
     id: 544,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID111",
     qualtricsText:
       "Everyone should respect the authority of the people in charge.",
@@ -513,7 +455,6 @@ const surveyItems = [
   {
     id: 545,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID112",
     qualtricsText:
       "In general, we can be certain that we know how reality works.",
@@ -522,7 +463,6 @@ const surveyItems = [
   {
     id: 546,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID113",
     qualtricsText:
       "In general, what we think we know for certain, might actually be wrong.",
@@ -531,7 +471,6 @@ const surveyItems = [
   {
     id: 547,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID114",
     qualtricsText: "Reality works in a predictable, logical way.",
     surveyId: 38,
@@ -539,7 +478,6 @@ const surveyItems = [
   {
     id: 548,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID115",
     qualtricsText:
       "Reality works in complicated ways that might turn out differently sometimes.",
@@ -548,7 +486,6 @@ const surveyItems = [
   {
     id: 549,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID116",
     qualtricsText:
       "There are some groups of people that should be followed instead of just following the people in charge.",
@@ -557,7 +494,6 @@ const surveyItems = [
   {
     id: 550,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID83",
     qualtricsText: "Your education?",
     surveyId: 38,
@@ -565,7 +501,6 @@ const surveyItems = [
   {
     id: 551,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID89",
     qualtricsText: "Political orientation?",
     surveyId: 38,
@@ -573,7 +508,6 @@ const surveyItems = [
   {
     id: 552,
     surveyIndexId: null,
-    sequence: -1,
     qualtricsId: "QID90",
     qualtricsText: "Your race/ethnicity?",
     surveyId: 38,
@@ -581,7 +515,6 @@ const surveyItems = [
   {
     id: 515,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID52",
     qualtricsText:
       "I make intentional disciplined efforts to use my money for God's purposes",
@@ -590,7 +523,6 @@ const surveyItems = [
   {
     id: 516,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID53",
     qualtricsText:
       "I make intentional disciplined efforts to use my time for God's purposes",
@@ -599,7 +531,6 @@ const surveyItems = [
   {
     id: 517,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID54",
     qualtricsText:
       "I make intentional disciplined efforts to use my talents and skills for God's purposes",
@@ -608,7 +539,6 @@ const surveyItems = [
   {
     id: 518,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID55",
     qualtricsText:
       "I make intentional disciplined efforts to use my freedoms for God's purposes",
@@ -617,7 +547,6 @@ const surveyItems = [
   {
     id: 519,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID56",
     qualtricsText:
       "I make intentional disciplined efforts to use my privileges for God's purposes",
@@ -626,7 +555,6 @@ const surveyItems = [
   {
     id: 520,
     surveyIndexId: 81,
-    sequence: -1,
     qualtricsId: "QID57",
     qualtricsText:
       "I make intentional disciplined efforts to use my relationships for God's purposes",
@@ -635,7 +563,6 @@ const surveyItems = [
   {
     id: 527,
     surveyIndexId: 82,
-    sequence: -1,
     qualtricsId: "QID65",
     qualtricsText: "I connect the passage to my feelings",
     surveyId: 38,
@@ -643,7 +570,6 @@ const surveyItems = [
   {
     id: 528,
     surveyIndexId: 82,
-    sequence: -1,
     qualtricsId: "QID66",
     qualtricsText: "I look in the passage for the motivations I should have",
     surveyId: 38,
@@ -651,7 +577,6 @@ const surveyItems = [
   {
     id: 529,
     surveyIndexId: 82,
-    sequence: -1,
     qualtricsId: "QID67",
     qualtricsText: "I let the passage shape my hopes and dreams",
     surveyId: 38,
@@ -659,7 +584,6 @@ const surveyItems = [
   {
     id: 533,
     surveyIndexId: 83,
-    sequence: -1,
     qualtricsId: "QID71",
     qualtricsText:
       "I experience the presence of God through interaction with the passage",
@@ -668,7 +592,6 @@ const surveyItems = [
   {
     id: 534,
     surveyIndexId: 83,
-    sequence: -1,
     qualtricsId: "QID72",
     qualtricsText: "I am moved by the Spirit as I interact with the passage",
     surveyId: 38,
@@ -676,7 +599,6 @@ const surveyItems = [
   {
     id: 535,
     surveyIndexId: 83,
-    sequence: -1,
     qualtricsId: "QID73",
     qualtricsText: "I know God more deeply through the passage",
     surveyId: 38,
@@ -684,7 +606,6 @@ const surveyItems = [
   {
     id: 524,
     surveyIndexId: 84,
-    sequence: -1,
     qualtricsId: "QID62",
     qualtricsText: "I put myself personally into the passage",
     surveyId: 38,
@@ -692,7 +613,6 @@ const surveyItems = [
   {
     id: 525,
     surveyIndexId: 84,
-    sequence: -1,
     qualtricsId: "QID63",
     qualtricsText:
       "I look for the larger story in the passage and where I fit in it",
@@ -701,7 +621,6 @@ const surveyItems = [
   {
     id: 536,
     surveyIndexId: 85,
-    sequence: -1,
     qualtricsId: "QID74",
     qualtricsText: "I think carefully about the meaning of the passage",
     surveyId: 38,
@@ -709,7 +628,6 @@ const surveyItems = [
   {
     id: 537,
     surveyIndexId: 85,
-    sequence: -1,
     qualtricsId: "QID75",
     qualtricsText: "I study the facts in the passage",
     surveyId: 38,
@@ -717,7 +635,6 @@ const surveyItems = [
   {
     id: 538,
     surveyIndexId: 85,
-    sequence: -1,
     qualtricsId: "QID76",
     qualtricsText: "I think about what the passage tells me to believe",
     surveyId: 38,
@@ -725,7 +642,6 @@ const surveyItems = [
   {
     id: 522,
     surveyIndexId: 86,
-    sequence: -1,
     qualtricsId: "QID60",
     qualtricsText: "I try to live out what the passage teaches me",
     surveyId: 38,
@@ -733,7 +649,6 @@ const surveyItems = [
   {
     id: 523,
     surveyIndexId: 86,
-    sequence: -1,
     qualtricsId: "QID61",
     qualtricsText: "I look for things the passage is telling me to do",
     surveyId: 38,
@@ -741,7 +656,6 @@ const surveyItems = [
   {
     id: 521,
     surveyIndexId: 86,
-    sequence: -1,
     qualtricsId: "QID59",
     qualtricsText: "I apply the passage to my life",
     surveyId: 38,
@@ -749,7 +663,6 @@ const surveyItems = [
   {
     id: 530,
     surveyIndexId: 87,
-    sequence: -1,
     qualtricsId: "QID68",
     qualtricsText: "I reflect on what the passage means for others and society",
     surveyId: 38,
@@ -757,7 +670,6 @@ const surveyItems = [
   {
     id: 531,
     surveyIndexId: 87,
-    sequence: -1,
     qualtricsId: "QID69",
     qualtricsText:
       "I try to learn what the passage says about justice for everyone",
@@ -766,7 +678,6 @@ const surveyItems = [
   {
     id: 532,
     surveyIndexId: 87,
-    sequence: -1,
     qualtricsId: "QID70",
     qualtricsText:
       "I think about God's response to all humankind (not just me or people close to me) from the passage",
@@ -775,7 +686,6 @@ const surveyItems = [
   {
     id: 541,
     surveyIndexId: 88,
-    sequence: -1,
     qualtricsId: "QID93",
     qualtricsText: "Do you consider yourself to be a Christian?",
     surveyId: 38,

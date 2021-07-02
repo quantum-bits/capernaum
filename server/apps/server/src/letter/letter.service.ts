@@ -34,11 +34,12 @@ export class LetterService extends BaseService<Letter> {
   }
 
   private alwaysResolve = [
-    "letterType",
-    "letterType.letterElementTypes",
+    "surveyLetters",
+    "surveyLetters.letterType",
+    "surveyLetters.letterType.letterElementTypes",
+    "surveyLetters.survey",
     "letterElements",
     "letterElements.letterElementType",
-    "surveys",
   ];
 
   readAll() {

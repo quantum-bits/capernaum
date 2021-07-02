@@ -1,13 +1,13 @@
 import { InputType, Int, ObjectType, Field } from "@nestjs/graphql";
-import { Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { Entity, OneToMany } from "typeorm";
 import { SurveyItem, SurveyItemCreateInput } from "./survey-item";
 import { SurveyDimension } from "./survey-dimension";
 import { AbstractEntity } from "../../shared/abstract-entity";
 import { ScriptureEngagementPractice } from "../../prediction/entities";
-import { Letter } from "../../letter/entities";
 import { Group } from "../../group/entities/group";
 import { SurveyResponse } from "./survey-response";
 import { FieldColumn } from "@server/src/decorators";
+import { SurveyLetter } from "@server/src/survey/entities/survey-letter";
 
 @Entity()
 @ObjectType({
@@ -19,10 +19,11 @@ export class Survey extends AbstractEntity {
   })
   importedDate: Date;
 
-  @Field(() => [Letter], { description: "Letters for this survey" })
-  @ManyToMany(() => Letter, (letter) => letter.surveys)
-  @JoinTable({ name: "survey_letter" })
-  letters: Letter[];
+  @Field(() => [SurveyLetter], {
+    description: "Survey letters for this survey",
+  })
+  @OneToMany(() => SurveyLetter, (surveyLetter) => surveyLetter.survey)
+  surveyLetters: SurveyLetter[];
 
   @Field(() => [SurveyItem])
   @OneToMany(() => SurveyItem, (item) => item.survey)

@@ -14,6 +14,7 @@ import {
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
   SurveyResponse,
 } from "./survey/entities";
 import { ScriptureEngagementPractice } from "./prediction/entities";
@@ -42,6 +43,7 @@ export const entities = [
   SurveyIndex,
   SurveyItem,
   SurveyItemResponse,
+  SurveyLetter,
   SurveyResponse,
   User,
   UserRole,

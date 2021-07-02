@@ -1,8 +1,8 @@
 import { Model } from "objection";
-import { LetterTypeModel } from "./letter-type.model";
 import { LetterElementModel } from "./letter-element.model";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyModel } from "@common/cli/src/models/survey.model";
+import { SurveyLetterModel } from "@common/cli/src/models/survey-letter.model";
 
 const debug = getDebugger("model:letter");
 
@@ -13,9 +13,8 @@ export class LetterModel extends Model {
   emailMessage: string;
   created: string;
   updated: string;
-  isFrozen: boolean;
+  surveyLetters: SurveyLetterModel[];
   surveys: SurveyModel[];
-  letterType: LetterTypeModel;
 
   static tableName = "letter";
 
@@ -30,6 +29,14 @@ export class LetterModel extends Model {
           to: "survey_letter.surveyId",
         },
         to: "survey.id",
+      },
+    },
+    surveyLetters: {
+      relation: Model.HasManyRelation,
+      modelClass: SurveyLetterModel,
+      join: {
+        from: "letter.id",
+        to: "survey_letter.letterId",
       },
     },
   };

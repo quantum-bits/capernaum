@@ -1,5 +1,10 @@
 import { Model } from "objection";
 import { LetterTypeModel } from "./letter-type.model";
+import { SurveyLetterModel } from "@common/cli/src/models/survey-letter.model";
+import { getDebugger } from "@helpers/debug-factory";
+import { LetterElementModel } from "@common/cli/src/models/letter-element.model";
+
+const debug = getDebugger("model:letter-element-type");
 
 export class LetterElementTypeModel extends Model {
   id!: number;
@@ -23,4 +28,11 @@ export class LetterElementTypeModel extends Model {
       },
     },
   });
+
+  static async beforeDelete({ asFindQuery, transaction }) {
+    debug("Delete letter elements");
+    await LetterElementModel.query(transaction)
+      .delete()
+      .whereIn("letterElementTypeId", asFindQuery().select("id"));
+  }
 }
