@@ -20,6 +20,10 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
     "letterType",
   ];
 
+  readOne(id: number) {
+    return this.repo.find({ where: { id }, relations: this.alwaysRelate });
+  }
+
   readAll() {
     return this.repo.find({ relations: this.alwaysRelate });
   }

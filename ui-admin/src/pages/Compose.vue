@@ -266,6 +266,7 @@ import AssociationTable from "./surveys/PredictionTableTab.vue";
 import SpinnerBtn from "@/components/buttons/SpinnerButton.vue";
 import {
   OneLetter,
+  OneLetter_letter,
   OneLetter_letter_letterElements,
   OneLetter_letter_letterElements_letterElementType,
 } from "@/graphql/types/OneLetter";
@@ -297,15 +298,16 @@ export default Vue.extend({
     PageHeader,
   },
 
+  props: {
+    surveyLetter: {
+      type: Object as SurveyLetter,
+      required: true,
+    },
+  },
+
   apollo: {
     theLetter: {
       query: ONE_LETTER_QUERY,
-      //     variables() {
-      //       console.log("route params: ", parseInt(this.$route.params.letterId));
-      //       return {
-      //         letterId: parseInt(this.$route.params.letterId),
-      //       };
-      //     },
       update(data: OneLetter) {
         const elements = data.letter.letterElements as LetterElement[];
         for (let box of elements) {
@@ -316,12 +318,6 @@ export default Vue.extend({
         this.letterExists = true;
         return data.letter;
       },
-      // skip() {
-      //   if (this.$route.params.letterId === undefined) {
-      //     console.log("skipping fetch for now....");
-      //   }
-      //   return this.$route.params.letterId === undefined;
-      // },
     },
 
     imageDetails: {
@@ -370,7 +366,7 @@ export default Vue.extend({
           description: "",
           letterElementTypes: [],
         },
-      },
+      } as unknown as OneLetter_letter,
     };
   },
 
@@ -388,6 +384,15 @@ export default Vue.extend({
         text: image.title,
         value: image.id,
       }));
+    },
+
+    chartElements(): SelectedItem[] {
+      return this.theLetter.survey.surveyDimensions.map(
+        (surveyDimension: OneLetter_letter_survey_surveyDimensions) => ({
+          text: surveyDimension.title,
+          value: surveyDimension.id,
+        })
+      );
     },
 
     surveyLetterIsFrozen(): boolean {

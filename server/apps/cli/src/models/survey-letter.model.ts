@@ -6,8 +6,4 @@ export class SurveyLetterModel extends Model {
   letterTypeId: number;
 
   static tableName = "survey_letter";
-
-  static get idColumn() {
-    return ["surveyId", "letterId", "letterTypeId"];
-  }
 }

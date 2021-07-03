@@ -34,7 +34,13 @@ export interface AllCapernaumSurveys_surveys_surveyLetters_letterType {
 }
 
 export interface AllCapernaumSurveys_surveys_surveyLetters {
+  /**
+   * The letter
+   */
   letter: AllCapernaumSurveys_surveys_surveyLetters_letter;
+  /**
+   * The letter type
+   */
   letterType: AllCapernaumSurveys_surveys_surveyLetters_letterType;
 }
 

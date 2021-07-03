@@ -67,9 +67,9 @@
 import Vue from "vue";
 import NewLetterButton from "@/components/buttons/NewLetterButton.vue";
 import PageHeader from "@/pages/PageHeader.vue";
-import { ALL_SURVEY_LETTERS } from "@/graphql/surveys.graphql";
-import { AllSurveyLetters_surveyLetters } from "@/graphql/types/AllSurveyLetters";
 import { DELETE_LETTER_MUTATION } from "@/graphql/letters.graphql";
+import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
+import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 
 export default Vue.extend({
   name: "Letters",
@@ -81,7 +81,7 @@ export default Vue.extend({
 
   apollo: {
     surveyLetters: {
-      query: ALL_SURVEY_LETTERS,
+      query: SURVEY_LETTERS_QUERY,
     },
   },
 
@@ -94,12 +94,12 @@ export default Vue.extend({
         { text: "Type" },
         { text: "Actions", sortable: false },
       ],
-      surveyLetters: [] as AllSurveyLetters_surveyLetters[],
+      surveyLetters: [] as SurveyLetters_surveyLetters[],
     };
   },
 
   methods: {
-    canDeleteLetter(surveyLetter: AllSurveyLetters_surveyLetters): boolean {
+    canDeleteLetter(surveyLetter: SurveyLetters_surveyLetters): boolean {
       return surveyLetter.letter.letterElements.length === 0;
     },
 
@@ -134,12 +134,12 @@ export default Vue.extend({
       this.$router.push({ name: "compose" });
     },
 
-    viewLetter(surveyLetter: AllSurveyLetters_surveyLetters): void {
+    viewLetter(surveyLetter: SurveyLetters_surveyLetters): void {
       console.log("item: ", surveyLetter);
       console.log("view letter!");
       this.$router.push({
         name: "compose",
-        params: { letterId: surveyLetter.letter.id.toString() },
+        params: { letterId: surveyLetter.id.toString() },
       });
     },
 

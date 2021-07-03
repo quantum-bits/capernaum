@@ -50,7 +50,13 @@ export interface OneLetter_letter_surveyLetters_letterType {
 }
 
 export interface OneLetter_letter_surveyLetters {
+  /**
+   * The survey
+   */
   survey: OneLetter_letter_surveyLetters_survey;
+  /**
+   * The letter type
+   */
   letterType: OneLetter_letter_surveyLetters_letterType;
 }
 

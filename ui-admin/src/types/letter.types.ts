@@ -1,5 +1,3 @@
-import { Survey } from "./survey.types";
-
 /** Types of elements that can appear in a letter; these come back from the db
  */
 export interface LetterElementType {
@@ -29,12 +27,6 @@ export interface Letter {
   created: string;
   updated: string;
   elements: LetterElement[];
-}
-
-export interface SurveyLetter {
-  survey: Survey;
-  letter: Letter;
-  isActive: boolean;
 }
 
 /** related enum

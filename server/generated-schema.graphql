@@ -320,8 +320,16 @@ type LetterElement {
 
 """Associate survey, letter, and letter type"""
 type SurveyLetter {
+  """Unique ID for this entity"""
+  id: Int!
+
+  """The survey"""
   survey: Survey!
+
+  """The letter"""
   letter: Letter!
+
+  """The letter type"""
   letterType: LetterType!
 }
 
@@ -604,7 +612,10 @@ type Query {
   surveyItemsReadAll: [SurveyItem!]!
 
   """Retrieve all survey letters"""
-  surveyLetters: [SurveyLetter!]!
+  surveyLetters(
+    """Optional survey letter ID"""
+    id: Int
+  ): [SurveyLetter!]!
 
   """Fetch all surveys"""
   surveys: [Survey!]!

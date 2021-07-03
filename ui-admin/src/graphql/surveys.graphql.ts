@@ -252,9 +252,10 @@ export const UPDATE_ASSOCIATION_TABLE = gql`
   }
 `;
 
-export const ALL_SURVEY_LETTERS = gql`
-  query AllSurveyLetters {
-    surveyLetters {
+export const SURVEY_LETTERS_QUERY = gql`
+  query SurveyLetters($id: Int) {
+    surveyLetters(id: $id) {
+      id
       survey {
         id
         qualtricsName
@@ -262,7 +263,6 @@ export const ALL_SURVEY_LETTERS = gql`
       letter {
         id
         title
-        updated
         letterElements {
           id
         }
@@ -270,7 +270,6 @@ export const ALL_SURVEY_LETTERS = gql`
       letterType {
         id
         key
-        description
       }
     }
   }

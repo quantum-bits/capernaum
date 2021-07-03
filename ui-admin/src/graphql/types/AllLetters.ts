@@ -50,7 +50,13 @@ export interface AllLetters_letters_surveyLetters_letterType {
 }
 
 export interface AllLetters_letters_surveyLetters {
+  /**
+   * The survey
+   */
   survey: AllLetters_letters_surveyLetters_survey;
+  /**
+   * The letter type
+   */
   letterType: AllLetters_letters_surveyLetters_letterType;
 }
 

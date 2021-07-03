@@ -42,7 +42,13 @@ export interface AllResponses_surveyResponses_survey_surveyLetters_letterType {
 }
 
 export interface AllResponses_surveyResponses_survey_surveyLetters {
+  /**
+   * The letter
+   */
   letter: AllResponses_surveyResponses_survey_surveyLetters_letter;
+  /**
+   * The letter type
+   */
   letterType: AllResponses_surveyResponses_survey_surveyLetters_letterType;
 }
 
