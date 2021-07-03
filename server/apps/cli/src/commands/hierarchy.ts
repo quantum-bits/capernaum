@@ -1,27 +1,18 @@
-import { Help, Option, Command, OptionValues } from "commander";
+import { Help, Command, OptionValues } from "commander";
 import chalk from "chalk";
 import { getDebugger } from "@helpers/debug-factory";
 
 const debug = getDebugger("cli");
-
-interface Argument {
-  name: string;
-}
-
-interface CommandPlus extends Command {
-  options: Option[];
-  commands: CommandPlus[];
-  _args: Argument[];
-}
+const help = new Help();
 
 function hierarchyHelper(
-  commands: CommandPlus[],
-  options: OptionValues,
+  commands: Command[],
+  cliOptions: OptionValues,
   tabWidth = 0
 ) {
   const tab = (n: number) => " ".repeat(n);
 
-  function sortByName(commands: CommandPlus[]) {
+  function sortByName(commands: Command[]) {
     return commands.sort((a, b) => a.name().localeCompare(b.name()));
   }
 
@@ -39,17 +30,22 @@ function hierarchyHelper(
 
     segments.push(chalk.blue(command.name().padEnd(commandFieldWidth)));
 
-    const opts = command.options.map((option) => option.flags);
+    debug("OPTIONS %O", help.visibleOptions(command));
+
+    const opts = help
+      .visibleOptions(command)
+      .filter((option) => option.long !== "--help")
+      .map((option) => option.flags);
     if (opts.length) {
       segments.push(chalk.yellow(opts.join(" ")));
     }
 
-    const args = command._args.map((arg) => arg.name);
+    const args = help.visibleArguments(command).map((arg) => arg.name());
     if (args.length) {
       segments.push(chalk.red(args.join(" ")));
     }
 
-    if (options.verbose) {
+    if (cliOptions.verbose) {
       segments.push(chalk.dim(command.description()));
     }
 
@@ -61,16 +57,15 @@ function hierarchyHelper(
 
     hierarchyHelper(
       command.commands,
-      options,
+      cliOptions,
       tabWidth + commandFieldWidth + 1
     );
   }
 }
 
-export function showHierarchy(options: OptionValues, program) {
+export function showHierarchy(options: OptionValues, program: Command) {
   {
-    const help = new Help();
-    const commands = help.visibleCommands(program) as CommandPlus[];
+    const commands = help.visibleCommands(program) as Command[];
     hierarchyHelper(commands, options);
   }
 }

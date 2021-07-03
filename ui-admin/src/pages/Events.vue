@@ -44,7 +44,9 @@ import PageHeader from "@/pages/PageHeader.vue";
 
 export default Vue.extend({
   name: "Events",
+
   components: { PageHeader },
+
   data() {
     return {
       allEvents: [] as Event[],

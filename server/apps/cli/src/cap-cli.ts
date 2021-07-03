@@ -67,10 +67,9 @@ qualtricsSurveyCommands
   .action(listQualtricsSurveys);
 
 qualtricsSurveyCommands
-  .command("get <survey-id>")
-  .description("get survey by ID", {
-    "survey-id": "survey ID (SV_...)",
-  })
+  .command("get")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .description("get survey by ID")
   .action(getQualtricsSurvey);
 
 const qualtricsResponseCommands = qualtricsCommands
@@ -78,11 +77,10 @@ const qualtricsResponseCommands = qualtricsCommands
   .description("response commands");
 
 qualtricsResponseCommands
-  .command("get <survey-id> [response-id]")
-  .description("get response(s)", {
-    "survey-id": "survey ID (SV_...)",
-    "response-id": "response ID (R_...)",
-  })
+  .command("get")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .argument("[response-id]", "response ID (R_...)")
+  .description("get response(s)")
   .option("--start-date", "start date (YYYY-MM-DD)")
   .option("--end-date", "end date (YYYY-MM-DD)")
   .action(getQualtricsResponse);
@@ -102,30 +100,27 @@ qualtricsSubscriptionCommands
   .action(listSubscriptions);
 
 qualtricsSubscriptionCommands
-  .command("get <subscription-id>")
-  .description("get subscription with ID", {
-    "subscription-id": "subscription ID (SUB_...)",
-  })
+  .command("get")
+  .argument("<subscription-id>", "subscription ID (SUB_...)")
+  .description("get subscription with ID")
   .action(getSubscription);
 
 qualtricsSubscriptionCommands
-  .command("create <publication-url> <survey-id>")
+  .command("create")
+  .argument("<publication-url>", "public URL to notify")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .description("subscribe to an event")
   .addOption(
     new Option("--topic <name>", "topic to subscribe")
       .choices(validEventNames())
       .makeOptionMandatory()
   )
-  .description("subscribe to an event", {
-    "publication-url": "public URL to notify",
-    "survey-id": "survey ID (SV_...)",
-  })
   .action(createSubscription);
 
 qualtricsSubscriptionCommands
-  .command("delete <subscription-id>")
-  .description("delete an event subscription", {
-    "subscription-id": "subscription ID (SUB_...)",
-  })
+  .command("delete")
+  .argument("<subscription-id>", "subscription ID (SUB_...)")
+  .description("delete an event subscription")
   .action(deleteSubscription);
 
 // Survey
@@ -138,8 +133,9 @@ surveyCommands
   .action(listSurveys);
 
 surveyCommands
-  .command("import <survey-id>")
-  .description("import survey by ID", { "survey-id": "survey ID (SV_...)" })
+  .command("import")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .description("import survey by ID")
   .action(importSurvey);
 
 surveyCommands
@@ -159,23 +155,22 @@ groupCommands
   .action(listGroups);
 
 groupCommands
-  .command("get <code-word>")
+  .command("get")
+  .argument("<code-word>", "code word for group")
   .option("--with-responses", "include all responses for group")
-  .description("get group by code word", {
-    "code-word": "code word for group",
-  })
+  .description("get group by code word")
   .action(getGroup);
 
 groupCommands
-  .command("close <group-pk>")
-  .description("close group", {
-    groupPk: "group PK",
-  })
+  .command("close")
+  .argument("<group-pk>", "group PK")
+  .description("close group")
   .action(closeGroup);
 
 groupCommands
-  .command("force-report <group-pk>")
-  .description("force report", { groupPk: "group PK" })
+  .command("force-report")
+  .argument("<group-pk>", "group PK")
+  .description("force report")
   .action(forceGroupReport);
 
 // Response
@@ -185,10 +180,9 @@ const responseCommands = program
   .description("survey response commands");
 
 responseCommands
-  .command("import <survey-id>")
-  .description("import responses to survey", {
-    "survey-id": "survey ID (SV_...)",
-  })
+  .command("import")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .description("import responses to survey")
   .action(importSurveyResponses);
 
 const dimensionCommands = responseCommands
@@ -267,21 +261,19 @@ msiCommands
 const letterCommands = program.command("letter").description("letter commands");
 
 letterCommands
-  .command("individual <letter-pk> <survey_response-pk>")
-  .description("create letter for response", {
-    letterPk: "letter PK",
-    surveyResponsePk: "survey response PK",
-  })
+  .command("individual")
+  .argument("<letter-pk>", "letter PK")
+  .argument("<survey_response-pk>", "survey response PK")
+  .description("create letter for response")
   .action((letterPk, surveyResponsePk) =>
     renderLetter(letterPk, surveyResponsePk, SurveyRespondentType.Individual)
   );
 
 letterCommands
-  .command("group <letter-pk> <group-pk>")
-  .description("create letter for group", {
-    letterPk: "letter PK",
-    groupPk: "group PK",
-  })
+  .command("group")
+  .argument("<letter-pk>", "letter PK")
+  .argument("<group-pk>", "group PK")
+  .description("create letter for group")
   .action((letterPk, groupPk) =>
     renderLetter(letterPk, groupPk, SurveyRespondentType.Group)
   );
@@ -298,18 +290,16 @@ const reporterCommands = program
   .description("report (create and email) commands");
 
 reporterCommands
-  .command("individual <qualtrics-survey-id> <qualtrics-response-id>")
-  .description("queue an individual report job", {
-    qualtricsSurveyId: "Qualtrics survey ID (SV_...)",
-    qualtricsResponseId: "Qualtrics response ID (R_...)",
-  })
+  .command("individual")
+  .argument("<qualtrics-survey-id>", "Qualtrics survey ID (SV_...)")
+  .argument("<qualtrics-response-id>", "Qualtrics response ID (R_...)")
+  .description("queue an individual report job")
   .action(queueIndividualReport);
 
 reporterCommands
-  .command("group <group-pk>")
-  .description("create and email group report", {
-    groupPk: "group PK",
-  })
+  .command("group")
+  .argument("<group-pk>", "group PK")
+  .description("create and email group report")
   .action(sendGroupReport);
 
 // Fixture
@@ -351,5 +341,5 @@ program
 
 // Do it.
 program.parseAsync().then(() => {
-  knex.destroy();
+  return knex.destroy();
 });
