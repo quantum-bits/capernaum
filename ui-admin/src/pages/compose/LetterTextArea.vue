@@ -61,13 +61,13 @@ import { VueEditor } from "vue2-editor";
 
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-import { LetterElementType } from "@/types/letter.types";
 import {
   UPDATE_LETTER_MUTATION,
   UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
 import Quill from "quill";
 import cloneDeep from "lodash/cloneDeep";
+import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 
 export interface Cfg {
   multiLineParagraph: boolean;
@@ -93,7 +93,7 @@ export default class LetterTextArea extends Vue {
   @Prop({ default: false }) isEmailText!: boolean;
   @Prop({ default: -Infinity }) imageId!: number;
 
-  letterElements: LetterElementType[] = [];
+  letterElements: SurveyLetters_surveyLetters_letter_letterElements[] = [];
 
   // https://github.com/KillerCodeMonkey/ngx-quill/issues/295
   // https://www.vue2editor.com/examples/#custom-toolbar

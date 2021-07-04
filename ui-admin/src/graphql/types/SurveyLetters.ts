@@ -118,6 +118,14 @@ export interface SurveyLetters_surveyLetters_letter {
    */
   updated: any;
   /**
+   * Description of letter
+   */
+  description: string;
+  /**
+   * Email message to go out with letter
+   */
+  emailMessage: string;
+  /**
    * Elements that make up this letter
    */
   letterElements: SurveyLetters_surveyLetters_letter_letterElements[];
@@ -132,6 +140,10 @@ export interface SurveyLetters_surveyLetters_letterType {
    * Letter type name
    */
   key: string;
+  /**
+   * Letter type description
+   */
+  description: string;
 }
 
 export interface SurveyLetters_surveyLetters {

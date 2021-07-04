@@ -50,7 +50,8 @@ import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
 
 import { OneImage, OneImage_image } from "@/graphql/types/OneImage";
 
-import { LetterElementEnum, LetterElementType } from "../types/letter.types";
+import { LetterElementEnum } from "@/types/letter.types";
+import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 
 @Component({
   apollo: {
@@ -85,7 +86,7 @@ export default class StaticLetterElement extends Vue {
   @Prop() parentIsFrozen!: boolean;
   @Prop({ default: -Infinity }) imageId!: number;
 
-  letterElements: LetterElementType[] = [];
+  letterElements: SurveyLetters_surveyLetters_letter_letterElements[] = [];
   theImage: OneImage_image | null = null;
 
   //@Emit("move-up")

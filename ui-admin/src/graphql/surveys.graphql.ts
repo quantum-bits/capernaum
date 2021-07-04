@@ -273,6 +273,8 @@ export const SURVEY_LETTERS_QUERY = gql`
         id
         title
         updated
+        description
+        emailMessage
         letterElements {
           id
           letterElementType {
@@ -295,6 +297,7 @@ export const SURVEY_LETTERS_QUERY = gql`
       letterType {
         id
         key
+        description
       }
     }
   }
