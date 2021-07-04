@@ -15,19 +15,10 @@
       <v-tab-item>
         <letter-content-tab :survey-letter="surveyLetter" />
       </v-tab-item>
-      <v-tab-item></v-tab-item>
+      <v-tab-item>
+        <letter-preview-tab />
+      </v-tab-item>
     </v-tabs-items>
-
-    <v-row justify="center">
-      <choose-chart-dialog
-        :visible="isChartDialogVisible"
-        :survey-letter="surveyLetter"
-      />
-    </v-row>
-
-    <v-row justify="center">
-      <choose-image-dialog :the-letter="surveyLetter.letter" />
-    </v-row>
 
     <!--
           Next:
@@ -59,6 +50,7 @@ import ChooseChartDialog from "@/pages/compose/ChooseChartDialog.vue";
 import ChooseImageDialog from "@/pages/compose/ChooseImageDialog.vue";
 import LetterDetailsTab from "@/pages/compose/LetterDetailsTab.vue";
 import LetterContentTab from "@/pages/compose/LetterContentTab.vue";
+import LetterPreviewTab from "@/pages/compose/LetterPreviewTab.vue";
 
 interface LetterElement
   extends SurveyLetters_surveyLetters_letter_letterElements {
@@ -76,11 +68,11 @@ export default Vue.extend({
   name: "ComposePage",
 
   components: {
-    ChooseChartDialog,
-    ChooseImageDialog,
+    PageHeader,
+
     LetterDetailsTab,
     LetterContentTab,
-    PageHeader,
+    LetterPreviewTab,
   },
 
   created() {

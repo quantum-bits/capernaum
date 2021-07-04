@@ -1,52 +1,49 @@
 <template>
-  <v-row v-if="surveyLetter">
-    <v-col xs10 offset-xs1>
-      <h2 class="title font-weight-regular mb-3 mt-5">
-        {{ letterContentHeading }}:
-      </h2>
-    </v-col>
-    <v-col xs10 offset-xs1 class="text-xs-right">
-      <LetterElementMenu
+  <v-card v-if="surveyLetter">
+    <v-card-title>
+      {{ letterContentHeading }}
+      <v-spacer />
+      <letter-element-menu
         :letterType="surveyLetter.letterType"
         @click="addElement($event)"
         offset-y
       />
-    </v-col>
+    </v-card-title>
 
-    <v-col xs10 offset-xs1>
-      <div
-        class="form-group ma-4"
-        v-for="(element, index) in surveyLetterElements"
-        :key="element.id"
-      >
-        <component
-          v-bind:is="letterElement(element.letterElementType.key)"
-          :letterElementId="element.id"
-          :imageId="imageId(element)"
-          :order="element.sequence"
-          :initialTextDelta="element.textDelta"
-          :largestSequenceNumber="largestSequenceNumber"
-          :smallestSequenceNumber="smallestSequenceNumber"
-          :letterElementKey="element.letterElementType.key"
-          :description="letterElementDescription(element)"
-          v-on:move-up="moveUp(index)"
-          v-on:move-down="moveDown(index)"
-          v-on:delete-element="deleteElement(element.id)"
-          v-on:refresh-page="refreshPage()"
-          v-on:edit-mode-on="setEditModeOn(element)"
-          v-on:edit-mode-off="setEditModeOff(element)"
-        />
-      </div>
-    </v-col>
-    <v-col xs10 offset-xs1 class="text-xs-right">
-      <LetterElementMenu
-        v-if="surveyLetterElements.length > 0"
-        :letterType="surveyLetter.letterType"
-        @click="addElement($event)"
-        offset-y
-      />
-    </v-col>
-  </v-row>
+    <v-row>
+      <v-col>
+        <div
+          class="form-group ma-4"
+          v-for="(element, index) in surveyLetterElements"
+          :key="element.id"
+        >
+          <component
+            v-bind:is="letterElement(element.letterElementType.key)"
+            :letterElementId="element.id"
+            :imageId="imageId(element)"
+            :order="element.sequence"
+            :initialTextDelta="element.textDelta"
+            :largestSequenceNumber="largestSequenceNumber"
+            :smallestSequenceNumber="smallestSequenceNumber"
+            :letterElementKey="element.letterElementType.key"
+            :description="letterElementDescription(element)"
+            v-on:move-up="moveUp(index)"
+            v-on:move-down="moveDown(index)"
+            v-on:delete-element="deleteElement(element.id)"
+            v-on:refresh-page="refreshPage()"
+            v-on:edit-mode-on="setEditModeOn(element)"
+            v-on:edit-mode-off="setEditModeOff(element)"
+          />
+        </div>
+      </v-col>
+    </v-row>
+
+    <choose-chart-dialog
+      :visible="isChartDialogVisible"
+      :survey-letter="surveyLetter"
+    />
+    <choose-image-dialog :letter="surveyLetter.letter" />
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -65,12 +62,18 @@ import {
 import { LetterElementEnum, LetterTypeEnum } from "@/types/letter.types";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 import Delta from "quill-delta";
+import StaticLetterElement from "@/pages/compose/StaticLetterElement.vue";
+import ChooseChartDialog from "@/pages/compose/ChooseChartDialog.vue";
+import ChooseImageDialog from "@/pages/compose/ChooseImageDialog.vue";
 
 export default Vue.extend({
   name: "LetterContentTab",
 
   components: {
     LetterElementMenu,
+    StaticLetterElement,
+    ChooseChartDialog,
+    ChooseImageDialog,
   },
 
   props: {
@@ -87,19 +90,15 @@ export default Vue.extend({
   },
 
   computed: {
-    surveyLetterElements(): SurveyLetters_surveyLetters_letter_letterElements[] {
-      if (this.surveyLetter.letter) {
-        return this.surveyLetter.letter
-          .letterElements as SurveyLetters_surveyLetters_letter_letterElements[];
-      } else {
-        return [];
-      }
+    letterContentHeading(): string {
+      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Content of Group Letter"
+        : "Content of Individual Letter";
     },
 
-    emailDescription(): string {
-      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
-        ? "Email message to Group Admin"
-        : "Email message to respondent";
+    surveyLetterElements(): SurveyLetters_surveyLetters_letter_letterElements[] {
+      return this.surveyLetter.letter
+        .letterElements as SurveyLetters_surveyLetters_letter_letterElements[];
     },
 
     largestSequenceNumber(): number {
@@ -129,7 +128,6 @@ export default Vue.extend({
       );
       return smallestSN;
     },
-
   },
 
   methods: {
@@ -323,12 +321,6 @@ export default Vue.extend({
         .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
-    },
-
-    letterContentHeading(): string {
-      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
-        ? "Content of Group Letter"
-        : "Content of Individual Letter";
     },
 
     letterElement(key: string): string {

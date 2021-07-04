@@ -68,7 +68,7 @@ interface GroupDetails {
 }
 
 export default Vue.extend({
-  name: "SurveyDetailTab",
+  name: "SurveyDetailsTab",
 
   components: { StaticInfoList, EditSaveCancelButtons },
 

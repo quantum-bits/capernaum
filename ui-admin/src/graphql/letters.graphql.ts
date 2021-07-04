@@ -6,7 +6,6 @@ export const ADD_LETTER_MUTATION = gql`
       id
       title
       description
-      updated
     }
   }
 `;
@@ -17,7 +16,6 @@ export const UPDATE_LETTER_MUTATION = gql`
       id
       title
       description
-      updated
     }
   }
 `;

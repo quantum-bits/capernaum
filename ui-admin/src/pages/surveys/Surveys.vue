@@ -36,7 +36,7 @@ import {
   AllCapernaumSurveys_surveys,
 } from "@/graphql/types/AllCapernaumSurveys";
 import * as is from "is";
-import SurveyDetailTab from "./SurveyDetailTab.vue";
+import SurveyDetailTab from "./SurveyDetailsTab.vue";
 import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
 import PredictionTableTab from "@/pages/surveys/PredictionTableTab.vue";
 

@@ -903,7 +903,6 @@ input LetterCreateInput {
   title: String!
   description: String!
   emailMessage: String!
-  isFrozen: Boolean = false
   surveyId: Int!
   letterTypeId: Int!
 }
@@ -913,7 +912,6 @@ input LetterUpdateInput {
   title: String
   description: String
   emailMessage: String
-  isFrozen: Boolean
   surveyId: Int
   letterTypeId: Int
 }

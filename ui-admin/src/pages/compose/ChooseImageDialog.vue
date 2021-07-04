@@ -47,7 +47,7 @@ export default Vue.extend({
   name: "ChooseImageDialog",
 
   props: {
-    theLetter: {
+    letter: {
       type: Object as () => SurveyLetters_surveyLetters_letter,
       required: true,
     },
@@ -100,7 +100,7 @@ export default Vue.extend({
             variables: {
               createInput: {
                 sequence: 1, //////////// FIXME nextSequence,
-                letterId: this.theLetter.id,
+                letterId: this.letter.id,
                 letterElementTypeId: this.imageTypeElementId,
                 imageId: this.selectedImage.value,
               },
@@ -151,5 +151,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style scoped></style>

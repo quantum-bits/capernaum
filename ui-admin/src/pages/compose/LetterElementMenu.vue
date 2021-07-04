@@ -24,7 +24,7 @@ import {
 } from "@/graphql/types/OneLetter";
 
 export default Vue.extend({
-  name: "ComposeMenu",
+  name: "LetterElementMenu",
 
   props: {
     letterType: Object as () => OneLetter_letter_surveyLetters_letterType,

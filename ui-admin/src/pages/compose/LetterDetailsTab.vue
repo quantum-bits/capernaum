@@ -1,105 +1,59 @@
 <template>
-  <div>
-    <div v-if="surveyLetter.letter">
-      <v-row>
-        <v-col xs7 offset-xs1>
-          <h2 class="title font-weight-regular mb-1">
-            Letter:
-            <span class="font-weight-light">{{
-              surveyLetter.letter.title
-            }}</span>
-          </h2>
-          <h2 class="title font-weight-regular mb-1">
-            Description:
-            <span class="font-weight-light">{{
-              surveyLetter.letter.description
-            }}</span>
-          </h2>
-          <h2 class="title font-weight-regular mb-1">
-            Letter Type:
-            <span class="font-weight-light">{{
-              surveyLetter.letterType.description
-            }}</span>
-          </h2>
-          <h2 class="title font-weight-regular mb-1">
-            Survey:
-            <span class="font-weight-light">
-              {{ surveyLetter.survey.qualtricsName }}
-            </span>
-          </h2>
-          <h2 class="title font-weight-regular mb-5">
-            Last Update:
-            <span class="font-weight-light">
-              {{ surveyLetter.letter.updated | standardDateTime }}
-            </span>
-          </h2>
-        </v-col>
-        <v-col class="text-xs-right">
-          <v-btn color="primary" dark @click="toggleEditMode"> Edit </v-btn>
-        </v-col>
-      </v-row>
-    </div>
-    <div v-if="surveyLetter && editModeOn">
-      <LetterInfoForm
-        :id="surveyLetter.letter.id"
-        :surveyId="surveyLetter.survey.id"
-        :initialTitle="surveyLetter.letter.title"
-        :initialDescription="surveyLetter.letter.description"
-        :letterTypeDescription="surveyLetter.letterType.description"
-        :isNew="isNew"
-        v-on:letter-info-updated="letterInfoUpdated"
-      >
-      </LetterInfoForm>
-    </div>
-    <div v-if="letterIsNewAndEditModeOn">
-      <LetterInfoForm
-        :isNew="isNew"
-        v-on:letter-created="newLetterCreated($event)"
-      >
-      </LetterInfoForm>
-    </div>
-    <div v-if="surveyLetter">
-      <v-row>
-        <v-col>
-          <h2 class="title font-weight-regular mb-1">
-            Boolean Association Table: NOT HERE ANY LONGER
-            <!-- FIXME --->
-          </h2>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <h2 class="title font-weight-regular mb-3 mt-4">Text for Email:</h2>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <LetterTextArea
-            :letterId="surveyLetter.letter.id"
-            :initialTextDelta="surveyLetter.letter.emailMessage"
-            :description="emailDescription"
-            :isEmailText="'true'"
-            v-on:edit-mode-on="setEmailEditModeOn()"
-            v-on:edit-mode-off="setEmailEditModeOff()"
-          />
-        </v-col>
-      </v-row>
-    </div>
-  </div>
+  <v-card v-if="surveyLetter.letter">
+    <v-row>
+      <v-col>
+        <v-card-title>Letter Details</v-card-title>
+        <static-info-list :info="staticInfo" />
+        <v-card-text>
+          <letter-details-form :survey-letter="surveyLetter" v-slot="{ knobs }">
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                :disabled="!knobs.valid"
+                color="success"
+                @click="knobs.submit"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </letter-details-form>
+        </v-card-text>
+      </v-col>
+
+      <v-col>
+        <v-card-title>{{ emailDescription }}</v-card-title>
+        <letter-text-area
+          :letterId="surveyLetter.letter.id"
+          :initialTextDelta="surveyLetter.letter.emailMessage"
+          :isEmailText="true"
+        />
+        <!-- FIXME - This was inside the previous element.
+        v-on:edit-mode-on="setEmailEditModeOn()"
+        v-on:edit-mode-off="setEmailEditModeOff()"
+        -->
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 import LetterTextArea from "@/pages/compose/LetterTextArea.vue";
-import LetterInfoForm from "@/pages/compose/LetterInfoForm.vue";
+import { LetterTypeEnum } from "@/types/letter.types";
+import LetterDetailsForm from "@/pages/compose/LetterDetailsForm.vue";
+import StaticInfoList, {
+  StaticInfoItem,
+} from "@/components/lists/StaticInfoList.vue";
+import prettyFormat from "pretty-format";
 
 export default Vue.extend({
   name: "LetterDetailsTab",
 
   components: {
+    StaticInfoList,
     LetterTextArea,
-    LetterInfoForm,
+    LetterDetailsForm,
   },
 
   props: {
@@ -108,7 +62,39 @@ export default Vue.extend({
       required: true,
     },
   },
+
+  data() {
+    return {
+      inEditMode: false,
+    };
+  },
+
+  computed: {
+    staticInfo(): StaticInfoItem[] {
+      return [
+        {
+          name: "Survey",
+          value: this.surveyLetter.survey.qualtricsName,
+        },
+        {
+          name: "Letter Type",
+          value: this.surveyLetter.letterType.description,
+        },
+      ];
+    },
+
+    emailDescription(): string {
+      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Email to Group Admin"
+        : "Email to Respondent";
+    },
+  },
+
+  methods: {
+    dump(arg: any) {
+      console.debug(prettyFormat(arg));
+      return arg;
+    },
+  },
 });
 </script>
-
-<style scoped></style>
