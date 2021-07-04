@@ -41,7 +41,7 @@ import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
 import PredictionTableTab from "@/pages/surveys/PredictionTableTab.vue";
 
 export default Vue.extend({
-  name: "Surveys",
+  name: "SurveysPage",
 
   components: {
     PageHeader,

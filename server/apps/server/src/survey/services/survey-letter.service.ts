@@ -15,8 +15,11 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
 
   private alwaysRelate = [
     "survey",
+    "survey.surveyDimensions",
+    "survey.surveyDimensions.surveyIndices",
     "letter",
     "letter.letterElements",
+    "letter.letterElements.letterElementType",
     "letterType",
   ];
 

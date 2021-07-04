@@ -118,7 +118,7 @@ import {
   DELETE_IMAGE,
   UPDATE_IMAGE_DETAILS,
 } from "@/graphql/images.graphql";
-import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
+import { AllImages, AllImages_imageDetails } from "@/graphql/types/AllImages";
 import vueFilePond from "vue-filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js";
 import "filepond/dist/filepond.min.css";
@@ -137,7 +137,7 @@ interface DialogState {
   heading: string;
   mode: DialogMode;
   title: string;
-  itemForUpdate: AllImages_images;
+  itemForUpdate: AllImages_imageDetails;
 }
 
 export default Vue.extend({
@@ -160,12 +160,12 @@ export default Vue.extend({
 
       valid: false,
 
-      imageDetails: [] as AllImages_images[],
+      imageDetails: [] as AllImages_imageDetails[],
       dialogState: {
         heading: "",
         mode: DialogMode.CLOSED,
         title: "",
-        itemForUpdate: {} as AllImages_images,
+        itemForUpdate: {} as AllImages_imageDetails,
       } as DialogState,
 
       titleRules: [
@@ -186,14 +186,14 @@ export default Vue.extend({
     imageDetails: {
       query: ALL_IMAGES_QUERY,
       update(data: AllImages) {
-        return data.images;
+        return data.imageDetails;
       },
       fetchPolicy: "network-only",
     },
   },
 
   methods: {
-    usedInLetters(image: AllImages_images) {
+    usedInLetters(image: AllImages_imageDetails) {
       return _.chain(image.letterElements)
         .flatMap((elt) => elt.letter)
         .map("title")
@@ -319,7 +319,7 @@ export default Vue.extend({
       this.dialogState.mode = DialogMode.OPEN_FOR_CREATE;
     },
 
-    openDialogForUpdate(item: AllImages_images) {
+    openDialogForUpdate(item: AllImages_imageDetails) {
       this.dialogState.heading = "Update image details";
       this.dialogState.title = item.title;
       this.dialogState.mode = DialogMode.OPEN_FOR_EDIT;
@@ -332,7 +332,7 @@ export default Vue.extend({
       this.dialogState.mode = DialogMode.CLOSED;
     },
 
-    canDelete(item: AllImages_images) {
+    canDelete(item: AllImages_imageDetails) {
       return item.letterElements.length === 0;
     },
   },

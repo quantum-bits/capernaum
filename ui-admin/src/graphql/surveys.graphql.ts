@@ -259,12 +259,37 @@ export const SURVEY_LETTERS_QUERY = gql`
       survey {
         id
         qualtricsName
+        surveyDimensions {
+          id
+          title
+          surveyIndices {
+            id
+            abbreviation
+            title
+          }
+        }
       }
       letter {
         id
         title
+        updated
         letterElements {
           id
+          letterElementType {
+            id
+            key
+            description
+          }
+          sequence
+          textDelta
+          image {
+            id
+            title
+          }
+          surveyDimension {
+            id
+            title
+          }
         }
       }
       letterType {

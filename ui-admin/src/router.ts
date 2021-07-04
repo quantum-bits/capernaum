@@ -43,9 +43,9 @@ const router = new VueRouter({
       component: () => import("./pages/surveys/Surveys.vue"),
     },
     {
-      path: "/compose/:letterId?",
+      path: "/compose/:surveyLetterId?",
       name: "compose",
-      component: () => import("./pages/Compose.vue"),
+      component: () => import("./pages/compose/Compose.vue"),
     },
     {
       path: "/responses",

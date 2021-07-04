@@ -2,128 +2,63 @@
   <v-container>
     <page-header title="Compose Letter" />
     <v-row justify="center">
-      <v-dialog v-model="chooseChartTypeDialog" persistent max-width="600">
-        <v-form ref="chartForm" v-model="chartSelectionValid" lazy-validation>
-          <v-card>
-            <v-card-title class="headline">Chart Letter Element</v-card-title>
-            <v-card-text>
-              Choose a custom type of chart from the list
-              <v-select
-                v-model="selectedSurveyDimension"
-                :items="chartElements"
-                :rules="[(v) => !!v || 'Chart type is required']"
-                label="Type of Chart"
-                return-object
-                required
-                persistent-hint
-                single-line
-              />
-            </v-card-text>
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="green darken-1" text @click="cancelChartSelection()"
-                >Cancel
-              </v-btn>
-              <v-btn
-                color="green darken-1"
-                :disabled="!chartSelectionValid"
-                text
-                @click="submitChartSelection()"
-                >Submit
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
-      </v-dialog>
+      <choose-chart-dialog
+        :visible="isChartDialogVisible"
+        :survey-letter="surveyLetter"
+      />
     </v-row>
 
     <v-row justify="center">
-      <v-dialog v-model="chooseImageDialog" persistent max-width="600">
-        <v-form ref="form" v-model="imageSelectionValid" lazy-validation>
-          <v-card>
-            <v-card-title class="headline">Image Letter Element</v-card-title>
-            <v-card-text>
-              Choose an image from the list
-              <v-select
-                v-model="selectedImage"
-                :items="imageElements"
-                :rules="[(v) => !!v || 'Image is required']"
-                label="Image"
-                return-object
-                required
-                persistent-hint
-                single-line
-              />
-            </v-card-text>
-            <v-card-actions>
-              <div class="flex-grow-1"></div>
-              <v-btn color="green darken-1" text @click="cancelImageSelection()"
-                >Cancel
-              </v-btn>
-              <v-btn
-                color="green darken-1"
-                :disabled="!imageSelectionValid"
-                text
-                @click="submitImageSelection()"
-                >Submit
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-form>
-      </v-dialog>
+      <choose-image-dialog :the-letter="surveyLetter.letter" />
     </v-row>
 
-    <v-row v-if="letterExistsAndIsFrozen" class="mb-3">
-      <v-col xs10 offset-xs1>
-        <v-alert :value="true" type="info">
-          Note that this letter has been frozen -- it is no longer editable.
-        </v-alert>
-      </v-col>
-    </v-row>
-
-    <div v-if="letterExistsAndEditModeOff">
+    <div v-if="surveyLetter.letter">
       <v-row row wrap>
         <v-col xs7 offset-xs1>
           <!--<h1 class="headline mb-3">{{ name }}</h1>-->
           <h2 class="title font-weight-regular mb-1">
             Letter:
-            <span class="font-weight-light">{{ letter.title }}</span>
+            <span class="font-weight-light">{{
+              surveyLetter.letter.title
+            }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Description:
-            <span class="font-weight-light">{{ letter.description }}</span>
+            <span class="font-weight-light">{{
+              surveyLetter.letter.description
+            }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Letter Type:
             <span class="font-weight-light">{{
-              letter.letterType.description
+              surveyLetter.letterType.description
             }}</span>
           </h2>
           <h2 class="title font-weight-regular mb-1">
             Survey:
             <span class="font-weight-light">
-              {{ theLetter.survey.qualtricsName }}
+              {{ surveyLetter.survey.qualtricsName }}
             </span>
           </h2>
           <h2 class="title font-weight-regular mb-5">
             Last Update:
-            <span class="font-weight-light">{{
-              letter.updated | standardDateTime
-            }}</span>
+            <span class="font-weight-light">
+              {{ surveyLetter.letter.updated | standardDateTime }}
+            </span>
           </h2>
         </v-col>
-        <v-col v-if="!surveyLetterIsFrozen" xs3 class="text-xs-right">
+        <v-col class="text-xs-right">
           <v-btn color="primary" dark @click="toggleEditMode"> Edit </v-btn>
         </v-col>
       </v-row>
     </div>
-    <div v-if="letterExistsAndEditModeOn">
+    <div v-if="surveyLetter && editModeOn">
       <LetterInfoForm
-        :id="letter.id"
-        :surveyId="letter.survey.id"
-        :initialTitle="letter.title"
-        :initialDescription="letter.description"
-        :letterTypeDescription="letter.letterType.description"
+        :id="surveyLetter.letter.id"
+        :surveyId="surveyLetter.letter.survey.id"
+        :initialTitle="surveyLetter.letter.title"
+        :initialDescription="surveyLetter.letter.description"
+        :letterTypeDescription="surveyLetter.letterType.description"
         :isNew="isNew"
         v-on:letter-info-updated="letterInfoUpdated"
       >
@@ -136,42 +71,26 @@
       >
       </LetterInfoForm>
     </div>
-    <div v-if="letterExists">
-      <v-row v-if="letterExistsAndIsNotGroup" row wrap>
-        <v-col xs7 offset-xs1>
+    <div v-if="surveyLetter">
+      <v-row>
+        <v-col>
           <h2 class="title font-weight-regular mb-1">
-            Boolean Association Table:
-            <span v-if="predictionTableEntriesExist" class="font-weight-light">
-              {{ theLetter.tableEntries.length }} entries
-            </span>
-            <span v-else class="font-weight-light"> None </span>
+            Boolean Association Table: NOT HERE ANY LONGER
+            <!-- FIXME --->
           </h2>
         </v-col>
-        <v-col xs3 class="text-xs-right">
-          <v-btn v-if="tableIsHidden" color="primary" dark @click="showTable">
-            Show Table
-          </v-btn>
-        </v-col>
-        <v-col v-if="!tableIsHidden" xs10 offset-xs1>
-          <AssociationTable
-            :letterId="theLetter.id"
-            :allowHideTable="allowHideTable"
-            v-on:hide-table="hideTable"
-          />
-        </v-col>
       </v-row>
-      <v-row row wrap>
-        <v-col xs11 offset-xs1>
+      <v-row>
+        <v-col>
           <h2 class="title font-weight-regular mb-3 mt-4">Text for Email:</h2>
         </v-col>
       </v-row>
       <v-row>
-        <v-col xs10 offset-xs1>
+        <v-col>
           <LetterTextArea
-            :letterId="letter.id"
-            :initialTextDelta="letter.emailMessage"
+            :letterId="surveyLetter.letter.id"
+            :initialTextDelta="surveyLetter.letter.emailMessage"
             :description="emailDescription"
-            :parentIsFrozen="surveyLetterIsFrozen"
             :isEmailText="'true'"
             v-on:edit-mode-on="setEmailEditModeOn()"
             v-on:edit-mode-off="setEmailEditModeOff()"
@@ -180,7 +99,7 @@
       </v-row>
     </div>
 
-    <v-row v-if="letterExists" row wrap>
+    <v-row v-if="surveyLetter">
       <v-col xs10 offset-xs1>
         <h2 class="title font-weight-regular mb-3 mt-5">
           {{ letterContentHeading }}:
@@ -188,8 +107,7 @@
       </v-col>
       <v-col xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
-          v-if="!surveyLetterIsFrozen"
-          :letterType="letter.letterType"
+          :letterType="surveyLetter.letterType"
           @click="addElement($event)"
           offset-y
         />
@@ -211,7 +129,6 @@
             :smallestSequenceNumber="smallestSequenceNumber"
             :letterElementKey="element.letterElementType.key"
             :description="letterElementDescription(element)"
-            :parentIsFrozen="surveyLetterIsFrozen"
             v-on:move-up="moveUp(index)"
             v-on:move-down="moveDown(index)"
             v-on:delete-element="deleteElement(element.id)"
@@ -223,8 +140,8 @@
       </v-col>
       <v-col xs10 offset-xs1 class="text-xs-right">
         <LetterElementMenu
-          v-if="surveyLetterElements.length > 0 && !surveyLetterIsFrozen"
-          :letterType="letter.letterType"
+          v-if="surveyLetterElements.length > 0"
+          :letterType="surveyLetter.letterType"
           @click="addElement($event)"
           offset-y
         />
@@ -249,38 +166,40 @@
 <script lang="ts">
 import Vue from "vue";
 import { Route, RawLocation } from "vue-router";
-import LetterTextArea from "../components/LetterTextArea.vue";
-import StaticLetterElement from "../components/StaticLetterElement.vue";
-import LetterInfoForm from "../components/LetterInfoForm.vue";
+import LetterTextArea from "../../components/LetterTextArea.vue";
+import StaticLetterElement from "../../components/StaticLetterElement.vue";
+import LetterInfoForm from "../../components/LetterInfoForm.vue";
 import { LetterElementEnum, LetterTypeEnum } from "@/types/letter.types";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
-  ONE_LETTER_QUERY,
   UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
-import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
 import LetterElementMenu from "@/components/LetterElementMenu.vue";
-import AssociationTable from "./surveys/PredictionTableTab.vue";
+import AssociationTable from "../surveys/PredictionTableTab.vue";
 import SpinnerBtn from "@/components/buttons/SpinnerButton.vue";
-import {
-  OneLetter,
-  OneLetter_letter,
-  OneLetter_letter_letterElements,
-  OneLetter_letter_letterElements_letterElementType,
-} from "@/graphql/types/OneLetter";
-import { AllImages, AllImages_images } from "@/graphql/types/AllImages";
 import Delta from "quill-delta/dist/Delta";
 import PageHeader from "@/pages/PageHeader.vue";
+import {
+  SurveyLetters,
+  SurveyLetters_surveyLetters,
+  SurveyLetters_surveyLetters_letter,
+  SurveyLetters_surveyLetters_letter_letterElements,
+  SurveyLetters_surveyLetters_letter_letterElements_letterElementType,
+} from "@/graphql/types/SurveyLetters";
+import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
+import ChooseChartDialog from "@/pages/compose/ChooseChartDialog.vue";
+import ChooseImageDialog from "@/pages/compose/ChooseImageDialog.vue";
 
-interface LetterElement extends OneLetter_letter_letterElements {
+interface LetterElement
+  extends SurveyLetters_surveyLetters_letter_letterElements {
   editModeOn: boolean;
   isNew: boolean;
   key: string;
 }
 
-interface SelectedItem {
+export interface SelectedItem {
   text: string;
   value: number;
 }
@@ -289,6 +208,8 @@ export default Vue.extend({
   name: "ComposePage",
 
   components: {
+    ChooseChartDialog,
+    ChooseImageDialog,
     LetterTextArea,
     StaticLetterElement,
     LetterInfoForm,
@@ -298,161 +219,71 @@ export default Vue.extend({
     PageHeader,
   },
 
-  props: {
-    surveyLetter: {
-      type: Object as SurveyLetter,
-      required: true,
-    },
-  },
+  created() {
+    const surveyLetterId = this.$route.params.surveyLetterId;
+    if (!surveyLetterId) {
+      throw new Error("No survey letter ID supplied in URL");
+    }
 
-  apollo: {
-    theLetter: {
-      query: ONE_LETTER_QUERY,
-      update(data: OneLetter) {
-        const elements = data.letter.letterElements as LetterElement[];
-        for (let box of elements) {
-          box.editModeOn = false;
-          box.isNew = false;
-        }
-        console.log("letter: ", data.letter);
-        this.letterExists = true;
-        return data.letter;
-      },
-    },
-
-    imageDetails: {
-      query: ALL_IMAGES_QUERY,
-      update(data: AllImages) {
-        return data.images;
-      },
-      fetchPolicy: "network-only",
-    },
+    this.$apollo
+      .query<SurveyLetters>({
+        query: SURVEY_LETTERS_QUERY,
+        variables: {
+          id: parseInt(surveyLetterId),
+        },
+      })
+      .then((result) => {
+        this.surveyLetter = result.data.surveyLetters[0];
+        console.info(
+          "SURVEY LETTER LOADED",
+          this.surveyLetter.letter.title,
+          this.surveyLetter.survey.qualtricsName
+        );
+      })
+      .catch((err) => {
+        throw err;
+      });
   },
 
   data() {
     return {
-      imageDetails: [] as AllImages_images[],
+      isChartDialogVisible: false,
+      isImageDialogVisible: false,
+
+      surveyLetter: {} as SurveyLetters_surveyLetters,
+
+      // OLD STUFF
       allowHideTable: true,
       tableIsHidden: true,
       isNew: false, // true if this is a new letter
       editModeOn: false,
-      chooseChartTypeDialog: false,
-      chooseImageDialog: false,
-      chartSelectionValid: false,
-      imageSelectionValid: false,
-      selectedSurveyDimension: null as null | SelectedItem,
-      selectedImage: null as null | SelectedItem,
-      chartTypeElementId: -Infinity, //used when creating a chart type of letter element
-      imageTypeElementId: -Infinity, //used when creating an image type of letter element
       confirmDialog: null,
       emailEditModeOn: false,
 
       name: "",
-      letterExists: false,
       generatingPDF: false,
-
-      theLetter: {
-        id: -1,
-        title: "",
-        description: "",
-        updated: "",
-        letterElements: [],
-        emailMessage: JSON.stringify({
-          ops: [],
-        }),
-        letterType: {
-          id: -1,
-          key: "",
-          description: "",
-          letterElementTypes: [],
-        },
-      } as unknown as OneLetter_letter,
     };
   },
 
   computed: {
     surveyLetterElements(): LetterElement[] {
-      if (this.theLetter) {
-        return this.theLetter.letterElements as LetterElement[];
+      if (this.surveyLetter.letter) {
+        return this.surveyLetter.letter.letterElements as LetterElement[];
       } else {
         return [];
       }
     },
 
-    imageElements(): SelectedItem[] {
-      return this.imageDetails.map((image: AllImages_images) => ({
-        text: image.title,
-        value: image.id,
-      }));
-    },
-
-    chartElements(): SelectedItem[] {
-      return this.theLetter.survey.surveyDimensions.map(
-        (surveyDimension: OneLetter_letter_survey_surveyDimensions) => ({
-          text: surveyDimension.title,
-          value: surveyDimension.id,
-        })
-      );
-    },
-
-    surveyLetterIsFrozen(): boolean {
-      // return this.theLetter && this.theLetter.isFrozen;
-      return false; /////////////////////////////////
-    },
-
-    letterExistsAndIsFrozen(): boolean {
-      if (this.letterExists) {
-        // return this.theLetter.isFrozen;
-        return false; //////////////////////////////////////////
-      } else {
-        return false;
-      }
-      // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
-    },
-
-    letterExistsAndIsNotGroup(): boolean {
-      if (this.letterExists) {
-        return this.theLetter.letterType.key !== LetterTypeEnum.GROUP;
-      } else {
-        return false;
-      }
-      // could possibly use return letter !== null && letter.isFrozen, but not sure if this is safe....
-    },
-
     emailDescription(): string {
-      if (this.letterExists) {
-        return this.theLetter.letterType.key === LetterTypeEnum.GROUP
-          ? "Email message to Group Admin"
-          : "Email message to respondent";
-      } else {
-        return "Email message to respondent";
-      }
+      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Email message to Group Admin"
+        : "Email message to respondent";
     },
 
     letterContentHeading(): string {
-      if (this.letterExists) {
-        return this.theLetter.letterType.key === LetterTypeEnum.GROUP
-          ? "Content of Group Letter"
-          : "Content of Individual Letter";
-      } else {
-        return "Content of Letter";
-      }
-    },
-
-    letterExistsAndEditModeOff(): boolean {
-      if (this.letterExists) {
-        return !this.editModeOn;
-      } else {
-        return false;
-      }
-    },
-
-    letterExistsAndEditModeOn(): boolean {
-      if (this.letterExists) {
-        return this.editModeOn;
-      } else {
-        return false;
-      }
+      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
+        ? "Content of Group Letter"
+        : "Content of Individual Letter";
     },
 
     letterIsNewAndEditModeOn(): boolean {
@@ -486,12 +317,12 @@ export default Vue.extend({
     allEditsSaved(): boolean {
       console.log("email edit mode on:", this.emailEditModeOn);
       let editsSaved = !this.emailEditModeOn;
-      this.theLetter.letterElements.forEach((letterElement: LetterElement) => {
-        //console.log('element:', letterElement);
-        if (letterElement.editModeOn) {
-          editsSaved = false;
-        }
-      });
+      // FIXME - no edit mode in letterElement
+      // this.surveyLetter.letter.letterElements.forEach((letterElement) => {
+      // if (letterElement.editModeOn) {
+      //   editsSaved = false;
+      // }
+      // });
       console.log("edits saved?", editsSaved);
       return editsSaved;
     },
@@ -504,73 +335,6 @@ export default Vue.extend({
 
     hideTable(): void {
       this.tableIsHidden = true;
-    },
-
-    cancelChartSelection(): void {
-      if (this.$refs.chartForm) {
-        console.log("canceling chart selection....");
-        (
-          this.$refs.chartForm as Vue & {
-            resetValidation: () => boolean;
-          }
-        ).resetValidation();
-        (
-          this.$refs.chartForm as Vue & {
-            reset: () => boolean;
-          }
-        ).reset();
-      } else {
-        console.log("no form! ", this.$refs.chartForm);
-      }
-      this.chartSelectionValid = true;
-      this.selectedSurveyDimension = null;
-      this.chooseChartTypeDialog = false;
-      this.chartTypeElementId = -Infinity;
-    },
-
-    cancelImageSelection(): void {
-      console.log("inside cancel image...", this.$refs.form);
-      if (this.$refs.form) {
-        (
-          this.$refs.form as Vue & {
-            resetValidation: () => boolean;
-          }
-        ).resetValidation();
-        (
-          this.$refs.form as Vue & {
-            reset: () => boolean;
-          }
-        ).reset();
-      } else {
-        console.log("no form! ", this.$refs.form);
-      }
-      this.imageSelectionValid = true;
-      this.selectedImage = null;
-      this.chooseImageDialog = false;
-      this.imageTypeElementId = -Infinity;
-    },
-
-    submitChartSelection(): void {
-      //console.log("selected survey dimension: ", this.selectedSurveyDimension);
-      console.log("chart form: ", this.$refs.chartForm);
-      if (
-        (this.$refs.chartForm as Vue & { validate: () => boolean }).validate()
-      ) {
-        console.log("chart form is valid!");
-        this.addChartElement();
-      } else {
-        console.log("form is not valid!");
-      }
-    },
-
-    submitImageSelection(): void {
-      console.log("image selection: ", this.selectedImage);
-      if ((this.$refs.form as Vue & { validate: () => boolean }).validate()) {
-        console.log("form is valid!");
-        this.addImageElement();
-      } else {
-        console.log("form is not valid!");
-      }
     },
 
     // Move code from
@@ -670,55 +434,21 @@ export default Vue.extend({
     },
 
     addElement(
-      letterElementType: OneLetter_letter_letterElements_letterElementType
+      letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
     ): void {
       if (letterElementType.key === LetterElementEnum.CHART) {
         console.log("we have a chart!");
-        this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
-        this.chooseChartTypeDialog = true;
+        //////////// FIXME
+        // this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
+        // this.chooseChartTypeDialog = true;
       } else if (letterElementType.key === LetterElementEnum.IMAGE) {
         console.log("we have an image!");
-        this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
-        this.chooseImageDialog = true;
+        //////////// FIXME
+        // this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
+        // this.chooseImageDialog = true;
       } else {
         console.log("we do not have a chart!");
         this.addNonChartElement(letterElementType);
-      }
-    },
-
-    addChartElement(): void {
-      //console.log("survey dimension id: ", this.selectedSurveyDimension.value);
-      if (this.selectedSurveyDimension !== null) {
-        // this object should not be null, since it is required in the form in order for it to be valid,
-        // but typescript was giving an error
-        const letterElements = this.surveyLetterElements;
-        let maxSequence = -1; //assuming the max sequence will be 0 or greater....
-        letterElements.forEach((letterElement) => {
-          if (maxSequence < letterElement.sequence) {
-            maxSequence = letterElement.sequence;
-          }
-        });
-        let newSequence: number = maxSequence + 1;
-        this.$apollo
-          .mutate({
-            mutation: CREATE_LETTER_ELEMENT_MUTATION,
-            variables: {
-              createInput: {
-                sequence: newSequence,
-                letterId: this.theLetter.id,
-                letterElementTypeId: this.chartTypeElementId,
-                surveyDimensionId: this.selectedSurveyDimension.value,
-              },
-            },
-          })
-          .then(({ data }) => {
-            console.log("done!", data);
-            this.cancelChartSelection();
-            this.refreshPage();
-          })
-          .catch((error) => {
-            console.log("there appears to have been an error: ", error);
-          });
       }
     },
 
@@ -729,38 +459,8 @@ export default Vue.extend({
       return Math.max(0, ...existingNumbers) + 1;
     },
 
-    addImageElement(): void {
-      if (this.selectedImage !== null) {
-        // selectedImage should not be null, since it is a required element in the form, but
-        // typescript was giving an error
-        console.log("image id: ", this.selectedImage.value);
-        const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
-
-        this.$apollo
-          .mutate({
-            mutation: CREATE_LETTER_ELEMENT_MUTATION,
-            variables: {
-              createInput: {
-                sequence: nextSequence,
-                letterId: this.theLetter.id,
-                letterElementTypeId: this.imageTypeElementId,
-                imageId: this.selectedImage.value,
-              },
-            },
-          })
-          .then(({ data }) => {
-            console.log("done!", data);
-            this.cancelImageSelection();
-            this.refreshPage();
-          })
-          .catch((error) => {
-            console.log("there appears to have been an error: ", error);
-          });
-      }
-    },
-
     addNonChartElement(
-      letterElementType: OneLetter_letter_letterElements_letterElementType
+      letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
     ): void {
       const nextSequence = this.nextSequenceNumber(this.surveyLetterElements);
 
@@ -770,14 +470,14 @@ export default Vue.extend({
         const emptyTextDelta = new Delta();
         createInput = {
           sequence: nextSequence,
-          letterId: this.theLetter.id,
+          letterId: this.surveyLetter.letter.id,
           letterElementTypeId: letterElementType.id,
           textDelta: JSON.stringify(emptyTextDelta),
         };
       } else {
         createInput = {
           sequence: nextSequence,
-          letterId: this.theLetter.id,
+          letterId: this.surveyLetter.letter.id,
           letterElementTypeId: letterElementType.id,
         };
       }
@@ -800,9 +500,11 @@ export default Vue.extend({
     },
 
     refreshPage(): void {
-      this.$apollo.queries.theLetter.refetch().then(({ data }) => {
-        console.log("letter data refetched! ", data);
-      });
+      /////////// FIX ME
+      console.error("REFRESH PAGE");
+      // this.$apollo.queries.surveyLetter.letter.refetch().then(({ data }) => {
+      //   console.log("letter data refetched! ", data);
+      // });
     },
 
     letterElement(key: string): string {
@@ -813,7 +515,9 @@ export default Vue.extend({
       }
     },
 
-    imageId(element: OneLetter_letter_letterElements): number {
+    imageId(
+      element: SurveyLetters_surveyLetters_letter_letterElements
+    ): number {
       if (
         element.letterElementType.key === LetterElementEnum.IMAGE &&
         element.image !== null
@@ -826,7 +530,7 @@ export default Vue.extend({
 
     setEditModeOn(element: LetterElement): void {
       element.editModeOn = true;
-      console.log("edit mode on!", this.theLetter.letterElements);
+      console.log("edit mode on!", this.surveyLetter.letter.letterElements);
     },
 
     setEditModeOff(element: LetterElement): void {
@@ -842,7 +546,9 @@ export default Vue.extend({
       this.emailEditModeOn = false;
     },
 
-    letterElementDescription(element: OneLetter_letter_letterElements): string {
+    letterElementDescription(
+      element: SurveyLetters_surveyLetters_letter_letterElements
+    ): string {
       if (
         element.letterElementType.key === LetterElementEnum.CHART &&
         element.surveyDimension !== null
@@ -870,10 +576,11 @@ export default Vue.extend({
 
     letterInfoUpdated(): void {
       // letter information has been successfully updated....
-      console.log("letter info updated!");
-      this.$apollo.queries.theLetter.refetch().then(({ data }) => {
-        console.log("survey data refetched! ", data);
-      });
+      console.log("FIX ME ----- letter info updated!");
+      //////////// FIXME
+      // this.$apollo.queries.surveyLetter.letter.refetch().then(({ data }) => {
+      //   console.log("survey data refetched! ", data);
+      // });
       this.editModeOn = false;
     },
 

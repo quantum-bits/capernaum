@@ -16,7 +16,7 @@
                 <router-link
                   :to="{
                     name: 'surveys',
-                    params: { surveyId: surveyLetter.survey.id },
+                    params: { surveyLetterId: surveyLetter.survey.id },
                   }"
                 >
                   {{ surveyLetter.survey.qualtricsName }}
@@ -135,7 +135,6 @@ export default Vue.extend({
     },
 
     viewLetter(surveyLetter: SurveyLetters_surveyLetters): void {
-      console.log("item: ", surveyLetter);
       console.log("view letter!");
       this.$router.push({
         name: "compose",
