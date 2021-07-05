@@ -24,7 +24,7 @@ export const ALL_IMAGES_QUERY = gql`
 
 export const ONE_IMAGE_QUERY = gql`
   query OneImage($id: Int!) {
-    image(id: $id) {
+    imageDetails: image(id: $id) {
       id
       title
       url

@@ -13,15 +13,15 @@
     />
 
     <slot v-bind:knobs="{ valid, submit }">
-      <v-btn disabled="true">THIS WON'T WORK</v-btn>
+      <v-btn disabled="true">OVERRIDE SLOT!</v-btn>
     </slot>
 
-    <snackbar :content="snackbarContent" />
+    <snackbar ref="snackbar" />
   </v-form>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import {
   ADD_LETTER_MUTATION,
   UPDATE_LETTER_MUTATION,
@@ -34,7 +34,14 @@ import {
   UpdateLetterVariables,
 } from "@/graphql/types/UpdateLetter";
 
-export default Vue.extend({
+type VueExt = Vue & {
+  $refs: {
+    snackbar: { trigger: (s: string) => void };
+    form: { validate: () => boolean };
+  };
+};
+
+export default (Vue as VueConstructor<VueExt>).extend({
   name: "LetterDetailsForm",
 
   components: { Snackbar },
@@ -59,14 +66,16 @@ export default Vue.extend({
       rules: {
         required: [(v: string) => !!v || "Required"],
       },
-
-      snackbarContent: "",
     };
   },
 
   methods: {
     validateForm() {
-      return (this.$refs.form as Vue & { validate: () => boolean }).validate();
+      return this.$refs.form.validate();
+    },
+
+    triggerSnackbar(content: string) {
+      this.$refs.snackbar.trigger(content);
     },
 
     submit(): void {
@@ -77,7 +86,7 @@ export default Vue.extend({
           this.updateLetter();
         }
       } else {
-        this.snackbarContent = "Your entry has problems.";
+        this.triggerSnackbar("Your entry has problems.");
       }
     },
 
@@ -98,10 +107,11 @@ export default Vue.extend({
           },
         })
         .then((result) => {
+          this.triggerSnackbar("Letter added successfully");
           this.$emit("letter-created", result.data?.createLetter.id);
         })
         .catch((error) => {
-          this.snackbarContent = `Sorry, there was error (${error})`;
+          this.triggerSnackbar(`Sorry, there was error (${error})`);
         });
     },
 
@@ -118,10 +128,11 @@ export default Vue.extend({
           },
         })
         .then((result) => {
+          this.triggerSnackbar("Letter updated successfully");
           this.$emit("letter-info-updated", result.data?.updateLetter.id);
         })
         .catch((error) => {
-          this.snackbarContent = `Sorry, there was error (${error})`;
+          this.triggerSnackbar(`Sorry, there was error (${error})`);
         });
     },
   },

@@ -39,13 +39,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
-import LetterTextArea from "@/pages/compose/LetterTextArea.vue";
-import { LetterTypeEnum } from "@/types/letter.types";
-import LetterDetailsForm from "@/pages/compose/LetterDetailsForm.vue";
+import LetterTextArea from "@/pages/letters/LetterTextArea.vue";
+import LetterDetailsForm from "@/pages/letters/LetterDetailsForm.vue";
 import StaticInfoList, {
   StaticInfoItem,
 } from "@/components/lists/StaticInfoList.vue";
-import prettyFormat from "pretty-format";
 
 export default Vue.extend({
   name: "LetterDetailsTab",
@@ -84,16 +82,12 @@ export default Vue.extend({
     },
 
     emailDescription(): string {
-      return this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
-        ? "Email to Group Admin"
-        : "Email to Respondent";
-    },
-  },
-
-  methods: {
-    dump(arg: any) {
-      console.debug(prettyFormat(arg));
-      return arg;
+      // return
+      // FIXME
+      // this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
+      //   ? "Email to Group Admin"
+      //   :
+      return "Email";
     },
   },
 });

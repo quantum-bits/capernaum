@@ -274,7 +274,6 @@ import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import { AllGroups_groups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
-import { LetterTypeEnum } from "@/types/letter.types";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
 import { quillDeltaToHtml } from "@/helpers/quill";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
@@ -382,18 +381,20 @@ export default Vue.extend({
 
   computed: {
     isGroupLetter(): boolean {
-      return this.chosenLetterType.key === LetterTypeEnum.GROUP;
+      return true;
+      // FIXME return this.chosenLetterType.key === LetterTypeEnum.GROUP;
     },
 
     groupSelected(): boolean {
       return (
-        this.chosenLetterType.key === LetterTypeEnum.GROUP &&
+        // FIXME--  this.chosenLetterType.key === LetterTypeEnum.GROUP &&
         this.chosenGroup !== null
       );
     },
 
     isIndividualLetter(): boolean {
-      return this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL;
+      return true;
+      // FIXME - return this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL;
     },
 
     availableSurveys(): Array<Record<string, string>> {
@@ -420,11 +421,12 @@ export default Vue.extend({
   methods: {
     updateData(chosenLetterType: ReadLetterTypes_readLetterTypes) {
       console.log("letter type updated: ", chosenLetterType);
-      if (chosenLetterType.key === LetterTypeEnum.GROUP) {
-        this.fetchGroups();
-      } else if (chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
-        this.fetchAllResponses();
-      }
+      // FIXME
+      // if (chosenLetterType.key === LetterTypeEnum.GROUP) {
+      //   this.fetchGroups();
+      // } else if (chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
+      //   this.fetchAllResponses();
+      // }
     },
 
     fetchGroups() {
@@ -490,10 +492,11 @@ export default Vue.extend({
       let numIndividualLetters = 0;
       let htmlContent = "<p>Survey results</p>";
       surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
-        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          htmlContent = quillDeltaToHtml(surveyLetter.letter.emailMessage);
-          numIndividualLetters += 1;
-        }
+        // FIXME
+        // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+        //   htmlContent = quillDeltaToHtml(surveyLetter.letter.emailMessage);
+        //   numIndividualLetters += 1;
+        // }
       });
 
       if (numIndividualLetters === 0) {
@@ -515,10 +518,11 @@ export default Vue.extend({
       let numIndividualLetters = 0;
       let letterId = -Infinity;
       surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
-        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          letterId = surveyLetter.letter.id;
-          numIndividualLetters += 1;
-        }
+        // FIXME
+        // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+        //   letterId = surveyLetter.letter.id;
+        //   numIndividualLetters += 1;
+        // }
       });
       if (numIndividualLetters === 0) {
         throw Error("Survey has no individual letter");
@@ -561,9 +565,10 @@ export default Vue.extend({
     hasIndividualLetter(item: SurveyResponse) {
       let hasIndividualLetter = false;
       item.survey.surveyLetters.forEach((surveyLetter) => {
-        if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-          hasIndividualLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
-        }
+        // FIXME
+        // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+        //   hasIndividualLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
+        // }
       });
       return hasIndividualLetter;
     },
@@ -610,20 +615,21 @@ export default Vue.extend({
 
     letterTitle(item: SurveyResponse) {
       let letterTitle = "No letter"; // default
-      if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
-        console.log("individual letter!", item);
-        item.survey.surveyLetters.forEach((surveyLetter) => {
-          if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-            letterTitle = surveyLetter.letter.title;
-          }
-        });
-      } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
-        item.survey.surveyLetters.forEach((surveyLetter) => {
-          if (surveyLetter.letterType.key === LetterTypeEnum.GROUP) {
-            letterTitle = surveyLetter.letter.title;
-          }
-        });
-      }
+      // FIXME
+      // if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
+      //   console.log("individual letter!", item);
+      //   item.survey.surveyLetters.forEach((surveyLetter) => {
+      //     if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
+      //       letterTitle = surveyLetter.letter.title;
+      //     }
+      //   });
+      // } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
+      //   item.survey.surveyLetters.forEach((surveyLetter) => {
+      //     if (surveyLetter.letterType.key === LetterTypeEnum.GROUP) {
+      //       letterTitle = surveyLetter.letter.title;
+      //     }
+      //   });
+      // }
       return letterTitle;
     },
 

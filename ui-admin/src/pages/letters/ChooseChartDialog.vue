@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SelectedItem } from "@/pages/compose/Compose.vue";
+import { SelectedItem } from "@/pages/letters/Compose.vue";
 import {
   SurveyLetters_surveyLetters,
   SurveyLetters_surveyLetters_survey_surveyDimensions,
@@ -49,11 +49,6 @@ export default Vue.extend({
   props: {
     surveyLetter: {
       type: Object as () => SurveyLetters_surveyLetters,
-      required: true,
-    },
-    visible: {
-      type: Boolean,
-      default: false,
       required: true,
     },
   },

@@ -2,7 +2,7 @@
   <v-snackbar v-model="visible" :timeout="timeout">
     {{ content }}
     <template v-slot:action="{ attrs }">
-      <v-btn color="pink" text v-bind="attrs" @click="visible = false">
+      <v-btn color="white" text v-bind="attrs" @click="visible = false">
         Close
       </v-btn>
     </template>
@@ -16,19 +16,19 @@ export default Vue.extend({
   name: "Snackbar",
 
   props: {
-    content: { type: String, required: true, default: null },
-    timeout: { type: Number, default: 2000 },
+    timeout: { type: Number, required: false },
   },
 
   data() {
     return {
+      content: "",
       visible: false,
     };
   },
 
-  watch: {
-    // Trigger snackbar when parent changes content prop.
-    content: function () {
+  methods: {
+    trigger(content: string) {
+      this.content = content;
       this.visible = true;
     },
   },

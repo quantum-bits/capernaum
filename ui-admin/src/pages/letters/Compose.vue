@@ -46,11 +46,11 @@ import {
   SurveyLetters_surveyLetters_letter_letterElements,
 } from "@/graphql/types/SurveyLetters";
 import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
-import ChooseChartDialog from "@/pages/compose/ChooseChartDialog.vue";
-import ChooseImageDialog from "@/pages/compose/ChooseImageDialog.vue";
-import LetterDetailsTab from "@/pages/compose/LetterDetailsTab.vue";
-import LetterContentTab from "@/pages/compose/LetterContentTab.vue";
-import LetterPreviewTab from "@/pages/compose/LetterPreviewTab.vue";
+import ChooseChartDialog from "@/pages/letters/ChooseChartDialog.vue";
+import ChooseImageDialog from "@/pages/letters/ChooseImageDialog.vue";
+import LetterDetailsTab from "@/pages/letters/LetterDetailsTab.vue";
+import LetterContentTab from "@/pages/letters/LetterContentTab.vue";
+import LetterPreviewTab from "@/pages/letters/LetterPreviewTab.vue";
 
 interface LetterElement
   extends SurveyLetters_surveyLetters_letter_letterElements {
