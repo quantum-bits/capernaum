@@ -22,10 +22,6 @@ export interface UpdateLetter_updateLetter {
    * Description of letter
    */
   description: string;
-  /**
-   * Date last updated
-   */
-  updated: any;
 }
 
 export interface UpdateLetter {

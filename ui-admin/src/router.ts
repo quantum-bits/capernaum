@@ -30,7 +30,7 @@ const router = new VueRouter({
     {
       path: "/letters",
       name: "letters",
-      component: () => import("./pages/Letters.vue"),
+      component: () => import("./pages/letters/LettersPage.vue"),
     },
     {
       path: "/qualtrics",
@@ -45,7 +45,7 @@ const router = new VueRouter({
     {
       path: "/compose/:surveyLetterId?",
       name: "compose",
-      component: () => import("./pages/letters/Compose.vue"),
+      component: () => import("./pages/letters/ComposePage.vue"),
     },
     {
       path: "/responses",

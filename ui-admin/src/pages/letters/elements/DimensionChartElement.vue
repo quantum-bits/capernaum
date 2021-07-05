@@ -1,5 +1,8 @@
 <template>
-  <element-card :title="`Dimension (${element.surveyDimension.title})`">
+  <element-card
+    :title="`Dimension (${element.surveyDimension.title})`"
+    :show-content="showContent"
+  >
   </element-card>
 </template>
 
@@ -18,6 +21,7 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
+    showContent: { type: Boolean, default: true },
   },
 });
 </script>

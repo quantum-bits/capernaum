@@ -80,6 +80,14 @@ export class LetterElementResolver {
     return this.letterElementService.update(updateInput);
   }
 
+  @Mutation(() => [LetterElement])
+  resequenceLetterElements(
+    @Args({ name: "letterElementIds", type: () => [Int] })
+    letterElementIds: number[]
+  ) {
+    return this.letterElementService.resequence(letterElementIds);
+  }
+
   @Mutation(() => Int)
   deleteLetterElement(@Args({ name: "id", type: () => Int }) id: number) {
     return this.letterElementService.delete(id);

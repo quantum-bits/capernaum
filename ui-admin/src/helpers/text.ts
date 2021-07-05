@@ -12,6 +12,7 @@ export function truncateWords(value: string, maxLength = 10): string {
 
 /**
  * Quick-and-dirty function to strip out HTML tags.
+ * Tried using the `html-to-text` package, but it doesn't play nice on the browser side.
  * @param value String containing HTML tags
  */
 export function stripHtmlTags(value: string): string {

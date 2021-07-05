@@ -1,5 +1,9 @@
 <template>
-  <element-card :title="`Image (${element.image.title})`">
+  <element-card
+    :title="`Image (${element.image.title})`"
+    :show-content="showContent"
+    :more-data="element.id"
+  >
     <v-img
       v-if="imageDetails"
       :src="imageDetails.url"
@@ -16,7 +20,7 @@
 import Vue from "vue";
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
-import { OneImage, OneImage_image } from "@/graphql/types/OneImage";
+import { OneImage, OneImage_imageDetails } from "@/graphql/types/OneImage";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 
 export default Vue.extend({
@@ -30,11 +34,12 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
+    showContent: { type: Boolean, default: true },
   },
 
   data() {
     return {
-      imageDetails: {} as OneImage_image,
+      imageDetails: {} as OneImage_imageDetails,
     };
   },
 
@@ -46,7 +51,7 @@ export default Vue.extend({
           id: this.element.image?.id,
         },
       })
-      .then((result) => (this.imageDetails = result.data.image));
+      .then((result) => (this.imageDetails = result.data.imageDetails));
   },
 });
 </script>

@@ -1,5 +1,9 @@
 <template>
-  <element-card :title="title">
+  <element-card
+    :title="title"
+    :show-content="showContent"
+    :more-data="element.id"
+  >
     <span v-html="textHtml" />
   </element-card>
 </template>
@@ -20,6 +24,7 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
+    showContent: { type: Boolean, default: true },
   },
 
   computed: {

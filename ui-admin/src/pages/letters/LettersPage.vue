@@ -72,7 +72,7 @@ import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 
 export default Vue.extend({
-  name: "Letters",
+  name: "LettersPage",
 
   components: {
     NewLetterButton,

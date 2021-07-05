@@ -1,5 +1,6 @@
 <template>
-  <element-card title="SE Prediction"> </element-card>
+  <element-card title="SE Prediction" :show-content="showContent">
+  </element-card>
 </template>
 
 <script lang="ts">
@@ -17,6 +18,7 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
+    showContent: { type: Boolean, default: true },
   },
 });
 </script>

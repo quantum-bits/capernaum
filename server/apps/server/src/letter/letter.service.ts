@@ -10,13 +10,14 @@ import {
   LetterType,
   LetterTypeCreateInput,
   LetterTypeUpdateInput,
-  LetterUpdateInput,
+  LetterUpdateInput
 } from "./entities";
 import { Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 import { SurveyDimension } from "@server/src/survey/entities";
 import { Image } from "@server/src/image/entities";
+import * as _ from "lodash";
 
 const debug = getDebugger("letter");
 
@@ -124,23 +125,62 @@ export class LetterTypeService extends BaseService<LetterType> {
 export class LetterElementService extends BaseService<LetterElement> {
   constructor(
     @InjectRepository(LetterElement)
-    private readonly letterElementRepo: Repository<LetterElement>
+    private readonly repo: Repository<LetterElement>
   ) {
-    super(letterElementRepo);
+    super(repo);
   }
 
   create(createInput: LetterElementCreateInput) {
-    return this.letterElementRepo.create(createInput);
+    return this.repo.create(createInput);
   }
 
   update(updateInput: LetterElementUpdateInput) {
-    return this.letterElementRepo
+    return this.repo
       .preload(updateInput)
-      .then((result) => this.letterElementRepo.save(result));
+      .then((result) => this.repo.save(result));
+  }
+
+  /**
+   * Resequence letter elements with the given IDs. Set their sequence numbers
+   * to their position (index) in the array, save in the DB, and return the
+   * updated letter elements.
+   * @param letterElementIds array of letter element IDs in the desired order
+   */
+  async resequence(letterElementIds: number[]) {
+    function debugLetterElements(msge, letterElements) {
+      debug(
+        `${msge} %O`,
+        _.map(letterElements, (elt) => _.pick(elt, ["id", "sequence"]))
+      );
+    }
+
+    // Create a map of the new index of each letter element.
+    const letterElementIdToNewIndex = new Map<number, number>(
+      _.map(letterElementIds, (id, idx) => [id, idx])
+    );
+    debug("map %o", letterElementIdToNewIndex);
+
+    // Get the letter elements.
+    const letterElements = await this.repo.findByIds(letterElementIds);
+    debugLetterElements("from database", letterElements);
+
+    // Resequence the letter elements.
+    _.forEach(letterElements, (elt) => {
+      elt.sequence = letterElementIdToNewIndex.get(elt.id);
+    });
+    debugLetterElements("resequenced", letterElements);
+
+    // Save the resequenced elements to the database.
+    await this.repo.save(letterElements);
+
+    // Fetch with additional relations to make client happier.
+    return this.repo.findByIds(letterElementIds, {
+      relations: ["letterElementType"],
+    });
   }
 
   delete(id: number) {
-    return this.letterElementRepo.delete(id).then((result) => result.affected);
+    return this.repo.delete(id).then((result) => result.affected);
   }
 
   resolveRelatedImage(letterElement: LetterElement): Image {

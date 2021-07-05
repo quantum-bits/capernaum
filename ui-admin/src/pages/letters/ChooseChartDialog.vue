@@ -36,7 +36,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { SelectedItem } from "@/pages/letters/Compose.vue";
+import { SelectedItem } from "@/pages/letters/ComposePage.vue";
 import {
   SurveyLetters_surveyLetters,
   SurveyLetters_surveyLetters_survey_surveyDimensions,

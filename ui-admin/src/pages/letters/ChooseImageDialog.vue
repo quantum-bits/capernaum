@@ -39,7 +39,7 @@ import Vue from "vue";
 import * as _ from "lodash";
 import { AllImages_imageDetails } from "@/graphql/types/AllImages";
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
-import { SelectedItem } from "@/pages/letters/Compose.vue";
+import { SelectedItem } from "@/pages/letters/ComposePage.vue";
 import { CREATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
 import { SurveyLetters_surveyLetters_letter } from "@/graphql/types/SurveyLetters";
 

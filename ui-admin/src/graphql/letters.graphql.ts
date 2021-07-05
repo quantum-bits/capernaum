@@ -225,3 +225,16 @@ export const SEND_LETTER_MUTATION = gql`
     }
   }
 `;
+
+export const RESEQUENCE_LETTER_ELEMENTS = gql`
+  mutation Resequence($letterElementIds: [Int!]!) {
+    resequenceLetterElements(letterElementIds: $letterElementIds) {
+      id
+      sequence
+      letterElementType {
+        id
+        key
+      }
+    }
+  }
+`;

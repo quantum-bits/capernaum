@@ -42,7 +42,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
-import { OneImage, OneImage_image } from "@/graphql/types/OneImage";
+import { OneImage, OneImage_imageDetails } from "@/graphql/types/OneImage";
 
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 
@@ -55,8 +55,8 @@ export default Vue.extend({
         return { id: this.imageId };
       },
       update(data: OneImage) {
-        console.log("image fetched! ", data.image);
-        return data.image;
+        console.log("image fetched! ", data.imageDetails);
+        return data.imageDetails;
       },
       skip() {
         if (this.imageId === -Infinity) {
@@ -82,7 +82,7 @@ export default Vue.extend({
   data() {
     return {
       letterElements: [] as SurveyLetters_surveyLetters_letter_letterElements[],
-      theImage: null as OneImage_image | null,
+      theImage: null as OneImage_imageDetails | null,
     };
   },
 

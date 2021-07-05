@@ -1,13 +1,33 @@
 <template>
   <v-card v-if="surveyLetter">
     <v-card-title>
-      {{ surveyLetter.letter.title }}
-      <v-spacer />
-      <letter-element-menu
-        :letterType="surveyLetter.letterType"
-        @click="addElement($event)"
-        offset-y
-      />
+      <v-container>
+        <v-row align="baseline" justify="space-between">
+          <v-col cols="auto">
+            {{ surveyLetter.letter.title }}
+          </v-col>
+          <v-col cols="auto">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-switch
+                  v-model="showContent"
+                  label="Show Content"
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+              <span>Drag-and-drop is easier with content hidden.</span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols="auto">
+            <letter-element-menu
+              :letterType="surveyLetter.letterType"
+              @click="addElement($event)"
+              offset-y
+            />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-card-title>
 
     <v-row>
@@ -17,6 +37,7 @@
             <component
               :is="letterElementToComponent(element)"
               :element="element"
+              :showContent="showContent"
             />
           </div>
         </draggable>
@@ -39,6 +60,7 @@ import LetterElementMenu from "@/pages/letters/LetterElementMenu.vue";
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
+  RESEQUENCE_LETTER_ELEMENTS,
 } from "@/graphql/letters.graphql";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 import Delta from "quill-delta";
@@ -53,6 +75,7 @@ import ImageElement from "@/pages/letters/elements/ImageElement.vue";
 import SECountElement from "@/pages/letters/elements/SECountElement.vue";
 import DemographicsElement from "@/pages/letters/elements/DemographicsElement.vue";
 import draggable from "vuedraggable";
+import { Resequence, ResequenceVariables } from "@/graphql/types/Resequence";
 
 const letterElementToComponentMap = new Map<string, string>([
   ["boilerplate-text", "BoilerplateElement"],
@@ -106,6 +129,7 @@ export default Vue.extend({
   data() {
     return {
       letterElements: [] as LetterElement[],
+      showContent: true,
       isNew: false, // true if this is a new letter
     };
   },
@@ -121,10 +145,6 @@ export default Vue.extend({
     dragChange(event: ChangeEvent<LetterElement>) {
       console.log("DRAG CHANGE", event);
       if (event.moved) {
-        const moved = event.moved;
-        console.log(
-          `MOVED ${moved.element.letterElementType.key} ${moved.element.id} ${moved.element.sequence} from ${moved.oldIndex} to ${moved.newIndex}`
-        );
         console.log(
           this.letterElements.map((elt, idx) => ({
             idx,
@@ -133,6 +153,21 @@ export default Vue.extend({
             sequence: elt.sequence,
           }))
         );
+
+        this.$apollo
+          .mutate<Resequence, ResequenceVariables>({
+            mutation: RESEQUENCE_LETTER_ELEMENTS,
+            variables: {
+              letterElementIds: _.map(this.letterElements, (elt) => elt.id),
+            },
+          })
+          .then((result) => {
+            console.log("result", result.data?.resequenceLetterElements);
+          })
+          .catch((err) => {
+            console.error(`Something went wrong: ${err}`);
+            throw err;
+          });
       }
     },
 

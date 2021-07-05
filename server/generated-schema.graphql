@@ -692,6 +692,7 @@ type Mutation {
   sendLetter(mailInput: SendMailInput!): SendMailResponse!
   createLetterElement(createInput: LetterElementCreateInput!): LetterElement!
   updateLetterElement(updateInput: LetterElementUpdateInput!): LetterElement!
+  resequenceLetterElements(letterElementIds: [Int!]!): [LetterElement!]!
   deleteLetterElement(id: Int!): Int!
   createLetter(createInput: LetterCreateInput!): Letter!
   updateLetter(letterData: LetterUpdateInput!): Letter!

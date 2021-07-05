@@ -68,7 +68,6 @@ export interface LetterCreateInput {
   title: string;
   description: string;
   emailMessage: string;
-  isFrozen?: boolean | null;
   surveyId: number;
   letterTypeId: number;
 }
@@ -96,7 +95,6 @@ export interface LetterUpdateInput {
   title?: string | null;
   description?: string | null;
   emailMessage?: string | null;
-  isFrozen?: boolean | null;
   surveyId?: number | null;
   letterTypeId?: number | null;
 }

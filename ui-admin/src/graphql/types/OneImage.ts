@@ -7,14 +7,14 @@
 // GraphQL query operation: OneImage
 // ====================================================
 
-export interface OneImage_image_letterElements {
+export interface OneImage_imageDetails_letterElements {
   /**
    * Unique ID for this entity
    */
   id: number;
 }
 
-export interface OneImage_image {
+export interface OneImage_imageDetails {
   /**
    * Unique ID for this entity
    */
@@ -47,11 +47,11 @@ export interface OneImage_image {
   /**
    * Letter elements that use this image
    */
-  letterElements: OneImage_image_letterElements[];
+  letterElements: OneImage_imageDetails_letterElements[];
 }
 
 export interface OneImage {
-  image: OneImage_image;
+  imageDetails: OneImage_imageDetails;
 }
 
 export interface OneImageVariables {
