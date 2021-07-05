@@ -1,7 +1,7 @@
 <template>
   <v-card v-if="surveyLetter">
     <v-card-title>
-      A TITLE RUNS THROUGH IT
+      {{ surveyLetter.letter.title }}
       <v-spacer />
       <letter-element-menu
         :letterType="surveyLetter.letterType"
@@ -12,12 +12,14 @@
 
     <v-row>
       <v-col>
-        <div v-for="element in letterElements" :key="element.id">
-          <component
-            :is="letterElementToComponent(element)"
-            :element="element"
-          />
-        </div>
+        <draggable v-model="letterElements" @change="dragChange">
+          <div v-for="element in letterElements" :key="element.id">
+            <component
+              :is="letterElementToComponent(element)"
+              :element="element"
+            />
+          </div>
+        </draggable>
       </v-col>
     </v-row>
 
@@ -30,7 +32,7 @@
 import Vue from "vue";
 import {
   SurveyLetters_surveyLetters,
-  SurveyLetters_surveyLetters_letter_letterElements,
+  SurveyLetters_surveyLetters_letter_letterElements as LetterElement,
   SurveyLetters_surveyLetters_letter_letterElements_letterElementType,
 } from "@/graphql/types/SurveyLetters";
 import LetterElementMenu from "@/pages/letters/LetterElementMenu.vue";
@@ -50,6 +52,7 @@ import DimensionChartElement from "@/pages/letters/elements/DimensionChartElemen
 import ImageElement from "@/pages/letters/elements/ImageElement.vue";
 import SECountElement from "@/pages/letters/elements/SECountElement.vue";
 import DemographicsElement from "@/pages/letters/elements/DemographicsElement.vue";
+import draggable from "vuedraggable";
 
 const letterElementToComponentMap = new Map<string, string>([
   ["boilerplate-text", "BoilerplateElement"],
@@ -59,6 +62,22 @@ const letterElementToComponentMap = new Map<string, string>([
   ["scripture-engagement-count", "SECountElement"],
   ["demographics", "DemographicsElement"],
 ]);
+
+interface ChangeEvent<T> {
+  added?: {
+    newIndex: number;
+    element: T;
+  };
+  removed?: {
+    oldIndex: number;
+    element: T;
+  };
+  moved?: {
+    newIndex: number;
+    oldIndex: number;
+    element: T;
+  };
+}
 
 export default Vue.extend({
   name: "LetterContentTab",
@@ -74,6 +93,7 @@ export default Vue.extend({
     ImageElement,
     SECountElement,
     DemographicsElement,
+    draggable,
   },
 
   props: {
@@ -85,31 +105,44 @@ export default Vue.extend({
 
   data() {
     return {
+      letterElements: [] as LetterElement[],
       isNew: false, // true if this is a new letter
     };
   },
 
-  computed: {
-    letterElements(): SurveyLetters_surveyLetters_letter_letterElements[] {
-      return _.sortBy(
-        this.surveyLetter.letter.letterElements,
-        (elt) => elt.sequence
-      );
-    },
+  mounted() {
+    this.letterElements = _.sortBy(
+      this.surveyLetter.letter.letterElements,
+      (elt) => elt.sequence
+    );
   },
 
   methods: {
-    letterElementToComponent(
-      letterElement: SurveyLetters_surveyLetters_letter_letterElements
-    ) {
+    dragChange(event: ChangeEvent<LetterElement>) {
+      console.log("DRAG CHANGE", event);
+      if (event.moved) {
+        const moved = event.moved;
+        console.log(
+          `MOVED ${moved.element.letterElementType.key} ${moved.element.id} ${moved.element.sequence} from ${moved.oldIndex} to ${moved.newIndex}`
+        );
+        console.log(
+          this.letterElements.map((elt, idx) => ({
+            idx,
+            id: elt.id,
+            type: elt.letterElementType.key,
+            sequence: elt.sequence,
+          }))
+        );
+      }
+    },
+
+    letterElementToComponent(letterElement: LetterElement) {
       return letterElementToComponentMap.get(
         letterElement.letterElementType.key
       );
     },
 
-    letterElementDescription(
-      element: SurveyLetters_surveyLetters_letter_letterElements
-    ): string {
+    letterElementDescription(element: LetterElement): string {
       if (
         // FIXME - element.letterElementType.key === LetterElementEnum.CHART &&
         element.surveyDimension !== null
@@ -155,7 +188,7 @@ export default Vue.extend({
     resetSequenceProperty(): void {
       // cycles through the elements array and resets the 'order' property to reflect
       // the current ordering of the text boxes
-      this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
+      // this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
     },
 
     addElement(
@@ -218,9 +251,7 @@ export default Vue.extend({
         });
     },
 
-    imageId(
-      element: SurveyLetters_surveyLetters_letter_letterElements
-    ): number {
+    imageId(element: LetterElement): number {
       if (
         // FIXME -- element.letterElementType.key === LetterElementEnum.IMAGE &&
         element.image !== null

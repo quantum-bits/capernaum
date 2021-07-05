@@ -138,7 +138,7 @@ export default Vue.extend({
       console.log("view letter!");
       this.$router.push({
         name: "compose",
-        params: { letterId: surveyLetter.id.toString() },
+        params: { surveyLetterId: surveyLetter.id.toString() },
       });
     },
 

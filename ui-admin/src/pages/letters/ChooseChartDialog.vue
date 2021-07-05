@@ -58,6 +58,7 @@ export default Vue.extend({
       selectionValid: false,
       selectedSurveyDimension: null as null | SelectedItem,
       chartTypeElementId: -Infinity, //used when creating a chart type of letter element
+      visible: false,
     };
   },
 

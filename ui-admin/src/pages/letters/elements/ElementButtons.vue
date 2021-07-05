@@ -1,9 +1,9 @@
 <template>
   <v-card-actions>
     <v-spacer />
-    <v-btn>Edit</v-btn>
-    <v-btn>Save</v-btn>
-    <v-btn>Cancel</v-btn>
+    <v-btn text color="primary">Edit</v-btn>
+    <v-btn text color="warning">Save</v-btn>
+    <v-btn text>Cancel</v-btn>
   </v-card-actions>
 </template>
 

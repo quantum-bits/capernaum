@@ -7,6 +7,7 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 import apolloProvider from "./plugins/apollo";
 import { DateTime } from "luxon";
+import { truncateWords } from "@/helpers";
 
 Vue.config.productionTip = false;
 
@@ -23,6 +24,8 @@ Vue.filter("truncate", function (value: string, maxLength = 100) {
     ? `${value.substring(0, maxLength)}...`
     : value;
 });
+
+Vue.filter("truncateWords", truncateWords);
 
 new Vue({
   router,

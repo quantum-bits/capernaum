@@ -1,20 +1,16 @@
 <template>
-  <v-card>
-    <v-card-title>SE Prediction</v-card-title>
-    <v-card-text> </v-card-text>
-    <element-buttons />
-  </v-card>
+  <element-card title="SE Prediction"> </element-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ElementButtons from "@/pages/letters/elements/ElementButtons.vue";
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
+import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 
 export default Vue.extend({
   name: "SEPredictionElement",
 
-  components: { ElementButtons },
+  components: { ElementCard },
 
   props: {
     element: {
