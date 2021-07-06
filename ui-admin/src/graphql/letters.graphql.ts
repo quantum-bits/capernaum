@@ -238,3 +238,18 @@ export const RESEQUENCE_LETTER_ELEMENTS = gql`
     }
   }
 `;
+
+export const LETTER_ELEMENTS_BY_TYPE = gql`
+  query LetterElementsByType {
+    elementsByLetterType: readLetterTypes {
+      id
+      key
+      description
+      letterElementTypes {
+        id
+        key
+        description
+      }
+    }
+  }
+`;

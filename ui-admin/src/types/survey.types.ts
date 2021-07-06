@@ -16,6 +16,7 @@ export interface SurveyDimension {
   sequence: number;
 }
 
+// FIXME - Stop using this entire file.
 export interface Survey {
   surveyDimensions: SurveyDimension[];
   title: string;

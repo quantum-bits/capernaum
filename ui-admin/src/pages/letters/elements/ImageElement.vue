@@ -3,6 +3,8 @@
     :title="`Image (${element.image.title})`"
     :show-content="showContent"
     :more-data="element.id"
+    :show-top-fab="showTopFab"
+    :menu-items="menuItems"
   >
     <v-img
       v-if="imageDetails"
@@ -22,6 +24,7 @@ import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/typ
 import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
 import { OneImage, OneImage_imageDetails } from "@/graphql/types/OneImage";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
+import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
 
 export default Vue.extend({
   name: "ImageElement",
@@ -35,6 +38,8 @@ export default Vue.extend({
       required: true,
     },
     showContent: { type: Boolean, default: true },
+    showTopFab: { type: Boolean, default: false },
+    menuItems: { type: Array as () => FabMenuItem[], required: true },
   },
 
   data() {

@@ -1,5 +1,5 @@
 <template>
-  <v-card-actions>
+  <v-card-actions class="mb-4">
     <v-spacer />
     <v-btn text color="primary" :disabled="!editEnabled" @click="enterEditMode">
       Edit

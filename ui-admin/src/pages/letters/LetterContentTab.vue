@@ -33,11 +33,13 @@
     <v-row>
       <v-col>
         <draggable v-model="letterElements" @change="dragChange">
-          <div v-for="element in letterElements" :key="element.id">
+          <div v-for="(element, idx) in letterElements" :key="element.id">
             <component
               :is="letterElementToComponent(element)"
               :element="element"
               :showContent="showContent"
+              :showTopFab="idx === 0"
+              :menu-items="fabMenuItems"
             />
           </div>
         </draggable>
@@ -60,6 +62,7 @@ import LetterElementMenu from "@/pages/letters/LetterElementMenu.vue";
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
+  LETTER_ELEMENTS_BY_TYPE,
   RESEQUENCE_LETTER_ELEMENTS,
 } from "@/graphql/letters.graphql";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
@@ -76,6 +79,8 @@ import SECountElement from "@/pages/letters/elements/SECountElement.vue";
 import DemographicsElement from "@/pages/letters/elements/DemographicsElement.vue";
 import draggable from "vuedraggable";
 import { Resequence, ResequenceVariables } from "@/graphql/types/Resequence";
+import { LetterElementsByType_elementsByLetterType } from "@/graphql/types/LetterElementsByType";
+import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
 
 const letterElementToComponentMap = new Map<string, string>([
   ["boilerplate-text", "BoilerplateElement"],
@@ -119,6 +124,12 @@ export default Vue.extend({
     draggable,
   },
 
+  apollo: {
+    elementsByLetterType: {
+      query: LETTER_ELEMENTS_BY_TYPE,
+    },
+  },
+
   props: {
     surveyLetter: {
       type: Object as () => SurveyLetters_surveyLetters,
@@ -128,10 +139,33 @@ export default Vue.extend({
 
   data() {
     return {
+      elementsByLetterType: [] as LetterElementsByType_elementsByLetterType[],
+      fabMenuItems: [] as FabMenuItem[],
       letterElements: [] as LetterElement[],
       showContent: true,
       isNew: false, // true if this is a new letter
     };
+  },
+
+  watch: {
+    elementsByLetterType(newVal) {
+      const letterElements = _.find(newVal, [
+        "key",
+        this.surveyLetter.letterType.key,
+      ]);
+      if (!letterElements) {
+        throw new Error(
+          `Can't find elements for letter type '${this.surveyLetter.letterType.key}'`
+        );
+      }
+      this.fabMenuItems = _.map(
+        _.sortBy(letterElements.letterElementTypes, ["description"]),
+        (elementTypes) => ({
+          text: elementTypes.description,
+          value: elementTypes.key,
+        })
+      );
+    },
   },
 
   mounted() {
@@ -143,7 +177,6 @@ export default Vue.extend({
 
   methods: {
     dragChange(event: ChangeEvent<LetterElement>) {
-      console.log("DRAG CHANGE", event);
       if (event.moved) {
         console.log(
           this.letterElements.map((elt, idx) => ({

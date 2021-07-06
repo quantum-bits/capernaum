@@ -3,6 +3,8 @@
     :title="title"
     :show-content="showContent"
     :more-data="element.id"
+    :show-top-fab="showTopFab"
+    :menu-items="menuItems"
   >
     <span v-html="textHtml" />
   </element-card>
@@ -13,6 +15,7 @@ import Vue from "vue";
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 import { quillDeltaToHtml, stripHtmlTags, truncateWords } from "@/helpers";
+import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
 
 export default Vue.extend({
   name: "BoilerplateElement",
@@ -25,6 +28,8 @@ export default Vue.extend({
       required: true,
     },
     showContent: { type: Boolean, default: true },
+    showTopFab: { type: Boolean, default: false },
+    menuItems: { type: Array as () => FabMenuItem[], required: true },
   },
 
   computed: {
