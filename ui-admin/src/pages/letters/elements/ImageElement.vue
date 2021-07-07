@@ -6,15 +6,19 @@
     :show-top-fab="showTopFab"
     :menu-items="menuItems"
   >
-    <v-img
-      v-if="imageDetails"
-      :src="imageDetails.url"
-      :alt="imageDetails.title"
-      max-height="100"
-      :width="400"
-      aspect-ratio="1"
-      :contain="true"
-    />
+    <v-row>
+      <v-col align="center">
+        <v-img
+          v-if="imageDetails"
+          :src="imageDetails.url"
+          :alt="imageDetails.title"
+          max-height="100"
+          :width="400"
+          aspect-ratio="1"
+          :contain="true"
+        />
+      </v-col>
+    </v-row>
   </element-card>
 </template>
 

@@ -1,54 +1,56 @@
 <template>
-  <v-card v-if="surveyLetter">
-    <v-card-title>
-      <v-container>
-        <v-row align="baseline" justify="space-between">
-          <v-col cols="auto">
-            {{ surveyLetter.letter.title }}
-          </v-col>
-          <v-col cols="auto">
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <v-switch
-                  v-model="showContent"
-                  label="Show Content"
-                  v-bind="attrs"
-                  v-on="on"
-                />
-              </template>
-              <span>Drag-and-drop is easier with content hidden.</span>
-            </v-tooltip>
-          </v-col>
-          <v-col cols="auto">
-            <letter-element-menu
-              :letterType="surveyLetter.letterType"
-              @click="addElement($event)"
-              offset-y
-            />
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card-title>
+  <v-container>
+    <v-card v-if="surveyLetter" elevation="0">
+      <v-card-title>
+        <v-container>
+          <v-row align="baseline" justify="space-between">
+            <v-col cols="auto">
+              {{ surveyLetter.letter.title }}
+            </v-col>
+            <v-col cols="auto">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-switch
+                    v-model="showContent"
+                    label="Show Content"
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+                <span>Drag-and-drop is easier with content hidden.</span>
+              </v-tooltip>
+            </v-col>
+            <v-col cols="auto">
+              <letter-element-menu
+                :letterType="surveyLetter.letterType"
+                @click="addElement($event)"
+                offset-y
+              />
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-title>
 
-    <v-row>
-      <v-col>
-        <draggable v-model="letterElements" @change="dragChange">
-          <div v-for="(element, idx) in letterElements" :key="element.id">
-            <component
-              :is="letterElementToComponent(element)"
-              :element="element"
-              :showContent="showContent"
-              :showTopFab="idx === 0"
-              :menu-items="fabMenuItems"
-            />
-          </div>
-        </draggable>
-      </v-col>
-    </v-row>
+      <v-row>
+        <v-col>
+          <draggable v-model="letterElements" @change="dragChange">
+            <div v-for="(element, idx) in letterElements" :key="element.id">
+              <component
+                :is="letterElementToComponent(element)"
+                :element="element"
+                :showContent="showContent"
+                :showTopFab="idx === 0"
+                :menu-items="fabMenuItems"
+              />
+            </div>
+          </draggable>
+        </v-col>
+      </v-row>
 
-    <choose-chart-dialog :survey-letter="surveyLetter" />
-    <choose-image-dialog :letter="surveyLetter.letter" />
-  </v-card>
+      <choose-chart-dialog :survey-letter="surveyLetter" />
+      <choose-image-dialog :letter="surveyLetter.letter" />
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
