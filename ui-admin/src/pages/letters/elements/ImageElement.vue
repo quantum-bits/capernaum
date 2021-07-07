@@ -1,13 +1,11 @@
 <template>
   <element-card
     :title="`Image (${element.image.title})`"
-    :show-content="showContent"
     :sub-title="element.id"
-    :show-top-fab="showTopFab"
-    :menu-items="menuItems"
+    :card-data="cardData"
   >
     <v-row>
-      <v-col align="center">
+      <v-col>
         <v-img
           v-if="imageDetails"
           :src="imageDetails.url"
@@ -28,7 +26,7 @@ import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/typ
 import { ONE_IMAGE_QUERY } from "@/graphql/images.graphql";
 import { OneImage, OneImage_imageDetails } from "@/graphql/types/OneImage";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
-import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
+import { CardData } from "@/pages/letters/LetterContentTab.vue";
 
 export default Vue.extend({
   name: "ImageElement",
@@ -41,9 +39,7 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
-    showContent: { type: Boolean, default: true },
-    showTopFab: { type: Boolean, default: false },
-    menuItems: { type: Array as () => FabMenuItem[], required: true },
+    cardData: { type: Object as () => CardData, required: true },
   },
 
   data() {
@@ -62,5 +58,6 @@ export default Vue.extend({
       })
       .then((result) => (this.imageDetails = result.data.imageDetails));
   },
+
 });
 </script>

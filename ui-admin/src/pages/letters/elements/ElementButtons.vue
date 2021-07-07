@@ -5,7 +5,14 @@
       Edit
     </v-btn>
     <v-btn text color="warning" :disabled="!saveEnabled"> Save </v-btn>
-    <v-btn text color="error" :disabled="!deleteEnabled"> Delete </v-btn>
+    <v-btn
+      text
+      color="error"
+      :disabled="!deleteEnabled"
+      @click="$emit('remove-element')"
+    >
+      Delete
+    </v-btn>
     <v-btn text :disabled="!cancelEnabled" @click="cancelEditMode">
       Cancel
     </v-btn>

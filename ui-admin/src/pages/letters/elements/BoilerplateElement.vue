@@ -1,11 +1,5 @@
 <template>
-  <element-card
-    :title="title"
-    :show-content="showContent"
-    :sub-title="element.id"
-    :show-top-fab="showTopFab"
-    :menu-items="menuItems"
-  >
+  <element-card :title="title" :sub-title="element.id" :card-data="cardData">
     <span v-html="textHtml" />
   </element-card>
 </template>
@@ -15,7 +9,7 @@ import Vue from "vue";
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 import { quillDeltaToHtml, stripHtmlTags, truncateWords } from "@/helpers";
-import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
+import { CardData } from "@/pages/letters/LetterContentTab.vue";
 
 export default Vue.extend({
   name: "BoilerplateElement",
@@ -27,20 +21,18 @@ export default Vue.extend({
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
-    showContent: { type: Boolean, default: true },
-    showTopFab: { type: Boolean, default: false },
-    menuItems: { type: Array as () => FabMenuItem[], required: true },
+    cardData: { type: Object as () => CardData, required: true },
   },
 
   computed: {
+    title(): string {
+      return `Text (${truncateWords(stripHtmlTags(this.textHtml))}...)`;
+    },
+
     textHtml(): string {
       return this.element.textDelta
         ? quillDeltaToHtml(this.element.textDelta)
         : "NO QUILL DELTA";
-    },
-
-    title(): string {
-      return `Text (${truncateWords(stripHtmlTags(this.textHtml))}...)`;
     },
   },
 });

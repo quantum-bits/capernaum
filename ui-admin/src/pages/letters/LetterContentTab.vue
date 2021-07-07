@@ -20,13 +20,6 @@
                 <span>Drag-and-drop is easier with content hidden.</span>
               </v-tooltip>
             </v-col>
-            <v-col cols="auto">
-              <letter-element-menu
-                :letterType="surveyLetter.letterType"
-                @click="addElement($event)"
-                offset-y
-              />
-            </v-col>
           </v-row>
         </v-container>
       </v-card-title>
@@ -38,9 +31,9 @@
               <component
                 :is="letterElementToComponent(element)"
                 :element="element"
-                :showContent="showContent"
-                :showTopFab="idx === 0"
-                :menu-items="fabMenuItems"
+                :card-data="cardData(idx)"
+                @add-element="addElement"
+                @remove-element="removeElement"
               />
             </div>
           </draggable>
@@ -83,6 +76,7 @@ import draggable from "vuedraggable";
 import { Resequence, ResequenceVariables } from "@/graphql/types/Resequence";
 import { LetterElementsByType_elementsByLetterType } from "@/graphql/types/LetterElementsByType";
 import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
+import prettyFormat from "pretty-format";
 
 const letterElementToComponentMap = new Map<string, string>([
   ["boilerplate-text", "BoilerplateElement"],
@@ -93,20 +87,32 @@ const letterElementToComponentMap = new Map<string, string>([
   ["demographics", "DemographicsElement"],
 ]);
 
+interface AddedEvent<T> {
+  newIndex: number;
+  element: T;
+}
+
+interface RemovedEvent<T> {
+  oldIndex: number;
+  element: T;
+}
+
+interface MovedEvent<T> {
+  newIndex: number;
+  oldIndex: number;
+  element: T;
+}
+
 interface ChangeEvent<T> {
-  added?: {
-    newIndex: number;
-    element: T;
-  };
-  removed?: {
-    oldIndex: number;
-    element: T;
-  };
-  moved?: {
-    newIndex: number;
-    oldIndex: number;
-    element: T;
-  };
+  added?: AddedEvent<T>;
+  removed?: RemovedEvent<T>;
+  moved?: MovedEvent<T>;
+}
+
+export interface CardData {
+  positionInList: number;
+  fabMenuItems: FabMenuItem[];
+  showContent: boolean;
 }
 
 export default Vue.extend({
@@ -142,10 +148,11 @@ export default Vue.extend({
   data() {
     return {
       elementsByLetterType: [] as LetterElementsByType_elementsByLetterType[],
-      fabMenuItems: [] as FabMenuItem[],
       letterElements: [] as LetterElement[],
+      isNew: false,
+
+      fabMenuItems: [] as FabMenuItem[],
       showContent: true,
-      isNew: false, // true if this is a new letter
     };
   },
 
@@ -178,32 +185,75 @@ export default Vue.extend({
   },
 
   methods: {
+    cardData(idx: number): CardData {
+      return {
+        fabMenuItems: this.fabMenuItems,
+        showContent: this.showContent,
+        positionInList: idx,
+      };
+    },
+
+    handleMovedElement(event: MovedEvent<LetterElement>) {
+      console.log(
+        `Moved ${event.oldIndex} to ${event.newIndex}:`,
+        prettyFormat(event.element)
+      );
+      console.log(
+        this.letterElements.map((elt, idx) => ({
+          idx,
+          id: elt.id,
+          type: elt.letterElementType.key,
+          sequence: elt.sequence,
+        }))
+      );
+
+      this.$apollo
+        .mutate<Resequence, ResequenceVariables>({
+          mutation: RESEQUENCE_LETTER_ELEMENTS,
+          variables: {
+            letterElementIds: _.map(this.letterElements, (elt) => elt.id),
+          },
+        })
+        .then((result) => {
+          console.log("result", result.data?.resequenceLetterElements);
+        })
+        .catch((err) => {
+          console.error(`Something went wrong: ${err}`);
+          throw err;
+        });
+    },
+
+    handleAddedElement(event: AddedEvent<LetterElement>) {
+      console.log(`Added at ${event.newIndex}:`, prettyFormat(event.element));
+    },
+
+    handleRemovedElement(event: RemovedEvent<LetterElement>) {
+      console.log(
+        `Removed from ${event.oldIndex}:`,
+        prettyFormat(event.element)
+      );
+    },
+
     dragChange(event: ChangeEvent<LetterElement>) {
       if (event.moved) {
-        console.log(
-          this.letterElements.map((elt, idx) => ({
-            idx,
-            id: elt.id,
-            type: elt.letterElementType.key,
-            sequence: elt.sequence,
-          }))
-        );
-
-        this.$apollo
-          .mutate<Resequence, ResequenceVariables>({
-            mutation: RESEQUENCE_LETTER_ELEMENTS,
-            variables: {
-              letterElementIds: _.map(this.letterElements, (elt) => elt.id),
-            },
-          })
-          .then((result) => {
-            console.log("result", result.data?.resequenceLetterElements);
-          })
-          .catch((err) => {
-            console.error(`Something went wrong: ${err}`);
-            throw err;
-          });
+        this.handleMovedElement(event.moved);
+      } else if (event.added) {
+        this.handleAddedElement(event.added);
+      } else if (event.removed) {
+        this.handleRemovedElement(event.removed);
+      } else {
+        throw new Error(`Invalid event: ${event}`);
       }
+    },
+
+    addElement(crackPosition: number, elementTypeKey: string): void {
+      console.log(`Add ${elementTypeKey} at position ${crackPosition}`);
+      this.letterElements.splice(crackPosition, 0, BoilerplateElement as any);
+    },
+
+    removeElement(positionInList: number): void {
+      console.log(`Remove element at position ${positionInList}`);
+      this.letterElements.splice(positionInList, 1);
     },
 
     letterElementToComponent(letterElement: LetterElement) {
@@ -261,24 +311,24 @@ export default Vue.extend({
       // this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
     },
 
-    addElement(
-      letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
-    ): void {
-      // if (letterElementType.key === LetterElementEnum.CHART) {
-      //   console.log("we have a chart!");
-      //   //////////// FIXME
-      //   // this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
-      //   // this.chooseChartTypeDialog = true;
-      // } else if (letterElementType.key === LetterElementEnum.IMAGE) {
-      //   console.log("we have an image!");
-      //   //////////// FIXME
-      //   // this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
-      //   // this.chooseImageDialog = true;
-      // } else {
-      //   console.log("we do not have a chart!");
-      //   this.addNonChartElement(letterElementType);
-      // }
-    },
+    // addElement(
+    //   letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
+    // ): void {
+    //   // if (letterElementType.key === LetterElementEnum.CHART) {
+    //   //   console.log("we have a chart!");
+    //   //   //////////// FIXME
+    //   //   // this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
+    //   //   // this.chooseChartTypeDialog = true;
+    //   // } else if (letterElementType.key === LetterElementEnum.IMAGE) {
+    //   //   console.log("we have an image!");
+    //   //   //////////// FIXME
+    //   //   // this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
+    //   //   // this.chooseImageDialog = true;
+    //   // } else {
+    //   //   console.log("we do not have a chart!");
+    //   //   this.addNonChartElement(letterElementType);
+    //   // }
+    // },
 
     addNonChartElement(
       letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType

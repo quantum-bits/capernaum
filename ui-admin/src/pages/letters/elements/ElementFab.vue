@@ -19,7 +19,7 @@
       <v-list-item
         v-for="(item, idx) in menuItems"
         :key="idx"
-        @click="$emit(item.value)"
+        @click="$emit('add-element', crackPosition, item.value)"
       >
         <v-list-item-title>{{ item.text }}</v-list-item-title>
       </v-list-item>
@@ -41,6 +41,12 @@ export default Vue.extend({
   props: {
     top: { type: Boolean, default: false },
     menuItems: { type: Array as () => FabMenuItem[], required: true },
+    // In which "crack" between elements does this button appear?
+    // For an `n`-element list:
+    //   0 = before first
+    //   1 = after first
+    //   n = after last
+    crackPosition: { type: Number, required: true },
   },
 });
 </script>
