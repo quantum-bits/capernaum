@@ -29,6 +29,8 @@
       </v-list>
     </v-menu>
 
+    <light-dark-switcher />
+
     <v-btn
       text
       href="https://github.com/quantum-bits/capernaum"
@@ -41,9 +43,12 @@
 
 <script>
 import Vue from "vue";
+import LightDarkSwitcher from "@/layouts/LightDarkSwitcher";
 
 export default Vue.extend({
-  name: "ToolBar",
+  name: "AppBar",
+
+  components: { LightDarkSwitcher },
 
   methods: {
     toggleDrawer() {

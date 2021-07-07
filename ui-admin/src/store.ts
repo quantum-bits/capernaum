@@ -10,8 +10,9 @@ export default new Vuex.Store({
   plugins: [createPersistedState()],
 
   state: {
+    user: {}, // Details of logged-in user
+    darkMode: true, // UI in dark mode?
     accessToken: "",
-    user: {},
   },
 
   getters: {
@@ -29,6 +30,10 @@ export default new Vuex.Store({
     logOut(state) {
       state.accessToken = "";
       state.user = {};
+    },
+
+    setDarkMode(state, newValue: boolean) {
+      state.darkMode = newValue;
     },
   },
 });

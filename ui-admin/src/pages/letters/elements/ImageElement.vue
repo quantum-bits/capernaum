@@ -2,7 +2,7 @@
   <element-card
     :title="`Image (${element.image.title})`"
     :show-content="showContent"
-    :more-data="element.id"
+    :sub-title="element.id"
     :show-top-fab="showTopFab"
     :menu-items="menuItems"
   >
