@@ -51,17 +51,15 @@ import Vue from "vue";
 import {
   SurveyLetters_surveyLetters,
   SurveyLetters_surveyLetters_letter_letterElements as LetterElement,
-  SurveyLetters_surveyLetters_letter_letterElements_letterElementType,
 } from "@/graphql/types/SurveyLetters";
 import LetterElementMenu from "@/pages/letters/LetterElementMenu.vue";
 import {
   CREATE_LETTER_ELEMENT_MUTATION,
   DELETE_LETTER_ELEMENT_MUTATION,
-  LETTER_ELEMENTS_BY_TYPE,
+  LETTER_ELEMENT_DETAILS,
   RESEQUENCE_LETTER_ELEMENTS,
 } from "@/graphql/letters.graphql";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
-import Delta from "quill-delta";
 import StaticLetterElement from "@/pages/letters/StaticLetterElement.vue";
 import ChooseChartDialog from "@/pages/letters/ChooseChartDialog.vue";
 import ChooseImageDialog from "@/pages/letters/ChooseImageDialog.vue";
@@ -74,18 +72,36 @@ import SECountElement from "@/pages/letters/elements/SECountElement.vue";
 import DemographicsElement from "@/pages/letters/elements/DemographicsElement.vue";
 import draggable from "vuedraggable";
 import { Resequence, ResequenceVariables } from "@/graphql/types/Resequence";
-import { LetterElementsByType_elementsByLetterType } from "@/graphql/types/LetterElementsByType";
+import {
+  LetterElementsByType,
+  LetterElementsByType_elementsByLetterType,
+} from "@/graphql/types/LetterElementsByType";
 import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
 import prettyFormat from "pretty-format";
+import {
+  CreateLetterElement,
+  CreateLetterElementVariables,
+} from "@/graphql/types/CreateLetterElement";
 
-const letterElementToComponentMap = new Map<string, string>([
-  ["boilerplate-text", "BoilerplateElement"],
-  ["scripture-engagement-prediction", "SEPredictionElement"],
-  ["dimension-chart", "DimensionChartElement"],
-  ["image", "ImageElement"],
-  ["scripture-engagement-count", "SECountElement"],
-  ["demographics", "DemographicsElement"],
-]);
+const letterElementKeyToDetails = new Map<
+  string,
+  {
+    componentName: string;
+    id: number; // Fetched from server.
+  }
+>(
+  _.map(
+    [
+      ["boilerplate-text", "BoilerplateElement"],
+      ["scripture-engagement-prediction", "SEPredictionElement"],
+      ["dimension-chart", "DimensionChartElement"],
+      ["image", "ImageElement"],
+      ["scripture-engagement-count", "SECountElement"],
+      ["demographics", "DemographicsElement"],
+    ],
+    ([key, componentName]) => [key, { componentName, id: -Infinity }]
+  )
+);
 
 interface AddedEvent<T> {
   newIndex: number;
@@ -133,8 +149,23 @@ export default Vue.extend({
   },
 
   apollo: {
-    elementsByLetterType: {
-      query: LETTER_ELEMENTS_BY_TYPE,
+    letterElementDetails: {
+      query: LETTER_ELEMENT_DETAILS,
+      update(result: LetterElementsByType) {
+        // Hang on to the elements in the current letter.
+        this.elementsByLetterType = result.elementsByLetterType;
+
+        // Update the lookup table with PKs from the database.
+        for (const lt of result.allLetterTypes) {
+          const details = letterElementKeyToDetails.get(lt.key);
+          if (details) {
+            details.id = lt.id;
+          } else {
+            throw new Error(`No letterElement ${lt.key}`);
+          }
+        }
+        console.log(prettyFormat(letterElementKeyToDetails));
+      },
     },
   },
 
@@ -248,7 +279,36 @@ export default Vue.extend({
 
     addElement(crackPosition: number, elementTypeKey: string): void {
       console.log(`Add ${elementTypeKey} at position ${crackPosition}`);
-      this.letterElements.splice(crackPosition, 0, BoilerplateElement as any);
+      const letterElementTypeId =
+        letterElementKeyToDetails.get(elementTypeKey)?.id;
+      if (!letterElementTypeId) {
+        throw new Error(`Type ${elementTypeKey} not found`);
+      }
+      const newLetterElement: LetterElementCreateInput = {
+        sequence: crackPosition,
+        letterId: this.surveyLetter.letter.id,
+        letterElementTypeId,
+      };
+
+      this.$apollo
+        .mutate<CreateLetterElement, CreateLetterElementVariables>({
+          mutation: CREATE_LETTER_ELEMENT_MUTATION,
+          variables: {
+            createInput: newLetterElement,
+          },
+        })
+        .then((result) => {
+          console.log("RESULT", result);
+          if (result.data?.createLetterElement) {
+            this.letterElements.splice(
+              crackPosition,
+              0,
+              result.data?.createLetterElement
+            );
+          } else {
+            throw new Error("Failed to retrieve new letter element");
+          }
+        });
     },
 
     removeElement(positionInList: number): void {
@@ -257,32 +317,37 @@ export default Vue.extend({
     },
 
     letterElementToComponent(letterElement: LetterElement) {
-      return letterElementToComponentMap.get(
+      const details = letterElementKeyToDetails.get(
         letterElement.letterElementType.key
       );
-    },
-
-    letterElementDescription(element: LetterElement): string {
-      if (
-        // FIXME - element.letterElementType.key === LetterElementEnum.CHART &&
-        element.surveyDimension !== null
-      ) {
-        return (
-          element.letterElementType.description +
-          " -- " +
-          element.surveyDimension.title
-        );
-      } else if (
-        // FIXME - element.letterElementType.key === LetterElementEnum.IMAGE &&
-        element.image !== null
-      ) {
-        return (
-          element.letterElementType.description + " -- " + element.image.title
-        );
+      if (details) {
+        return details.componentName;
       } else {
-        return element.letterElementType.description;
+        throw new Error(`Can't find letter element ${letterElement}`);
       }
     },
+
+    // letterElementDescription(element: LetterElement): string {
+    //   if (
+    //     // FIXME - element.letterElementType.key === LetterElementEnum.CHART &&
+    //     element.surveyDimension !== null
+    //   ) {
+    //     return (
+    //       element.letterElementType.description +
+    //       " -- " +
+    //       element.surveyDimension.title
+    //     );
+    //   } else if (
+    //     // FIXME - element.letterElementType.key === LetterElementEnum.IMAGE &&
+    //     element.image !== null
+    //   ) {
+    //     return (
+    //       element.letterElementType.description + " -- " + element.image.title
+    //     );
+    //   } else {
+    //     return element.letterElementType.description;
+    //   }
+    // },
 
     deleteElement(letterElementId: number): void {
       console.log(letterElementId);
@@ -305,11 +370,11 @@ export default Vue.extend({
         });
     },
 
-    resetSequenceProperty(): void {
-      // cycles through the elements array and resets the 'order' property to reflect
-      // the current ordering of the text boxes
-      // this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
-    },
+    // resetSequenceProperty(): void {
+    //   // cycles through the elements array and resets the 'order' property to reflect
+    //   // the current ordering of the text boxes
+    //   // this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
+    // },
 
     // addElement(
     //   letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
@@ -330,46 +395,46 @@ export default Vue.extend({
     //   // }
     // },
 
-    addNonChartElement(
-      letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
-    ): void {
-      const nextSequence = 42;
-
-      console.log("letter element type: ", letterElementType);
-      let createInput: LetterElementCreateInput;
-      if (letterElementType.key) {
-        /// FIXME- === LetterElementEnum.BOILERPLATE) {
-        const emptyTextDelta = new Delta();
-        createInput = {
-          sequence: nextSequence,
-          letterId: this.surveyLetter.letter.id,
-          letterElementTypeId: letterElementType.id,
-          textDelta: JSON.stringify(emptyTextDelta),
-        };
-      } else {
-        createInput = {
-          sequence: nextSequence,
-          letterId: this.surveyLetter.letter.id,
-          letterElementTypeId: letterElementType.id,
-        };
-      }
-
-      this.$apollo
-        .mutate({
-          mutation: CREATE_LETTER_ELEMENT_MUTATION,
-          variables: {
-            createInput: createInput,
-          },
-        })
-        .then(({ data }) => {
-          console.log("done!", data);
-          // FIXME --------- this.refreshPage();
-          //this.$emit("letter-created", data.createLetter.id);
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
-    },
+    // addNonChartElement(
+    //   letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
+    // ): void {
+    //   const nextSequence = 42;
+    //
+    //   console.log("letter element type: ", letterElementType);
+    //   let createInput: LetterElementCreateInput;
+    //   if (letterElementType.key) {
+    //     /// FIXME- === LetterElementEnum.BOILERPLATE) {
+    //     const emptyTextDelta = new Delta();
+    //     createInput = {
+    //       sequence: nextSequence,
+    //       letterId: this.surveyLetter.letter.id,
+    //       letterElementTypeId: letterElementType.id,
+    //       textDelta: JSON.stringify(emptyTextDelta),
+    //     };
+    //   } else {
+    //     createInput = {
+    //       sequence: nextSequence,
+    //       letterId: this.surveyLetter.letter.id,
+    //       letterElementTypeId: letterElementType.id,
+    //     };
+    //   }
+    //
+    //   this.$apollo
+    //     .mutate({
+    //       mutation: CREATE_LETTER_ELEMENT_MUTATION,
+    //       variables: {
+    //         createInput: createInput,
+    //       },
+    //     })
+    //     .then(({ data }) => {
+    //       console.log("done!", data);
+    //       // FIXME --------- this.refreshPage();
+    //       //this.$emit("letter-created", data.createLetter.id);
+    //     })
+    //     .catch((error) => {
+    //       console.log("there appears to have been an error: ", error);
+    //     });
+    // },
 
     imageId(element: LetterElement): number {
       if (

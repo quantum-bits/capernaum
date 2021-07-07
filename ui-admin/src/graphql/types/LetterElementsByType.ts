@@ -7,6 +7,21 @@
 // GraphQL query operation: LetterElementsByType
 // ====================================================
 
+export interface LetterElementsByType_allLetterTypes {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter element type name
+   */
+  key: string;
+  /**
+   * Letter element type description
+   */
+  description: string;
+}
+
 export interface LetterElementsByType_elementsByLetterType_letterElementTypes {
   /**
    * Unique ID for this entity
@@ -39,5 +54,6 @@ export interface LetterElementsByType_elementsByLetterType {
 }
 
 export interface LetterElementsByType {
+  allLetterTypes: LetterElementsByType_allLetterTypes[];
   elementsByLetterType: LetterElementsByType_elementsByLetterType[];
 }

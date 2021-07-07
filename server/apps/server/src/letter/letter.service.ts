@@ -10,7 +10,7 @@ import {
   LetterType,
   LetterTypeCreateInput,
   LetterTypeUpdateInput,
-  LetterUpdateInput
+  LetterUpdateInput,
 } from "./entities";
 import { Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
@@ -122,16 +122,55 @@ export class LetterTypeService extends BaseService<LetterType> {
 }
 
 @Injectable()
+export class LetterElementTypeService extends BaseService<LetterElementType> {
+  constructor(
+    @InjectRepository(LetterElementType)
+    private readonly repo: Repository<LetterElementType>
+  ) {
+    super(repo);
+  }
+
+  readAll() {
+    return this.repo.find({ order: { description: "ASC" } });
+  }
+
+  readOne(id: number) {
+    return this.repo.findOneOrFail(id);
+  }
+
+  resolveLetterTypes(letterElementType: LetterElementType) {
+    return this.resolveMany(letterElementType, "letterTypes");
+  }
+}
+
+@Injectable()
 export class LetterElementService extends BaseService<LetterElement> {
   constructor(
+    private readonly letterService: LetterService,
+    private readonly letterElementTypeService: LetterElementTypeService,
     @InjectRepository(LetterElement)
     private readonly repo: Repository<LetterElement>
   ) {
     super(repo);
   }
 
-  create(createInput: LetterElementCreateInput) {
-    return this.repo.create(createInput);
+  async create(createInput: LetterElementCreateInput) {
+    const letter = await this.letterService.readOne(createInput.letterId);
+    const letterElementType = await this.letterElementTypeService.readOne(
+      createInput.letterElementTypeId
+    );
+    const newLetterElement = await this.repo.save(
+      this.repo.create({
+        letter,
+        letterElementType,
+        sequence: createInput.sequence,
+      })
+    );
+    console.log("NEW ELT", createInput, newLetterElement);
+
+    return this.repo.findOneOrFail(newLetterElement.id, {
+      relations: ["letterElementType"],
+    });
   }
 
   update(updateInput: LetterElementUpdateInput) {
@@ -189,23 +228,5 @@ export class LetterElementService extends BaseService<LetterElement> {
 
   resolveRelatedSurveyDimension(letterElement: LetterElement): SurveyDimension {
     return this.resolveOne(letterElement, "surveyDimension");
-  }
-}
-
-@Injectable()
-export class LetterElementTypeService extends BaseService<LetterElementType> {
-  constructor(
-    @InjectRepository(LetterElementType)
-    private readonly repo: Repository<LetterElementType>
-  ) {
-    super(repo);
-  }
-
-  readAll() {
-    return this.repo.find({ order: { description: "ASC" } });
-  }
-
-  resolveLetterTypes(letterElementType: LetterElementType) {
-    return this.resolveMany(letterElementType, "letterTypes");
   }
 }

@@ -139,6 +139,20 @@ export const CREATE_LETTER_ELEMENT_MUTATION = gql`
     createLetterElement(createInput: $createInput) {
       id
       sequence
+      image {
+        id
+        title
+      }
+      surveyDimension {
+        id
+        title
+      }
+      textDelta
+      letterElementType {
+        id
+        key
+        description
+      }
     }
   }
 `;
@@ -239,8 +253,13 @@ export const RESEQUENCE_LETTER_ELEMENTS = gql`
   }
 `;
 
-export const LETTER_ELEMENTS_BY_TYPE = gql`
+export const LETTER_ELEMENT_DETAILS = gql`
   query LetterElementsByType {
+    allLetterTypes: letterElementTypes {
+      id
+      key
+      description
+    }
     elementsByLetterType: readLetterTypes {
       id
       key
