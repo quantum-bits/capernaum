@@ -82,12 +82,18 @@ import {
   CreateLetterElement,
   CreateLetterElementVariables,
 } from "@/graphql/types/CreateLetterElement";
+import {
+  DeleteLetterElement,
+  DeleteLetterElementVariables,
+} from "@/graphql/types/DeleteLetterElement";
 
+// Map letter element key (e.g., `image`) to both the component name to be rendered
+// and the PK of the corresponding letter element in the database.
 const letterElementKeyToDetails = new Map<
   string,
   {
     componentName: string;
-    id: number; // Fetched from server.
+    pk: number; // Fetched from server.
   }
 >(
   _.map(
@@ -99,10 +105,11 @@ const letterElementKeyToDetails = new Map<
       ["scripture-engagement-count", "SECountElement"],
       ["demographics", "DemographicsElement"],
     ],
-    ([key, componentName]) => [key, { componentName, id: -Infinity }]
+    ([key, componentName]) => [key, { componentName, pk: -Infinity }]
   )
 );
 
+// Declarations of types returned by the vuedraggable "change" event.
 interface AddedEvent<T> {
   newIndex: number;
   element: T;
@@ -125,6 +132,7 @@ interface ChangeEvent<T> {
   moved?: MovedEvent<T>;
 }
 
+// Props passed to the ElementCard component behind all type-specific elements.
 export interface CardData {
   positionInList: number;
   fabMenuItems: FabMenuItem[];
@@ -156,12 +164,12 @@ export default Vue.extend({
         this.elementsByLetterType = result.elementsByLetterType;
 
         // Update the lookup table with PKs from the database.
-        for (const lt of result.allLetterTypes) {
-          const details = letterElementKeyToDetails.get(lt.key);
+        for (const letterType of result.allLetterTypes) {
+          const details = letterElementKeyToDetails.get(letterType.key);
           if (details) {
-            details.id = lt.id;
+            details.pk = letterType.id;
           } else {
-            throw new Error(`No letterElement ${lt.key}`);
+            throw new Error(`No letterElement ${letterType.key}`);
           }
         }
         console.log(prettyFormat(letterElementKeyToDetails));
@@ -188,6 +196,7 @@ export default Vue.extend({
   },
 
   watch: {
+    // Extract details for this letter once they arrive from the server.
     elementsByLetterType(newVal) {
       const letterElements = _.find(newVal, [
         "key",
@@ -216,6 +225,7 @@ export default Vue.extend({
   },
 
   methods: {
+    // Construct the data to be passed into each of the letter element cards.
     cardData(idx: number): CardData {
       return {
         fabMenuItems: this.fabMenuItems,
@@ -224,6 +234,19 @@ export default Vue.extend({
       };
     },
 
+    // Map a letter element to its corresponding component name.
+    letterElementToComponent(letterElement: LetterElement) {
+      const details = letterElementKeyToDetails.get(
+        letterElement.letterElementType.key
+      );
+      if (details) {
+        return details.componentName;
+      } else {
+        throw new Error(`Can't find letter element ${letterElement}`);
+      }
+    },
+
+    // An element has been moved via drag-and-drop.
     handleMovedElement(event: MovedEvent<LetterElement>) {
       console.log(
         `Moved ${event.oldIndex} to ${event.newIndex}:`,
@@ -238,6 +261,7 @@ export default Vue.extend({
         }))
       );
 
+      // Issue the request to resequence all the elements in the database.
       this.$apollo
         .mutate<Resequence, ResequenceVariables>({
           mutation: RESEQUENCE_LETTER_ELEMENTS,
@@ -254,10 +278,12 @@ export default Vue.extend({
         });
     },
 
+    // A letter element has been added to the displayed list.
     handleAddedElement(event: AddedEvent<LetterElement>) {
       console.log(`Added at ${event.newIndex}:`, prettyFormat(event.element));
     },
 
+    // A letter element has been removed from the displayed list.
     handleRemovedElement(event: RemovedEvent<LetterElement>) {
       console.log(
         `Removed from ${event.oldIndex}:`,
@@ -265,6 +291,7 @@ export default Vue.extend({
       );
     },
 
+    // `vuedraggable` things something has changed.
     dragChange(event: ChangeEvent<LetterElement>) {
       if (event.moved) {
         this.handleMovedElement(event.moved);
@@ -277,19 +304,24 @@ export default Vue.extend({
       }
     },
 
+    // Add a new element of the given type the letter in the appropriate "crack"
+    // between/around existing elements.
     addElement(crackPosition: number, elementTypeKey: string): void {
       console.log(`Add ${elementTypeKey} at position ${crackPosition}`);
       const letterElementTypeId =
-        letterElementKeyToDetails.get(elementTypeKey)?.id;
+        letterElementKeyToDetails.get(elementTypeKey)?.pk;
       if (!letterElementTypeId) {
         throw new Error(`Type ${elementTypeKey} not found`);
       }
+
+      // Construct the request to the server for a new element of the proper type.
       const newLetterElement: LetterElementCreateInput = {
         sequence: crackPosition,
         letterId: this.surveyLetter.letter.id,
         letterElementTypeId,
       };
 
+      // Ask the server to add it.
       this.$apollo
         .mutate<CreateLetterElement, CreateLetterElementVariables>({
           mutation: CREATE_LETTER_ELEMENT_MUTATION,
@@ -298,6 +330,8 @@ export default Vue.extend({
           },
         })
         .then((result) => {
+          // Insert the returned data into the letter element list, which will
+          // cause the UI to update reactively.
           console.log("RESULT", result);
           if (result.data?.createLetterElement) {
             this.letterElements.splice(
@@ -311,130 +345,29 @@ export default Vue.extend({
         });
     },
 
+    // Remove an element from the letter.
     removeElement(positionInList: number): void {
-      console.log(`Remove element at position ${positionInList}`);
-      this.letterElements.splice(positionInList, 1);
-    },
-
-    letterElementToComponent(letterElement: LetterElement) {
-      const details = letterElementKeyToDetails.get(
-        letterElement.letterElementType.key
+      const letterElementId = this.letterElements[positionInList].id;
+      console.log(
+        `Remove element ${letterElementId} at position ${positionInList}`
       );
-      if (details) {
-        return details.componentName;
-      } else {
-        throw new Error(`Can't find letter element ${letterElement}`);
-      }
-    },
 
-    // letterElementDescription(element: LetterElement): string {
-    //   if (
-    //     // FIXME - element.letterElementType.key === LetterElementEnum.CHART &&
-    //     element.surveyDimension !== null
-    //   ) {
-    //     return (
-    //       element.letterElementType.description +
-    //       " -- " +
-    //       element.surveyDimension.title
-    //     );
-    //   } else if (
-    //     // FIXME - element.letterElementType.key === LetterElementEnum.IMAGE &&
-    //     element.image !== null
-    //   ) {
-    //     return (
-    //       element.letterElementType.description + " -- " + element.image.title
-    //     );
-    //   } else {
-    //     return element.letterElementType.description;
-    //   }
-    // },
-
-    deleteElement(letterElementId: number): void {
-      console.log(letterElementId);
+      // Send the request to the server.
       this.$apollo
-        .mutate({
+        .mutate<DeleteLetterElement, DeleteLetterElementVariables>({
           mutation: DELETE_LETTER_ELEMENT_MUTATION,
-          variables: {
-            id: letterElementId,
-          },
+          variables: { id: letterElementId },
         })
-        .then(({ data }) => {
-          console.log("done!", data);
-          // FIXME --- this.refreshPage();
-          //this.$emit("letter-created", data.createLetter.id);
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-          //this.errorMessage =
-          //  "Sorry, there appears to have been an error.  Please tray again later.";
+        .then((result) => {
+          if (result.data?.deleteLetterElement === 1) {
+            // Get rid of it from the UI.
+            this.letterElements.splice(positionInList, 1);
+            console.log("Delete successful");
+          } else {
+            console.log("Unexpected result", result);
+          }
         });
     },
-
-    // resetSequenceProperty(): void {
-    //   // cycles through the elements array and resets the 'order' property to reflect
-    //   // the current ordering of the text boxes
-    //   // this.letterElements.forEach((elt, idx) => (elt.sequence = idx));
-    // },
-
-    // addElement(
-    //   letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
-    // ): void {
-    //   // if (letterElementType.key === LetterElementEnum.CHART) {
-    //   //   console.log("we have a chart!");
-    //   //   //////////// FIXME
-    //   //   // this.chartTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of chart in the dialog....
-    //   //   // this.chooseChartTypeDialog = true;
-    //   // } else if (letterElementType.key === LetterElementEnum.IMAGE) {
-    //   //   console.log("we have an image!");
-    //   //   //////////// FIXME
-    //   //   // this.imageTypeElementId = letterElementType.id; //will use this later on, after choosing a particular type of image in the dialog....
-    //   //   // this.chooseImageDialog = true;
-    //   // } else {
-    //   //   console.log("we do not have a chart!");
-    //   //   this.addNonChartElement(letterElementType);
-    //   // }
-    // },
-
-    // addNonChartElement(
-    //   letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType
-    // ): void {
-    //   const nextSequence = 42;
-    //
-    //   console.log("letter element type: ", letterElementType);
-    //   let createInput: LetterElementCreateInput;
-    //   if (letterElementType.key) {
-    //     /// FIXME- === LetterElementEnum.BOILERPLATE) {
-    //     const emptyTextDelta = new Delta();
-    //     createInput = {
-    //       sequence: nextSequence,
-    //       letterId: this.surveyLetter.letter.id,
-    //       letterElementTypeId: letterElementType.id,
-    //       textDelta: JSON.stringify(emptyTextDelta),
-    //     };
-    //   } else {
-    //     createInput = {
-    //       sequence: nextSequence,
-    //       letterId: this.surveyLetter.letter.id,
-    //       letterElementTypeId: letterElementType.id,
-    //     };
-    //   }
-    //
-    //   this.$apollo
-    //     .mutate({
-    //       mutation: CREATE_LETTER_ELEMENT_MUTATION,
-    //       variables: {
-    //         createInput: createInput,
-    //       },
-    //     })
-    //     .then(({ data }) => {
-    //       console.log("done!", data);
-    //       // FIXME --------- this.refreshPage();
-    //       //this.$emit("letter-created", data.createLetter.id);
-    //     })
-    //     .catch((error) => {
-    //       console.log("there appears to have been an error: ", error);
-    //     });
-    // },
 
     imageId(element: LetterElement): number {
       if (

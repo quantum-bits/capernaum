@@ -166,7 +166,7 @@ export class LetterElementService extends BaseService<LetterElement> {
         sequence: createInput.sequence,
       })
     );
-    console.log("NEW ELT", createInput, newLetterElement);
+    debug("New letter element %O", newLetterElement);
 
     return this.repo.findOneOrFail(newLetterElement.id, {
       relations: ["letterElementType"],
