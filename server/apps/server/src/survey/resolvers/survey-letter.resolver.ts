@@ -1,10 +1,24 @@
-import { Resolver, Query, Args, Int } from "@nestjs/graphql";
-import { SurveyLetter } from "@server/src/survey/entities";
+import { Resolver, Query, Args, Int, Mutation } from "@nestjs/graphql";
+import {
+  SurveyLetter,
+  SurveyLetterCreateInput,
+} from "@server/src/survey/entities";
 import { SurveyLetterService } from "@server/src/survey/services";
 
 @Resolver(() => SurveyLetter)
 export class SurveyLetterResolver {
   constructor(private readonly surveyLetterService: SurveyLetterService) {}
+
+  @Mutation(() => SurveyLetter, { description: "Create a new surveyLetter" })
+  createSurveyLetter(
+    @Args({
+      name: "surveyLetterCreateInput",
+      type: () => SurveyLetterCreateInput,
+    })
+    surveyLetterCreateInput: SurveyLetterCreateInput
+  ) {
+    return this.surveyLetterService.create(surveyLetterCreateInput);
+  }
 
   @Query(() => [SurveyLetter], { description: "Retrieve all survey letters" })
   surveyLetters(

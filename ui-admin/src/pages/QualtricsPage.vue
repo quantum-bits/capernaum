@@ -93,7 +93,7 @@ import {
 } from "@/graphql/types/ImportQualtricsSurvey";
 
 export default Vue.extend({
-  name: "Qualtrics",
+  name: "QualtricsPage",
 
   components: {
     PageHeader,
@@ -158,6 +158,7 @@ export default Vue.extend({
     importDate(survey: CombinedSurveys_combinedSurveys) {
       const standardDate = Vue.filter("standardDate");
       if (survey.capernaumSurvey) {
+        console.log("CAP SURVEY", survey.capernaumSurvey);
         return standardDate(survey.capernaumSurvey.importedDate);
       }
       return "";

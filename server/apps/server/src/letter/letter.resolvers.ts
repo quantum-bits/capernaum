@@ -25,10 +25,13 @@ import {
   LetterTypeService,
 } from "./letter.service";
 import { Int } from "@nestjs/graphql";
-import { Survey, SurveyDimension } from "../survey/entities";
+import { SurveyDimension } from "../survey/entities";
 import { Image } from "../image/entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("letter");
 
 @Resolver(() => Letter)
 @UseGuards(GqlAuthGuard)
@@ -57,6 +60,7 @@ export class LetterResolver {
 
   @Mutation(() => Int)
   deleteLetter(@Args({ name: "id", type: () => Int }) id: number) {
+    debug("deleteLetter/%d", id);
     return this.letterService.delete(id);
   }
 }
@@ -144,10 +148,5 @@ export class LetterTypeResolver {
   @Mutation(() => LetterType)
   updateLetterType(@Args("updateInput") updateInput: LetterTypeUpdateInput) {
     return this.letterTypeService.update(updateInput);
-  }
-
-  @Mutation(() => Int)
-  deleteLetterType(@Args({ name: "id", type: () => Int }) id: number) {
-    return this.letterTypeService.delete(id);
   }
 }

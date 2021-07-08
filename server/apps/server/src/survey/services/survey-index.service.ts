@@ -12,10 +12,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import * as _ from "lodash";
 import { getDebugger } from "@helpers/debug-factory";
-import {
-  AssociationUpdateInput,
-  ScriptureEngagementPractice,
-} from "@server/src/prediction/entities";
+import { AssociationUpdateInput } from "@server/src/prediction/entities";
 
 const debug = getDebugger("survey-index");
 

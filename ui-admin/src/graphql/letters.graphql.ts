@@ -10,6 +10,31 @@ export const ADD_LETTER_MUTATION = gql`
   }
 `;
 
+export const CREATE_SURVEY_LETTER = gql`
+  mutation CreateSurveyLetter($input: SurveyLetterCreateInput!) {
+    createSurveyLetter(surveyLetterCreateInput: $input) {
+      id
+      letter {
+        id
+        created
+        description
+        letterElements {
+          id
+        }
+      }
+      letterType {
+        id
+        key
+        description
+      }
+      survey {
+        id
+        qualtricsName
+      }
+    }
+  }
+`;
+
 export const UPDATE_LETTER_MUTATION = gql`
   mutation UpdateLetter($letterData: LetterUpdateInput!) {
     updateLetter(letterData: $letterData) {
@@ -268,6 +293,27 @@ export const LETTER_ELEMENT_DETAILS = gql`
         id
         key
         description
+      }
+    }
+  }
+`;
+
+export const LETTERS_FOR_SURVEYS = gql`
+  query LettersForSurveys {
+    letterTypes: readLetterTypes {
+      id
+      key
+      description
+    }
+    surveys {
+      id
+      qualtricsName
+      surveyLetters {
+        letterType {
+          id
+          key
+          description
+        }
       }
     }
   }

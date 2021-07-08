@@ -68,7 +68,6 @@ export interface LetterCreateInput {
   title: string;
   description: string;
   emailMessage: string;
-  surveyId: number;
   letterTypeId: number;
 }
 
@@ -95,7 +94,6 @@ export interface LetterUpdateInput {
   title?: string | null;
   description?: string | null;
   emailMessage?: string | null;
-  surveyId?: number | null;
   letterTypeId?: number | null;
 }
 
@@ -167,6 +165,11 @@ export interface SurveyIndexUpdateInput {
   abbreviation?: string | null;
   title?: string | null;
   useForPredictions?: boolean | null;
+}
+
+export interface SurveyLetterCreateInput {
+  surveyId: number;
+  letterTypeId: number;
 }
 
 export interface SurveyUpdateInput {

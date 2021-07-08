@@ -15,7 +15,7 @@ import {
 import { Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
-import { SurveyDimension } from "@server/src/survey/entities";
+import { SurveyDimension, SurveyLetter } from "@server/src/survey/entities";
 import { Image } from "@server/src/image/entities";
 import * as _ from "lodash";
 
@@ -84,8 +84,18 @@ export class LetterService extends BaseService<Letter> {
       .then((result) => this.repo.save(result));
   }
 
-  delete(id: number) {
-    return this.repo.delete(id).then((result) => result.affected);
+  async delete(letterId: number) {
+    debug("delete/%d", letterId);
+    return this.repo.manager.transaction(async (manager) => {
+      const letterRepo = manager.getRepository(Letter);
+      const surveyLetterRepo = manager.getRepository(SurveyLetter);
+
+      const letter = await letterRepo.findOneOrFail(letterId);
+      const result = await surveyLetterRepo.delete({ letter });
+      debug("delete/%O", result);
+
+      return letterRepo.delete(letter.id).then((result) => result.affected);
+    });
   }
 }
 
@@ -114,10 +124,6 @@ export class LetterTypeService extends BaseService<LetterType> {
     return this.repo
       .preload(updateInput)
       .then((result) => this.repo.save(result));
-  }
-
-  delete(id: number) {
-    return this.repo.delete(id).then((result) => result.affected);
   }
 }
 

@@ -2,7 +2,7 @@
   <v-container>
     <page-header title="Letters">
       <v-col>
-        <NewLetterButton @click="addLetter($event)" offset-y />
+        <NewLetterButton @addedLetter="updateTable" offset-y />
       </v-col>
     </page-header>
     <v-row>
@@ -34,9 +34,9 @@
                   </template>
                   <span>View and edit this letter.</span>
                 </v-tooltip>
-                <v-tooltip v-if="canDeleteLetter(surveyLetter)" top>
+                <v-tooltip v-if="canDeleteLetter(surveyLetter.letter)" top>
                   <template v-slot:activator="{ on }">
-                    <a @click="deleteLetter(surveyLetter.id)" v-on="on">
+                    <a @click="deleteLetter(surveyLetter.letter.id)" v-on="on">
                       <v-icon>
                         {{ "mdi-close-circle" }}
                       </v-icon>
@@ -69,7 +69,15 @@ import NewLetterButton from "@/components/buttons/NewLetterButton.vue";
 import PageHeader from "@/pages/PageHeader.vue";
 import { DELETE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
-import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
+import {
+  SurveyLetters_surveyLetters,
+  SurveyLetters_surveyLetters_letter,
+} from "@/graphql/types/SurveyLetters";
+import {
+  DeleteLetter,
+  DeleteLetterVariables,
+} from "@/graphql/types/DeleteLetter";
+import * as _ from "lodash";
 
 export default Vue.extend({
   name: "LettersPage",
@@ -92,59 +100,51 @@ export default Vue.extend({
         { text: "Last Update" },
         { text: "Survey" },
         { text: "Type" },
-        { text: "Actions", sortable: false },
+        { text: "Actions", sortable: false, align: "center" },
       ],
       surveyLetters: [] as SurveyLetters_surveyLetters[],
     };
   },
 
   methods: {
-    canDeleteLetter(surveyLetter: SurveyLetters_surveyLetters): boolean {
-      return surveyLetter.letter.letterElements.length === 0;
+    canDeleteLetter(letter: SurveyLetters_surveyLetters_letter): boolean {
+      return letter.letterElements.length === 0;
     },
 
-    deleteLetter(id: number): void {
-      console.log("delete letter!", id);
+    deleteLetter(letterId: number): void {
       this.$apollo
-        .mutate({
+        .mutate<DeleteLetter, DeleteLetterVariables>({
           mutation: DELETE_LETTER_MUTATION,
           variables: {
-            id: id,
+            id: letterId,
           },
         })
-        .then(({ data }) => {
-          console.log("letter successfully deleted!", data);
-          this.refreshLetterData();
+        .then((response) => {
+          console.log("Letter deleted", response);
+          this.surveyLetters = _.filter(
+            this.surveyLetters,
+            (sl) => sl.letter.id !== letterId
+          );
         })
         .catch((error) => {
-          console.log(
-            "there appears to have been an error when attempting to delete the letter: ",
-            error
-          );
+          console.log("Error attempting to delete letter", error);
         });
     },
 
-    newLetter(): void {
-      console.log("create new letter");
-      this.$router.push({ name: "compose" });
-    },
-
-    addLetter(event: string): void {
-      console.log("create new letter!", event);
-      this.$router.push({ name: "compose" });
-    },
-
-    viewLetter(surveyLetter: SurveyLetters_surveyLetters): void {
-      console.log("view letter!");
-      this.$router.push({
-        name: "compose",
-        params: { surveyLetterId: surveyLetter.id.toString() },
+    updateTable(newSurveyLetter: SurveyLetters_surveyLetters) {
+      console.log("UPDATE TABLE", newSurveyLetter);
+      this.surveyLetters.push({
+        id: newSurveyLetter.id,
+        letter: newSurveyLetter.letter,
+        letterType: newSurveyLetter.letterType,
+        survey: newSurveyLetter.survey,
       });
     },
 
-    refreshLetterData(): void {
-      this.$apollo.queries.letterData.refetch().then(({ data }) => {
-        console.log("item(s) refetched!", data);
+    viewLetter(surveyLetter: SurveyLetters_surveyLetters): void {
+      this.$router.push({
+        name: "compose",
+        params: { surveyLetterId: surveyLetter.id.toString() },
       });
     },
   },

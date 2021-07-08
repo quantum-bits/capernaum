@@ -63,7 +63,6 @@ export class LetterCreateInput implements Partial<Letter> {
   @Field() title: string;
   @Field() description: string;
   @Field() emailMessage: string;
-  @Field(() => Int) surveyId: number;
   @Field(() => Int) letterTypeId: number;
 }
 
@@ -73,6 +72,5 @@ export class LetterUpdateInput {
   @Field({ nullable: true }) title: string;
   @Field({ nullable: true }) description: string;
   @Field({ nullable: true }) emailMessage: string;
-  @Field(() => Int, { nullable: true }) surveyId: number;
   @Field(() => Int, { nullable: true }) letterTypeId: number;
 }

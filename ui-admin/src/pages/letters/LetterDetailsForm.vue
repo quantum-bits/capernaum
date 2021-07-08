@@ -56,7 +56,6 @@ export default (Vue as VueConstructor<VueExt>).extend({
   data() {
     return {
       valid: true,
-      isNew: false,
 
       formFields: {
         title: this.surveyLetter.letter.title,
@@ -80,39 +79,10 @@ export default (Vue as VueConstructor<VueExt>).extend({
 
     submit(): void {
       if (this.validateForm()) {
-        if (this.isNew) {
-          this.addLetter();
-        } else {
-          this.updateLetter();
-        }
+        this.updateLetter();
       } else {
         this.triggerSnackbar("Your entry has problems.");
       }
-    },
-
-    addLetter(): void {
-      this.$apollo
-        .mutate<AddLetter, AddLetterVariables>({
-          mutation: ADD_LETTER_MUTATION,
-          variables: {
-            createInput: {
-              title: this.formFields.title,
-              description: this.formFields.description,
-              surveyId: this.surveyLetter.survey.id,
-              letterTypeId: this.surveyLetter.letterType.id,
-              emailMessage: JSON.stringify({
-                ops: [],
-              }),
-            },
-          },
-        })
-        .then((result) => {
-          this.triggerSnackbar("Letter added successfully");
-          this.$emit("letter-created", result.data?.createLetter.id);
-        })
-        .catch((error) => {
-          this.triggerSnackbar(`Sorry, there was error (${error})`);
-        });
     },
 
     updateLetter() {

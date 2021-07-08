@@ -679,6 +679,9 @@ type Mutation {
   """
   deleteSurveyIndex(id: Int!): SurveyIndexDeleteOutput!
 
+  """Create a new surveyLetter"""
+  createSurveyLetter(surveyLetterCreateInput: SurveyLetterCreateInput!): SurveyLetter!
+
   """Create a new survey."""
   createSurvey(createInput: SurveyCreateInput!): Survey! @deprecated(reason: "Should only create surveys from Qualtrics")
   updateSurvey(updateInput: SurveyUpdateInput!): Survey!
@@ -699,7 +702,6 @@ type Mutation {
   deleteLetter(id: Int!): Int!
   createLetterType(createInput: LetterTypeCreateInput!): LetterType!
   updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
-  deleteLetterType(id: Int!): Int!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
@@ -776,6 +778,11 @@ input SurveyIndexUpdateInput {
   abbreviation: String
   title: String
   useForPredictions: Boolean
+}
+
+input SurveyLetterCreateInput {
+  surveyId: Int!
+  letterTypeId: Int!
 }
 
 input SurveyCreateInput {
@@ -904,7 +911,6 @@ input LetterCreateInput {
   title: String!
   description: String!
   emailMessage: String!
-  surveyId: Int!
   letterTypeId: Int!
 }
 
@@ -913,7 +919,6 @@ input LetterUpdateInput {
   title: String
   description: String
   emailMessage: String
-  surveyId: Int
   letterTypeId: Int
 }
 

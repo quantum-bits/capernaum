@@ -5,7 +5,7 @@ import { Letter, LetterType } from "@server/src/letter/entities";
 import { AbstractEntity } from "@server/src/shared/abstract-entity";
 
 @Entity()
-@Unique(["survey", "letter", "letterType"])
+@Unique(["survey", "letterType"]) // Can only have one letter of a given type per survey.
 @ObjectType({ description: "Associate survey, letter, and letter type" })
 export class SurveyLetter extends AbstractEntity {
   @Field(() => Survey, { description: "The survey" })
@@ -24,6 +24,5 @@ export class SurveyLetter extends AbstractEntity {
 @InputType()
 export class SurveyLetterCreateInput {
   @Field(() => Int) surveyId: number;
-  @Field(() => Int) letterId: number;
   @Field(() => Int) letterTypeId: number;
 }
