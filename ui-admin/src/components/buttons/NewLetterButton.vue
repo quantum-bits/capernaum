@@ -40,7 +40,7 @@
 import Vue from "vue";
 import {
   CREATE_SURVEY_LETTER,
-  LETTERS_FOR_SURVEYS,
+  LETTERS_AND_SURVEYS,
 } from "@/graphql/letters.graphql";
 import {
   LettersForSurveys_letterTypes,
@@ -51,6 +51,7 @@ import {
   CreateSurveyLetter,
   CreateSurveyLetterVariables,
 } from "@/graphql/types/CreateSurveyLetter";
+import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 
 // Track `survey` missing a letter of type `letterType`.
 interface MissingLetter {
@@ -63,7 +64,7 @@ export default Vue.extend({
 
   apollo: {
     lettersForSurveys: {
-      query: LETTERS_FOR_SURVEYS,
+      query: LETTERS_AND_SURVEYS,
       update(data) {
         this.letterTypes = data.letterTypes;
         this.surveys = data.surveys;
@@ -71,9 +72,19 @@ export default Vue.extend({
     },
   },
 
+  props: {
+    // Current survey-letter combinations
+    currentSurveyLetters: {
+      type: Array as () => SurveyLetters_surveyLetters[],
+      required: true,
+    },
+  },
+
   data() {
     return {
+      // All the letter types.
       letterTypes: [] as LettersForSurveys_letterTypes[],
+      // All the known surveys.
       surveys: [] as LettersForSurveys_surveys[],
     };
   },
@@ -85,15 +96,18 @@ export default Vue.extend({
         _.forEach(this.letterTypes, (letterType) => {
           if (
             _.find(
-              survey.surveyLetters,
-              (sl) => sl.letterType.id === letterType.id
+              this.currentSurveyLetters,
+              (csl) =>
+                csl.survey.id === survey.id &&
+                csl.letterType.id === letterType.id
             )
           ) {
+            // Already have a survey-letter that matches.
             console.log(
               `'${survey.qualtricsName}' has type '${letterType.key}'`
             );
           } else {
-            // No letter of this type
+            // No survey-letter of this type.
             missing.push({ survey: survey, letterType: letterType });
           }
         });
@@ -121,21 +135,13 @@ export default Vue.extend({
           },
         })
         .then((result) => {
-          console.log("addLetter", result);
-          // Add the newly added letter type to the associated surveys. This removes
-          // the survey-letter combination from the menu.
-          const survey = _.find(
-            this.surveys,
-            (survey) => survey.id === missingLetter.survey.id
-          );
-          if (survey) {
-            survey.surveyLetters.push({ letterType: missingLetter.letterType });
+          const newSurveyLetter = result.data?.createSurveyLetter;
+          if (newSurveyLetter) {
+            console.log("addLetter", newSurveyLetter);
+            this.$emit("addedLetter", newSurveyLetter);
           } else {
-            throw new Error("Survey not found");
+            throw new Error("Failed to add survey letter");
           }
-
-          // Let the parent page know that a new letter was added.
-          this.$emit("addedLetter", result.data?.createSurveyLetter);
         });
     },
   },

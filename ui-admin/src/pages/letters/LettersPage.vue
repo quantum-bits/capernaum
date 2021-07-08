@@ -2,7 +2,11 @@
   <v-container>
     <page-header title="Letters">
       <v-col>
-        <NewLetterButton @addedLetter="updateTable" offset-y />
+        <new-letter-button
+          :current-survey-letters="surveyLetters"
+          @addedLetter="updateTable"
+          offset-y
+        />
       </v-col>
     </page-header>
     <v-row>

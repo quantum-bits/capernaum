@@ -298,7 +298,7 @@ export const LETTER_ELEMENT_DETAILS = gql`
   }
 `;
 
-export const LETTERS_FOR_SURVEYS = gql`
+export const LETTERS_AND_SURVEYS = gql`
   query LettersForSurveys {
     letterTypes: readLetterTypes {
       id
@@ -308,13 +308,6 @@ export const LETTERS_FOR_SURVEYS = gql`
     surveys {
       id
       qualtricsName
-      surveyLetters {
-        letterType {
-          id
-          key
-          description
-        }
-      }
     }
   }
 `;

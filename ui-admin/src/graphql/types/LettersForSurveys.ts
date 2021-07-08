@@ -22,28 +22,6 @@ export interface LettersForSurveys_letterTypes {
   description: string;
 }
 
-export interface LettersForSurveys_surveys_surveyLetters_letterType {
-  /**
-   * Unique ID for this entity
-   */
-  id: number;
-  /**
-   * Letter type name
-   */
-  key: string;
-  /**
-   * Letter type description
-   */
-  description: string;
-}
-
-export interface LettersForSurveys_surveys_surveyLetters {
-  /**
-   * The letter type
-   */
-  letterType: LettersForSurveys_surveys_surveyLetters_letterType;
-}
-
 export interface LettersForSurveys_surveys {
   /**
    * Unique ID for this entity
@@ -53,10 +31,6 @@ export interface LettersForSurveys_surveys {
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
-  /**
-   * Survey letters for this survey
-   */
-  surveyLetters: LettersForSurveys_surveys_surveyLetters[];
 }
 
 export interface LettersForSurveys {
