@@ -1,38 +1,48 @@
 <template>
-  <v-form ref="form" v-model="valid">
-    <v-text-field
-      v-model="formFields.title"
-      :rules="rules.required"
-      label="Title"
-    />
+  <v-container>
+    <v-card>
+      <v-card-title>Letter Details</v-card-title>
+      <static-info-list :info="staticInfo" />
 
-    <v-text-field
-      v-model="formFields.description"
-      :rules="rules.required"
-      label="Description"
-    />
+      <v-card-text>
+        <v-form ref="form" v-model="valid">
+          <v-text-field
+            v-model="formFields.title"
+            :rules="rules.required"
+            label="Title"
+          />
 
-    <slot v-bind:knobs="{ valid, submit }">
-      <v-btn disabled="true">OVERRIDE SLOT!</v-btn>
-    </slot>
+          <v-text-field
+            v-model="formFields.description"
+            :rules="rules.required"
+            label="Description"
+          />
+        </v-form>
+      </v-card-text>
+
+      <v-card-actions>
+        <v-spacer />
+        <edit-save-cancel-buttons />
+      </v-card-actions>
+    </v-card>
 
     <snackbar ref="snackbar" />
-  </v-form>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue, { VueConstructor } from "vue";
-import {
-  ADD_LETTER_MUTATION,
-  UPDATE_LETTER_MUTATION,
-} from "@/graphql/letters.graphql";
+import { UPDATE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 import Snackbar from "@/components/Snackbar.vue";
-import { AddLetter, AddLetterVariables } from "@/graphql/types/AddLetter";
 import {
   UpdateLetter,
   UpdateLetterVariables,
 } from "@/graphql/types/UpdateLetter";
+import StaticInfoList, {
+  StaticInfoItem,
+} from "@/components/lists/StaticInfoList.vue";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 type VueExt = Vue & {
   $refs: {
@@ -42,9 +52,9 @@ type VueExt = Vue & {
 };
 
 export default (Vue as VueConstructor<VueExt>).extend({
-  name: "LetterDetailsForm",
+  name: "LetterDetailsCard",
 
-  components: { Snackbar },
+  components: { EditSaveCancelButtons, StaticInfoList, Snackbar },
 
   props: {
     surveyLetter: {
@@ -66,6 +76,21 @@ export default (Vue as VueConstructor<VueExt>).extend({
         required: [(v: string) => !!v || "Required"],
       },
     };
+  },
+
+  computed: {
+    staticInfo(): StaticInfoItem[] {
+      return [
+        {
+          name: "Survey",
+          value: this.surveyLetter.survey.qualtricsName,
+        },
+        {
+          name: "Letter Type",
+          value: this.surveyLetter.letterType.description,
+        },
+      ];
+    },
   },
 
   methods: {

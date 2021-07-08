@@ -1,17 +1,22 @@
 <template>
   <div>
-    <v-btn color="primary" :disabled="!enableEditButton" @click="enterEditMode">
+    <v-btn
+      text
+      color="primary"
+      :disabled="!enableEditButton"
+      @click="enterEditMode"
+    >
       Edit
     </v-btn>
     <v-btn
-      class="mx-2"
+      text
       color="warning"
       :disabled="!enableSaveButton"
       @click="saveChanges"
     >
       Save
     </v-btn>
-    <v-btn :disabled="!enableCancelButton" @click="cancelEditMode">
+    <v-btn text :disabled="!enableCancelButton" @click="cancelEditMode">
       Cancel
     </v-btn>
   </div>

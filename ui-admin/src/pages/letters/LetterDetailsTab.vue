@@ -1,57 +1,40 @@
 <template>
-  <v-card v-if="surveyLetter.letter">
+  <v-container v-if="surveyLetter.letter">
     <v-row>
       <v-col>
-        <v-card-title>Letter Details</v-card-title>
-        <static-info-list :info="staticInfo" />
-        <v-card-text>
-          <letter-details-form :survey-letter="surveyLetter" v-slot="{ knobs }">
-            <v-card-actions>
-              <v-spacer />
-              <v-btn
-                :disabled="!knobs.valid"
-                color="success"
-                @click="knobs.submit"
-              >
-                Save
-              </v-btn>
-            </v-card-actions>
-          </letter-details-form>
-        </v-card-text>
+        <letter-details-card :survey-letter="surveyLetter" />
       </v-col>
 
       <v-col>
-        <v-card-title>{{ emailDescription }}</v-card-title>
-        <letter-text-area
-          :letterId="surveyLetter.letter.id"
-          :initialTextDelta="surveyLetter.letter.emailMessage"
-          :isEmailText="true"
-        />
-        <!-- FIXME - This was inside the previous element.
+        <v-card>
+          <v-card-title>{{ emailDescription }}</v-card-title>
+          <letter-text-area
+            :letterId="surveyLetter.letter.id"
+            :initialTextDelta="surveyLetter.letter.emailMessage"
+            :isEmailText="true"
+          />
+          <!-- FIXME - This was inside the previous element.
         v-on:edit-mode-on="setEmailEditModeOn()"
         v-on:edit-mode-off="setEmailEditModeOff()"
         -->
+        </v-card>
       </v-col>
     </v-row>
-  </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
 import LetterTextArea from "@/pages/letters/LetterTextArea.vue";
-import LetterDetailsForm from "@/pages/letters/LetterDetailsForm.vue";
-import StaticInfoList, {
-  StaticInfoItem,
-} from "@/components/lists/StaticInfoList.vue";
+import LetterDetailsCard from "@/pages/letters/LetterDetailsCard.vue";
 
 export default Vue.extend({
   name: "LetterDetailsTab",
 
   components: {
-    StaticInfoList,
     LetterTextArea,
-    LetterDetailsForm,
+    LetterDetailsCard,
   },
 
   props: {
@@ -68,19 +51,6 @@ export default Vue.extend({
   },
 
   computed: {
-    staticInfo(): StaticInfoItem[] {
-      return [
-        {
-          name: "Survey",
-          value: this.surveyLetter.survey.qualtricsName,
-        },
-        {
-          name: "Letter Type",
-          value: this.surveyLetter.letterType.description,
-        },
-      ];
-    },
-
     emailDescription(): string {
       // return
       // FIXME

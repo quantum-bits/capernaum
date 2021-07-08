@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import NewLetterButton from "@/components/buttons/NewLetterButton.vue";
+import NewLetterButton from "@/pages/letters/NewLetterButton.vue";
 import PageHeader from "@/pages/PageHeader.vue";
 import { DELETE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";

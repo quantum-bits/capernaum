@@ -137,8 +137,11 @@ export default Vue.extend({
         .then((result) => {
           const newSurveyLetter = result.data?.createSurveyLetter;
           if (newSurveyLetter) {
-            console.log("addLetter", newSurveyLetter);
             this.$emit("addedLetter", newSurveyLetter);
+            this.$router.push({
+              name: "compose",
+              params: { surveyLetterId: newSurveyLetter.id.toString() },
+            });
           } else {
             throw new Error("Failed to add survey letter");
           }
