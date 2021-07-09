@@ -13,11 +13,11 @@
       <edit-save-cancel-buttons
         :is-data-dirty="isDataDirty"
         :is-data-valid="true"
-        @enterEditMode="inEditMode = true"
-        @leaveEditMode="inEditMode = false"
-        @backupData="saveTableContent"
-        @restoreData="restoreTableContent"
-        @persistData="saveTableEdits"
+        @enter-edit-mode="inEditMode = true"
+        @leave-edit-mode="inEditMode = false"
+        @backup-data="saveTableContent"
+        @restore-data="restoreTableContent"
+        @persist-data="saveTableEdits"
       />
     </v-card-actions>
   </v-card>
@@ -36,7 +36,7 @@ import {
   UpdateAssociationTableVariables,
 } from "@/graphql/types/UpdateAssociationTable";
 import { UPDATE_ASSOCIATION_TABLE } from "@/graphql/surveys.graphql";
-import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 
 interface AssociationTableHeader {
   text: string; // text for the column

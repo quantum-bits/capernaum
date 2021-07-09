@@ -2,22 +2,11 @@
   <v-container v-if="surveyLetter.letter">
     <v-row>
       <v-col>
-        <letter-details-card :survey-letter="surveyLetter" />
+        <letter-details-form :survey-letter="surveyLetter" />
       </v-col>
 
       <v-col>
-        <v-card>
-          <v-card-title>{{ emailDescription }}</v-card-title>
-          <letter-text-area
-            :letterId="surveyLetter.letter.id"
-            :initialTextDelta="surveyLetter.letter.emailMessage"
-            :isEmailText="true"
-          />
-          <!-- FIXME - This was inside the previous element.
-        v-on:edit-mode-on="setEmailEditModeOn()"
-        v-on:edit-mode-off="setEmailEditModeOff()"
-        -->
-        </v-card>
+        <letter-details-cover-letter :email-message="emailMessage" />
       </v-col>
     </v-row>
   </v-container>
@@ -26,15 +15,16 @@
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
-import LetterTextArea from "@/pages/letters/LetterTextArea.vue";
-import LetterDetailsCard from "@/pages/letters/LetterDetailsCard.vue";
+import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
+import LetterDetailsForm from "@/pages/letters/LetterDetailsForm.vue";
+import LetterDetailsCoverLetter from "@/pages/letters/LetterDetailsCoverLetter.vue";
 
 export default Vue.extend({
   name: "LetterDetailsTab",
 
   components: {
-    LetterTextArea,
-    LetterDetailsCard,
+    LetterDetailsCoverLetter,
+    LetterDetailsForm,
   },
 
   props: {
@@ -51,13 +41,13 @@ export default Vue.extend({
   },
 
   computed: {
-    emailDescription(): string {
-      // return
-      // FIXME
-      // this.surveyLetter.letterType.key === LetterTypeEnum.GROUP
-      //   ? "Email to Group Admin"
-      //   :
-      return "Email";
+    emailMessage(): Record<string, any> {
+      const emailMessage = this.surveyLetter.letter.emailMessage;
+      if (isQuillDeltaString(emailMessage)) {
+        return quillDeltaToTipTapJson(emailMessage);
+      } else {
+        return JSON.parse(this.surveyLetter.letter.emailMessage);
+      }
     },
   },
 });

@@ -36,7 +36,7 @@ export interface FabMenuItem {
 }
 
 export default Vue.extend({
-  name: "ElementFab",
+  name: "ElementAddFab",
 
   props: {
     top: { type: Boolean, default: false },

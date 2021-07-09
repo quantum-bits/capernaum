@@ -8,6 +8,7 @@
     >
       Edit
     </v-btn>
+
     <v-btn
       text
       color="warning"
@@ -16,6 +17,17 @@
     >
       Save
     </v-btn>
+
+    <v-btn
+      text
+      color="error"
+      v-if="allowDelete"
+      :disabled="!enableDeleteButton"
+      @click="deleteData"
+    >
+      Delete
+    </v-btn>
+
     <v-btn text :disabled="!enableCancelButton" @click="cancelEditMode">
       Cancel
     </v-btn>
@@ -26,9 +38,13 @@
 import Vue from "vue";
 
 export default Vue.extend({
-  name: "EditSaveCancelButtons",
+  name: "EditSaveDeleteCancelButtons",
 
   props: {
+    allowDelete: {
+      type: Boolean,
+      default: false,
+    },
     isDataDirty: {
       type: Boolean,
       required: true,
@@ -54,6 +70,10 @@ export default Vue.extend({
       return this.inEditMode && this.isDataDirty && this.isDataValid;
     },
 
+    enableDeleteButton(): boolean {
+      return this.inEditMode;
+    },
+
     enableCancelButton(): boolean {
       return this.inEditMode;
     },
@@ -61,21 +81,27 @@ export default Vue.extend({
 
   methods: {
     enterEditMode(): void {
-      this.$emit("enterEditMode");
-      this.$emit("backupData");
+      this.$emit("backup-data");
+      this.$emit("enter-edit-mode");
       this.inEditMode = true;
     },
 
-    cancelEditMode(): void {
-      this.$emit("leaveEditMode");
-      this.$emit("restoreData");
+    saveChanges(): void {
+      this.$emit("persist-data");
+      this.$emit("backup-data");
+      this.$emit("leave-edit-mode");
       this.inEditMode = false;
     },
 
-    saveChanges(): void {
-      this.$emit("persistData");
-      this.$emit("backupData");
-      this.$emit("leaveEditMode");
+    deleteData(): void {
+      this.$emit("delete-data");
+      this.$emit("leave-edit-mode");
+      this.inEditMode = false;
+    },
+
+    cancelEditMode(): void {
+      this.$emit("restore-data");
+      this.$emit("leave-edit-mode");
       this.inEditMode = false;
     },
   },

@@ -4,10 +4,19 @@
       <v-card-title>
         <v-container>
           <v-row align="baseline" justify="space-between">
-            <v-col cols="auto">
+            <v-col>
               {{ surveyLetter.letter.title }}
             </v-col>
-            <v-col cols="auto">
+            <v-col>
+              <element-add-button
+                v-if="letterElements.length === 0"
+                label="Add First Element"
+                :menu-items="fabMenuItems"
+                :crack-position="0"
+                @add-element="addElement"
+              />
+            </v-col>
+            <v-col>
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-switch
@@ -76,7 +85,9 @@ import {
   LetterElementsByType,
   LetterElementsByType_elementsByLetterType,
 } from "@/graphql/types/LetterElementsByType";
-import { FabMenuItem } from "@/pages/letters/elements/ElementFab.vue";
+import ElementFab, {
+  FabMenuItem,
+} from "@/pages/letters/elements/ElementAddFab.vue";
 import prettyFormat from "pretty-format";
 import {
   CreateLetterElement,
@@ -86,6 +97,7 @@ import {
   DeleteLetterElement,
   DeleteLetterElementVariables,
 } from "@/graphql/types/DeleteLetterElement";
+import ElementAddButton from "@/pages/letters/elements/ElementAddButton.vue";
 
 // Map letter element key (e.g., `image`) to both the component name to be rendered
 // and the PK of the corresponding letter element in the database.
@@ -143,6 +155,8 @@ export default Vue.extend({
   name: "LetterContentTab",
 
   components: {
+    ElementAddButton,
+    ElementFab,
     LetterElementMenu,
     StaticLetterElement,
     ChooseChartDialog,

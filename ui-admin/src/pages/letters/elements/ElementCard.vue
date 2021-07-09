@@ -15,10 +15,14 @@
     <v-card-text v-if="cardData.showContent">
       <slot></slot>
     </v-card-text>
-    <element-buttons
-      v-if="cardData.showContent"
-      @remove-element="bubbleRemoveEvent(cardData.positionInList)"
-    />
+    <v-card-actions>
+      <v-spacer />
+      <edit-save-delete-cancel-buttons
+        v-if="cardData.showContent"
+        :allow-delete="true"
+        @delete-data="bubbleRemoveEvent(cardData.positionInList)"
+      />
+    </v-card-actions>
     <element-fab
       v-if="cardData.showContent"
       :crack-position="cardData.positionInList + 1"
@@ -30,14 +34,14 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ElementButtons from "@/pages/letters/elements/ElementButtons.vue";
-import ElementFab from "@/pages/letters/elements/ElementFab.vue";
+import ElementFab from "@/pages/letters/elements/ElementAddFab.vue";
 import { CardData } from "@/pages/letters/LetterContentTab.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 
 export default Vue.extend({
   name: "ElementCard",
 
-  components: { ElementButtons, ElementFab },
+  components: { EditSaveDeleteCancelButtons, ElementFab },
 
   props: {
     title: { type: String, required: true },

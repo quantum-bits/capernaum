@@ -9,6 +9,7 @@
         />
       </v-col>
     </page-header>
+
     <v-row>
       <v-col>
         <v-data-table :headers="headers" :items="surveyLetters">

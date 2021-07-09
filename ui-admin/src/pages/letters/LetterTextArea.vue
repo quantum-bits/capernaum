@@ -1,54 +1,31 @@
 <template>
   <v-row>
-    <v-col xs12 sm12>
-      <v-card v-show="editModeOn">
-        <v-card-title v-if="description" primary-title>
-          <div>
-            <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
-          </div>
+    <v-col>
+      <v-card>
+        <v-card-title>
+          {{ description }}
         </v-card-title>
-        <v-card-text>
-          <vue-editor
-            ref="editor"
-            v-model="htmlForEditor"
-            :editor-toolbar="customToolbar"
-          ></vue-editor>
-        </v-card-text>
-        <v-card-actions v-if="!parentIsFrozen">
-          <v-btn text color="orange" @click="cancelEdits">Cancel</v-btn>
-          <v-btn text color="orange" @click="save">Save</v-btn>
-          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement"
-            >Delete</v-btn
-          >
-          <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-          <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
 
-      <v-card v-show="!editModeOn">
-        <v-card-title primary-title>
-          <div>
-            <h3 class="title font-weight-regular mb-2">{{ description }}</h3>
-          </div>
-        </v-card-title>
-        <v-card-text>
-          <div v-html="htmlForEditor"></div>
-        </v-card-text>
-        <v-card-actions v-if="!parentIsFrozen">
-          <v-btn text color="orange" @click="openEditor">Edit</v-btn>
-          <v-btn v-if="!isEmailText" text color="orange" @click="deleteElement"
-            >Delete</v-btn
-          >
-          <v-btn v-if="showMoveUp" text color="orange" @click="moveUp">
-            <v-icon>mdi-arrow-up</v-icon>
-          </v-btn>
-          <v-btn v-if="showMoveDown" text color="orange" @click="moveDown">
-            <v-icon>mdi-arrow-down</v-icon>
-          </v-btn>
+        <vue-editor
+          v-if="inEditMode"
+          ref="editor"
+          v-model="htmlForEditor"
+          :editor-toolbar="customToolbar"
+        />
+
+        <div v-else v-html="htmlForEditor" />
+
+        <v-card-actions>
+          <v-spacer />
+          <edit-save-delete-cancel-buttons
+            :is-data-dirty="isDirty"
+            :is-data-valid="isValid"
+            @enter-edit-mode="inEditMode = true"
+            @leave-edit-mode="inEditMode = false"
+            @backup-data="saveTextDelta"
+            @restore-data="restoreTextDelta"
+            @persist-data="save"
+          />
         </v-card-actions>
       </v-card>
     </v-col>
@@ -58,41 +35,30 @@
 <script lang="ts">
 import Vue from "vue";
 import { VueEditor } from "vue2-editor";
-
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-
 import {
   UPDATE_LETTER_MUTATION,
   UPDATE_LETTER_ELEMENT_MUTATION,
 } from "@/graphql/letters.graphql";
 import Quill from "quill";
-import cloneDeep from "lodash/cloneDeep";
-import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
-
-export interface QuillConfig {
-  multiLineParagraph: boolean;
-}
+import * as _ from "lodash";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 
 export default Vue.extend({
   name: "LetterTextArea",
 
   components: {
     VueEditor,
+    EditSaveDeleteCancelButtons,
   },
 
   props: {
-    letterElementId: { type: Number, default: -1 },
-    letterId: { type: Number, default: -1 },
-    order: { type: Number, default: 0 },
-    largestSequenceNumber: { type: Number, default: 0 },
-    smallestSequenceNumber: { type: Number, default: 0 },
-    initialTextDelta: { type: String },
-    initialEditModeOn: { type: Boolean, default: false },
-    letterElementKey: { type: String, default: "" },
+    initialTextDelta: { type: String, default: "" },
     description: { type: String, default: "" },
-    parentIsFrozen: { type: Boolean },
+
+    letterId: { type: Number, default: -Infinity },
+    letterElementId: { type: Number, default: -Infinity },
     isEmailText: { type: Boolean, default: false },
-    imageId: { type: Number, default: -Infinity },
   },
 
   // Initialize the HTML version of the content.
@@ -102,8 +68,6 @@ export default Vue.extend({
 
   data() {
     return {
-      letterElements: [] as SurveyLetters_surveyLetters_letter_letterElements[],
-
       customToolbar: [
         [{ header: [1, 2, false] }],
         ["bold", "italic"],
@@ -117,16 +81,7 @@ export default Vue.extend({
         ["link"],
       ],
 
-      // Used with QuillDeltaToHtmlConverter; for more configuration options,
-      // see: https://github.com/nozer/quill-delta-to-html
-      // Might want to set `allowBackgroundClasses` or `classPrefix`
-      // to non-default values in order to mess with the CSS
-      // inside the boilerplate text area.
-      quillConfig: {
-        multiLineParagraph: false,
-      } as QuillConfig,
-
-      editModeOn: this.initialEditModeOn,
+      inEditMode: false,
 
       // Authoritative source for the boilerplate content.
       // Initialize from the prop. Update with each edit.
@@ -142,50 +97,51 @@ export default Vue.extend({
     };
   },
 
+  computed: {
+    // Call it valid if there is some text.
+    isValid(): boolean {
+      return this.textDelta.length > 0;
+    },
+
+    isDirty(): boolean {
+      return !_.isEqual(this.textDelta, this.saveTextDelta);
+    },
+
+    // Fetch a properly typed Quill.
+    // FIXME: Refactor this egregious type hack.
+    // FIXME: function needs a return type
+    quillEditor(): Quill {
+      console.log("quill editor: ", this.$refs.editor);
+      return (this.$refs.editor as Vue & { quill: Quill }).quill;
+    },
+  },
+
   methods: {
     // Grab a copy of the current content so we can support canceling and edit.
     saveTextDelta() {
-      this.savedTextDelta = cloneDeep(this.textDelta);
+      this.savedTextDelta = _.cloneDeep(this.textDelta);
     },
 
     // Restore the content from the saved version.
     restoreTextDelta() {
-      this.textDelta = cloneDeep(this.savedTextDelta);
+      this.textDelta = _.cloneDeep(this.savedTextDelta);
+    },
+
+    enterEditMode(): void {
+      this.inEditMode = true;
+      this.quillEditor.setContents(this.textDelta);
     },
 
     // Update the HTML version of the content for use by the editor and by the non-editing display.
     updateHtmlFromTextDelta() {
-      this.htmlForEditor = new QuillDeltaToHtmlConverter(
-        this.textDelta.ops,
-        this.quillConfig
-      ).convert();
-    },
-
-    moveUp(): void {
-      this.$emit("move-up");
-    },
-
-    moveDown(): void {
-      this.$emit("move-down");
-    },
-
-    deleteElement(): void {
-      this.$emit("delete-element");
-    },
-
-    // User canceled the edit. Restore the content and the HTML to their values
-    // prior to editing.
-    cancelEdits(): void {
-      this.editModeOn = false;
-      this.$emit("edit-mode-off");
-      this.restoreTextDelta();
-      this.updateHtmlFromTextDelta();
+      this.htmlForEditor = new QuillDeltaToHtmlConverter(this.textDelta.ops, {
+        multiLineParagraph: false,
+      }).convert();
     },
 
     // User wants to save the edit. Update content and HTML to their new values.
     // Send a mutation to the server to update the database.
     save(): void {
-      this.editModeOn = false;
       this.textDelta = this.quillEditor.getContents();
       this.updateHtmlFromTextDelta();
       console.log("letter element id: ", this.letterElementId);
@@ -231,33 +187,6 @@ export default Vue.extend({
             console.log("there appears to have been an error: ", error);
           });
       }
-    },
-
-    // Open the editor. Hang on to the current content for a possible cancellation.
-    // Update the editor to contain the content.
-    openEditor(): void {
-      this.editModeOn = true;
-      this.$emit("edit-mode-on");
-      this.saveTextDelta();
-      this.quillEditor.setContents(this.textDelta);
-    },
-  },
-
-  computed: {
-    showMoveDown(): boolean {
-      return this.order < this.largestSequenceNumber;
-    },
-
-    showMoveUp(): boolean {
-      return this.order > this.smallestSequenceNumber;
-    },
-
-    // Fetch a properly typed Quill.
-    // FIXME: Refactor this egregious type hack.
-    // FIXME: function needs a return type
-    quillEditor(): Quill {
-      console.log("quill editor: ", this.$refs.editor);
-      return (this.$refs.editor as Vue & { quill: Quill }).quill;
     },
   },
 

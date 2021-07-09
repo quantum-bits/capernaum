@@ -5,7 +5,7 @@
       <static-info-list :info="staticInfo" />
 
       <v-card-text>
-        <v-form ref="form" v-model="valid">
+        <v-form ref="form" v-model="valid" :disabled="!inEditMode">
           <v-text-field
             v-model="formFields.title"
             :rules="rules.required"
@@ -22,7 +22,15 @@
 
       <v-card-actions>
         <v-spacer />
-        <edit-save-cancel-buttons />
+        <edit-save-delete-cancel-buttons
+          :is-data-dirty="isDataDirty"
+          :is-data-valid="valid"
+          @enter-edit-mode="inEditMode = true"
+          @leave-edit-mode="inEditMode = false"
+          @backup-data="backupFormFields"
+          @restore-data="restoreFormFields"
+          @persist-data="persistFormFields"
+        />
       </v-card-actions>
     </v-card>
 
@@ -42,7 +50,13 @@ import {
 import StaticInfoList, {
   StaticInfoItem,
 } from "@/components/lists/StaticInfoList.vue";
-import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
+import * as _ from "lodash";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+
+interface LetterDetailsForm {
+  title: string;
+  description: string;
+}
 
 type VueExt = Vue & {
   $refs: {
@@ -52,9 +66,13 @@ type VueExt = Vue & {
 };
 
 export default (Vue as VueConstructor<VueExt>).extend({
-  name: "LetterDetailsCard",
+  name: "LetterDetailsForm",
 
-  components: { EditSaveCancelButtons, StaticInfoList, Snackbar },
+  components: {
+    EditSaveDeleteCancelButtons,
+    StaticInfoList,
+    Snackbar,
+  },
 
   props: {
     surveyLetter: {
@@ -67,10 +85,14 @@ export default (Vue as VueConstructor<VueExt>).extend({
     return {
       valid: true,
 
+      inEditMode: false,
+
       formFields: {
         title: this.surveyLetter.letter.title,
         description: this.surveyLetter.letter.description,
-      },
+      } as LetterDetailsForm,
+
+      formFieldsBackup: {} as LetterDetailsForm,
 
       rules: {
         required: [(v: string) => !!v || "Required"],
@@ -91,9 +113,21 @@ export default (Vue as VueConstructor<VueExt>).extend({
         },
       ];
     },
+
+    isDataDirty(): boolean {
+      return !_.isEqual(this.formFields, this.formFieldsBackup);
+    },
   },
 
   methods: {
+    backupFormFields() {
+      this.formFieldsBackup = _.cloneDeep(this.formFields);
+    },
+
+    restoreFormFields() {
+      this.formFields = _.cloneDeep(this.formFieldsBackup);
+    },
+
     validateForm() {
       return this.$refs.form.validate();
     },
@@ -102,7 +136,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
       this.$refs.snackbar.trigger(content);
     },
 
-    submit(): void {
+    persistFormFields(): void {
       if (this.validateForm()) {
         this.updateLetter();
       } else {

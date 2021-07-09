@@ -59,7 +59,7 @@ import {
 } from "@/graphql/types/UpdateSurvey";
 import { UPDATE_SURVEY } from "@/graphql/surveys.graphql";
 import * as _ from "lodash";
-import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 
 interface GroupDetails {
   okayForGroup: boolean;

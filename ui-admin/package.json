@@ -11,6 +11,8 @@
     "gen:types": "rm -f ./src/graphql/types/*.ts && apollo client:codegen --no-addTypename --target=typescript --outputFlat ./src/graphql/types"
   },
   "dependencies": {
+    "@tiptap/starter-kit": "^2.0.0-beta.82",
+    "@tiptap/vue-2": "^2.0.0-beta.39",
     "@vue/composition-api": "^1.0.0-rc.13",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
