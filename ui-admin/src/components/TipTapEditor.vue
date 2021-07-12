@@ -3,14 +3,19 @@
     <v-card-title>{{ title }}</v-card-title>
 
     <v-card-text>
-      <editor-content v-if="editor" :editor="editor" />
+      <editor-content
+        v-if="editor"
+        :editor="editor"
+        class="prose-mirror-wrapper"
+        :class="classBindings"
+      />
     </v-card-text>
 
     <v-card-actions>
       <v-spacer />
       <edit-save-delete-cancel-buttons
         :is-data-dirty="isDirty"
-        :is-data-valid="isValid"
+        :is-data-valid="true"
         @enter-edit-mode="setEditMode(true)"
         @leave-edit-mode="setEditMode(false)"
         @backup-data="backupContent"
@@ -60,6 +65,13 @@ export default Vue.extend({
     isValid(): boolean {
       return !this.editor.isEmpty;
     },
+
+    classBindings(): Record<string, unknown> {
+      return {
+        "prose-mirror-active": this.inEditMode,
+        "prose-mirror-inactive": !this.inEditMode,
+      };
+    },
   },
 
   methods: {
@@ -98,3 +110,17 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style>
+.prose-mirror-wrapper {
+  padding: 1em;
+}
+
+.prose-mirror-active {
+  border: #1976d2 solid 1px;
+}
+
+.prose-mirror-inactive {
+  border: gray dashed 1px;
+}
+</style>

@@ -6,7 +6,7 @@
       </v-col>
 
       <v-col>
-        <letter-details-cover-letter :email-message="emailMessage" />
+        <letter-details-cover-letter :letter="surveyLetter.letter" />
       </v-col>
     </v-row>
   </v-container>
@@ -38,17 +38,6 @@ export default Vue.extend({
     return {
       inEditMode: false,
     };
-  },
-
-  computed: {
-    emailMessage(): Record<string, any> {
-      const emailMessage = this.surveyLetter.letter.emailMessage;
-      if (isQuillDeltaString(emailMessage)) {
-        return quillDeltaToTipTapJson(emailMessage);
-      } else {
-        return JSON.parse(this.surveyLetter.letter.emailMessage);
-      }
-    },
   },
 });
 </script>
