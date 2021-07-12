@@ -2,7 +2,7 @@
   <v-container>
     <tip-tap-editor
       title="Email Cover Letter"
-      :tip-tap-json="messageContent"
+      :initial-content="letter.emailMessage"
       @contentUpdated="saveEmailMessage"
     />
   </v-container>
@@ -17,7 +17,6 @@ import {
   UpdateLetterVariables,
 } from "@/graphql/types/UpdateLetter";
 import { SurveyLetters_surveyLetters_letter } from "@/graphql/types/SurveyLetters";
-import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
 
 export default Vue.extend({
   name: "LetterDetailsCoverLetter",
@@ -30,17 +29,6 @@ export default Vue.extend({
     letter: {
       type: Object as () => SurveyLetters_surveyLetters_letter,
       required: true,
-    },
-  },
-
-  computed: {
-    messageContent(): Record<string, unknown> {
-      const emailMessage = this.letter.emailMessage;
-      if (isQuillDeltaString(emailMessage)) {
-        return quillDeltaToTipTapJson(emailMessage);
-      } else {
-        return JSON.parse(this.letter.emailMessage);
-      }
     },
   },
 

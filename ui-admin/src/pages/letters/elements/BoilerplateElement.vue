@@ -1,6 +1,6 @@
 <template>
   <element-card :title="title" :sub-title="element.id" :card-data="cardData">
-    <span v-html="textHtml" />
+    <tip-tap-editor flat :initial-content="this.element.textDelta" />
   </element-card>
 </template>
 
@@ -10,11 +10,12 @@ import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/typ
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 import { quillDeltaToHtml, stripHtmlTags, truncateWords } from "@/helpers";
 import { CardData } from "@/pages/letters/LetterContentTab.vue";
+import TipTapEditor from "@/components/TipTapEditor.vue";
 
 export default Vue.extend({
   name: "BoilerplateElement",
 
-  components: { ElementCard },
+  components: { TipTapEditor, ElementCard },
 
   props: {
     element: {

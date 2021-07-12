@@ -1,6 +1,6 @@
 <template>
-  <v-card>
-    <v-card-title>{{ title }}</v-card-title>
+  <v-card :elevation="elevation">
+    <v-card-title v-if="title">{{ title }}</v-card-title>
 
     <v-card-text>
       <editor-content
@@ -28,12 +28,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Content, Editor, EditorContent } from "@tiptap/vue-2";
+import { Content, Editor, EditorContent, JSONContent } from "@tiptap/vue-2";
 import StarterKit from "@tiptap/starter-kit";
 import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 import * as _ from "lodash";
-
-type TipTapContent = Record<string, string | number>;
+import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
 
 export default Vue.extend({
   name: "TipTapEditor",
@@ -44,20 +43,37 @@ export default Vue.extend({
   },
 
   props: {
-    title: { type: String, required: true },
-    tipTapJson: { type: Object, required: true },
+    title: { type: String },
+    initialContent: { type: String, required: true },
+    flat: { type: Boolean, default: false },
   },
 
   data() {
     return {
       editor: {} as Editor,
       inEditMode: false,
-      content: {} as TipTapContent,
-      savedContent: {} as TipTapContent,
+      content: {} as JSONContent,
+      savedContent: {} as JSONContent,
     };
   },
 
   computed: {
+    // Decode the initial content.
+    tipTapJson(): JSONContent {
+      console.log("Initial content", this.initialContent);
+      if (isQuillDeltaString(this.initialContent)) {
+        console.log("Quill Delta");
+        return quillDeltaToTipTapJson(this.initialContent);
+      } else {
+        console.log("Tip Tap JSON");
+        return JSON.parse(this.initialContent);
+      }
+    },
+
+    elevation(): number | undefined {
+      return this.flat ? 0 : undefined;
+    },
+
     isDirty(): boolean {
       return !_.isEqual(this.content, this.savedContent);
     },
@@ -81,7 +97,7 @@ export default Vue.extend({
     },
 
     backupContent() {
-      this.savedContent = this.editor.getJSON();
+      this.savedContent = this.editor.getJSON() as JSONContent;
     },
 
     restoreContent() {
@@ -100,7 +116,7 @@ export default Vue.extend({
       content: this.tipTapJson,
       editable: false,
       onUpdate: () => {
-        this.content = this.editor.getJSON();
+        this.content = this.editor.getJSON() as JSONContent;
       },
     });
   },

@@ -19,18 +19,18 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { FabMenuItem } from "@/pages/letters/elements/ElementAddFab.vue";
+import { ElementCardMenuItem } from "@/pages/letters/elements/ElementCardMenu.vue";
 
 /**
- * Simple, non-FAB add button for creating the first element in a letter.
- * See `ElementAddFab` for the fancier version.
+ * Simple add button for creating the first element in a letter.
+ * See `ElementCardMenu` for the fancier version.
  */
 export default Vue.extend({
   name: "ElementAddButton",
 
   props: {
     label: { type: String, required: true },
-    menuItems: { type: Array as () => FabMenuItem[], required: true },
+    menuItems: { type: Array as () => ElementCardMenuItem[], required: true },
     crackPosition: { type: Number, default: 0 },
   },
 });

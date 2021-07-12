@@ -11,7 +11,7 @@
               <element-add-button
                 v-if="letterElements.length === 0"
                 label="Add First Element"
-                :menu-items="fabMenuItems"
+                :menu-items="cardMenuItems"
                 :crack-position="0"
                 @add-element="addElement"
               />
@@ -85,9 +85,6 @@ import {
   LetterElementsByType,
   LetterElementsByType_elementsByLetterType,
 } from "@/graphql/types/LetterElementsByType";
-import ElementFab, {
-  FabMenuItem,
-} from "@/pages/letters/elements/ElementAddFab.vue";
 import prettyFormat from "pretty-format";
 import {
   CreateLetterElement,
@@ -98,6 +95,7 @@ import {
   DeleteLetterElementVariables,
 } from "@/graphql/types/DeleteLetterElement";
 import ElementAddButton from "@/pages/letters/elements/ElementAddButton.vue";
+import { ElementCardMenuItem } from "@/pages/letters/elements/ElementCardMenu.vue";
 
 // Map letter element key (e.g., `image`) to both the component name to be rendered
 // and the PK of the corresponding letter element in the database.
@@ -147,7 +145,7 @@ interface ChangeEvent<T> {
 // Props passed to the ElementCard component behind all type-specific elements.
 export interface CardData {
   positionInList: number;
-  fabMenuItems: FabMenuItem[];
+  cardMenuItems: ElementCardMenuItem[];
   showContent: boolean;
 }
 
@@ -156,7 +154,6 @@ export default Vue.extend({
 
   components: {
     ElementAddButton,
-    ElementFab,
     LetterElementMenu,
     StaticLetterElement,
     ChooseChartDialog,
@@ -204,7 +201,7 @@ export default Vue.extend({
       letterElements: [] as LetterElement[],
       isNew: false,
 
-      fabMenuItems: [] as FabMenuItem[],
+      cardMenuItems: [] as ElementCardMenuItem[],
       showContent: true,
     };
   },
@@ -221,7 +218,7 @@ export default Vue.extend({
           `Can't find elements for letter type '${this.surveyLetter.letterType.key}'`
         );
       }
-      this.fabMenuItems = _.map(
+      this.cardMenuItems = _.map(
         _.sortBy(letterElements.letterElementTypes, ["description"]),
         (elementTypes) => ({
           text: elementTypes.description,
@@ -242,7 +239,7 @@ export default Vue.extend({
     // Construct the data to be passed into each of the letter element cards.
     cardData(idx: number): CardData {
       return {
-        fabMenuItems: this.fabMenuItems,
+        cardMenuItems: this.cardMenuItems,
         showContent: this.showContent,
         positionInList: idx,
       };

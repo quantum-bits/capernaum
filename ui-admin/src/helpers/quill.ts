@@ -1,7 +1,6 @@
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import { generateJSON } from "@tiptap/vue-2";
+import { generateJSON, JSONContent } from "@tiptap/vue-2";
 import StarterKit from "@tiptap/starter-kit";
-import { del } from "@vue/composition-api";
 
 export function isQuillDeltaString(deltaString: string): boolean {
   return deltaString.match(/^{"ops"/) !== null;
@@ -20,15 +19,13 @@ export function quillDeltaToHtml(deltaString: string): string {
   return converter.convert();
 }
 
-export function quillDeltaToTipTapJson(
-  deltaString: string
-): Record<string, any> {
+export function quillDeltaToTipTapJson(deltaString: string): JSONContent {
   console.log("deltaString", deltaString);
 
   const htmlString = quillDeltaToHtml(deltaString);
   console.log("htmlString", htmlString);
 
-  const tipTapJson = generateJSON(htmlString, [StarterKit]);
+  const tipTapJson = generateJSON(htmlString, [StarterKit]) as JSONContent;
   console.log("tipTapJson", tipTapJson);
 
   return tipTapJson;
