@@ -45,10 +45,12 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
     isDataDirty: {
       type: Boolean,
       required: true,
     },
+
     isDataValid: {
       type: Boolean,
       required: true,

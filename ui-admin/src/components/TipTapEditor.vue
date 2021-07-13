@@ -2,14 +2,64 @@
   <v-card :elevation="elevation">
     <v-card-title v-if="title">{{ title }}</v-card-title>
 
-    <v-card-text>
-      <editor-content
-        v-if="editor"
-        :editor="editor"
-        class="prose-mirror-wrapper"
-        :class="classBindings"
-      />
-    </v-card-text>
+    <div class="prose-mirror-wrapper" :class="classBindings">
+      <v-row class="mb-1">
+        <v-col>
+          <v-btn-toggle class="mr-4" dense mandatory v-model="blockType">
+            <v-btn
+              @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+              :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
+            >
+              <v-icon>mdi-format-header-1</v-icon>
+            </v-btn>
+            <v-btn
+              @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+              :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
+            >
+              <v-icon>mdi-format-header-2</v-icon>
+            </v-btn>
+            <v-btn
+              @click="editor.chain().focus().setParagraph().run()"
+              :class="{ 'is-active': editor.isActive('paragraph') }"
+            >
+              <v-icon>mdi-format-pilcrow</v-icon>
+            </v-btn>
+            <v-btn
+              @click="editor.chain().focus().toggleBulletList().run()"
+              :class="{ 'is-active': editor.isActive('bulletList') }"
+            >
+              <v-icon>mdi-format-list-bulleted</v-icon>
+            </v-btn>
+            <v-btn
+              @click="editor.chain().focus().toggleOrderedList().run()"
+              :class="{ 'is-active': editor.isActive('orderedList') }"
+            >
+              <v-icon>mdi-format-list-numbered</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+
+          <v-btn-toggle class="ml-4" dense multiple model="fontStyles">
+            <v-btn
+              @click="editor.chain().focus().toggleBold().run()"
+              :class="{ 'is-active': editor.isActive('bold') }"
+            >
+              <v-icon>mdi-format-bold</v-icon>
+            </v-btn>
+            <v-btn
+              @click="editor.chain().focus().toggleItalic().run()"
+              :class="{ 'is-active': editor.isActive('italic') }"
+            >
+              <v-icon>mdi-format-italic</v-icon>
+            </v-btn>
+          </v-btn-toggle>
+        </v-col>
+      </v-row>
+
+      <editor-content v-if="editor" :editor="editor" />
+
+      <h2>Saved Content</h2>
+      <pre><code>{{ savedContent }}</code></pre>
+    </div>
 
     <v-card-actions>
       <v-spacer />
@@ -54,6 +104,9 @@ export default Vue.extend({
       inEditMode: false,
       content: {} as JSONContent,
       savedContent: {} as JSONContent,
+
+      blockType: 2,
+      fontStyles: [],
     };
   },
 
@@ -92,19 +145,23 @@ export default Vue.extend({
 
   methods: {
     setEditMode(enabled: boolean) {
+      console.log(`Set edit mode to ${enabled}`);
       this.inEditMode = enabled;
       this.editor.setEditable(enabled);
     },
 
     backupContent() {
+      console.log("Back up content");
       this.savedContent = this.editor.getJSON() as JSONContent;
     },
 
     restoreContent() {
+      console.log("Restore content");
       this.editor.commands.setContent(this.savedContent as Content, false);
     },
 
     persistContent() {
+      console.log("Persist content");
       const content = this.editor.getJSON();
       this.$emit("contentUpdated", content);
     },
@@ -115,9 +172,6 @@ export default Vue.extend({
       extensions: [StarterKit],
       content: this.tipTapJson,
       editable: false,
-      onUpdate: () => {
-        this.content = this.editor.getJSON() as JSONContent;
-      },
     });
   },
 
