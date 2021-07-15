@@ -3,62 +3,73 @@
     <v-card-title v-if="title">{{ title }}</v-card-title>
 
     <div class="prose-mirror-wrapper" :class="classBindings">
-      <v-row class="mb-1">
+      <v-row class="mb-1" align="baseline">
         <v-col>
-          <v-btn-toggle class="mr-4" dense mandatory v-model="blockType">
+          <v-btn-toggle class="mr-4" dense multiple v-model="blockType">
             <v-btn
+              :value="style.Heading1"
               @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-              :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
             >
               <v-icon>mdi-format-header-1</v-icon>
             </v-btn>
             <v-btn
+              :value="style.Heading2"
               @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-              :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
             >
               <v-icon>mdi-format-header-2</v-icon>
             </v-btn>
             <v-btn
+              :value="style.Paragraph"
               @click="editor.chain().focus().setParagraph().run()"
-              :class="{ 'is-active': editor.isActive('paragraph') }"
             >
               <v-icon>mdi-format-pilcrow</v-icon>
             </v-btn>
             <v-btn
+              :value="style.ListBullet"
               @click="editor.chain().focus().toggleBulletList().run()"
-              :class="{ 'is-active': editor.isActive('bulletList') }"
             >
               <v-icon>mdi-format-list-bulleted</v-icon>
             </v-btn>
             <v-btn
+              :value="style.ListNumber"
               @click="editor.chain().focus().toggleOrderedList().run()"
-              :class="{ 'is-active': editor.isActive('orderedList') }"
             >
               <v-icon>mdi-format-list-numbered</v-icon>
             </v-btn>
           </v-btn-toggle>
 
-          <v-btn-toggle class="ml-4" dense multiple model="fontStyles">
+          <v-btn-toggle class="ml-4" dense multiple v-model="fontStyle">
             <v-btn
+              :value="style.Bold"
               @click="editor.chain().focus().toggleBold().run()"
-              :class="{ 'is-active': editor.isActive('bold') }"
             >
               <v-icon>mdi-format-bold</v-icon>
             </v-btn>
             <v-btn
+              :value="style.Italic"
               @click="editor.chain().focus().toggleItalic().run()"
-              :class="{ 'is-active': editor.isActive('italic') }"
             >
               <v-icon>mdi-format-italic</v-icon>
             </v-btn>
           </v-btn-toggle>
         </v-col>
+        <v-col>
+          <v-checkbox label="Debug" v-model="debugContent"></v-checkbox>
+        </v-col>
       </v-row>
 
       <editor-content v-if="editor" :editor="editor" />
 
-      <h2>Saved Content</h2>
-      <pre><code>{{ savedContent }}</code></pre>
+      <v-row v-if="debugContent">
+        <v-col>
+          <h2>Current Content</h2>
+          <pre><code>{{ currentContent }}</code></pre>
+        </v-col>
+        <v-col>
+          <h2>Saved Content</h2>
+          <pre><code>{{ savedContent }}</code></pre>
+        </v-col>
+      </v-row>
     </div>
 
     <v-card-actions>
@@ -78,11 +89,22 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Content, Editor, EditorContent, JSONContent } from "@tiptap/vue-2";
+import { Editor, EditorContent, JSONContent } from "@tiptap/vue-2";
+import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
-import * as _ from "lodash";
 import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
+import * as _ from "lodash";
+
+enum Style {
+  Heading1,
+  Heading2,
+  Paragraph,
+  ListBullet,
+  ListNumber,
+  Bold,
+  Italic,
+}
 
 export default Vue.extend({
   name: "TipTapEditor",
@@ -102,11 +124,14 @@ export default Vue.extend({
     return {
       editor: {} as Editor,
       inEditMode: false,
-      content: {} as JSONContent,
+      currentContent: {} as JSONContent,
       savedContent: {} as JSONContent,
 
-      blockType: 2,
-      fontStyles: [],
+      blockType: [2],
+      fontStyle: [] as number[],
+      style: Style,
+
+      debugContent: false,
     };
   },
 
@@ -128,7 +153,7 @@ export default Vue.extend({
     },
 
     isDirty(): boolean {
-      return !_.isEqual(this.content, this.savedContent);
+      return !_.isEqual(this.currentContent, this.savedContent);
     },
 
     isValid(): boolean {
@@ -143,6 +168,14 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    editor: {
+      handler(newVal) {
+        console.log("THIS IS THE EDITOR", newVal);
+      },
+    },
+  },
+
   methods: {
     setEditMode(enabled: boolean) {
       console.log(`Set edit mode to ${enabled}`);
@@ -150,14 +183,19 @@ export default Vue.extend({
       this.editor.setEditable(enabled);
     },
 
+    retrieveContent() {
+      this.currentContent = this.editor.getJSON() as JSONContent;
+    },
+
     backupContent() {
       console.log("Back up content");
-      this.savedContent = this.editor.getJSON() as JSONContent;
+      this.savedContent = _.cloneDeep(this.currentContent);
     },
 
     restoreContent() {
       console.log("Restore content");
-      this.editor.commands.setContent(this.savedContent as Content, false);
+      this.currentContent = _.cloneDeep(this.savedContent);
+      this.editor.commands.setContent(this.currentContent, false);
     },
 
     persistContent() {
@@ -165,13 +203,77 @@ export default Vue.extend({
       const content = this.editor.getJSON();
       this.$emit("contentUpdated", content);
     },
+
+    wrapIsActive(
+      name: string,
+      attributes?: { [key: string]: unknown }
+    ): boolean {
+      const rtn: boolean = this.editor.isActive(name, attributes);
+      if (rtn) {
+        console.info(
+          `'${name}' ${JSON.stringify(attributes)} ${
+            rtn ? "IS ACTIVE" : "is not active"
+          }`
+        );
+      }
+      return rtn;
+    },
+
+    updateFontStyleButtons() {
+      const updatedStyle = [];
+      if (this.wrapIsActive("bold")) {
+        updatedStyle.push(Style.Bold);
+      }
+      if (this.wrapIsActive("italic")) {
+        updatedStyle.push(Style.Italic);
+      }
+      this.fontStyle = updatedStyle;
+    },
+
+    updateBlockTypeButtons() {
+      const updatedStyle = [];
+      if (this.wrapIsActive("heading", { level: 1 })) {
+        updatedStyle.push(Style.Heading1);
+      }
+      if (this.wrapIsActive("heading", { level: 2 })) {
+        updatedStyle.push(Style.Heading2);
+      }
+      if (this.wrapIsActive("paragraph")) {
+        updatedStyle.push(Style.Paragraph);
+      }
+      if (this.wrapIsActive("bulletList")) {
+        updatedStyle.push(Style.ListBullet);
+      }
+      if (this.wrapIsActive("orderedList")) {
+        updatedStyle.push(Style.ListNumber);
+      }
+      this.blockType = updatedStyle;
+    },
+
+    updateStyleButtons() {
+      this.updateFontStyleButtons();
+      this.updateBlockTypeButtons();
+    },
   },
 
   created() {
     this.editor = new Editor({
-      extensions: [StarterKit],
+      extensions: [StarterKit, Placeholder],
       content: this.tipTapJson,
       editable: false,
+      autofocus: true,
+      onCreate: () => {
+        this.retrieveContent();
+      },
+      onUpdate: () => {
+        console.log("UPDATE");
+        this.retrieveContent();
+        this.updateStyleButtons();
+      },
+      onSelectionUpdate: () => {
+        console.log("SELECTION UPDATE");
+        this.updateStyleButtons();
+      },
     });
   },
 
@@ -182,6 +284,14 @@ export default Vue.extend({
 </script>
 
 <style>
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #ced4da;
+  pointer-events: none;
+  height: 0;
+}
+
 .prose-mirror-wrapper {
   padding: 1em;
 }
