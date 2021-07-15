@@ -7,7 +7,7 @@
     </template>
 
     <v-list dense>
-      <v-list-group v-if="positionInList > 0" v-model="showAddBefore" no-action>
+      <v-list-group v-model="showAddBefore" no-action>
         <template v-slot:prependIcon>
           <v-icon color="primary">mdi-arrow-up-circle-outline</v-icon>
         </template>

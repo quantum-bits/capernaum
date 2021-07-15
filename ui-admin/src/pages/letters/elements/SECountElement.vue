@@ -1,26 +1,30 @@
 <template>
-  <v-card>
-    <v-card-title>Scripture Engagement Count</v-card-title>
-    <v-card-text> </v-card-text>
-    <edit-save-delete-cancel-buttons />
-  </v-card>
+  <element-card
+    title="Scripture Engagement Counts"
+    :sub-title="element.id"
+    :card-data="cardData"
+  >
+    Scripture engagement count data will appear here.
+  </element-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/types/SurveyLetters";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import { CardData } from "@/pages/letters/LetterContentTab.vue";
+import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 
 export default Vue.extend({
   name: "SECountElement",
 
-  components: { EditSaveDeleteCancelButtons },
+  components: { ElementCard },
 
   props: {
     element: {
       type: Object as () => SurveyLetters_surveyLetters_letter_letterElements,
       required: true,
     },
+    cardData: { type: Object as () => CardData, required: true },
   },
 });
 </script>
