@@ -70,7 +70,7 @@ import {
 } from "@/graphql/letters.graphql";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 import StaticLetterElement from "@/pages/letters/StaticLetterElement.vue";
-import ChooseChartDialog from "@/pages/letters/ChooseChartDialog.vue";
+import ChooseChartDialog from "@/pages/letters/ChooseDimensionDialog.vue";
 import ChooseImageDialog from "@/pages/letters/ChooseImageDialog.vue";
 import * as _ from "lodash";
 import BoilerplateElement from "./elements/BoilerplateElement.vue";
@@ -147,6 +147,7 @@ export interface CardData {
   positionInList: number;
   cardMenuItems: ElementCardMenuItem[];
   showContent: boolean;
+  surveyLetter: SurveyLetters_surveyLetters;
 }
 
 export default Vue.extend({
@@ -242,6 +243,7 @@ export default Vue.extend({
         cardMenuItems: this.cardMenuItems,
         showContent: this.showContent,
         positionInList: idx,
+        surveyLetter: this.surveyLetter,
       };
     },
 

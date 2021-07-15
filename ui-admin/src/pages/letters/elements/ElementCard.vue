@@ -13,8 +13,11 @@
       />
     </v-card-title>
     <v-card-text v-if="cardData.showContent">
-      <slot></slot>
+      <slot />
     </v-card-text>
+    <v-card-actions>
+      <slot name="actions"></slot>
+    </v-card-actions>
   </v-card>
 </template>
 

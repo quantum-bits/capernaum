@@ -18,6 +18,7 @@ import { BaseService } from "@server/src/shared/base.service";
 import { SurveyDimension, SurveyLetter } from "@server/src/survey/entities";
 import { Image } from "@server/src/image/entities";
 import * as _ from "lodash";
+import { SurveyDimensionService } from "@server/src/survey/services";
 
 const debug = getDebugger("letter");
 
@@ -154,6 +155,7 @@ export class LetterElementService extends BaseService<LetterElement> {
   constructor(
     private readonly letterService: LetterService,
     private readonly letterElementTypeService: LetterElementTypeService,
+    private readonly surveyDimensionService: SurveyDimensionService,
     @InjectRepository(LetterElement)
     private readonly repo: Repository<LetterElement>
   ) {
@@ -179,10 +181,26 @@ export class LetterElementService extends BaseService<LetterElement> {
     });
   }
 
-  update(updateInput: LetterElementUpdateInput) {
+  async update(updateInput: LetterElementUpdateInput) {
+    debug("Update input %O", updateInput);
+
+    const surveyDimension = await this.surveyDimensionService.readOne(
+      updateInput.surveyDimensionId
+    );
+
     return this.repo
-      .preload(updateInput)
-      .then((result) => this.repo.save(result));
+      .preload({
+        id: updateInput.id,
+        surveyDimension,
+      })
+      .then((preloaded) => {
+        debug("Preloaded %O", preloaded);
+        return this.repo.save(preloaded);
+      })
+      .then((saved) => {
+        debug("Saved %O", saved);
+        return saved;
+      });
   }
 
   /**

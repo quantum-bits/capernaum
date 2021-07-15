@@ -1,5 +1,5 @@
 <template>
-  <v-menu v-model="menuVisible" :close-on-content-click="false">
+  <v-menu left v-model="menuVisible" :close-on-content-click="false">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-bind="attrs" v-on="on">
         <v-icon>mdi-dots-vertical</v-icon>

@@ -44,7 +44,7 @@ import {
 import { CREATE_LETTER_ELEMENT_MUTATION } from "@/graphql/letters.graphql";
 
 export default Vue.extend({
-  name: "ChooseChartDialog",
+  name: "ChooseDimensionDialog",
 
   props: {
     surveyLetter: {

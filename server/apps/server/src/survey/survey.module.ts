@@ -73,6 +73,7 @@ import { Group } from "@server/src/group/entities";
     SurveyResponseService,
     SurveyAnalyticsService,
     SurveyLetterService,
+    SurveyDimensionService,
   ],
 })
 export class SurveyModule {
