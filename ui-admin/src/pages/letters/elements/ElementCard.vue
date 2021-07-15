@@ -2,8 +2,8 @@
   <v-card outlined class="my-2" elevation="2">
     <v-card-title>
       <v-icon class="mr-2">mdi-drag-vertical</v-icon>
-      <span class="blue--text mr-2" v-if="subTitle">{{ subTitle }}</span>
       {{ title }}
+      <span class="blue--text ml-2" v-if="subTitle">[{{ subTitle }}]</span>
       <v-spacer />
       <element-card-menu
         :position-in-list="cardData.positionInList"
@@ -15,8 +15,8 @@
     <v-card-text v-if="cardData.showContent">
       <slot />
     </v-card-text>
-    <v-card-actions>
-      <slot name="actions"></slot>
+    <v-card-actions v-if="cardData.showContent">
+      <slot name="actions" />
     </v-card-actions>
   </v-card>
 </template>

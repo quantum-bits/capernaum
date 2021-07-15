@@ -1,10 +1,10 @@
 <template>
-  <element-card :title="title" :card-data="cardData">
+  <element-card :title="title" :sub-title="element.id" :card-data="cardData">
     <v-select
       :disabled="!inEditMode"
       label="Select a survey dimension"
-      :items="dimensionSelections"
-      v-model="selectedDimension"
+      :items="availableDimensions"
+      v-model="selectedDimensionId"
     />
 
     <template v-slot:actions>
@@ -12,10 +12,10 @@
       <edit-save-delete-cancel-buttons
         @enter-edit-mode="inEditMode = true"
         @leave-edit-mode="inEditMode = false"
-        :is-data-valid="selectedDimension !== null"
-        :is-data-dirty="selectedDimension !== savedDimension"
-        @backup-data="savedDimension = selectedDimension"
-        @restore-data="selectedDimension = savedDimension"
+        :is-data-valid="selectedDimensionId !== null"
+        :is-data-dirty="selectedDimensionId !== savedDimensionId"
+        @backup-data="savedDimensionId = selectedDimensionId"
+        @restore-data="selectedDimensionId = savedDimensionId"
         @persist-data="saveDimension"
       />
     </template>
@@ -59,28 +59,35 @@ export default Vue.extend({
   data() {
     return {
       inEditMode: false,
-      selectedDimension:
-        (this.element.surveyDimension
-          ?.id as SurveyLetters_surveyLetters_survey_surveyDimensions) || null,
-      savedDimension: null,
+      selectedDimensionId: this.element.surveyDimension?.id as number | null,
+      savedDimensionId: null as number | null,
     };
   },
 
   computed: {
-    title(): string {
-      const dimension = _.find(
-        this.cardData.surveyLetter.survey.surveyDimensions,
-        (dim) => dim.id === this.selectedDimension
-      );
-      const dimensionTitle = dimension ? dimension.title : "none";
-      return `Dimension Chart (${dimensionTitle})`;
-    },
-
-    dimensionSelections(): Selection[] {
+    availableDimensions(): Selection[] {
       return this.cardData.surveyLetter.survey.surveyDimensions.map((dim) => ({
         text: dim.title,
         value: dim.id,
       }));
+    },
+
+    selectedDimension():
+      | SurveyLetters_surveyLetters_survey_surveyDimensions
+      | undefined {
+      if (this.selectedDimensionId) {
+        return _.find(
+          this.cardData.surveyLetter.survey.surveyDimensions,
+          (dim) => dim.id === this.selectedDimensionId
+        );
+      }
+      return undefined;
+    },
+
+    title(): string {
+      return `Dimension Chart (${
+        this.selectedDimension ? this.selectedDimension.title : "none"
+      })`;
     },
   },
 
@@ -92,7 +99,7 @@ export default Vue.extend({
           variables: {
             updateInput: {
               id: this.element.id,
-              surveyDimensionId: this.selectedDimension,
+              surveyDimensionId: this.selectedDimensionId,
             },
           },
         })
