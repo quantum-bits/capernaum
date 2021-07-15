@@ -92,6 +92,7 @@ import Vue from "vue";
 import { Editor, EditorContent, JSONContent } from "@tiptap/vue-2";
 import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
+import { generateHTML } from "@tiptap/vue-2";
 import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
 import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
 import * as _ from "lodash";
@@ -183,7 +184,7 @@ export default Vue.extend({
       this.editor.setEditable(enabled);
     },
 
-    retrieveContent() {
+    retrieveCurrentContent() {
       this.currentContent = this.editor.getJSON() as JSONContent;
     },
 
@@ -201,7 +202,7 @@ export default Vue.extend({
     persistContent() {
       console.log("Persist content");
       const content = this.editor.getJSON();
-      this.$emit("contentUpdated", content);
+      this.$emit("save-content", content);
     },
 
     wrapIsActive(
@@ -257,21 +258,27 @@ export default Vue.extend({
   },
 
   created() {
+    const extensions = [StarterKit, Placeholder];
+
+    const emitUpdateEvent = () => {
+      this.$emit("html-updated", generateHTML(this.currentContent, extensions));
+    };
+
     this.editor = new Editor({
-      extensions: [StarterKit, Placeholder],
+      extensions,
       content: this.tipTapJson,
       editable: false,
       autofocus: true,
       onCreate: () => {
-        this.retrieveContent();
+        this.retrieveCurrentContent();
+        emitUpdateEvent();
       },
       onUpdate: () => {
-        console.log("UPDATE");
-        this.retrieveContent();
+        this.retrieveCurrentContent();
         this.updateStyleButtons();
+        emitUpdateEvent();
       },
       onSelectionUpdate: () => {
-        console.log("SELECTION UPDATE");
         this.updateStyleButtons();
       },
     });
@@ -284,6 +291,7 @@ export default Vue.extend({
 </script>
 
 <style>
+/* Style the placeholder text. */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;

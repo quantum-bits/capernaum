@@ -7,7 +7,11 @@ import * as _ from "lodash";
  */
 export function truncateWords(value: string, maxLength = 10): string {
   const words = _.split(value, /\s+/);
-  return _.take(words, _.min([words.length, maxLength])).join(" ");
+  if (words.length <= maxLength) {
+    return words.join(" ");
+  } else {
+    return _.concat(_.take(words, maxLength), "...").join(" ");
+  }
 }
 
 /**
