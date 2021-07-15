@@ -1,5 +1,9 @@
 <template>
-  <element-card title="SE Prediction" :card-data="cardData">
+  <element-card
+    title="SE Prediction"
+    :sub-title="element.id"
+    :card-data="cardData"
+  >
     AN SEP PREDICTION
   </element-card>
 </template>

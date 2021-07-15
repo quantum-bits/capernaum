@@ -634,13 +634,13 @@ type Query {
   letter(id: Int!): Letter!
   letters: [Letter!]!
   readLetterTypes: [LetterType!]!
+  images: [Image!]!
+  image(id: Int!): Image!
   scriptureEngagementPractice(id: Int!): ScriptureEngagementPractice!
   scriptureEngagementPractices: [ScriptureEngagementPractice!]!
   user(id: Int!): User!
   users: [User!]!
   userRoles: [UserRole!]!
-  images: [Image!]!
-  image(id: Int!): Image!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
   organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   subscriptions: [QualtricsSubscription!]!
@@ -702,6 +702,8 @@ type Mutation {
   deleteLetter(id: Int!): Int!
   createLetterType(createInput: LetterTypeCreateInput!): LetterType!
   updateLetterType(updateInput: LetterTypeUpdateInput!): LetterType!
+  updateImage(updateInput: ImageUpdateInput!): Image!
+  deleteImage(id: Int!): Int!
 
   """Create a scripture engagement practice"""
   createScriptureEngagementPractice(createInput: ScriptureEngagementPracticeCreateInput!): ScriptureEngagementPractice!
@@ -713,8 +715,6 @@ type Mutation {
   changePassword(passwordInput: ChangePasswordInput!): String!
   createUserRole(createInput: UserRoleCreateInput!): UserRole!
   writeLetter(writerInput: WriterInput!): WriterOutput!
-  updateImage(updateInput: ImageUpdateInput!): Image!
-  deleteImage(id: Int!): Int!
 
   """
   Import a survey from Qualtrics. Always use this to create a Capernaum survey.
@@ -940,6 +940,11 @@ input LetterTypeUpdateInput {
   description: String
 }
 
+input ImageUpdateInput {
+  id: Int!
+  title: String!
+}
+
 input ScriptureEngagementPracticeCreateInput {
   title: String!
   description: String!
@@ -995,11 +1000,6 @@ input UserRoleCreateInput {
 input WriterInput {
   letterId: Int!
   surveyResponseId: Int!
-}
-
-input ImageUpdateInput {
-  id: Int!
-  title: String!
 }
 
 input QualtricsSubscriptionCreateInput {

@@ -287,6 +287,7 @@ export const SURVEY_LETTERS_QUERY = gql`
           image {
             id
             title
+            url
           }
           surveyDimension {
             id

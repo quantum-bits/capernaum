@@ -73,6 +73,7 @@ export interface SurveyLetters_surveyLetters_letter_letterElements_image {
    * Image title from user
    */
   title: string;
+  url: string;
 }
 
 export interface SurveyLetters_surveyLetters_letter_letterElements_surveyDimension {

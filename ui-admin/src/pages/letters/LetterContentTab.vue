@@ -48,9 +48,6 @@
           </draggable>
         </v-col>
       </v-row>
-
-      <choose-chart-dialog :survey-letter="surveyLetter" />
-      <choose-image-dialog :letter="surveyLetter.letter" />
     </v-card>
   </v-container>
 </template>
@@ -70,8 +67,6 @@ import {
 } from "@/graphql/letters.graphql";
 import { LetterElementCreateInput } from "@/graphql/types/globalTypes";
 import StaticLetterElement from "@/pages/letters/StaticLetterElement.vue";
-import ChooseChartDialog from "@/pages/letters/ChooseDimensionDialog.vue";
-import ChooseImageDialog from "@/pages/letters/ChooseImageDialog.vue";
 import * as _ from "lodash";
 import BoilerplateElement from "./elements/BoilerplateElement.vue";
 import SEPredictionElement from "@/pages/letters/elements/SEPredictionElement.vue";
@@ -157,8 +152,6 @@ export default Vue.extend({
     ElementAddButton,
     LetterElementMenu,
     StaticLetterElement,
-    ChooseChartDialog,
-    ChooseImageDialog,
     BoilerplateElement,
     SEPredictionElement,
     DimensionChartElement,

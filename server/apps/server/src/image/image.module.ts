@@ -11,5 +11,6 @@ import { PDFController } from "./pdf.controller";
   imports: [TypeOrmModule.forFeature([Image]), FileModule],
   controllers: [ImageController, PDFController],
   providers: [ImageResolver, ImageService],
+  exports: [ImageService],
 })
 export class ImageModule {}

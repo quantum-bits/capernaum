@@ -15,7 +15,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { SurveyLetters_surveyLetters } from "@/graphql/types/SurveyLetters";
-import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
 import LetterDetailsForm from "@/pages/letters/LetterDetailsForm.vue";
 import LetterDetailsCoverLetter from "@/pages/letters/LetterDetailsCoverLetter.vue";
 

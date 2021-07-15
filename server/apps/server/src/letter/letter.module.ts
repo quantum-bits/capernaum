@@ -19,6 +19,7 @@ import {
   LetterTypeService,
 } from "./letter.service";
 import { SurveyModule } from "@server/src/survey/survey.module";
+import { ImageModule } from "@server/src/image/image.module";
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SurveyModule } from "@server/src/survey/survey.module";
       LetterElementType,
     ]),
     forwardRef(() => SurveyModule),
+    ImageModule,
   ],
   providers: [
     LetterElementResolver,

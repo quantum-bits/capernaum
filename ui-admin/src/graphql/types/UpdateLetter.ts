@@ -22,6 +22,10 @@ export interface UpdateLetter_updateLetter {
    * Description of letter
    */
   description: string;
+  /**
+   * Email message to go out with letter
+   */
+  emailMessage: string;
 }
 
 export interface UpdateLetter {

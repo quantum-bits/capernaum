@@ -58,6 +58,7 @@ export default Vue.extend({
     },
 
     saveContent(content: { [key: string]: unknown }) {
+      console.log("Save content", content);
       this.$apollo
         .mutate<UpdateLetterElement, UpdateLetterElementVariables>({
           mutation: UPDATE_LETTER_ELEMENT_MUTATION,

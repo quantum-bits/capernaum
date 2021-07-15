@@ -168,6 +168,7 @@ export const CREATE_LETTER_ELEMENT_MUTATION = gql`
       image {
         id
         title
+        url
       }
       surveyDimension {
         id

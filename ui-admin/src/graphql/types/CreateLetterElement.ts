@@ -18,6 +18,7 @@ export interface CreateLetterElement_createLetterElement_image {
    * Image title from user
    */
   title: string;
+  url: string;
 }
 
 export interface CreateLetterElement_createLetterElement_surveyDimension {

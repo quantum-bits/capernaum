@@ -17,20 +17,7 @@
               label="Letter Type"
               @change="updateData($event)"
           /></v-col>
-          <!-- https://codepen.io/giorgosk/pen/zdWrEY -->
-          <!--
-          <v-col v-if="isGroupLetter">
-            <v-select
-              class="mr-2"
-              v-model="chosenGroup"
-              :items="groups"
-              item-text="name"
-              item-value="id"
-              return-object
-              label="Choose Group"
-              @change="fetchGroupResponses($event)"
-          /></v-col>
-          -->
+
           <v-col>
             <v-select
               class="mr-2"
@@ -275,7 +262,6 @@ import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import { AllGroups_groups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
 import { ReadLetterTypes_readLetterTypes } from "@/graphql/types/ReadLetterTypes";
-import { quillDeltaToHtml } from "@/helpers/quill";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
 
 export default Vue.extend({
