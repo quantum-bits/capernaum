@@ -4,6 +4,19 @@
     <v-row>
       <v-col>
         <v-data-table class="elevation-1" :headers="headers" :items="groups">
+          <template v-slot:item.name="{ item }">
+            <router-link
+              :to="{
+                name: 'responses',
+                params: {
+                  surveyId: item.survey.id,
+                  groupId: item.id,
+                },
+              }"
+            >
+              {{ item.name }}
+            </router-link>
+          </template>
           <template v-slot:item.responses="{ item }">
             {{ item.surveyResponses.length }}
           </template>
@@ -56,7 +69,7 @@ export default Vue.extend({
 
   data() {
     return {
-      groups: [] as unknown as AllGroups,
+      groups: [] as AllGroups_groups[],
 
       headers: [
         { text: "Group Name", value: "name" },
@@ -116,7 +129,7 @@ export default Vue.extend({
         },
       });
 
-      this.groups.groups = this.groups.groups.filter((grp) => grp.id !== id);
+      this.groups = this.groups.filter((grp) => grp.id !== id);
     },
   },
 });

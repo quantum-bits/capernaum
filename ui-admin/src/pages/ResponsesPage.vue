@@ -7,7 +7,7 @@
           v-model="selectedSurveyId"
           :items="availableSurveys"
           label="Select a survey"
-          @change="fetchSurveyResponses()"
+          @change="surveyChosen()"
         />
       </v-col>
       <v-col>
@@ -16,7 +16,7 @@
           v-model="selectedGroupId"
           :items="availableGroups"
           label="Select a group"
-          @change="fetchSurveyResponses()"
+          @change="groupChosen()"
         />
       </v-col>
       <v-col cols="1">
@@ -149,11 +149,14 @@ import {
   SurveyResponses_surveyResponses,
   SurveyResponsesVariables,
 } from "@/graphql/types/SurveyResponses";
+import { Route } from "vue-router";
 
 interface Selection {
   text: string;
-  value: number;
+  value: string;
 }
+
+const ALL_GROUPS = "all";
 
 export default Vue.extend({
   name: "ResponsesPage",
@@ -168,8 +171,8 @@ export default Vue.extend({
   data() {
     return {
       surveys: [] as AllCapernaumSurveys_surveys[],
-      selectedSurveyId: null as number | null,
-      selectedGroupId: null as number | null,
+      selectedSurveyId: null as string | null,
+      selectedGroupId: null as string | null,
       surveyResponses: [] as SurveyResponses_surveyResponses[],
 
       groups: [] as AllGroups_groups[],
@@ -185,16 +188,6 @@ export default Vue.extend({
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
         { text: "Action", value: "action", sortable: false },
-      ],
-
-      groupHeaders: [
-        { text: "Admin First Name", value: "adminFirstName" },
-        { text: "Admin Last Name", value: "adminLastName" },
-        { text: "Date", value: "date" },
-        { text: "Survey", value: "survey.qualtricsName" },
-        { text: "Email", value: "adminEmail" },
-        { text: "Group Name", value: "name" },
-        { text: "Fetch Responses", value: "action", sortable: false },
       ],
 
       letterWriterOutput: {} as LetterWriterOutput,
@@ -235,6 +228,12 @@ export default Vue.extend({
       })
       .then((response) => {
         this.surveys = response.data.surveys;
+
+        // Check URL parameters. Call fetch unconditionally;
+        // if selections are bogus, it'll figure that out.
+        this.selectedSurveyId = this.$route.params.surveyId;
+        this.selectedGroupId = this.$route.params.groupId;
+        this.fetchSurveyResponses();
       })
       .catch((error) => {
         throw new Error(`Failed to fetch surveys: ${error}`);
@@ -244,18 +243,30 @@ export default Vue.extend({
       });
   },
 
+  beforeRouteEnter(to, from, next) {
+    console.log("ENTER TO", to);
+    console.log("ENTER FROM", from);
+    next();
+  },
+
+  beforeRouteUpdate(to, from, next) {
+    console.log("UPDATE TO", to);
+    console.log("UPDATE FROM", from);
+    next();
+  },
+
   computed: {
     availableSurveys(): Selection[] {
       return this.surveys.map((survey) => ({
         text: survey.qualtricsName,
-        value: survey.id,
+        value: survey.id.toString(),
       }));
     },
 
     selectedSurvey(): AllCapernaumSurveys_surveys | undefined {
       return _.find(
         this.surveys,
-        (survey) => survey.id === this.selectedSurveyId
+        (survey) => survey.id.toString() === this.selectedSurveyId
       );
     },
 
@@ -265,9 +276,9 @@ export default Vue.extend({
       }
       const selections = this.selectedSurvey.groups.map((group) => ({
         text: group.name,
-        value: group.id,
+        value: group.id.toString(),
       }));
-      selections.unshift({ text: "All Groups", value: -1 });
+      selections.unshift({ text: "All Groups", value: ALL_GROUPS });
       return selections;
     },
 
@@ -294,15 +305,52 @@ export default Vue.extend({
       this.spinnerVisible = false;
     },
 
+    surveyChosen() {
+      this.selectedGroupId = null; // Deselect any previously chosen group.
+      this.$router.replace({
+        name: "responses",
+        params: {
+          surveyId: this.selectedSurveyId!,
+        },
+      });
+      this.fetchSurveyResponses();
+    },
+
+    groupChosen() {
+      this.$router.replace({
+        name: "responses",
+        params: {
+          ...this.$router.currentRoute.params,
+          groupId: this.selectedGroupId!.toString(),
+        },
+      });
+      this.fetchSurveyResponses();
+    },
+
     fetchSurveyResponses() {
-      if (this.selectedSurveyId) {
+      if (!this.selectedSurvey) {
+        // No survey selected
+        return;
+      } else {
+        // Specify the desired survey.
         const variables: SurveyResponsesVariables = {
-          surveyId: this.selectedSurveyId,
+          surveyId: this.selectedSurvey.id,
         };
-        if (this.selectedGroupId && this.selectedGroupId > 0) {
-          variables.groupId = this.selectedGroupId;
+
+        if (this.selectedSurvey.groups.length) {
+          // Selected survey has groups
+          if (!this.selectedGroupId) {
+            // No group selected
+            this.showSnackbar("Survey has groups; please select one");
+            return;
+          }
+          if (this.selectedGroupId !== ALL_GROUPS) {
+            // Add the selected group (if any).
+            variables.groupId = parseInt(this.selectedGroupId);
+          }
         }
 
+        this.showSpinner();
         return this.$apollo
           .query<SurveyResponses, SurveyResponsesVariables>({
             query: SURVEY_RESPONSES_QUERY,
@@ -310,10 +358,14 @@ export default Vue.extend({
           })
           .then((result) => {
             this.surveyResponses = result.data.surveyResponses;
-            console.log("SURVEY RESPONSES", this.surveyResponses);
+            const numResponses = this.surveyResponses.length;
+            this.showSnackbar(
+              `Fetched ${numResponses} ${pluralize("response", numResponses)}`
+            );
+          })
+          .finally(() => {
+            this.hideSpinner();
           });
-      } else {
-        throw new Error("No survey selected");
       }
     },
 

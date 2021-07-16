@@ -15,13 +15,22 @@
         <v-data-table :headers="headers" :items="surveyLetters">
           <template v-slot:item="{ item: surveyLetter }">
             <tr>
-              <td>{{ surveyLetter.letter.title }}</td>
+              <td>
+                <router-link
+                  :to="{
+                    name: 'compose',
+                    params: { surveyLetterId: surveyLetter.id },
+                  }"
+                >
+                  {{ surveyLetter.letter.title }}
+                </router-link>
+              </td>
               <td>{{ surveyLetter.letter.updated | standardDate }}</td>
               <td>
                 <router-link
                   :to="{
                     name: 'surveys',
-                    params: { surveyLetterId: surveyLetter.survey.id },
+                    params: { surveyId: surveyLetter.survey.id },
                   }"
                 >
                   {{ surveyLetter.survey.qualtricsName }}
@@ -29,16 +38,6 @@
               </td>
               <td>{{ surveyLetter.letterType.description }}</td>
               <td>
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <a class="mr-4" @click="viewLetter(surveyLetter)" v-on="on">
-                      <v-icon>
-                        {{ "mdi-pencil" }}
-                      </v-icon>
-                    </a>
-                  </template>
-                  <span>View and edit this letter.</span>
-                </v-tooltip>
                 <v-tooltip v-if="canDeleteLetter(surveyLetter.letter)" top>
                   <template v-slot:activator="{ on }">
                     <a @click="deleteLetter(surveyLetter.letter.id)" v-on="on">
@@ -143,13 +142,6 @@ export default Vue.extend({
         letter: newSurveyLetter.letter,
         letterType: newSurveyLetter.letterType,
         survey: newSurveyLetter.survey,
-      });
-    },
-
-    viewLetter(surveyLetter: SurveyLetters_surveyLetters): void {
-      this.$router.push({
-        name: "compose",
-        params: { surveyLetterId: surveyLetter.id.toString() },
       });
     },
   },

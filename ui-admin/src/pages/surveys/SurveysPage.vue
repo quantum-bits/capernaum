@@ -1,7 +1,12 @@
 <template>
   <v-container>
     <page-header title="Surveys">
-      <survey-selector v-model="selectedSurveyId" :surveys="surveys" />
+      <v-select
+        label="Select a survey"
+        v-model="selectedSurveyId"
+        :items="availableSurveys"
+        @change="onSurveySelected"
+      />
     </page-header>
     <v-tabs v-model="currentTab" fixed-tabs>
       <v-tab>Details</v-tab>
@@ -9,7 +14,7 @@
       <v-tab>Associations</v-tab>
     </v-tabs>
 
-    <v-tabs-items v-model="currentTab" v-if="isSurveySelected">
+    <v-tabs-items v-model="currentTab" v-if="selectedSurveyId > 0">
       <v-tab-item>
         <survey-detail-tab :survey="selectedSurvey" />
       </v-tab-item>
@@ -20,32 +25,32 @@
         <prediction-table-tab :survey="selectedSurvey" />
       </v-tab-item>
     </v-tabs-items>
-    <v-row>
-      <v-col> </v-col>
-    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import PageHeader from "@/pages/PageHeader.vue";
-import SurveySelector from "@/components/SurveySelector.vue";
 import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
 import {
   AllCapernaumSurveys,
   AllCapernaumSurveys_surveys,
 } from "@/graphql/types/AllCapernaumSurveys";
-import * as is from "is";
 import SurveyDetailTab from "./SurveyDetailsTab.vue";
 import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
 import PredictionTableTab from "@/pages/surveys/PredictionTableTab.vue";
+import * as _ from "lodash";
+
+interface Selection {
+  text: string;
+  value: number;
+}
 
 export default Vue.extend({
   name: "SurveysPage",
 
   components: {
     PageHeader,
-    SurveySelector,
     SurveyDetailTab,
     SurveyDimensionsTab,
     PredictionTableTab,
@@ -56,7 +61,6 @@ export default Vue.extend({
       surveys: [] as AllCapernaumSurveys_surveys[],
       currentTab: 0,
       selectedSurveyId: undefined as number | undefined,
-      selectedSurvey: undefined as AllCapernaumSurveys_surveys | undefined,
     };
   },
 
@@ -79,22 +83,28 @@ export default Vue.extend({
   },
 
   computed: {
-    isSurveySelected(): boolean {
-      return is.defined(this.selectedSurvey);
+    availableSurveys(): Selection[] {
+      return this.surveys.map((survey) => ({
+        text: survey.qualtricsName,
+        value: survey.id,
+      }));
+    },
+
+    selectedSurvey(): AllCapernaumSurveys_surveys | undefined {
+      return _.find(
+        this.surveys,
+        (survey) => survey.id === this.selectedSurveyId
+      );
     },
   },
 
-  watch: {
-    selectedSurveyId: function (): void {
-      const possibleSurvey = this.surveys.find(
-        (survey) => survey.id === this.selectedSurveyId
-      );
-
-      if (possibleSurvey) {
-        this.selectedSurvey = possibleSurvey;
-      } else {
-        throw new Error(`Can't find survey ${this.selectedSurveyId}`);
-      }
+  methods: {
+    onSurveySelected(surveyId: number) {
+      this.selectedSurveyId = surveyId;
+      this.$router.replace({
+        name: "surveys",
+        params: { surveyId: surveyId.toString() },
+      });
     },
   },
 });
