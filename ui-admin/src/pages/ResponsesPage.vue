@@ -220,40 +220,23 @@ export default Vue.extend({
     };
   },
 
-  mounted(): void {
-    this.showSpinner();
-    this.$apollo
-      .query<AllCapernaumSurveys>({
-        query: ALL_CAPERNAUM_SURVEYS,
-      })
-      .then((response) => {
-        this.surveys = response.data.surveys;
+  // beforeRouteEnter(to, from, next) {
+  //   console.group("beforeRouteEnter");
+  //   console.log(`Route ENTER from '${from.fullPath}' to '${to.fullPath}'`);
+  //   next(async (vm: any) => {
+  //     console.group("NEXT IN ENTER");
+  //     await vm.handleUrlParameters(to);
+  //     console.groupEnd();
+  //   });
+  //   console.groupEnd();
+  // },
 
-        // Check URL parameters. Call fetch unconditionally;
-        // if selections are bogus, it'll figure that out.
-        this.selectedSurveyId = this.$route.params.surveyId;
-        this.selectedGroupId = this.$route.params.groupId;
-        this.fetchSurveyResponses();
-      })
-      .catch((error) => {
-        throw new Error(`Failed to fetch surveys: ${error}`);
-      })
-      .finally(() => {
-        this.hideSpinner();
-      });
-  },
-
-  beforeRouteEnter(to, from, next) {
-    console.log("ENTER TO", to);
-    console.log("ENTER FROM", from);
-    next();
-  },
-
-  beforeRouteUpdate(to, from, next) {
-    console.log("UPDATE TO", to);
-    console.log("UPDATE FROM", from);
-    next();
-  },
+  // beforeRouteUpdate(to, from, next) {
+  //   console.group("beforeRouteUpdate");
+  //   console.log(`Route UPDATE from '${from.fullPath}' to '${to.fullPath}'`);
+  //   this.handleUrlParameters(to).then(() => next());
+  //   console.groupEnd();
+  // },
 
   computed: {
     availableSurveys(): Selection[] {
@@ -264,10 +247,11 @@ export default Vue.extend({
     },
 
     selectedSurvey(): AllCapernaumSurveys_surveys | undefined {
-      return _.find(
-        this.surveys,
-        (survey) => survey.id.toString() === this.selectedSurveyId
-      );
+      if (this.selectedSurveyId) {
+        return this.findSurveyById(parseInt(this.selectedSurveyId));
+      } else {
+        return undefined;
+      }
     },
 
     availableGroups(): Selection[] {
@@ -296,13 +280,49 @@ export default Vue.extend({
     },
   },
 
+  async created() {
+    console.group("CREATED");
+    await this.fetchSurveys();
+    this.$nextTick(async () => {
+      await this.handleUrlParameters();
+    });
+    console.groupEnd();
+  },
+
+  watch: {
+    $route: "handleUrlParameters",
+  },
+
   methods: {
+    async handleUrlParameters() {
+      // Check URL parameters. Call fetch unconditionally;
+      // if selections are bogus, it'll figure that out.
+      console.group("handleUrlParameters");
+      this.selectedSurveyId = this.$route.params.surveyId;
+      this.selectedGroupId = this.$route.params.groupId;
+      console.log(
+        "URL PARAMS %s/%s",
+        this.selectedSurveyId,
+        this.selectedGroupId
+      );
+      console.log("SURVEY BEFORE", this.selectedSurvey?.qualtricsName);
+      console.group("fetchSurveyResponses");
+      await this.fetchSurveyResponses();
+      console.groupEnd();
+      console.log("SURVEY AFTER", this.selectedSurvey?.qualtricsName);
+      console.groupEnd();
+    },
+
     showSpinner() {
       this.spinnerVisible = true;
     },
 
     hideSpinner() {
       this.spinnerVisible = false;
+    },
+
+    findSurveyById(id: number) {
+      return _.find(this.surveys, (survey) => survey.id === id);
     },
 
     surveyChosen() {
@@ -327,46 +347,75 @@ export default Vue.extend({
       this.fetchSurveyResponses();
     },
 
+    fetchSurveys() {
+      console.group("fetchSurveys");
+      this.showSpinner();
+      return this.$apollo
+        .query<AllCapernaumSurveys>({
+          query: ALL_CAPERNAUM_SURVEYS,
+        })
+        .then((response) => {
+          this.surveys = response.data.surveys;
+          console.log(`FETCHED ${this.surveys.length} SURVEYS`);
+        })
+        .catch((error) => {
+          throw new Error(`Failed to fetch surveys: ${error}`);
+        })
+        .finally(() => {
+          this.hideSpinner();
+          console.groupEnd();
+        });
+    },
+
     fetchSurveyResponses() {
-      if (!this.selectedSurvey) {
+      if (!this.selectedSurveyId) {
         // No survey selected
+        console.log("No survey selected");
         return;
-      } else {
-        // Specify the desired survey.
-        const variables: SurveyResponsesVariables = {
-          surveyId: this.selectedSurvey.id,
-        };
-
-        if (this.selectedSurvey.groups.length) {
-          // Selected survey has groups
-          if (!this.selectedGroupId) {
-            // No group selected
-            this.showSnackbar("Survey has groups; please select one");
-            return;
-          }
-          if (this.selectedGroupId !== ALL_GROUPS) {
-            // Add the selected group (if any).
-            variables.groupId = parseInt(this.selectedGroupId);
-          }
-        }
-
-        this.showSpinner();
-        return this.$apollo
-          .query<SurveyResponses, SurveyResponsesVariables>({
-            query: SURVEY_RESPONSES_QUERY,
-            variables,
-          })
-          .then((result) => {
-            this.surveyResponses = result.data.surveyResponses;
-            const numResponses = this.surveyResponses.length;
-            this.showSnackbar(
-              `Fetched ${numResponses} ${pluralize("response", numResponses)}`
-            );
-          })
-          .finally(() => {
-            this.hideSpinner();
-          });
       }
+
+      const survey = this.findSurveyById(parseInt(this.selectedSurveyId));
+      if (!survey) {
+        // No survey with the given ID.
+        console.log(`No survey with ID ${this.selectedSurveyId}`);
+        return;
+      }
+
+      // Specify the desired survey.
+      const variables: SurveyResponsesVariables = {
+        surveyId: survey.id,
+      };
+
+      if (survey.groups.length) {
+        // Selected survey has groups
+        if (!this.selectedGroupId) {
+          // No group selected
+          console.log("No group selected");
+          this.showSnackbar("Survey has groups; please select one");
+          return;
+        }
+        if (this.selectedGroupId !== ALL_GROUPS) {
+          // Add the selected group (if any).
+          variables.groupId = parseInt(this.selectedGroupId);
+        }
+      }
+
+      this.showSpinner();
+      return this.$apollo
+        .query<SurveyResponses, SurveyResponsesVariables>({
+          query: SURVEY_RESPONSES_QUERY,
+          variables,
+        })
+        .then((result) => {
+          this.surveyResponses = result.data.surveyResponses;
+          const numResponses = this.surveyResponses.length;
+          this.showSnackbar(
+            `Fetched ${numResponses} ${pluralize("response", numResponses)}`
+          );
+        })
+        .finally(() => {
+          this.hideSpinner();
+        });
     },
 
     // fetchGroups() {
