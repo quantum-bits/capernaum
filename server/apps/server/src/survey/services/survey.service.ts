@@ -37,6 +37,7 @@ export class SurveyService extends BaseService<Survey> {
     "surveyDimensions.surveyIndices",
     "surveyDimensions.surveyIndices.surveyItems",
     "surveyDimensions.surveyIndices.scriptureEngagementPractices",
+    "groups",
   ];
 
   readAll() {
@@ -80,10 +81,6 @@ export class SurveyService extends BaseService<Survey> {
 
   resolveRelatedResponses(survey: Survey) {
     return this.resolveMany(survey, "surveyResponses");
-  }
-
-  resolveRelatedGroups(survey: Survey) {
-    return this.resolveMany(survey, "surveyGroups");
   }
 
   resolveRelatedItems(

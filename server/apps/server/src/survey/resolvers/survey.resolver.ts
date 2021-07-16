@@ -86,11 +86,4 @@ export class SurveyResolver {
   resolveSurveyResponses(@Parent() survey: Survey) {
     return this.surveyService.resolveRelatedResponses(survey);
   }
-
-  @ResolveField("groups", () => [Group], {
-    description: "Groups using this survey",
-  })
-  resolveGroups(@Parent() survey: Survey) {
-    return this.surveyService.resolveRelatedGroups(survey);
-  }
 }

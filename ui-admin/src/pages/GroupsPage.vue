@@ -4,23 +4,28 @@
     <v-row>
       <v-col>
         <v-data-table class="elevation-1" :headers="headers" :items="groups">
-          <template v-slot:[`item.responses`]="{ item }">
+          <template v-slot:item.responses="{ item }">
             {{ item.surveyResponses.length }}
           </template>
-          <template v-slot:[`item.adminFullName`]="{ item }">
+          <template v-slot:item.adminFullName="{ item }">
             {{ item.adminFirstName }} {{ item.adminLastName }}
           </template>
-          <template v-slot:[`item.codeWord`]="{ item }">
+          <template v-slot:item.codeWord="{ item }">
             <samp>{{ item.codeWord }}</samp>
           </template>
-          <template v-slot:[`item.actions`]="{ item }">
+          <template v-slot:item.actions="{ item }">
             <v-icon small @click="confirmDelete(item)"> mdi-delete </v-icon>
           </template>
-          <template v-slot:[`item.closedAfter`]="{ item }">
+          <template v-slot:item.closedAfter="{ item }">
             {{ item.closedAfter | standardDate }}
           </template>
-          <template v-slot:[`item.status`]="{ item }">
-            {{ item.closedAfter }}
+          <template v-slot:item.status="{ item }">
+            <v-chip
+              small
+              :color="isClosed(item.closedAfter) ? 'primary' : 'success'"
+            >
+              {{ isClosed(item.closedAfter) ? "Closed" : "Open" }}
+            </v-chip>
           </template>
         </v-data-table>
       </v-col>
@@ -45,7 +50,7 @@ import PageHeader from "@/pages/PageHeader.vue";
 import { AllGroups, AllGroups_groups } from "@/graphql/types/AllGroups";
 
 export default Vue.extend({
-  name: "Groups",
+  name: "GroupsPage",
 
   components: { ConfirmDialog, PageHeader },
 
@@ -58,8 +63,8 @@ export default Vue.extend({
         { text: "Group Code", value: "codeWord" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
-        { text: "Responses", value: "responses", align: "end" },
         { text: "Status", value: "status" },
+        { text: "Responses", value: "responses", align: "end" },
         { text: "Closed After", value: "closedAfter" },
         { text: "Actions", value: "actions", sortable: false },
       ],

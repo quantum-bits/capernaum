@@ -3,9 +3,7 @@
     <v-col>
       <h1 class="headline my-4">{{ title }}</h1>
     </v-col>
-    <v-col>
-      <slot />
-    </v-col>
+    <slot />
   </v-row>
 </template>
 

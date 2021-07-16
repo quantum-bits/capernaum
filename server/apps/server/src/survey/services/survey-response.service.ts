@@ -7,19 +7,28 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
+import { GroupService } from "@server/src/group/group.service";
+import { SurveyService } from "@server/src/survey/services/survey.service";
 
 const debug = getDebugger("response");
 
 @Injectable()
 export class SurveyResponseService extends BaseService<SurveyResponse> {
   constructor(
+    private readonly surveyService: SurveyService,
+    private readonly groupService: GroupService,
     @InjectRepository(SurveyResponse)
     private readonly repo: Repository<SurveyResponse>
   ) {
     super(repo);
   }
 
-  private alwaysResolve = ["survey", "surveyItemResponses"];
+  private alwaysResolve = [
+    "survey",
+    "survey.surveyLetters",
+    "survey.surveyLetters.letterType",
+    "surveyItemResponses",
+  ];
 
   readAll() {
     return this.repo.find({ relations: this.alwaysResolve });
@@ -29,6 +38,24 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
     return this.repo.findOne(id, {
       relations: this.alwaysResolve,
     });
+  }
+
+  async readSome(surveyId: number, groupId?: number) {
+    debug("readSome(%d, %d)", surveyId, groupId);
+    const query = this.repo
+      .createQueryBuilder("sr")
+      .innerJoinAndSelect("sr.survey", "s")
+      .innerJoinAndSelect("s.surveyLetters", "sl")
+      .innerJoinAndSelect("sl.letterType", "lt")
+      .where("s.id = :sid", { sid: surveyId });
+
+    if (groupId) {
+      query
+        .innerJoin("sr.group", "grp")
+        .where("grp.id = :gid", { gid: groupId });
+    }
+
+    return query.getMany();
   }
 
   readForAnalysis(id: number) {

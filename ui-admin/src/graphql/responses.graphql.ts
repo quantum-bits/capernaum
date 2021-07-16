@@ -1,21 +1,22 @@
 import gql from "graphql-tag";
 
-export const ALL_RESPONSES_QUERY = gql`
-  query AllResponses {
-    surveyResponses {
+export const SURVEY_RESPONSES_QUERY = gql`
+  query SurveyResponses($surveyId: Int!, $groupId: Int) {
+    surveyResponses(surveyId: $surveyId, groupId: $groupId) {
       id
       qualtricsResponseId
       email
+      startDate
+      endDate
+      progress
+      duration
+      finished
+      latitude
+      longitude
       survey {
-        qualtricsId
-        qualtricsName
+        id
         surveyLetters {
-          letter {
-            id
-            title
-            description
-            emailMessage
-          }
+          id
           letterType {
             id
             key
@@ -23,10 +24,6 @@ export const ALL_RESPONSES_QUERY = gql`
           }
         }
       }
-      startDate
-      endDate
-      duration
-      finished
     }
   }
 `;

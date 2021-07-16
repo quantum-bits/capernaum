@@ -26,6 +26,10 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       okayForGroup
       publicName
       detailedDescription
+      groups {
+        id
+        name
+      }
       surveyLetters {
         letter {
           id

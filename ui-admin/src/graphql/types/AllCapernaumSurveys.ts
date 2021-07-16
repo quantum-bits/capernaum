@@ -7,6 +7,17 @@
 // GraphQL query operation: AllCapernaumSurveys
 // ====================================================
 
+export interface AllCapernaumSurveys_surveys_groups {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Group name
+   */
+  name: string;
+}
+
 export interface AllCapernaumSurveys_surveys_surveyLetters_letter {
   /**
    * Unique ID for this entity
@@ -142,6 +153,7 @@ export interface AllCapernaumSurveys_surveys {
    * Detailed description of this survey; mostly for group use
    */
   detailedDescription: string;
+  groups: AllCapernaumSurveys_surveys_groups[];
   /**
    * Survey letters for this survey
    */

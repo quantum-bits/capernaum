@@ -12,8 +12,11 @@ export class SurveyResponseResolver {
   ) {}
 
   @Query(() => [SurveyResponse])
-  surveyResponses() {
-    return this.surveyResponseService.readAll();
+  surveyResponses(
+    @Args({ name: "surveyId", type: () => Int }) surveyId: number,
+    @Args({ name: "groupId", type: () => Int, nullable: true }) groupId?: number
+  ) {
+    return this.surveyResponseService.readSome(surveyId, groupId);
   }
 
   @Query(() => SurveyResponse)

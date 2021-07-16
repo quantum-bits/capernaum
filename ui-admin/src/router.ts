@@ -50,7 +50,7 @@ const router = new VueRouter({
     {
       path: "/responses",
       name: "responses",
-      component: () => import("./pages/Responses.vue"),
+      component: () => import("./pages/ResponsesPage.vue"),
     },
     {
       path: "/scripture-engagement-practices",
@@ -65,7 +65,7 @@ const router = new VueRouter({
     {
       path: "/groups",
       name: "groups",
-      component: () => import("./pages/Groups.vue"),
+      component: () => import("./pages/GroupsPage.vue"),
     },
     {
       path: "/web-hooks",
