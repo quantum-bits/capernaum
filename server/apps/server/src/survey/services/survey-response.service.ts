@@ -46,6 +46,7 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
       .createQueryBuilder("sr")
       .innerJoinAndSelect("sr.survey", "s")
       .innerJoinAndSelect("s.surveyLetters", "sl")
+      .innerJoinAndSelect("sl.letter", "l")
       .innerJoinAndSelect("sl.letterType", "lt")
       .where("s.id = :sid", { sid: surveyId });
 

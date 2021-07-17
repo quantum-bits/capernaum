@@ -17,6 +17,9 @@ export const SURVEY_RESPONSES_QUERY = gql`
         id
         surveyLetters {
           id
+          letter {
+            id
+          }
           letterType {
             id
             key

@@ -24,11 +24,22 @@ import { ResponseSummary } from "@server/src/survey/entities";
 import { WriterOutput } from "@server/src/writer/entities";
 import { writeFile } from "fs/promises";
 import execa from "execa";
+import prettyFormat from "pretty-format";
 
 const debug = getDebugger("writer");
 
+export function isQuillDeltaString(deltaString: string): boolean {
+  return deltaString.match(/^{"ops"/) !== null;
+}
+
 type ResponseDetail = [string, string | number];
 
+/**
+ * Format a LaTeX command.
+ * @param command - \command part
+ * @param content - {content} part
+ * @param options - [options] part
+ */
 function formatLaTeX(command: string, content: string, options?: string) {
   const rtn = [];
   rtn.push(`\\${command}`);
@@ -39,20 +50,38 @@ function formatLaTeX(command: string, content: string, options?: string) {
   return rtn.join("");
 }
 
+/**
+ * Wrap `content` in an environment called `name`.
+ * @param name
+ * @param content
+ */
 function formatEnvironment(name: string, content: string) {
   return [formatLaTeX("begin", name), content, formatLaTeX("end", name)].join(
     "\n"
   );
 }
 
+/**
+ * Format a hyperlink: \href{url}{text}
+ * @param url
+ * @param text
+ */
 function formatHref(url: string, text: string) {
   return `\\href{${url}}{\\underline{${text}}}`;
 }
 
+/**
+ * Format verbatim text: \verb|text|
+ * @param text
+ */
 function formatVerbatim(text: string) {
   return `\\verb|${text}|`;
 }
 
+/**
+ * Format as a comment: %%%%% text
+ * @param text
+ */
 function formatComment(text: string) {
   return `%%%%% ${text}`;
 }
@@ -71,19 +100,34 @@ function generateBaseName(
 export class LineBuffer {
   constructor(private allLines = [], private currentLine = "") {}
 
+  /**
+   * Complete the current line, adding it to the array of all lines.
+   */
   flushCurrentLine(): void {
     this.allLines.push(this.currentLine);
     this.currentLine = "";
   }
 
+  /**
+   * Append `moreChars` to the end of the current line.
+   * @param moreChars
+   */
   appendToCurrentLine(moreChars: string): void {
     this.currentLine += moreChars;
   }
 
+  /**
+   * Wrap the current line in LaTeX command: \wrapper{currentLine}
+   * @param wrapper
+   */
   wrapCurrentLine(wrapper: string): void {
     this.currentLine = formatLaTeX(wrapper, this.currentLine);
   }
 
+  /**
+   * Unpack `packed` into newline-separated lines.
+   * @param packed
+   */
   unpackMultipleLines(packed: string): void {
     for (const char of packed) {
       if (char === "\n") {
@@ -94,10 +138,38 @@ export class LineBuffer {
     }
   }
 
+  /**
+   * Concatenate together all lines.
+   */
   concatenateLines(): string {
     this.flushCurrentLine();
     return "\n\n" + this.allLines.join("\n\n");
   }
+}
+
+enum TipTapNodeType {
+  Document = "doc",
+  Paragraph = "paragraph",
+  Text = "text",
+  HardBreak = "hardBreak",
+  OrderedList = "orderedList",
+  ListItem = "listItem",
+}
+
+enum TipTapMarkType {
+  Bold = "bold",
+  Italic = "italic",
+}
+
+interface TipTapMark {
+  type: TipTapMarkType;
+}
+
+interface TipTapNode {
+  type: TipTapNodeType;
+  text: string;
+  marks: TipTapMark[];
+  content: TipTapNode[];
 }
 
 @Injectable()
@@ -124,66 +196,128 @@ export class WriterService {
   }
 
   private static renderBoilerplate(letterElement: LetterElement) {
-    const quillDelta = JSON.parse(letterElement.textDelta);
-    const lineBuffer = new LineBuffer();
+    debug("renderBoilerplate %O", letterElement);
 
-    for (const op of quillDelta.ops) {
-      // console.log(JSON.stringify(op, null, 2));
+    const textDeltaJson = JSON.parse(letterElement.textDelta);
+    return isQuillDeltaString(letterElement.textDelta)
+      ? renderQuillOps(textDeltaJson)
+      : renderTipTap(textDeltaJson);
 
-      // All Quill Delta ops appear to have an `insert` property.
-      assert.ok(op.hasOwnProperty("insert"));
+    /**
+     * Render TipTap JSON as LaTeX.
+     * @param tipTapDoc: top-level document node.
+     */
+    function renderTipTap(tipTapDoc: TipTapNode) {
+      debug("renderTipTap %O", tipTapDoc);
+      if (tipTapDoc.type !== TipTapNodeType.Document) {
+        throw new Error("Bogus tipTapDoc");
+      }
 
-      if (op.insert === "\n") {
-        // Insert op that is just a newline.
-        // Quill docs: Attributes associated with a newline character
-        // describes formatting for that line.
+      const result = renderTipTapNode(tipTapDoc);
+      debug("result %s", result);
+      return result;
+    }
 
-        assert.ok(op.hasOwnProperty("attributes"));
-        let wrapper = "";
-        if (op.attributes.hasOwnProperty("header")) {
-          if (op.attributes.header === 1) {
-            wrapper = "section*";
-          } else if (op.attributes.header === 2) {
-            wrapper = "subsection*";
-          } else {
-            throw Error(`Bogus attributes ${op.attributes}`);
-          }
-        }
-        if (op.attributes.hasOwnProperty("list")) {
-          wrapper = "item";
-        }
-        lineBuffer.wrapCurrentLine(wrapper);
-        lineBuffer.flushCurrentLine();
-      } else {
-        // Insert op that is not just a newline.
-        if (op.hasOwnProperty("attributes")) {
-          // More than a newline and has attributes.
-          for (const attribute of Object.keys(op.attributes)) {
-            switch (attribute) {
-              case "bold":
-                lineBuffer.appendToCurrentLine(
-                  formatLaTeX("textbf", op.insert)
-                );
-                break;
-              case "italic":
-                lineBuffer.appendToCurrentLine(formatLaTeX("emph", op.insert));
-                break;
-              default:
-                throw Error(`Unknown attribute ${attribute}`);
-            }
-          }
-        } else {
-          // More than a newline and don't have attributes.
-          lineBuffer.unpackMultipleLines(op.insert);
-        }
+    function renderTipTapNode(node: TipTapNode): string {
+      switch (node.type) {
+        case TipTapNodeType.Document:
+          return _.reduce(
+            node.content,
+            (acc, n) => acc + renderTipTapNode(n),
+            ""
+          );
+        case TipTapNodeType.Paragraph:
+          return _.reduce(
+            node.content,
+            (acc, n) => acc + renderTipTapNode(n),
+            ""
+          );
+        case TipTapNodeType.Text:
+          return node.text;
+        case TipTapNodeType.OrderedList:
+          return _.reduce(
+            node.content,
+            (acc, n) => acc + formatLaTeX("item", renderTipTapNode(n)),
+            ""
+          );
+        case TipTapNodeType.ListItem:
+          break;
+        case TipTapNodeType.HardBreak:
+          return "\n";
+        default:
+          throw new Error(
+            `Unknown node type: '${JSON.stringify(node, null, 2)}'`
+          );
       }
     }
 
-    return lineBuffer.concatenateLines();
+    /**
+     * Render Quill Delta as LaTeX. This is the old style and should
+     * be removed whenever the transition to TipTap is complete.
+     * @param quillDelta
+     */
+    function renderQuillOps(quillDelta) {
+      const lineBuffer = new LineBuffer();
+
+      for (const op of quillDelta.ops) {
+        // console.log(JSON.stringify(op, null, 2));
+
+        // All Quill Delta ops appear to have an `insert` property.
+        assert.ok(op.hasOwnProperty("insert"));
+
+        if (op.insert === "\n") {
+          // Insert op that is just a newline.
+          // Quill docs: Attributes associated with a newline character
+          // describes formatting for that line.
+
+          assert.ok(op.hasOwnProperty("attributes"));
+          let wrapper = "";
+          if (op.attributes.hasOwnProperty("header")) {
+            if (op.attributes.header === 1) {
+              wrapper = "section*";
+            } else if (op.attributes.header === 2) {
+              wrapper = "subsection*";
+            } else {
+              throw Error(`Bogus attributes ${op.attributes}`);
+            }
+          }
+          if (op.attributes.hasOwnProperty("list")) {
+            wrapper = "item";
+          }
+          lineBuffer.wrapCurrentLine(wrapper);
+          lineBuffer.flushCurrentLine();
+        } else {
+          // Insert op that is not just a newline.
+          if (op.hasOwnProperty("attributes")) {
+            // More than a newline and has attributes.
+            for (const attribute of Object.keys(op.attributes)) {
+              switch (attribute) {
+                case "bold":
+                  lineBuffer.appendToCurrentLine(
+                    formatLaTeX("textbf", op.insert)
+                  );
+                  break;
+                case "italic":
+                  lineBuffer.appendToCurrentLine(
+                    formatLaTeX("emph", op.insert)
+                  );
+                  break;
+                default:
+                  throw Error(`Unknown attribute ${attribute}`);
+              }
+            }
+          } else {
+            // More than a newline and don't have attributes.
+            lineBuffer.unpackMultipleLines(op.insert);
+          }
+        }
+      }
+      return lineBuffer.concatenateLines();
+    }
   }
 
   private static renderChart(chartData: ChartData) {
-    debug("renderChart - %O", chartData);
+    debug("renderChart %O", chartData);
 
     function chartHeight() {
       const height =
@@ -219,7 +353,7 @@ export class WriterService {
   }
 
   private renderPredictions(predictions: Prediction[]) {
-    debug("renderPredictions - %O", predictions);
+    debug("renderPredictions %O", predictions);
 
     return predictions
       .filter((prediction) => prediction.predict)
@@ -308,11 +442,6 @@ export class WriterService {
         case "boilerplate-text":
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
-        case "scripture-engagement-prediction":
-          renderedElements.push(this.renderPredictions(predictions));
-          break;
-        case "scripture-engagement-count":
-          break;
         case "demographics":
           break;
         case "dimension-chart":
@@ -327,6 +456,11 @@ export class WriterService {
           break;
         case "image":
           renderedElements.push(this.renderImage(letterElement));
+          break;
+        case "scripture-engagement-count":
+          break;
+        case "scripture-engagement-prediction":
+          renderedElements.push(this.renderPredictions(predictions));
           break;
         default:
           throw Error(
@@ -404,22 +538,26 @@ export class WriterService {
     debug("letter %d for response %d", letterId, surveyResponseId);
 
     const letter = await this.letterService.readOne(letterId);
+    debug("renderIndividualLetter %O", letter);
 
     const surveyResponse = await this.surveyResponseService.readOne(
       surveyResponseId
     );
+    debug("renderIndividualLetter %O", surveyResponse);
 
     const dimensions =
       await this.surveyAnalyticsService.calculateSurveyDimensions(
         surveyResponse.id,
         SurveyRespondentType.Individual
       );
+    debug("renderIndividualLetter dimensions %O", dimensions);
 
     const predictions =
       await this.surveyAnalyticsService.predictScriptureEngagementPractices(
         surveyResponse.id,
         SurveyRespondentType.Individual
       );
+    debug("renderIndividualLetter %O", predictions);
 
     const renderedElements = await this.renderAllElements(
       letter,

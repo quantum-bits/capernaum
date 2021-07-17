@@ -7,6 +7,13 @@
 // GraphQL query operation: SurveyResponses
 // ====================================================
 
+export interface SurveyResponses_surveyResponses_survey_surveyLetters_letter {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+}
+
 export interface SurveyResponses_surveyResponses_survey_surveyLetters_letterType {
   /**
    * Unique ID for this entity
@@ -27,6 +34,10 @@ export interface SurveyResponses_surveyResponses_survey_surveyLetters {
    * Unique ID for this entity
    */
   id: number;
+  /**
+   * The letter
+   */
+  letter: SurveyResponses_surveyResponses_survey_surveyLetters_letter;
   /**
    * The letter type
    */

@@ -53,20 +53,25 @@
             show-select
             class="elevation-1"
           >
-            <template v-slot:[`item.letter`]="{ item }">
-              {{ letterTitle(item) }}
-            </template>
-            <template v-slot:[`item.date`]="{ item }">
+            <template v-slot:item.date="{ item }">
               {{ item.endDate | standardDate }}
             </template>
-            <template v-slot:[`item.action`]="{ item }">
-              <v-icon @click="sendEmail(item)"> mdi-email </v-icon>
-              <v-icon class="ml-2" @click="generatePDF(item)">
-                mdi-adobe-acrobat
-              </v-icon>
-              <v-icon class="ml-2" @click="deleteResponse(item)">
-                mdi-close-circle
-              </v-icon>
+            <template v-slot:item.action="{ item }">
+              <icon-button
+                icon-name="mdi-adobe-acrobat"
+                tool-tip="Create PDF report"
+                @click="generatePDF(item)"
+              />
+              <icon-button
+                icon-name="mdi-email"
+                tool-tip="Send PDF report by email"
+                @click="sendEmail(item)"
+              />
+              <icon-button
+                icon-name="mdi-close-circle"
+                tool-tip="Delete this response from database (Qualtrics not changed)"
+                @click="deleteResponse(item)"
+              />
             </template>
           </v-data-table>
         </v-card>
@@ -97,7 +102,11 @@
 
     <v-snackbar v-model="snackbar.visible">
       {{ snackbar.text }}
-      <v-btn text @click="snackbar.visible = false">Close</v-btn>
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar.visible = false"
+          >Close</v-btn
+        >
+      </template>
     </v-snackbar>
 
     <v-bottom-sheet v-model="bottomSheet.visible" inset>
@@ -118,10 +127,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  IMPORT_SURVEY_RESPONSES,
-  SURVEY_RESPONSES_QUERY,
-} from "@/graphql/responses.graphql";
+import { SURVEY_RESPONSES_QUERY } from "@/graphql/responses.graphql";
 import {
   ALL_CAPERNAUM_SURVEYS,
   DELETE_SURVEY_RESPONSE,
@@ -130,12 +136,12 @@ import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 import {
   WriteLetter,
   WriteLetter_writeLetter as LetterWriterOutput,
+  WriteLetterVariables,
 } from "@/graphql/types/WriteLetter";
 import isEmpty from "lodash/isEmpty";
 import MailDialog from "@/components/dialogs/MailDialog.vue";
 import ResponseSummary from "@/components/ResponseSummary.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
-import { ImportSurveyResponses } from "@/graphql/types/ImportSurveyResponses";
 import { AllGroups_groups } from "@/graphql/types/AllGroups";
 import pluralize from "pluralize";
 import {
@@ -150,6 +156,7 @@ import {
   SurveyResponsesVariables,
 } from "@/graphql/types/SurveyResponses";
 import Debug from "debug";
+import IconButton from "@/components/buttons/IconButton.vue";
 const debug = Debug("cap:responses");
 
 interface Selection {
@@ -163,6 +170,7 @@ export default Vue.extend({
   name: "ResponsesPage",
 
   components: {
+    IconButton,
     PageHeader,
     MailDialog,
     ConfirmDialog,
@@ -184,8 +192,6 @@ export default Vue.extend({
 
       masterHeaders: [
         { text: "Date", value: "date" },
-        { text: "Survey", value: "survey.qualtricsName" },
-        { text: "Letter", value: "letter" },
         { text: "Response ID", value: "qualtricsResponseId" },
         { text: "Email", value: "email" },
         { text: "Action", value: "action", sortable: false },
@@ -301,25 +307,33 @@ export default Vue.extend({
     },
 
     surveyChosen() {
-      this.selectedGroupId = null; // Deselect any previously chosen group.
-      this.$router.replace({
-        name: "responses",
-        params: {
-          surveyId: this.selectedSurveyId!,
-        },
-      });
-      this.fetchSurveyResponses();
+      if (this.selectedSurveyId) {
+        this.selectedGroupId = null; // Deselect any previously chosen group.
+        this.$router.replace({
+          name: "responses",
+          params: {
+            surveyId: this.selectedSurveyId,
+          },
+        });
+        this.fetchSurveyResponses();
+      } else {
+        console.error("No selectedSurveyId");
+      }
     },
 
     groupChosen() {
-      this.$router.replace({
-        name: "responses",
-        params: {
-          ...this.$router.currentRoute.params,
-          groupId: this.selectedGroupId!.toString(),
-        },
-      });
-      this.fetchSurveyResponses();
+      if (this.selectedGroupId) {
+        this.$router.replace({
+          name: "responses",
+          params: {
+            ...this.$router.currentRoute.params,
+            groupId: this.selectedGroupId,
+          },
+        });
+        this.fetchSurveyResponses();
+      } else {
+        console.error("No selectedGroupId");
+      }
     },
 
     fetchSurveys() {
@@ -393,56 +407,6 @@ export default Vue.extend({
         });
     },
 
-    // fetchGroups() {
-    //   this.$apollo
-    //     .query({
-    //       query: ALL_GROUPS,
-    //     })
-    //     .then(({ data }) => {
-    //       debug("received groups!", data.allGroups);
-    //       this.groups = data.allGroups;
-    //     })
-    //     .catch((error) => {
-    //       debug("there appears to have been an error: ", error);
-    //     });
-    // },
-
-    // fetchAllResponses() {
-    //   this.$apollo
-    //     .query({
-    //       query: SURVEY_RESPONSES_QUERY,
-    //     })
-    //     .then(({ data }) => {
-    //       debug("received responses!", data.surveyResponses);
-    //       this.surveyResponses = data.surveyResponses;
-    //     })
-    //     .catch((error) => {
-    //       debug("there appears to have been an error: ", error);
-    //     });
-    // },
-    //
-    // fetchGroupResponses(group: AllGroups_groups) {
-    //   debug("inside fetch group responses: ", group);
-    //   this.chosenGroup = group;
-    //   let chosenGroupId = group.id;
-    //   //if (this.chosenGroup !== null) {
-    //   this.$apollo
-    //     .query({
-    //       query: GROUP_RESPONSES_QUERY,
-    //       variables: {
-    //         groupId: chosenGroupId,
-    //       },
-    //     })
-    //     .then(({ data }) => {
-    //       debug("received responses!", data.groupResponses);
-    //       this.surveyResponses = data.groupResponses;
-    //     })
-    //     .catch((error) => {
-    //       debug("there appears to have been an error: ", error);
-    //     });
-    //   //}
-    // },
-
     clearLetterWriterOutput() {
       this.letterWriterOutput = {} as LetterWriterOutput;
     },
@@ -452,58 +416,26 @@ export default Vue.extend({
       this.snackbar.visible = true;
     },
 
-    sendEmail(surveyResponse: SurveyResponses_surveyResponses) {
-      let numIndividualLetters = 0;
-      let htmlContent = "<p>Survey results</p>";
-      // surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
-      //   // FIXME
-      //   // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //   //   htmlContent = quillDeltaToHtml(surveyLetter.letter.emailMessage);
-      //   //   numIndividualLetters += 1;
-      //   // }
-      // });
-
-      if (numIndividualLetters === 0) {
-        throw Error("Survey has no individual letter");
-      } else if (numIndividualLetters > 1) {
-        throw Error("Survey has more than one individual letter");
-      }
-
-      this.mailDialog.respondentEmail = surveyResponse.email;
-      this.mailDialog.adminEmail = this.$store.state.user.email;
-      this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
-      alert("this.mailDialog.textContent = quillHtmlToText(htmlContent);");
-      this.mailDialog.textContent = htmlContent;
-      this.mailDialog.htmlContent = htmlContent;
-      this.mailDialog.visible = true;
-    },
-
     generatePDF(surveyResponse: SurveyResponses_surveyResponses) {
-      let numIndividualLetters = 0;
-      let letterId = -Infinity;
-      // surveyResponse.survey.surveyLetters.forEach((surveyLetter) => {
-      //   // FIXME
-      //   // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //   //   letterId = surveyLetter.letter.id;
-      //   //   numIndividualLetters += 1;
-      //   // }
-      // });
-      if (numIndividualLetters === 0) {
-        throw Error("Survey has no individual letter");
-      } else if (numIndividualLetters > 1) {
-        throw Error("Survey has more than one individual letter");
-      }
-
       this.clearLetterWriterOutput();
       this.spinnerVisible = true;
 
+      const surveyLetter = _.find(
+        surveyResponse.survey.surveyLetters,
+        (sltr) => sltr.letterType.key === "individual"
+      );
+      if (!surveyLetter) {
+        this.showSnackbar("No individual letter for this survey");
+        return;
+      }
+
       this.$apollo
-        .mutate<WriteLetter>({
+        .mutate<WriteLetter, WriteLetterVariables>({
           mutation: WRITE_LETTER_MUTATION,
           variables: {
             writerInput: {
-              letterId: letterId,
               surveyResponseId: surveyResponse.id,
+              letterId: surveyLetter.letter.id,
             },
           },
         })
@@ -511,7 +443,6 @@ export default Vue.extend({
           debug("response", response);
           if (response.data) {
             const writeLetter = response.data.writeLetter;
-
             this.showSnackbar(writeLetter.message);
             if (writeLetter.responseSummary) {
               this.letterWriterOutput = writeLetter;
@@ -526,15 +457,14 @@ export default Vue.extend({
         });
     },
 
-    hasIndividualLetter(item: SurveyResponses_surveyResponses) {
-      let hasIndividualLetter = false;
-      // item.survey.surveyLetters.forEach((surveyLetter) => {
-      //   // FIXME
-      //   // if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //   //   hasIndividualLetter = true; // there should only be one individual letter per survey; we're technically searching to see if there is at least one....
-      //   // }
-      // });
-      // return hasIndividualLetter;
+    sendEmail(surveyResponse: SurveyResponses_surveyResponses) {
+      this.mailDialog.respondentEmail = surveyResponse.email;
+      this.mailDialog.adminEmail = this.$store.state.user.email;
+      this.mailDialog.attachmentPath = this.letterWriterOutput.pdfAbsolutePath;
+      alert("this.mailDialog.textContent = quillHtmlToText(htmlContent);");
+      this.mailDialog.textContent = "FILL IN SOME CONTENT";
+      this.mailDialog.htmlContent = "<p>FILL IN SOME CONTENT</p>";
+      this.mailDialog.visible = true;
     },
 
     confirmDelete(item: SurveyResponses_surveyResponses) {
@@ -575,55 +505,6 @@ export default Vue.extend({
         this.selectedResponses = [];
         this.spinnerVisible = false;
       }
-    },
-
-    letterTitle(item: SurveyResponses_surveyResponses) {
-      let letterTitle = "No letter"; // default
-      // FIXME
-      // if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //   debug("individual letter!", item);
-      //   item.survey.surveyLetters.forEach((surveyLetter) => {
-      //     if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //       letterTitle = surveyLetter.letter.title;
-      //     }
-      //   });
-      // } else if (this.chosenLetterType.key === LetterTypeEnum.GROUP) {
-      //   item.survey.surveyLetters.forEach((surveyLetter) => {
-      //     if (surveyLetter.letterType.key === LetterTypeEnum.GROUP) {
-      //       letterTitle = surveyLetter.letter.title;
-      //     }
-      //   });
-      // }
-      return letterTitle;
-    },
-
-    fetchFromQualtrics() {
-      // Import all responses for one survey from the Qualtrics API.
-      this.spinnerVisible = true;
-
-      this.$apollo
-        .mutate<ImportSurveyResponses>({
-          mutation: IMPORT_SURVEY_RESPONSES,
-          variables: {
-            qId: this.selectedSurveyId,
-          },
-          refetchQueries: ["AllResponses"],
-        })
-        .then((mutationResult) => {
-          const stats = mutationResult.data?.importQualtricsSurveyResponses;
-          if (stats) {
-            this.bottomSheet.content = `Imported ${
-              stats.importCount
-            } ${pluralize("response", stats.importCount)} (${
-              stats.duplicateCount
-            } ${pluralize("duplicate", stats.duplicateCount)})`;
-            this.bottomSheet.visible = true;
-            this.selectedSurveyId = null;
-          }
-        })
-        .finally(() => {
-          this.spinnerVisible = false;
-        });
     },
   },
 });
