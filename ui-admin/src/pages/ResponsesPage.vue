@@ -149,7 +149,8 @@ import {
   SurveyResponses_surveyResponses,
   SurveyResponsesVariables,
 } from "@/graphql/types/SurveyResponses";
-import { Route } from "vue-router";
+import Debug from "debug";
+const debug = Debug("cap:responses");
 
 interface Selection {
   text: string;
@@ -220,24 +221,6 @@ export default Vue.extend({
     };
   },
 
-  // beforeRouteEnter(to, from, next) {
-  //   console.group("beforeRouteEnter");
-  //   console.log(`Route ENTER from '${from.fullPath}' to '${to.fullPath}'`);
-  //   next(async (vm: any) => {
-  //     console.group("NEXT IN ENTER");
-  //     await vm.handleUrlParameters(to);
-  //     console.groupEnd();
-  //   });
-  //   console.groupEnd();
-  // },
-
-  // beforeRouteUpdate(to, from, next) {
-  //   console.group("beforeRouteUpdate");
-  //   console.log(`Route UPDATE from '${from.fullPath}' to '${to.fullPath}'`);
-  //   this.handleUrlParameters(to).then(() => next());
-  //   console.groupEnd();
-  // },
-
   computed: {
     availableSurveys(): Selection[] {
       return this.surveys.map((survey) => ({
@@ -289,27 +272,19 @@ export default Vue.extend({
     console.groupEnd();
   },
 
-  watch: {
-    $route: "handleUrlParameters",
-  },
-
   methods: {
     async handleUrlParameters() {
       // Check URL parameters. Call fetch unconditionally;
       // if selections are bogus, it'll figure that out.
       console.group("handleUrlParameters");
-      this.selectedSurveyId = this.$route.params.surveyId;
-      this.selectedGroupId = this.$route.params.groupId;
-      console.log(
-        "URL PARAMS %s/%s",
-        this.selectedSurveyId,
-        this.selectedGroupId
-      );
-      console.log("SURVEY BEFORE", this.selectedSurvey?.qualtricsName);
+      this.selectedSurveyId = this.$route.params.surveyId?.toString();
+      this.selectedGroupId = this.$route.params.groupId?.toString();
+      debug("URL PARAMS %s/%s", this.selectedSurveyId, this.selectedGroupId);
+      debug("SURVEY BEFORE", this.selectedSurvey?.qualtricsName);
       console.group("fetchSurveyResponses");
       await this.fetchSurveyResponses();
       console.groupEnd();
-      console.log("SURVEY AFTER", this.selectedSurvey?.qualtricsName);
+      debug("SURVEY AFTER", this.selectedSurvey?.qualtricsName);
       console.groupEnd();
     },
 
@@ -356,7 +331,7 @@ export default Vue.extend({
         })
         .then((response) => {
           this.surveys = response.data.surveys;
-          console.log(`FETCHED ${this.surveys.length} SURVEYS`);
+          debug(`FETCHED ${this.surveys.length} SURVEYS`);
         })
         .catch((error) => {
           throw new Error(`Failed to fetch surveys: ${error}`);
@@ -370,14 +345,14 @@ export default Vue.extend({
     fetchSurveyResponses() {
       if (!this.selectedSurveyId) {
         // No survey selected
-        console.log("No survey selected");
+        debug("No survey selected");
         return;
       }
 
       const survey = this.findSurveyById(parseInt(this.selectedSurveyId));
       if (!survey) {
         // No survey with the given ID.
-        console.log(`No survey with ID ${this.selectedSurveyId}`);
+        debug(`No survey with ID ${this.selectedSurveyId}`);
         return;
       }
 
@@ -390,7 +365,7 @@ export default Vue.extend({
         // Selected survey has groups
         if (!this.selectedGroupId) {
           // No group selected
-          console.log("No group selected");
+          debug("No group selected");
           this.showSnackbar("Survey has groups; please select one");
           return;
         }
@@ -424,11 +399,11 @@ export default Vue.extend({
     //       query: ALL_GROUPS,
     //     })
     //     .then(({ data }) => {
-    //       console.log("received groups!", data.allGroups);
+    //       debug("received groups!", data.allGroups);
     //       this.groups = data.allGroups;
     //     })
     //     .catch((error) => {
-    //       console.log("there appears to have been an error: ", error);
+    //       debug("there appears to have been an error: ", error);
     //     });
     // },
 
@@ -438,16 +413,16 @@ export default Vue.extend({
     //       query: SURVEY_RESPONSES_QUERY,
     //     })
     //     .then(({ data }) => {
-    //       console.log("received responses!", data.surveyResponses);
+    //       debug("received responses!", data.surveyResponses);
     //       this.surveyResponses = data.surveyResponses;
     //     })
     //     .catch((error) => {
-    //       console.log("there appears to have been an error: ", error);
+    //       debug("there appears to have been an error: ", error);
     //     });
     // },
     //
     // fetchGroupResponses(group: AllGroups_groups) {
-    //   console.log("inside fetch group responses: ", group);
+    //   debug("inside fetch group responses: ", group);
     //   this.chosenGroup = group;
     //   let chosenGroupId = group.id;
     //   //if (this.chosenGroup !== null) {
@@ -459,11 +434,11 @@ export default Vue.extend({
     //       },
     //     })
     //     .then(({ data }) => {
-    //       console.log("received responses!", data.groupResponses);
+    //       debug("received responses!", data.groupResponses);
     //       this.surveyResponses = data.groupResponses;
     //     })
     //     .catch((error) => {
-    //       console.log("there appears to have been an error: ", error);
+    //       debug("there appears to have been an error: ", error);
     //     });
     //   //}
     // },
@@ -533,7 +508,7 @@ export default Vue.extend({
           },
         })
         .then((response) => {
-          console.log("response", response);
+          debug("response", response);
           if (response.data) {
             const writeLetter = response.data.writeLetter;
 
@@ -606,7 +581,7 @@ export default Vue.extend({
       let letterTitle = "No letter"; // default
       // FIXME
       // if (this.chosenLetterType.key === LetterTypeEnum.INDIVIDUAL) {
-      //   console.log("individual letter!", item);
+      //   debug("individual letter!", item);
       //   item.survey.surveyLetters.forEach((surveyLetter) => {
       //     if (surveyLetter.letterType.key === LetterTypeEnum.INDIVIDUAL) {
       //       letterTitle = surveyLetter.letter.title;
