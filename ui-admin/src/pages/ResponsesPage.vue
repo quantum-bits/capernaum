@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <page-header title="Responses">
+    <page-header title="Individual Responses">
       <v-col>
         <v-select
           :disabled="availableSurveys.length === 0"
@@ -59,7 +59,7 @@
             <template v-slot:item.action="{ item }">
               <icon-button
                 icon-name="mdi-adobe-acrobat"
-                tool-tip="Create PDF report"
+                tool-tip="Create individual PDF report"
                 @click="generatePDF(item)"
               />
               <icon-button
@@ -434,7 +434,7 @@ export default Vue.extend({
           mutation: WRITE_LETTER_MUTATION,
           variables: {
             writerInput: {
-              surveyResponseId: surveyResponse.id,
+              responseOrGroupId: surveyResponse.id,
               letterId: surveyLetter.letter.id,
             },
           },

@@ -1,6 +1,10 @@
 <template>
   <v-container>
-    <page-header title="Groups" />
+    <page-header title="Group Responses">
+      <v-col cols="1">
+        <v-progress-circular v-if="spinnerVisible" indeterminate />
+      </v-col>
+    </page-header>
     <v-row>
       <v-col>
         <v-data-table class="elevation-1" :headers="headers" :items="groups">
@@ -27,7 +31,16 @@
             <samp>{{ item.codeWord }}</samp>
           </template>
           <template v-slot:item.actions="{ item }">
-            <v-icon small @click="confirmDelete(item)"> mdi-delete </v-icon>
+            <icon-button
+              icon-name="mdi-adobe-acrobat"
+              tool-tip="Create group PDF report"
+              @click="generatePDF(item)"
+            />
+            <icon-button
+              icon-name="mdi-delete"
+              tool-tip="Delete group"
+              @click="confirmDelete(item)"
+            />
           </template>
           <template v-slot:item.closedAfter="{ item }">
             {{ item.closedAfter | standardDate }}
@@ -43,6 +56,15 @@
         </v-data-table>
       </v-col>
     </v-row>
+
+    <v-snackbar v-model="snackbar.visible">
+      {{ snackbar.text }}
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar.visible = false"
+          >Close</v-btn
+        >
+      </template>
+    </v-snackbar>
 
     <confirm-dialog
       v-model="deleteDialog.visible"
@@ -60,12 +82,20 @@ import { ALL_GROUPS, DELETE_GROUP } from "@/graphql/groups.graphql";
 import { DateTime } from "luxon";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import PageHeader from "@/pages/PageHeader.vue";
-import { AllGroups, AllGroups_groups } from "@/graphql/types/AllGroups";
+import { AllGroups_groups } from "@/graphql/types/AllGroups";
+import IconButton from "@/components/buttons/IconButton.vue";
+import * as _ from "lodash";
+import {
+  WriteLetter,
+  WriteLetter_writeLetter as LetterWriterOutput,
+  WriteLetterVariables,
+} from "@/graphql/types/WriteLetter";
+import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
 
 export default Vue.extend({
   name: "GroupsPage",
 
-  components: { ConfirmDialog, PageHeader },
+  components: { IconButton, ConfirmDialog, PageHeader },
 
   data() {
     return {
@@ -82,10 +112,19 @@ export default Vue.extend({
         { text: "Actions", value: "actions", sortable: false },
       ],
 
+      letterWriterOutput: {} as LetterWriterOutput,
+
       deleteDialog: {
         group: null as unknown as AllGroups_groups,
         visible: false,
       },
+
+      snackbar: {
+        visible: false,
+        text: "",
+      },
+
+      spinnerVisible: false,
     };
   },
 
@@ -117,6 +156,57 @@ export default Vue.extend({
     confirmDelete(group: AllGroups_groups) {
       this.deleteDialog.group = group;
       this.deleteDialog.visible = true;
+    },
+
+    showSpinner() {
+      this.spinnerVisible = true;
+    },
+
+    hideSpinner() {
+      this.spinnerVisible = false;
+    },
+
+    showSnackbar(text: string) {
+      this.snackbar.text = text;
+      this.snackbar.visible = true;
+    },
+
+    generatePDF(group: AllGroups_groups) {
+      const surveyLetter = _.find(
+        group.survey.surveyLetters,
+        (surveyLetter) => surveyLetter.letterType.key === "group"
+      );
+      if (!surveyLetter) {
+        this.showSnackbar("No group letter for this survey");
+        return;
+      }
+
+      this.showSpinner();
+      this.$apollo
+        .mutate<WriteLetter, WriteLetterVariables>({
+          mutation: WRITE_LETTER_MUTATION,
+          variables: {
+            writerInput: {
+              letterId: surveyLetter.letter.id,
+              responseOrGroupId: group.id,
+            },
+          },
+        })
+        .then((response) => {
+          if (response.data) {
+            const writeLetter = response.data.writeLetter;
+            this.showSnackbar(writeLetter.message);
+            if (writeLetter.responseSummary) {
+              this.letterWriterOutput = writeLetter;
+            }
+          }
+        })
+        .catch((error) => {
+          console.error("generatePDF error", error);
+        })
+        .finally(() => {
+          this.hideSpinner();
+        });
     },
 
     deleteGroup() {

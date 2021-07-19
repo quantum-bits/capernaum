@@ -52,7 +52,7 @@ export class Letter extends AbstractEntity {
     // If we loaded elements, sort 'em.
     if (this.letterElements) {
       this.letterElements = this.letterElements.sort(
-        (a, b) => b.sequence - a.sequence
+        (a, b) => a.sequence - b.sequence
       );
     }
   }

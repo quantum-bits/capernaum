@@ -32,6 +32,16 @@ export const ALL_GROUPS = gql`
         emailKey
         groupCodeKey
         okayForGroup
+        surveyLetters {
+          letterType {
+            id
+            key
+          }
+          letter {
+            id
+            description
+          }
+        }
       }
       surveyResponses {
         id

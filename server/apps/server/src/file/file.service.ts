@@ -1,5 +1,5 @@
 import { join, normalize } from "path";
-import { access, close, open, unlink, write } from "fs";
+import fs from "fs-extra";
 
 interface FileDetails {
   fileName: string;
@@ -7,58 +7,85 @@ interface FileDetails {
   fileSize: number;
 }
 
+// Terminology:
+//  abs - starts with a slash
+//  rel - starts with a non-slash
+//  dir - ends at a directory
+// path - ends at a file
+
+// /home/capernaum/static/pdfs/alpha/beta/foo.pdf
+// /====/========= top-level abs dir
+//                 ======/==== top-level rel dir
+//                             =====/==== working rel dir
+//                                        ===.=== file name
+// /====/=========/======/====/=====/====/===.=== abs path
+//                 ======/====/=====/====/===.=== rel path
+
 export class FileService {
-  // Relative dir (e.g., 'static/pdfs' or 'static/images')
-  private readonly relDir: string;
+  private readonly topLevelAbsDir: string;
+  private readonly topLevelRelDir: string;
+  private workingRelDir = "";
 
-  // Absolute dir (e.g., '/home/capernaum/static/pdfs')
-  private readonly absDir: string;
-
+  // The `subDir` is something like `images` or `pdfs`.
   constructor(private readonly subDir: string) {
-    // Top-level capernaum base path (e.g., '/home/capernaum')
-    const baseAbsDir = normalize(process.env.CAP_BASE_ABS_DIR);
+    this.topLevelAbsDir = normalize(process.env.CAP_BASE_ABS_DIR);
+    this.topLevelRelDir = join(process.env.CAP_STATIC_REL_DIR, subDir);
 
-    this.relDir = normalize(join(process.env.CAP_STATIC_REL_DIR, subDir));
-    this.absDir = normalize(join(baseAbsDir, this.relDir));
-
-    access(this.absDir, (err) => {
-      if (err) {
-        throw Error(`Can't find a base directory at '${this.absDir}'`);
-      }
-    });
+    // Make sure the directory is there.
+    const dir = join(this.topLevelAbsDir, this.topLevelRelDir);
+    if (!fs.existsSync(dir)) {
+      throw new Error(`Top-level directory '${dir}' doesn't exist`);
+    }
   }
 
-  absoluteDir(): string {
-    return this.absDir;
+  async setWorkingDir(dir?: string) {
+    this.workingRelDir = dir;
+    try {
+      await fs.ensureDir(this.absoluteDir);
+    } catch {
+      throw new Error(
+        `Failed to ensure working directory '${this.absoluteDir}'`
+      );
+    }
+    return this.absoluteDir;
   }
 
-  relativePath(fileName: string): string {
-    return join(this.relDir, fileName);
+  get absoluteDir() {
+    return join(this.topLevelAbsDir, this.relativeDir);
   }
 
   absolutePath(fileName: string): string {
-    return join(this.absDir, fileName);
+    return join(this.absoluteDir, fileName);
   }
 
+  get relativeDir() {
+    return join(this.topLevelRelDir, this.workingRelDir);
+  }
+
+  relativePath(fileName: string): string {
+    return join(this.relativeDir, fileName);
+  }
+
+  // Save `buffer` to `fileName`. The file must not already exist.
   async saveFile(fileName: string, buffer: Buffer): Promise<FileDetails> {
     const fullPath = this.absolutePath(fileName);
 
     return new Promise((resolve, reject) => {
       let fileSize = NaN;
 
-      open(fullPath, "w", (err, fd) => {
+      fs.open(fullPath, "w", (err, fd) => {
         if (err) {
-          reject(Error(`Upload file '${fullPath}' already exists`));
+          reject(Error(`File '${fullPath}' already exists`));
         }
 
-        write(fd, buffer, (err, bytesWritten) => {
+        fs.write(fd, buffer, (err, bytesWritten) => {
           if (err) {
             reject(Error(`Failed to write '${fullPath}'`));
           }
           fileSize = bytesWritten;
         });
 
-        close(fd, (err) => {
+        fs.close(fd, (err) => {
           if (err) {
             reject(Error(`Failed to close '${fullPath}'`));
           }
@@ -73,11 +100,12 @@ export class FileService {
     });
   }
 
+  // Delete a file at `fileName`.
   deleteFile(fileName: string): Promise<unknown> {
     const fullPath = this.absolutePath(fileName);
 
     return new Promise((resolve, reject) => {
-      unlink(fullPath, (err) => {
+      fs.unlink(fullPath, (err) => {
         if (err) {
           reject(err);
         }

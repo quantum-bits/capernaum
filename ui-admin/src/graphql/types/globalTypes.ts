@@ -194,7 +194,7 @@ export interface UserUpdateInput {
 
 export interface WriterInput {
   letterId: number;
-  surveyResponseId: number;
+  responseOrGroupId: number;
 }
 
 //==============================================================

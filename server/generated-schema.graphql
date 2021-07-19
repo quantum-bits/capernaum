@@ -395,11 +395,6 @@ enum WhichItems {
   WithoutIndex
 }
 
-type ChartEntry {
-  title: String!
-  value: Float!
-}
-
 type PredictionDetails {
   surveyIndexTitle: String!
   surveyIndexAbbreviation: String!
@@ -997,7 +992,7 @@ input UserRoleCreateInput {
 
 input WriterInput {
   letterId: Int!
-  surveyResponseId: Int!
+  responseOrGroupId: Int!
 }
 
 input QualtricsSubscriptionCreateInput {

@@ -7,7 +7,6 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
-import { GroupService } from "@server/src/group/group.service";
 import { SurveyService } from "@server/src/survey/services/survey.service";
 
 const debug = getDebugger("response");
@@ -16,7 +15,6 @@ const debug = getDebugger("response");
 export class SurveyResponseService extends BaseService<SurveyResponse> {
   constructor(
     private readonly surveyService: SurveyService,
-    private readonly groupService: GroupService,
     @InjectRepository(SurveyResponse)
     private readonly repo: Repository<SurveyResponse>
   ) {

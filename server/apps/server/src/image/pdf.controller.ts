@@ -1,11 +1,11 @@
 import { Controller, Get, Inject, Param, Res } from "@nestjs/common";
 import { FileService } from "../file/file.service";
-import { PDF_FILE_SERVICE } from "../file/file.module";
+import { REPORT_FILE_SERVICE } from "../file/file.module";
 
 @Controller("files")
 export class PDFController {
   constructor(
-    @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService
+    @Inject(REPORT_FILE_SERVICE) private readonly pdfFileService: FileService
   ) {}
 
   @Get(":fileName")

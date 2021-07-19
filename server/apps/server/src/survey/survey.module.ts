@@ -34,6 +34,7 @@ import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analy
 import { LetterModule } from "@server/src/letter/letter.module";
 import { ScriptureEngagementPractice } from "@server/src/prediction/entities";
 import { Group } from "@server/src/group/entities";
+import { GroupService } from "@server/src/group/group.service";
 
 @Module({
   imports: [

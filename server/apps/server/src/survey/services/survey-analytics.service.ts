@@ -271,6 +271,6 @@ export class SurveyAnalyticsService {
       }
     }
     debug("%O", summaryByPracticeId);
-    return summaryByPracticeId.values();
+    return Array.from(summaryByPracticeId.values());
   }
 }

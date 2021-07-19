@@ -22,6 +22,39 @@ export interface AllGroups_groups_type {
   code: string;
 }
 
+export interface AllGroups_groups_survey_surveyLetters_letterType {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Letter type name
+   */
+  key: string;
+}
+
+export interface AllGroups_groups_survey_surveyLetters_letter {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Description of letter
+   */
+  description: string;
+}
+
+export interface AllGroups_groups_survey_surveyLetters {
+  /**
+   * The letter type
+   */
+  letterType: AllGroups_groups_survey_surveyLetters_letterType;
+  /**
+   * The letter
+   */
+  letter: AllGroups_groups_survey_surveyLetters_letter;
+}
+
 export interface AllGroups_groups_survey {
   /**
    * Unique ID for this entity
@@ -47,6 +80,10 @@ export interface AllGroups_groups_survey {
    * Make this survey available to groups?
    */
   okayForGroup: boolean;
+  /**
+   * Survey letters for this survey
+   */
+  surveyLetters: AllGroups_groups_survey_surveyLetters[];
 }
 
 export interface AllGroups_groups_surveyResponses {

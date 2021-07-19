@@ -1,5 +1,5 @@
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import { htmlToText } from "html-to-text";
+import { convert } from "html-to-text";
 
 export function quillDeltaToHtml(deltaString: string): string {
   let delta = JSON.parse(deltaString);
@@ -13,5 +13,5 @@ export function quillDeltaToHtml(deltaString: string): string {
 }
 
 export function quillHtmlToText(quillHtml: string): string {
-  return htmlToText(quillHtml);
+  return convert(quillHtml);
 }

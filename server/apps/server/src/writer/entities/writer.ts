@@ -4,7 +4,7 @@ import { ResponseSummary } from "../../survey/entities";
 @InputType()
 export class WriterInput {
   @Field(() => Int) letterId: number;
-  @Field(() => Int) surveyResponseId: number;
+  @Field(() => Int) responseOrGroupId: number;
 }
 
 @ObjectType()

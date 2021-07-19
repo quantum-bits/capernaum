@@ -2,6 +2,7 @@ import prettyFormat from "pretty-format";
 import { table, TableUserConfig } from "table";
 import chalk from "chalk";
 import * as _ from "lodash";
+import { DateTime } from "luxon";
 
 export function printPretty(val: unknown) {
   console.log(prettyFormat(val));
@@ -39,4 +40,12 @@ export function printTable(
   };
 
   console.log(table(data, config));
+}
+
+export function isoDate(date: Date) {
+  return DateTime.fromJSDate(date).toISODate();
+}
+
+export function localeDate(date: string) {
+  return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
 }

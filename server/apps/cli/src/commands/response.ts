@@ -202,11 +202,10 @@ export async function countGroupPredictions(
   const nestContext = new NestContext();
   const surveyAnalyticsService = await nestContext.get(SurveyAnalyticsService);
   const visualizationService = await nestContext.get(VisualizationService);
-  const predictionCountsIterator =
+  const predictionCounts =
     await surveyAnalyticsService.countPredictionsPerGroup(groupId);
   await nestContext.close();
 
-  const predictionCounts = Array.from(predictionCountsIterator);
   debug("predictionCounts %O", predictionCounts);
 
   if (options.pdf) {

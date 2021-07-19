@@ -17,6 +17,7 @@ import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 import { DateTime } from "luxon";
 import { SurveyService } from "@server/src/survey/services";
+import { GroupDemographics } from "@server/src/writer/writer.service";
 
 const debug = getDebugger("group");
 
@@ -137,7 +138,14 @@ export class GroupService {
   }
 
   // Always resolve these relations.
-  private alwaysResolve = ["type", "survey", "surveyResponses"];
+  private alwaysResolve = [
+    "type",
+    "survey",
+    "survey.surveyLetters",
+    "survey.surveyLetters.letter",
+    "survey.surveyLetters.letterType",
+    "surveyResponses",
+  ];
 
   readAll() {
     return this.repo.find({
@@ -200,7 +208,7 @@ export class GroupService {
     return this.repo.update(groupId, { reportSent: now });
   }
 
-  async countResponses(groupId: number) {
+  async countResponses(groupId: number): Promise<number> {
     const result = await this.repo
       .createQueryBuilder("grp")
       .innerJoin("grp.surveyResponses", "sr")
@@ -209,6 +217,19 @@ export class GroupService {
       .getRawOne();
     debug("countResponses %O", result);
     return parseInt(result.response_count);
+  }
+
+  async demographics(groupId: number): Promise<GroupDemographics> {
+    const result = await this.repo
+      .createQueryBuilder("grp")
+      .innerJoinAndSelect("grp.surveyResponses", "sr")
+      .where("grp.id = :groupId", { groupId })
+      .select('MIN("endDate") AS "earliestResponse"')
+      .addSelect('MAX("endDate") AS "latestResponse"')
+      .addSelect('COUNT(*) AS "responseCount"')
+      .getRawOne();
+    debug("dateRange %O", result);
+    return result;
   }
 
   update(updateInput: GroupUpdateInput): Promise<Group> {

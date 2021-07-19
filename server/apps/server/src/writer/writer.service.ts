@@ -5,10 +5,10 @@ import * as assert from "assert";
 import {
   Dimension,
   Prediction,
+  PredictionCount,
   SurveyRespondentType,
 } from "../survey/survey.types";
-import { createHash } from "crypto";
-import { IMAGE_FILE_SERVICE, PDF_FILE_SERVICE } from "../file/file.module";
+import { IMAGE_FILE_SERVICE, REPORT_FILE_SERVICE } from "../file/file.module";
 import { LetterElementService, LetterService } from "../letter/letter.service";
 import {
   SurveyResponseService,
@@ -17,14 +17,14 @@ import {
 import { GroupService } from "../group/group.service";
 import { getDebugger } from "@helpers/debug-factory";
 import { SurveyAnalyticsService } from "@server/src/survey/services/survey-analytics.service";
-import { ChartData } from "@server/src/writer/writer.types";
 import { DateTime } from "luxon";
 import * as _ from "lodash";
 import { ResponseSummary } from "@server/src/survey/entities";
 import { WriterOutput } from "@server/src/writer/entities";
 import { writeFile } from "fs/promises";
 import execa from "execa";
-import prettyFormat from "pretty-format";
+import { VisualizationService } from "@server/src/visualization/visualization.service";
+import { localeDate } from "@helpers/formatting";
 
 const debug = getDebugger("writer");
 
@@ -61,6 +61,10 @@ function formatEnvironment(name: string, content: string) {
   );
 }
 
+function formatCenter(content: string) {
+  return formatEnvironment("center", content);
+}
+
 /**
  * Format a hyperlink: \href{url}{text}
  * @param url
@@ -84,17 +88,6 @@ function formatVerbatim(text: string) {
  */
 function formatComment(text: string) {
   return `%%%%% ${text}`;
-}
-
-// Generate a hash digest for the file.
-function generateBaseName(
-  letterId: number,
-  respondentType: SurveyRespondentType,
-  groupOrResponseId: number
-) {
-  return createHash("sha1")
-    .update(`${letterId}-${respondentType}-${groupOrResponseId}`)
-    .digest("hex");
 }
 
 export class LineBuffer {
@@ -148,12 +141,14 @@ export class LineBuffer {
 }
 
 enum TipTapNodeType {
+  BulletList = "bulletList",
   Document = "doc",
+  HardBreak = "hardBreak",
+  Heading = "heading",
+  ListItem = "listItem",
+  OrderedList = "orderedList",
   Paragraph = "paragraph",
   Text = "text",
-  HardBreak = "hardBreak",
-  OrderedList = "orderedList",
-  ListItem = "listItem",
 }
 
 enum TipTapMarkType {
@@ -165,25 +160,68 @@ interface TipTapMark {
   type: TipTapMarkType;
 }
 
+type TipTapAttributes = { [key: string]: string | number };
+
 interface TipTapNode {
   type: TipTapNodeType;
+  attrs: TipTapAttributes;
   text: string;
   marks: TipTapMark[];
   content: TipTapNode[];
 }
 
+export interface GroupDemographics {
+  responseCount: number;
+  earliestResponse: string;
+  latestResponse: string;
+}
+
+interface RenderParameters {
+  letter: Letter;
+  dimensions: Dimension[];
+  predictions: Prediction[];
+  predictionCounts?: PredictionCount[];
+  groupDemographics?: GroupDemographics;
+}
+
 @Injectable()
 export class WriterService {
   constructor(
-    @Inject(IMAGE_FILE_SERVICE) private readonly imageFileService: FileService,
-    @Inject(PDF_FILE_SERVICE) private readonly pdfFileService: FileService,
+    @Inject(IMAGE_FILE_SERVICE)
+    private readonly imageFileService: FileService,
+    @Inject(REPORT_FILE_SERVICE)
+    private readonly reportFileService: FileService,
+
     private readonly letterService: LetterService,
     private readonly letterElementService: LetterElementService,
     private readonly surveyService: SurveyService,
     private readonly groupService: GroupService,
     private readonly surveyResponseService: SurveyResponseService,
-    private readonly surveyAnalyticsService: SurveyAnalyticsService
+    private readonly surveyAnalyticsService: SurveyAnalyticsService,
+    private readonly visualizationService: VisualizationService
   ) {}
+
+  /**
+   * 1. Generate a relative directory in which to store the files associated with a report.
+   *    Files will end up at locations like these:
+   *     .../survey-38/group-42/report.pdf
+   *    .../survey-38/individual-30517/report.pdf
+   *    .../survey-38/individual-30517/dimension-9.pdf
+   * 2. Set the FileService's working directory.
+   *
+   * @param surveyId
+   * @param type
+   * @param groupOrResponseId
+   */
+  async setWorkingDir(
+    surveyId: number,
+    type: SurveyRespondentType,
+    groupOrResponseId: number
+  ) {
+    const workDir = `survey-${surveyId}/${type}-${groupOrResponseId}`;
+    const absoluteDir = await this.reportFileService.setWorkingDir(workDir);
+    debug(`Absolute dir now '${absoluteDir}'`);
+  }
 
   private renderImage(letterElement: LetterElement) {
     const fullPath = this.imageFileService.absolutePath(
@@ -214,39 +252,61 @@ export class WriterService {
       }
 
       const result = renderTipTapNode(tipTapDoc);
-      debug("result %s", result);
+      debug("LaTeX %s", result);
       return result;
     }
 
-    function renderTipTapNode(node: TipTapNode): string {
-      switch (node.type) {
+    function renderTipTapNode(tipTapNode: TipTapNode): string {
+      const reducedContent = _.reduce(
+        tipTapNode.content,
+        (acc, node) => acc + renderTipTapNode(node),
+        ""
+      );
+
+      switch (tipTapNode.type) {
         case TipTapNodeType.Document:
-          return _.reduce(
-            node.content,
-            (acc, n) => acc + renderTipTapNode(n),
-            ""
-          );
+          return reducedContent;
+        case TipTapNodeType.Heading:
+          const level = tipTapNode.attrs.level;
+          const command =
+            level === 1 ? "section*" : level === 2 ? "subsection*" : null;
+          if (!level) {
+            throw new Error(`No level for heading`);
+          }
+          return formatLaTeX(command, reducedContent) + "\n\n";
         case TipTapNodeType.Paragraph:
-          return _.reduce(
-            node.content,
-            (acc, n) => acc + renderTipTapNode(n),
-            ""
-          );
+          return reducedContent + "\n\n";
         case TipTapNodeType.Text:
-          return node.text;
+          let text = tipTapNode.text;
+          if (tipTapNode.marks) {
+            for (const mark of tipTapNode.marks) {
+              switch (mark.type) {
+                case TipTapMarkType.Bold:
+                  text = formatLaTeX("textbf", text);
+                  break;
+                case TipTapMarkType.Italic:
+                  text = formatLaTeX("emph", text);
+                  break;
+                default:
+                  throw new Error(`Unknown mark type: '${tipTapNode.marks}'`);
+              }
+            }
+          }
+          return text;
+        case TipTapNodeType.BulletList:
         case TipTapNodeType.OrderedList:
-          return _.reduce(
-            node.content,
-            (acc, n) => acc + formatLaTeX("item", renderTipTapNode(n)),
-            ""
-          );
+          const envName =
+            tipTapNode.type === TipTapNodeType.BulletList
+              ? "itemize"
+              : "enumerate";
+          return formatEnvironment(envName, reducedContent.trim()) + "\n\n";
         case TipTapNodeType.ListItem:
-          break;
+          return formatLaTeX("item", reducedContent.trim()) + "\n";
         case TipTapNodeType.HardBreak:
           return "\n";
         default:
           throw new Error(
-            `Unknown node type: '${JSON.stringify(node, null, 2)}'`
+            `Unknown node type: '${JSON.stringify(tipTapNode, null, 2)}'`
           );
       }
     }
@@ -316,44 +376,18 @@ export class WriterService {
     }
   }
 
-  private static renderChart(chartData: ChartData) {
-    debug("renderChart %O", chartData);
-
-    function chartHeight() {
-      const height =
-        2.218962113 + 0.372607394 * (2 * chartData.entries.length - 1);
-      return `height=${height}cm`;
-    }
-
-    const chart = `
-      \\begin{adjustwidth}{0cm}{1.5cm}
-      \\begin{flushright}
-      \\begin{tikzpicture}
-        \\begin{axis}[
-          title=${chartData.title},
-          xbar, xmin=0, xmax=7,
-          width=0.75\\textwidth,
-          ${chartHeight()},
-          enlarge y limits={abs=0.5cm},
-          symbolic y coords={${chartData.allTitles()}},
-          ytick=data,
-          %nodes near coords,
-          %nodes near coords align={horizontal},
-          ]
-          \\addplot [fill = fillColor] coordinates {
-            ${chartData.allCoordinates()}
-          };
-          ${chartData.allBarLabels()}
-        \\end{axis}
-      \\end{tikzpicture}
-      \\end{flushright}
-      \\end{adjustwidth}`;
-
-    return formatEnvironment("center", chart);
+  private renderDimensionChart(dimension: Dimension) {
+    const filePath = this.reportFileService.absolutePath(
+      `dimension-chart-${dimension.id}.pdf`
+    );
+    debug("renderDimensionChart %O to %s", dimension, filePath);
+    this.visualizationService.visualizeDimension(dimension, filePath);
+    return formatCenter(formatLaTeX("includegraphics", filePath));
   }
 
   private renderPredictions(predictions: Prediction[]) {
-    debug("renderPredictions %O", predictions);
+    const filePath = this.reportFileService.absolutePath("predictions.pdf");
+    debug("renderPredictions %O to %s", filePath);
 
     return predictions
       .filter((prediction) => prediction.predict)
@@ -370,10 +404,48 @@ export class WriterService {
       .join("\n\n");
   }
 
+  private static renderDemographics(
+    groupDemographics: GroupDemographics
+  ): string {
+    const earliest = localeDate(groupDemographics.earliestResponse);
+    const latest = localeDate(groupDemographics.latestResponse);
+    const table = `
+    \\begin{tabular}{ll}
+    \\toprule
+    Number of responses & ${groupDemographics.responseCount} \\\\
+    Earliest response & ${earliest} \\\\
+    Latest response & ${latest} \\\\
+    \\bottomrule
+    \\end{tabular}
+    `;
+    return formatCenter(table);
+  }
+
+  private renderScriptureEngagementCounts(
+    predictionCounts: PredictionCount[]
+  ): string {
+    const filePath = this.reportFileService.absolutePath(
+      "prediction-counts.pdf"
+    );
+    debug(
+      "renderScriptureEngagementCounts %O to %s",
+      predictionCounts,
+      filePath
+    );
+    this.visualizationService.visualizePredictionCounts(
+      predictionCounts,
+      filePath
+    );
+    return formatCenter(
+      formatLaTeX("includegraphics", filePath, "width=\\textwidth")
+    );
+  }
+
   private static renderDocument(renderedElements: string[]) {
     return `
     \\documentclass[11pt]{article}
     
+    \\usepackage{booktabs}
     \\usepackage[hmargin=0.75in,top=1.0in,bottom=1.5in]{geometry}
     \\usepackage{graphicx}
     \\usepackage{changepage}
@@ -424,17 +496,13 @@ export class WriterService {
     ].join("\n");
   }
 
-  private async renderAllElements(
-    letter: Letter,
-    dimensions: Dimension[],
-    predictions: Prediction[]
-  ) {
+  private async renderAllElements(params: RenderParameters) {
     const renderedElements: string[] = [];
 
-    for (const letterElement of letter.letterElements) {
+    for (const letterElement of params.letter.letterElements) {
       renderedElements.push(
         formatComment(
-          `id ${letterElement.id} (${letterElement.letterElementType.key})`
+          `${letterElement.letterElementType.key} (ID ${letterElement.id})`
         )
       );
       debug("render element %O", letterElement);
@@ -443,24 +511,28 @@ export class WriterService {
           renderedElements.push(WriterService.renderBoilerplate(letterElement));
           break;
         case "demographics":
+          renderedElements.push(
+            WriterService.renderDemographics(params.groupDemographics)
+          );
           break;
         case "dimension-chart":
           const dimension: Dimension = _.find(
-            dimensions,
+            params.dimensions,
             (dim) => dim.id === letterElement.surveyDimension.id
           );
           debug("selected dimension %O", dimension);
-          renderedElements.push(
-            WriterService.renderChart(dimension.asChartData())
-          );
+          renderedElements.push(this.renderDimensionChart(dimension));
           break;
         case "image":
           renderedElements.push(this.renderImage(letterElement));
           break;
         case "scripture-engagement-count":
+          renderedElements.push(
+            this.renderScriptureEngagementCounts(params.predictionCounts)
+          );
           break;
         case "scripture-engagement-prediction":
-          renderedElements.push(this.renderPredictions(predictions));
+          renderedElements.push(this.renderPredictions(params.predictions));
           break;
         default:
           throw Error(
@@ -491,12 +563,12 @@ export class WriterService {
     return writerOutput;
   }
 
-  private async runLaTeX(renderedElements: string[], baseName: string) {
+  private async runLaTeX(renderedElements: string[]) {
     // Set up paths.
-    const texFileName = baseName + ".tex";
-    const texFilePath = this.pdfFileService.absolutePath(texFileName);
-    const pdfFileName = baseName + ".pdf";
-    const pdfAbsolutePath = this.pdfFileService.absolutePath(pdfFileName);
+    const texFileName = "report.tex";
+    const texFilePath = this.reportFileService.absolutePath(texFileName);
+    const pdfFileName = "report.pdf";
+    const pdfAbsolutePath = this.reportFileService.absolutePath(pdfFileName);
 
     // Create the document.
     const renderedDocument = WriterService.renderDocument(renderedElements);
@@ -514,7 +586,7 @@ export class WriterService {
     // Run LaTeX to create the PDF.
     try {
       const result = await execa("lualatex", ["--halt-on-error", texFilePath], {
-        cwd: this.pdfFileService.absoluteDir(),
+        cwd: this.reportFileService.absoluteDir,
       });
       debug("ran LaTeX %O", result);
     } catch (errorResult) {
@@ -526,7 +598,7 @@ export class WriterService {
       true,
       "Letter created successfully",
       pdfFileName,
-      this.pdfFileService.relativePath(pdfFileName),
+      this.reportFileService.relativePath(pdfFileName),
       pdfAbsolutePath
     );
 
@@ -534,11 +606,8 @@ export class WriterService {
     return writerOutput;
   }
 
-  async renderIndividualLetter(letterId: number, surveyResponseId: number) {
-    debug("letter %d for response %d", letterId, surveyResponseId);
-
-    const letter = await this.letterService.readOne(letterId);
-    debug("renderIndividualLetter %O", letter);
+  async renderIndividualLetter(letter: Letter, surveyResponseId: number) {
+    debug("individual letter %O for response %d", letter, surveyResponseId);
 
     const surveyResponse = await this.surveyResponseService.readOne(
       surveyResponseId
@@ -559,11 +628,17 @@ export class WriterService {
       );
     debug("renderIndividualLetter %O", predictions);
 
-    const renderedElements = await this.renderAllElements(
+    await this.setWorkingDir(
+      surveyResponse.survey.id,
+      SurveyRespondentType.Individual,
+      surveyResponse.id
+    );
+
+    const renderedElements = await this.renderAllElements({
       letter,
       dimensions,
-      predictions
-    );
+      predictions,
+    });
 
     renderedElements.push(
       WriterService.renderResponseDetails([
@@ -572,18 +647,11 @@ export class WriterService {
       ])
     );
 
-    const baseName = generateBaseName(
-      letter.id,
-      SurveyRespondentType.Individual,
-      surveyResponse.id
-    );
-    return await this.runLaTeX(renderedElements, baseName);
+    return await this.runLaTeX(renderedElements);
   }
 
-  async renderGroupLetter(letterId: number, groupId: number) {
-    debug("letter %d for group %d", letterId, groupId);
-
-    const letter = await this.letterService.readOne(letterId);
+  async renderGroupLetter(letter: Letter, groupId: number) {
+    debug("letter %O for group %d", letter, groupId);
 
     const group = await this.groupService.readOne(groupId);
 
@@ -599,11 +667,26 @@ export class WriterService {
         SurveyRespondentType.Group
       );
 
-    const renderedElements = await this.renderAllElements(
+    const predictionCounts =
+      await this.surveyAnalyticsService.countPredictionsPerGroup(group.id);
+
+    await this.setWorkingDir(
+      group.survey.id,
+      SurveyRespondentType.Group,
+      group.id
+    );
+
+    const groupDemographics: GroupDemographics =
+      await this.groupService.demographics(group.id);
+    debug("demographics %O", groupDemographics);
+
+    const renderedElements = await this.renderAllElements({
       letter,
       dimensions,
-      predictions
-    );
+      predictions,
+      predictionCounts,
+      groupDemographics,
+    });
 
     renderedElements.push(
       WriterService.renderResponseDetails([
@@ -613,11 +696,31 @@ export class WriterService {
       ])
     );
 
-    const baseName = generateBaseName(
-      letter.id,
-      SurveyRespondentType.Individual,
-      group.id
-    );
-    return await this.runLaTeX(renderedElements, baseName);
+    return await this.runLaTeX(renderedElements);
+  }
+
+  async renderLetter(letterId: number, responseOrGroupId: number) {
+    // Fetch the letter.  There _should_ only be one type
+    // per letter, but make sure.
+    const letter = await this.letterService.readOne(letterId);
+    const uniqueTypes = _.uniqBy(letter.surveyLetters, "letterTypeId");
+    if (uniqueTypes.length !== 1) {
+      throw new Error(
+        `Invalid letter types for letter ${letterId}: ${JSON.stringify(
+          letter.surveyLetters
+        )}`
+      );
+    }
+
+    // Grab the type from an arbitrary letter and render away.
+    const typeKey = letter.surveyLetters[0].letterType.key;
+    switch (typeKey) {
+      case "individual":
+        return this.renderIndividualLetter(letter, responseOrGroupId);
+      case "group":
+        return this.renderGroupLetter(letter, responseOrGroupId);
+      default:
+        throw new Error(`Invalid letter type: '${typeKey}'`);
+    }
   }
 }

@@ -15,6 +15,8 @@
             <tr>
               <td v-if="isImported(survey)">
                 <router-link
+                  v-bind="attrs"
+                  v-on="on"
                   :to="{
                     name: 'surveys',
                     params: { surveyId: survey.capernaumSurvey.id },

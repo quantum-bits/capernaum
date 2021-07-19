@@ -1,4 +1,4 @@
-    import { Args, Mutation, Resolver } from "@nestjs/graphql";
+import { Args, Mutation, Resolver } from "@nestjs/graphql";
 import { WriterInput, WriterOutput } from "./entities";
 import { UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";
@@ -12,9 +12,9 @@ export class WriterResolver {
 
   @Mutation(() => WriterOutput)
   async writeLetter(@Args("writerInput") writerInput: WriterInput) {
-    return this.letterWriter.renderIndividualLetter(
+    return this.letterWriter.renderLetter(
       writerInput.letterId,
-      writerInput.surveyResponseId
+      writerInput.responseOrGroupId
     );
   }
 }
