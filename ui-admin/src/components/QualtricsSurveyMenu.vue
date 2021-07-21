@@ -16,8 +16,12 @@
 import Vue from "vue";
 import { ALL_QUALTRICS_SURVEYS_QUERY } from "@/graphql/surveys.graphql";
 import { QualtricsSurveys } from "@/graphql/types/QualtricsSurveys";
-import { QualtricsSurveySelection } from "@/pages/survey.types";
 import is from "is";
+
+interface QualtricsSurveySelection {
+  text: string;
+  value: string;
+}
 
 export default Vue.extend({
   /**

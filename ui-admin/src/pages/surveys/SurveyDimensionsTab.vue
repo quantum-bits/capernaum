@@ -8,7 +8,7 @@
           <v-btn text @click="changeAll(false)">Hide All</v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-btn color="primary" @click="dimensionDialog.visible = true">
+          <v-btn color="primary" @click="showDimensionAddDialog">
             Add Dimension
           </v-btn>
         </v-col>
@@ -23,12 +23,11 @@
           color="primary"
           rounded
           hoverable
-          open-on-click
           :items="surveyContent"
         >
           <template v-slot:label="{ item }">
             <span v-html="item.name" />
-            <span v-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
+            <span v-if="item.type === surveyElementType.Index">
               ({{ item.abbreviation }})
               <v-tooltip v-if="item.useForPredictions" top>
                 <span> Items in this index used for SEP predictions. </span>
@@ -44,21 +43,40 @@
           </template>
 
           <template v-slot:append="{ item }">
-            <span v-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION">
-              <survey-dimension-branch
-                :survey="survey"
-                :survey-dimension="item"
-                @refetch="refetchSurveyData"
+            <span v-if="item.type === surveyElementType.Dimension">
+              <icon-button
+                icon-name="mdi-pencil"
+                tool-tip="Edit this survey dimension."
+                @click="showDimensionEditDialog"
+              />
+              <icon-button
+                :can-click="canDeleteSurveyDimension(item)"
+                icon-name="mdi-close-circle"
+                tool-tip="Delete this survey dimension and all associated survey indexes."
+                disabled-tool-tip="One or more survey indexes associated with this survey dimension have boolean associations, so it cannot be deleted."
+                @click="showConfirmDeleteDimensionDialog"
               />
             </span>
-            <span v-else-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
-              <survey-index-branch
-                :survey="survey"
-                :survey-index="item"
-                @refetch="refetchSurveyData"
+
+            <span v-else-if="item.type === surveyElementType.Index">
+              <icon-button
+                icon-name="mdi-plus-circle"
+                tool-tip="Add a new survey index for this survey dimension."
+                @click="showIndexAddDialog"
+              />
+              <icon-button
+                icon-name="mdi-pencil"
+                tool-tip="Edit this survey index and/or update the associations to survey items."
+                @click="showIndexEditDialog"
+              />
+              <icon-button
+                :can-click="canDeleteSurveyIndex(item)"
+                icon-name="mdi-close-circle"
+                tool-tip="Delete this survey index and the associations to survey items."
+                disabled-tool-tip="This survey index has boolean associations and cannot be deleted."
               />
             </span>
-            <span v-else-if="item.type === surveyDimensionEnum.SURVEY_ITEM" />
+            <span v-else-if="item.type === surveyElementType.Item" />
             <span v-else> Something went horribly wrong. </span>
           </template>
         </v-treeview>
@@ -67,99 +85,243 @@
 
     <dimension-dialog
       v-model="dimensionDialog.visible"
-      dialog-title="Add a New Survey Dimension"
-      title-hint="e.g., 'Focal Dimension'"
-      @ready="createDimension"
+      :dialog-title="dimensionDialog.dialogTitle"
+      :title-hint="dimensionDialog.titleHint"
+      :survey-dimension="dimensionDialog.surveyDimension"
+      @ready="dimensionDialog.callback"
+    />
+
+    <index-dialog
+      v-model="indexDialog.visible"
+      :dialog-title="indexDialog.dialogTitle"
+      :title-hint="indexDialog.titleHint"
+      :abbreviation-hint="indexDialog.abbreviationHint"
+      :survey-index="indexDialog.surveyIndex"
+      :available-items="availableItems"
+      :selected-tems="indexDialog.selectedItems"
+      :can-turn-off-predictions="indexDialog.canTurnOffPredictions"
+      @ready="indexDialog.callback"
+    />
+
+    <confirm-dialog
+      v-model="confirmDialog.visible"
+      :dialog-title="confirmDialog.dialogTitle"
+      :dialog-text="confirmDialog.dialogText"
+      :button-label="confirmDialog.buttonLabel"
+      @confirmed="confirmDialog.callback"
     />
   </v-card>
 </template>
 
 <script lang="ts">
-import { ADD_DIMENSION_MUTATION } from "@/graphql/surveys.graphql";
-import { SurveyDimensionEnum, SurveyDimensionView } from "@/pages/survey.types";
-import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
-import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
 import {
-  AllCapernaumSurveys_surveys,
-  AllCapernaumSurveys_surveys_surveyDimensions,
-  AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+  ADD_DIMENSION_MUTATION,
+  ADD_INDEX_MUTATION,
+  DELETE_DIMENSION,
+  DELETE_INDEX,
+  UPDATE_DIMENSION_MUTATION,
+  UPDATE_INDEX_MUTATION,
+} from "@/graphql/surveys.graphql";
+import DimensionDialog from "./DimensionDialog.vue";
+import {
+  DimensionDialogResponse,
+  SurveyItemSelection,
+} from "@/components/dialogs/dialog.types";
+import {
+  AllCapernaumSurveys_surveys as SurveyEntity,
+  AllCapernaumSurveys_surveys_surveyDimensions as SurveyDimensionEntity,
+  AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices as SurveyIndexEntity,
+  AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems as SurveyItemEntity,
 } from "@/graphql/types/AllCapernaumSurveys";
-import SurveyDimensionBranch from "@/pages/surveys/SurveyDimensionBranch.vue";
-import SurveyIndexBranch from "@/pages/surveys/SurveyIndexBranch.vue";
-import { defineComponent, onMounted, ref } from "@vue/composition-api";
+import { defineComponent, ref } from "@vue/composition-api";
+import IconButton from "@/components/buttons/IconButton.vue";
+import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
+import IndexDialog from "@/pages/surveys/IndexDialog.vue";
+import {
+  TossSurveyIndex,
+  TossSurveyIndexVariables,
+} from "@/graphql/types/TossSurveyIndex";
+import { UpdateIndex, UpdateIndexVariables } from "@/graphql/types/UpdateIndex";
+import {
+  SurveyDimensionUpdateInput,
+  SurveyIndexCreateInput,
+  SurveyIndexUpdateInput,
+} from "@/graphql/types/globalTypes";
+import { AddIndex, AddIndexVariables } from "@/graphql/types/AddIndex";
+import * as _ from "lodash";
+import { TossSurveyDimension } from "@/graphql/types/TossSurveyDimension";
+import {
+  UpdateDimension,
+  UpdateDimensionVariables,
+} from "@/graphql/types/UpdateDimension";
+
+enum SurveyElementType {
+  Dimension,
+  Index,
+  Item,
+}
+
+interface AbstractSurveyView {
+  id: number;
+  name: string;
+  type: SurveyElementType;
+}
+
+interface SurveyDimensionView extends AbstractSurveyView {
+  entity: SurveyDimensionEntity;
+  children: SurveyIndexView[];
+}
+
+interface SurveyIndexView extends AbstractSurveyView {
+  entity: SurveyIndexEntity;
+  children: SurveyItemView[];
+}
+
+interface SurveyItemView extends AbstractSurveyView {
+  entity: SurveyItemEntity;
+}
 
 export default defineComponent({
   name: "SurveyDimensionsTab",
 
   setup() {
-    const treeView = ref(null);
+    const treeView = ref();
 
-    onMounted(() => {
-      console.log(treeView.value);
-    });
+    const changeAll = (val: boolean) => {
+      console.log(val ? "SHOW ALL" : "HIDE ALL");
+      treeView.value.updateAll(val);
+    };
 
-    return { treeView };
+    return { treeView, changeAll };
   },
 
   components: {
-    SurveyIndexBranch,
-    SurveyDimensionBranch,
+    ConfirmDialog,
     DimensionDialog,
+    IndexDialog,
+    IconButton,
   },
 
   props: {
     survey: {
-      type: Object as () => AllCapernaumSurveys_surveys,
+      type: Object as () => SurveyEntity,
       required: true,
     },
   },
 
   data() {
     return {
-      surveyDimensionEnum: SurveyDimensionEnum, // Grant access to enum from within template
+      // Grant access to enum from within template
+      surveyElementType: SurveyElementType,
+
       dimensionDialog: {
+        dialogTitle: "",
+        titleHint: "e.g., 'Focal Dimension'",
+        surveyDimension: null as unknown as SurveyEntity,
+        callback: null as unknown as (ddr: DimensionDialogResponse) => void,
         visible: false,
+      },
+
+      indexDialog: {
+        dialogTitle: "",
+        titleHint: "e.g., 'Focus on Others'",
+        abbreviationHint: "e.g., 'FOO'",
+        surveyIndex: null as unknown as SurveyIndexEntity,
+        selectedItems: [] as SurveyItemEntity[],
+        canTurnOffPredictions: false,
+        callback: null as unknown as (siv: SurveyIndexView) => void,
+        visible: false,
+      },
+
+      confirmDialog: {
+        dialogTitle: "",
+        dialogText: "",
+        buttonLabel: "Delete",
+        callback: null as unknown as () => void,
+        visible: false,
+      },
+
+      rules: {
+        required: [(v: never) => !!v || "Required field"],
       },
     };
   },
 
+  computed: {
+    availableItems(): SurveyItemSelection[] {
+      return this.survey.surveyItems.map((item) => ({
+        id: item.id,
+        name: item.qualtricsText,
+      }));
+      // .concat(this.selectedItems);
+    },
+
+    surveyContent(): SurveyDimensionView[] {
+      // Dimensions
+      return this.survey.surveyDimensions.map((dim: SurveyDimensionEntity) => ({
+        id: dim.id,
+        name: dim.title,
+        type: SurveyElementType.Dimension,
+        entity: dim,
+
+        // Indices
+        children: dim.surveyIndices.map((idx: SurveyIndexEntity) => ({
+          id: idx.id,
+          name: idx.title,
+          type: SurveyElementType.Index,
+          entity: idx,
+
+          // Items
+          children: idx.surveyItems.map((item: SurveyItemEntity) => ({
+            id: item.id,
+            name: item.qualtricsText,
+            type: SurveyElementType.Item,
+            entity: item,
+          })),
+        })),
+      }));
+    },
+  },
+
   methods: {
-    prependIcon(item: SurveyDimensionView) {
-      switch (item.type) {
-        case SurveyDimensionEnum.SURVEY_DIMENSION:
-          return "mdi-arrow-expand-horizontal";
-        case SurveyDimensionEnum.SURVEY_INDEX:
-          return "mdi-format-list-bulleted";
-        case SurveyDimensionEnum.SURVEY_ITEM:
-          return "mdi-comment-outline";
-        default:
-          throw new Error("Bogus dimension item");
-      }
+    hideDimensionDialog() {
+      this.dimensionDialog.visible = false;
     },
 
-    changeAll(val: boolean) {
-      // this.treeView.updateAll(true);
-      (this.treeView as any).updateAll(val);
+    hideIndexDialog() {
+      this.indexDialog.visible = false;
     },
 
-    canDeleteSurveyDimension(
-      surveyDimension: AllCapernaumSurveys_surveys_surveyDimensions
-    ) {
-      return surveyDimension.surveyIndices.every(
-        (surveyIndex) => surveyIndex.scriptureEngagementPractices.length === 0
-      );
+    hideConfirmDialog() {
+      this.confirmDialog.visible = false;
     },
 
-    canDeleteSurveyIndex(
-      surveyIndex: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices
-    ) {
-      return surveyIndex.scriptureEngagementPractices.length === 0;
+    // Dimension methods
+    showDimensionAddDialog() {
+      _.assign(this.dimensionDialog, {
+        dialogTitle: "Add a New Survey Dimension",
+        callback: this.createDimension,
+        visible: true,
+      });
     },
 
-    refetchSurveyData() {
-      this.$apollo.queries.survey
-        .refetch()
-        .catch((err) => console.error("Something went wrong", err));
+    showDimensionEditDialog(dimensionView: SurveyDimensionView) {
+      _.assign(this.dimensionDialog, {
+        dialogTitle: "Edit and Existing Survey Dimension",
+        surveyDimension: dimensionView.entity,
+        callback: this.updateDimension,
+        visible: true,
+      });
+    },
+
+    showConfirmDeleteDimensionDialog(dimensionView: SurveyDimensionView) {
+      _.assign(this.dimensionDialog, {
+        dialogTitle: `Really delete dimension '${dimensionView.name}'?`,
+        dialogText: "Doing so will also delete any associated indexes.",
+        buttonLabel: "Delete",
+        callback: this.deleteDimension,
+        visible: true,
+      });
     },
 
     createDimension(dialogResponse: DimensionDialogResponse) {
@@ -176,51 +338,164 @@ export default defineComponent({
           },
         })
         .then(() => {
-          this.dimensionDialog.visible = false;
+          this.hideDimensionDialog();
           this.refetchSurveyData();
         })
         .catch((error) => {
           console.log("there appears to have been an error: ", error);
         });
     },
-  },
 
-  computed: {
-    surveyContent(): SurveyDimensionView[] {
-      function compareStrings(a: string, b: string): number {
-        return a < b ? -1 : a > b ? 1 : 0;
+    updateDimension(updateInput: SurveyDimensionUpdateInput) {
+      this.$apollo
+        .mutate<UpdateDimension, UpdateDimensionVariables>({
+          mutation: UPDATE_DIMENSION_MUTATION,
+          variables: {
+            updateInput,
+          },
+        })
+        .then(() => {
+          this.hideDimensionDialog();
+          this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    canDeleteSurveyDimension(surveyDimension: SurveyDimensionEntity) {
+      console.log("DIM", surveyDimension);
+      return surveyDimension.surveyIndices.every(
+        (surveyIndex) => surveyIndex.scriptureEngagementPractices.length === 0
+      );
+    },
+
+    deleteDimension(surveyDimensionId: number) {
+      this.$apollo
+        .mutate<TossSurveyDimension, TossSurveyIndexVariables>({
+          mutation: DELETE_DIMENSION,
+          variables: {
+            id: surveyDimensionId,
+          },
+        })
+        .then(() => {
+          this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    // Index methods
+    showIndexAddDialog(dimension: SurveyDimensionView) {
+      _.assign(this.indexDialog, {
+        dialogTitle: `Add a new survey index for '${dimension.name}'`,
+        canTurnOffPredictions: true,
+        callback: this.createIndex,
+        visible: true,
+      });
+    },
+
+    selectedItems(index: SurveyIndexView): SurveyItemSelection[] {
+      return index.children.map((item) => ({
+        id: item.id,
+        name: item.name,
+      }));
+    },
+
+    showIndexEditDialog(
+      dimensionView: SurveyDimensionView,
+      indexView: SurveyIndexView
+    ) {
+      _.assign(this.indexDialog, {
+        dialogTitle: `Edit Survey Index for '${dimensionView.name}'`,
+        surveyIndex: indexView.entity,
+        selectedItems: this.selectedItems(indexView),
+        canTurnOffPredictions: this.canDeleteSurveyIndex(indexView.entity),
+        callback: this.updateIndex,
+        visible: true,
+      });
+    },
+
+    showConfirmDeleteIndexDialog(index: SurveyIndexView) {
+      _.assign(this.confirmDialog, {
+        dialogTitle: `Really delete the index '${index.name}'?`,
+        dialogText: "This action is not reversible.",
+        visible: true,
+      });
+    },
+
+    createIndex(createInput: SurveyIndexCreateInput) {
+      this.$apollo
+        .mutate<AddIndex, AddIndexVariables>({
+          mutation: ADD_INDEX_MUTATION,
+          variables: {
+            createInput,
+          },
+        })
+        .then(() => {
+          this.hideIndexDialog();
+          this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    updateIndex(updateInput: SurveyIndexUpdateInput) {
+      this.$apollo
+        .mutate<UpdateIndex, UpdateIndexVariables>({
+          mutation: UPDATE_INDEX_MUTATION,
+          variables: {
+            updateInput,
+          },
+        })
+        .then(() => {
+          this.hideIndexDialog();
+          this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    canDeleteSurveyIndex(surveyIndex: SurveyIndexEntity) {
+      return surveyIndex.scriptureEngagementPractices.length === 0;
+    },
+
+    deleteIndex(surveyIndexId: number) {
+      this.$apollo
+        .mutate<TossSurveyIndex, TossSurveyIndexVariables>({
+          mutation: DELETE_INDEX,
+          variables: {
+            id: surveyIndexId,
+          },
+        })
+        .then(() => {
+          this.refetchSurveyData();
+        })
+        .catch((error) => {
+          console.log("there appears to have been an error: ", error);
+        });
+    },
+
+    prependIcon(item: SurveyDimensionView) {
+      switch (item.type) {
+        case SurveyElementType.Dimension:
+          return "mdi-arrow-expand-horizontal";
+        case SurveyElementType.Index:
+          return "mdi-format-list-bulleted";
+        case SurveyElementType.Item:
+          return "mdi-comment-outline";
+        default:
+          throw new Error("Bogus dimension item");
       }
+    },
 
-      // Dimensions
-      return this.survey.surveyDimensions
-        .map((dim) => ({
-          id: dim.id,
-          name: dim.title,
-          type: SurveyDimensionEnum.SURVEY_DIMENSION,
-          canDelete: this.canDeleteSurveyDimension(dim),
-
-          // Indices
-          children: dim.surveyIndices
-            .map((index) => ({
-              id: index.id,
-              dimensionId: dim.id,
-              dimensionName: dim.title,
-              name: index.title,
-              abbreviation: index.abbreviation,
-              useForPredictions: index.useForPredictions,
-              type: SurveyDimensionEnum.SURVEY_INDEX,
-              canDelete: this.canDeleteSurveyIndex(index),
-
-              // Items
-              children: index.surveyItems.map((item) => ({
-                id: item.id,
-                name: item.qualtricsText,
-                type: SurveyDimensionEnum.SURVEY_ITEM,
-              })),
-            }))
-            .sort((a, b) => compareStrings(a.name, b.name)),
-        }))
-        .sort((a, b) => compareStrings(a.name, b.name));
+    refetchSurveyData() {
+      this.$apollo.queries.survey
+        .refetch()
+        .catch((err) => console.error("Something went wrong", err));
     },
   },
 });
