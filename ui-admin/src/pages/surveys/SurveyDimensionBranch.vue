@@ -1,77 +1,49 @@
 <template>
-  <v-card>
-    <v-tooltip top>
-      <span>Add a new survey index for this survey dimension.</span>
-      <template v-slot:activator="{ on }">
-        <a @click="visible.indexDialog = true" v-on="on">
-          <v-icon class="mx-2">
-            {{ "mdi-plus-circle" }}
-          </v-icon>
-        </a>
-      </template>
-    </v-tooltip>
-
-    <v-tooltip top>
-      <span>Edit this survey dimension.</span>
-      <template v-slot:activator="{ on }">
-        <a @click="visible.dimensionDialog = true" v-on="on">
-          <v-icon class="mx-2">
-            {{ "mdi-pencil" }}
-          </v-icon>
-        </a>
-      </template>
-    </v-tooltip>
-
-    <v-tooltip v-if="surveyDimension.canDelete" top>
-      <span>
-        Delete this survey dimension and all associated survey indexes.
-      </span>
-      <template v-slot:activator="{ on }">
-        <a @click="visible.deleteDialog = true" v-on="on">
-          <v-icon class="mx-2">
-            {{ "mdi-close-circle" }}
-          </v-icon>
-        </a>
-      </template>
-    </v-tooltip>
-    <v-tooltip v-else top>
-      <span>
-        One or more survey indexes associated with this survey dimension have
-        boolean associations, so it cannot be deleted.
-      </span>
-      <template v-slot:activator="{ on }">
-        <v-icon v-on="on" class="mx-2 grey--text text--lighten-1">
-          {{ "mdi-close-circle" }}
-        </v-icon>
-      </template>
-    </v-tooltip>
-
-    <dimension-dialog
-      v-model="visible.dimensionDialog"
-      dialog-title="Edit an existing survey dimension"
-      title-hint="e.g., 'Focal Dimension'"
-      :initial-title="surveyDimension.name"
-      @ready="updateDimension"
+  <span>
+    <icon-button
+      icon-name="mdi-plus-circle"
+      tool-tip="Add a new survey index for this survey dimension."
+      @click="visible.indexDialog = true"
+    />
+    <icon-button
+      icon-name="mdi-pencil"
+      tool-tip="Edit this survey dimension."
+      @click="visible.dimensionDialog = true"
+    />
+    <icon-button
+      :can-click="surveyDimension.canDelete"
+      icon-name="mdi-close-circle"
+      tool-tip="Delete this survey dimension and all associated survey indexes."
+      disabled-tool-tip="One or more survey indexes associated with this survey dimension have boolean associations, so it cannot be deleted."
+      @click="visible.deleteDialog = true"
     />
 
-    <index-dialog
-      v-model="visible.indexDialog"
-      :dialog-title="`Add a new survey index for '${surveyDimension.name}'`"
-      title-hint="e.g., 'A focus on others"
-      abbreviation-hint="e.g., 'FOO'"
-      :available-items="availableItems"
-      :can-turn-off-predictions="true"
-      @ready="createIndex"
-    />
+    <!--    <dimension-dialog-->
+    <!--      v-model="visible.dimensionDialog"-->
+    <!--      dialog-title="Edit an existing survey dimension"-->
+    <!--      title-hint="e.g., 'Focal Dimension'"-->
+    <!--      :initial-title="surveyDimension.name"-->
+    <!--      @ready="updateDimension"-->
+    <!--    />-->
 
-    <confirm-dialog
-      v-model="visible.deleteDialog"
-      :dialog-title="`Really delete the dimension '${surveyDimension.name}'?`"
-      dialog-text="Doing so will also delete any associated indexes."
-      button-label="Delete"
-      @confirmed="deleteDimension"
-    />
-  </v-card>
+    <!--    <index-dialog-->
+    <!--      v-model="visible.indexDialog"-->
+    <!--      :dialog-title="`Add a new survey index for '${surveyDimension.name}'`"-->
+    <!--      title-hint="e.g., 'A focus on others"-->
+    <!--      abbreviation-hint="e.g., 'FOO'"-->
+    <!--      :available-items="availableItems"-->
+    <!--      :can-turn-off-predictions="true"-->
+    <!--      @ready="createIndex"-->
+    <!--    />-->
+
+    <!--    <confirm-dialog-->
+    <!--      v-model="visible.deleteDialog"-->
+    <!--      :dialog-title="`Really delete the dimension '${surveyDimension.name}'?`"-->
+    <!--      dialog-text="Doing so will also delete any associated indexes."-->
+    <!--      button-label="Delete"-->
+    <!--      @confirmed="deleteDimension"-->
+    <!--    />-->
+  </span>
 </template>
 
 <script lang="ts">
@@ -82,24 +54,25 @@ import {
   DELETE_DIMENSION,
   UPDATE_DIMENSION_MUTATION,
 } from "@/graphql/surveys.graphql";
-import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
-import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
-import IndexDialog from "../../components/dialogs/IndexDialog.vue";
+// import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
+// import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
+// import IndexDialog from "../../components/dialogs/IndexDialog.vue";
 import {
   DimensionDialogResponse,
   IndexDialogResponse,
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
+import IconButton from "@/components/buttons/IconButton.vue";
 
 export default Vue.extend({
   name: "SurveyDimensionBranch",
-
-  components: {
-    ConfirmDialog,
-    DimensionDialog,
-    IndexDialog,
-  },
+  components: { IconButton },
+  // components: {
+  //   ConfirmDialog,
+  //   DimensionDialog,
+  //   IndexDialog,
+  // },
 
   props: {
     survey: {

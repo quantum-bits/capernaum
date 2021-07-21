@@ -1,37 +1,58 @@
 <template>
   <v-card>
     <v-card-title>
-      Dimensions, Indices, Items
-      <v-spacer />
-      <v-btn color="primary" @click="dimensionDialog.visible = true">
-        Add Survey Dimension
-      </v-btn>
+      <v-row justify="space-around">
+        <v-col cols="auto"> Dimensions, Indices, Items </v-col>
+        <v-col cols="auto">
+          <v-btn text @click="changeAll(true)">Show All</v-btn>
+          <v-btn text @click="changeAll(false)">Hide All</v-btn>
+        </v-col>
+        <v-col cols="auto">
+          <v-btn color="primary" @click="dimensionDialog.visible = true">
+            Add Dimension
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-card-title>
 
     <v-row>
       <v-col cols="10" offset="1">
-        <v-treeview dense rounded hoverable :items="surveyContent">
+        <v-treeview
+          ref="treeView"
+          dense
+          color="primary"
+          rounded
+          hoverable
+          open-on-click
+          :items="surveyContent"
+        >
           <template v-slot:label="{ item }">
-            <span v-html="item.name"></span>
+            <span v-html="item.name" />
             <span v-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
               ({{ item.abbreviation }})
+              <v-tooltip v-if="item.useForPredictions" top>
+                <span> Items in this index used for SEP predictions. </span>
+                <template v-slot:activator="{ on }">
+                  <v-chip small color="primary" v-on="on">SEP</v-chip>
+                </template>
+              </v-tooltip>
             </span>
           </template>
+
           <template v-slot:prepend="{ item }">
-            <v-icon v-if="item.type === surveyDimensionEnum.SURVEY_ITEM">
-              {{ "mdi-comment-outline" }}
-            </v-icon>
+            <v-icon>{{ prependIcon(item) }}</v-icon>
           </template>
+
           <template v-slot:append="{ item }">
             <span v-if="item.type === surveyDimensionEnum.SURVEY_DIMENSION">
-              <dimension-branch
+              <survey-dimension-branch
                 :survey="survey"
                 :survey-dimension="item"
                 @refetch="refetchSurveyData"
               />
             </span>
             <span v-else-if="item.type === surveyDimensionEnum.SURVEY_INDEX">
-              <index-branch
+              <survey-index-branch
                 :survey="survey"
                 :survey-index="item"
                 @refetch="refetchSurveyData"
@@ -54,26 +75,36 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import { ADD_DIMENSION_MUTATION } from "@/graphql/surveys.graphql";
 import { SurveyDimensionEnum, SurveyDimensionView } from "@/pages/survey.types";
-import DimensionBranch from "./SurveyDimensionBranch.vue";
 import DimensionDialog from "../../components/dialogs/DimensionDialog.vue";
-import IndexBranch from "./SurveyIndexBranch.vue";
 import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
 import {
   AllCapernaumSurveys_surveys,
   AllCapernaumSurveys_surveys_surveyDimensions,
   AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
 } from "@/graphql/types/AllCapernaumSurveys";
+import SurveyDimensionBranch from "@/pages/surveys/SurveyDimensionBranch.vue";
+import SurveyIndexBranch from "@/pages/surveys/SurveyIndexBranch.vue";
+import { defineComponent, onMounted, ref } from "@vue/composition-api";
 
-export default Vue.extend({
+export default defineComponent({
   name: "SurveyDimensionsTab",
 
+  setup() {
+    const treeView = ref(null);
+
+    onMounted(() => {
+      console.log(treeView.value);
+    });
+
+    return { treeView };
+  },
+
   components: {
-    DimensionBranch,
+    SurveyIndexBranch,
+    SurveyDimensionBranch,
     DimensionDialog,
-    IndexBranch,
   },
 
   props: {
@@ -93,6 +124,24 @@ export default Vue.extend({
   },
 
   methods: {
+    prependIcon(item: SurveyDimensionView) {
+      switch (item.type) {
+        case SurveyDimensionEnum.SURVEY_DIMENSION:
+          return "mdi-arrow-expand-horizontal";
+        case SurveyDimensionEnum.SURVEY_INDEX:
+          return "mdi-format-list-bulleted";
+        case SurveyDimensionEnum.SURVEY_ITEM:
+          return "mdi-comment-outline";
+        default:
+          throw new Error("Bogus dimension item");
+      }
+    },
+
+    changeAll(val: boolean) {
+      // this.treeView.updateAll(true);
+      (this.treeView as any).updateAll(val);
+    },
+
     canDeleteSurveyDimension(
       surveyDimension: AllCapernaumSurveys_surveys_surveyDimensions
     ) {

@@ -30,7 +30,7 @@ import {
 } from "@/graphql/types/SurveyLetters";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 import { CardData } from "@/pages/letters/LetterContentTab.vue";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 import {
   UpdateLetterElement,
   UpdateLetterElementVariables,

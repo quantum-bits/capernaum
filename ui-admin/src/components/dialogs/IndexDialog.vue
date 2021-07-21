@@ -122,7 +122,7 @@ export default Vue.extend({
       this.$emit("input", false);
     },
 
-    onSubmit() {
+    onSave() {
       const response: IndexDialogResponse = {
         title: this.dialogState.title,
         abbreviation: this.dialogState.abbreviation,

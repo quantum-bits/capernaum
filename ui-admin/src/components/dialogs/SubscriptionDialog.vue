@@ -111,7 +111,7 @@ export default Vue.extend({
   },
 
   methods: {
-    onSubmit() {
+    onSave() {
       const result: SubscriptionDialogResponse = {
         hostName: this.dialogState.hostName,
         subscriptionType: this.dialogState.subscriptionType as SubscriptionType,

@@ -93,7 +93,7 @@ import { Editor, EditorContent, JSONContent } from "@tiptap/vue-2";
 import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import { generateHTML } from "@tiptap/vue-2";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
 import * as _ from "lodash";
 

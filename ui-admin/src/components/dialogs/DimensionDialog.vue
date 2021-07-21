@@ -1,8 +1,13 @@
 <template>
-  <v-dialog persistent max-width="800">
+  <v-dialog
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
+    persistent
+    max-width="800"
+  >
     <v-card>
-      <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
-      <v-form ref="dimensionForm" v-model="formValid" lazy-validation>
+      <v-card-title>{{ dialogTitle }}</v-card-title>
+      <v-form ref="dimensionForm" v-model="formValid">
         <v-card-text>
           <v-text-field
             v-model="dimensionTitle"
@@ -16,14 +21,10 @@
 
         <v-card-actions>
           <v-spacer />
-
-          <v-btn color="success" text @click="$emit('input', false)">
-            Cancel
+          <v-btn text :disabled="!formValid" color="warning" @click="onSave">
+            Save
           </v-btn>
-
-          <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
-            Submit
-          </v-btn>
+          <v-btn text @click="$emit('input', false)"> Cancel </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -38,10 +39,10 @@ export default Vue.extend({
   name: "DimensionDialog",
 
   props: {
-    value: { type: Boolean, required: true, default: false },
+    value: { type: Boolean, required: true },
+
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
-
     initialTitle: String,
   },
 
@@ -57,32 +58,12 @@ export default Vue.extend({
   },
 
   methods: {
-    onSubmit() {
+    onSave() {
       const response: DimensionDialogResponse = {
         title: this.dimensionTitle,
       };
-      this.$emit("ready", response);
       this.$emit("input", false);
-    },
-  },
-
-  watch: {
-    value: {
-      handler: function (newValue) {
-        //KK: deleted oldValue here because it was not being used (typescript warning)
-        if (newValue) {
-          this.dimensionTitle = this.initialTitle;
-
-          if (this.$refs.dimensionForm) {
-            (
-              this.$refs.dimensionForm as Vue & {
-                resetValidation: () => boolean;
-              }
-            ).resetValidation();
-          }
-        }
-      },
-      immediate: true,
+      this.$emit("ready", response);
     },
   },
 });

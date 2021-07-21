@@ -36,7 +36,7 @@ import {
   UpdateAssociationTableVariables,
 } from "@/graphql/types/UpdateAssociationTable";
 import { UPDATE_ASSOCIATION_TABLE } from "@/graphql/surveys.graphql";
-import EditSaveCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 interface AssociationTableHeader {
   text: string; // text for the column

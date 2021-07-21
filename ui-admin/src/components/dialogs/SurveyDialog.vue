@@ -75,7 +75,7 @@ export default Vue.extend({
   },
 
   methods: {
-    onSubmit() {
+    onSave() {
       const response: SurveyDialogResponse = {
         detailedDescription: this.dialogState.description,
         okayForGroup: this.dialogState.okayForGroup,

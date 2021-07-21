@@ -51,7 +51,7 @@ import StaticInfoList, {
   StaticInfoItem,
 } from "@/components/lists/StaticInfoList.vue";
 import * as _ from "lodash";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 interface LetterDetailsForm {
   title: string;

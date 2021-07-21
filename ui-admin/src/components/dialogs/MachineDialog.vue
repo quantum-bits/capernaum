@@ -67,7 +67,7 @@ export default Vue.extend({
   },
 
   methods: {
-    onSubmit() {
+    onSave() {
       const result: MachineCreateInput = {
         name: this.dialogState.machineName,
         hostName: this.dialogState.hostName,

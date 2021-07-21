@@ -42,7 +42,7 @@ import {
 } from "@/graphql/letters.graphql";
 import Quill from "quill";
 import * as _ from "lodash";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 export default Vue.extend({
   name: "LetterTextArea",

@@ -6,6 +6,9 @@ import vuetify from "./plugins/vuetify";
 import apolloProvider from "./plugins/apollo";
 import { DateTime } from "luxon";
 import { truncateWords } from "@/helpers";
+import VueCompositionAPI from "@vue/composition-api";
+
+Vue.use(VueCompositionAPI);
 
 Vue.config.productionTip = false;
 

@@ -42,7 +42,7 @@ import { SurveyLetters_surveyLetters_letter_letterElements } from "@/graphql/typ
 import { ALL_IMAGES_QUERY } from "@/graphql/images.graphql";
 import ElementCard from "@/pages/letters/elements/ElementCard.vue";
 import { CardData } from "@/pages/letters/LetterContentTab.vue";
-import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 import * as _ from "lodash";
 import { AllImages_imageDetails } from "@/graphql/types/AllImages";
 import {

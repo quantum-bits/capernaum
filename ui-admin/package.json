@@ -16,6 +16,7 @@
     "@tiptap/extension-placeholder": "^2.0.0-beta.25",
     "@tiptap/starter-kit": "^2.0.0-beta.82",
     "@tiptap/vue-2": "^2.0.0-beta.39",
+    "@vue/composition-api": "^1.0.3",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
     "apollo-link": "^1.2.14",

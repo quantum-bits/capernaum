@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
 
-import { Login_login as Response } from "@/graphql/types/Login";
+import { Login_login } from "@/graphql/types/Login";
 
 Vue.use(Vuex);
 
@@ -11,7 +11,7 @@ export default new Vuex.Store({
 
   state: {
     user: {}, // Details of logged-in user
-    darkMode: true, // UI in dark mode?
+    darkMode: false, // UI in dark mode?
     accessToken: "",
   },
 
@@ -22,7 +22,7 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    logIn(state, response: Response) {
+    logIn(state, response: Login_login) {
       state.accessToken = response.accessToken;
       state.user = response.user;
     },

@@ -37,11 +37,11 @@
       <edit-save-cancel-buttons
         :is-data-dirty="isDataDirty"
         :is-data-valid="formValid"
-        @enterEditMode="inEditMode = true"
-        @leaveEditMode="inEditMode = false"
-        @backupData="saveUndoDetails"
-        @restoreData="restoreUndoDetails"
-        @persistData="saveDetails"
+        @enter-edit-mode="inEditMode = true"
+        @leave-edit-mode="inEditMode = false"
+        @backup-data="saveUndoDetails"
+        @restore-data="restoreUndoDetails"
+        @persist-data="saveDetails"
       />
     </v-card-actions>
   </v-card>
@@ -59,7 +59,7 @@ import {
 } from "@/graphql/types/UpdateSurvey";
 import { UPDATE_SURVEY } from "@/graphql/surveys.graphql";
 import * as _ from "lodash";
-import EditSaveCancelButtons from "@/components/buttons/EditSaveDeleteCancelButtons.vue";
+import EditSaveCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
 
 interface GroupDetails {
   okayForGroup: boolean;
@@ -105,10 +105,6 @@ export default Vue.extend({
 
     isDataDirty(): boolean {
       return !_.isEqual(this.undoDetails, this.groupDetails);
-    },
-
-    saveButtonEnabled(): boolean {
-      return this.formValid && this.groupDetails.okayForGroup;
     },
   },
 
