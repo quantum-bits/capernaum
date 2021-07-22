@@ -21,8 +21,8 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text :disabled="!formValid" color="warning" @click="onSave">
-            Save
+          <v-btn text :disabled="!formValid" color="warning" @click="onReady">
+            {{ mainActionLabel }}
           </v-btn>
           <v-btn text @click="$emit('input', false)"> Cancel </v-btn>
         </v-card-actions>
@@ -33,7 +33,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { DimensionDialogResponse } from "@/components/dialogs/dialog.types";
+import { AllCapernaumSurveys_surveys_surveyDimensions } from "@/graphql/types/AllCapernaumSurveys";
+import { DialogMode } from "@/components/dialogs/dialog.types";
 
 export default Vue.extend({
   name: "DimensionDialog",
@@ -43,23 +44,45 @@ export default Vue.extend({
 
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
-    initialTitle: String,
+
+    dialogMode: { type: Number, required: true },
+    surveyDimension:
+      Object as () => AllCapernaumSurveys_surveys_surveyDimensions,
+  },
+
+  created() {
+    if (this.dialogMode === DialogMode.Create && this.surveyDimension) {
+      throw new Error("Passed survey dimension in create mode");
+    } else if (this.dialogMode === DialogMode.Update && !this.surveyDimension) {
+      throw new Error("In update mode, but no survey dimension supplied");
+    }
   },
 
   data() {
     return {
       dimensionTitle: "",
       formValid: false,
-
       rules: {
         required: [(v: string): boolean | string => !!v || "Required field"],
       },
     };
   },
 
+  computed: {
+    mainActionLabel(): string {
+      return this.dialogMode === DialogMode.Create ? "Create" : "Update";
+    },
+  },
+
+  watch: {
+    surveyDimension(newValue) {
+      this.dimensionTitle = newValue.title;
+    },
+  },
+
   methods: {
-    onSave() {
-      const response: DimensionDialogResponse = {
+    onReady() {
+      const response: Partial<AllCapernaumSurveys_surveys_surveyDimensions> = {
         title: this.dimensionTitle,
       };
       this.$emit("input", false);

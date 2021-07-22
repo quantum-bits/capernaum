@@ -60,10 +60,8 @@
 
         <v-card-actions>
           <v-spacer />
-
           <v-btn color="success" text @click="onCancel"> Cancel </v-btn>
-
-          <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
+          <v-btn :disabled="!formValid" color="success" text @click="onSave">
             Submit
           </v-btn>
         </v-card-actions>

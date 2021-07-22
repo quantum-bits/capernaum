@@ -83,7 +83,7 @@ import { DateTime } from "luxon";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import PageHeader from "@/pages/PageHeader.vue";
 import { AllGroups_groups } from "@/graphql/types/AllGroups";
-import IconButton from "@/components/buttons/IconButton.vue";
+import IconButton from "@/components/buttons/IconButton";
 import * as _ from "lodash";
 import {
   WriteLetter,

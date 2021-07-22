@@ -28,8 +28,8 @@
           <template v-slot:label="{ item }">
             <span v-html="item.name" />
             <span v-if="item.type === surveyElementType.Index">
-              ({{ item.abbreviation }})
-              <v-tooltip v-if="item.useForPredictions" top>
+              ({{ item.entity.abbreviation }})
+              <v-tooltip v-if="item.entity.useForPredictions" top>
                 <span> Items in this index used for SEP predictions. </span>
                 <template v-slot:activator="{ on }">
                   <v-chip small color="primary" v-on="on">SEP</v-chip>
@@ -47,14 +47,14 @@
               <icon-button
                 icon-name="mdi-pencil"
                 tool-tip="Edit this survey dimension."
-                @click="showDimensionEditDialog"
+                @click="showDimensionEditDialog(item.entity)"
               />
               <icon-button
-                :can-click="canDeleteSurveyDimension(item)"
+                :can-click="canDeleteSurveyDimension(item.entity)"
                 icon-name="mdi-close-circle"
                 tool-tip="Delete this survey dimension and all associated survey indexes."
                 disabled-tool-tip="One or more survey indexes associated with this survey dimension have boolean associations, so it cannot be deleted."
-                @click="showConfirmDeleteDimensionDialog"
+                @click="showConfirmDeleteDimensionDialog(item.entity)"
               />
             </span>
 
@@ -70,7 +70,7 @@
                 @click="showIndexEditDialog"
               />
               <icon-button
-                :can-click="canDeleteSurveyIndex(item)"
+                :can-click="canDeleteSurveyIndex(item.entity)"
                 icon-name="mdi-close-circle"
                 tool-tip="Delete this survey index and the associations to survey items."
                 disabled-tool-tip="This survey index has boolean associations and cannot be deleted."
@@ -87,6 +87,7 @@
       v-model="dimensionDialog.visible"
       :dialog-title="dimensionDialog.dialogTitle"
       :title-hint="dimensionDialog.titleHint"
+      :dialog-mode="dimensionDialog.dialogMode"
       :survey-dimension="dimensionDialog.surveyDimension"
       @ready="dimensionDialog.callback"
     />
@@ -124,7 +125,7 @@ import {
 } from "@/graphql/surveys.graphql";
 import DimensionDialog from "./DimensionDialog.vue";
 import {
-  DimensionDialogResponse,
+  DialogMode,
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 import {
@@ -133,7 +134,6 @@ import {
   AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices as SurveyIndexEntity,
   AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices_surveyItems as SurveyItemEntity,
 } from "@/graphql/types/AllCapernaumSurveys";
-import { defineComponent, ref } from "@vue/composition-api";
 import IconButton from "@/components/buttons/IconButton.vue";
 import ConfirmDialog from "@/components/dialogs/ConfirmDialog.vue";
 import IndexDialog from "@/pages/surveys/IndexDialog.vue";
@@ -143,6 +143,7 @@ import {
 } from "@/graphql/types/TossSurveyIndex";
 import { UpdateIndex, UpdateIndexVariables } from "@/graphql/types/UpdateIndex";
 import {
+  SurveyDimensionCreateInput,
   SurveyDimensionUpdateInput,
   SurveyIndexCreateInput,
   SurveyIndexUpdateInput,
@@ -154,6 +155,11 @@ import {
   UpdateDimension,
   UpdateDimensionVariables,
 } from "@/graphql/types/UpdateDimension";
+import Vue from "vue";
+import {
+  AddDimension,
+  AddDimensionVariables,
+} from "@/graphql/types/AddDimension";
 
 enum SurveyElementType {
   Dimension,
@@ -181,19 +187,8 @@ interface SurveyItemView extends AbstractSurveyView {
   entity: SurveyItemEntity;
 }
 
-export default defineComponent({
+export default Vue.extend({
   name: "SurveyDimensionsTab",
-
-  setup() {
-    const treeView = ref();
-
-    const changeAll = (val: boolean) => {
-      console.log(val ? "SHOW ALL" : "HIDE ALL");
-      treeView.value.updateAll(val);
-    };
-
-    return { treeView, changeAll };
-  },
 
   components: {
     ConfirmDialog,
@@ -217,8 +212,9 @@ export default defineComponent({
       dimensionDialog: {
         dialogTitle: "",
         titleHint: "e.g., 'Focal Dimension'",
+        dialogMode: DialogMode.Noop,
         surveyDimension: null as unknown as SurveyEntity,
-        callback: null as unknown as (ddr: DimensionDialogResponse) => void,
+        callback: () => null,
         visible: false,
       },
 
@@ -229,7 +225,7 @@ export default defineComponent({
         surveyIndex: null as unknown as SurveyIndexEntity,
         selectedItems: [] as SurveyItemEntity[],
         canTurnOffPredictions: false,
-        callback: null as unknown as (siv: SurveyIndexView) => void,
+        callback: () => null,
         visible: false,
       },
 
@@ -237,7 +233,7 @@ export default defineComponent({
         dialogTitle: "",
         dialogText: "",
         buttonLabel: "Delete",
-        callback: null as unknown as () => void,
+        callback: () => null,
         visible: false,
       },
 
@@ -296,44 +292,54 @@ export default defineComponent({
       this.confirmDialog.visible = false;
     },
 
+    changeAll(val: boolean) {
+      console.log(val ? "SHOW ALL" : "HIDE ALL");
+      (this.$refs.treeView as any).updateAll(val);
+    },
+
     // Dimension methods
     showDimensionAddDialog() {
       _.assign(this.dimensionDialog, {
         dialogTitle: "Add a New Survey Dimension",
+        dialogMode: DialogMode.Create,
         callback: this.createDimension,
         visible: true,
       });
     },
 
-    showDimensionEditDialog(dimensionView: SurveyDimensionView) {
+    showDimensionEditDialog(dimension: SurveyDimensionEntity) {
       _.assign(this.dimensionDialog, {
-        dialogTitle: "Edit and Existing Survey Dimension",
-        surveyDimension: dimensionView.entity,
-        callback: this.updateDimension,
+        dialogTitle: "Edit an Existing Survey Dimension",
+        dialogMode: DialogMode.Update,
+        surveyDimension: dimension,
+        callback: (updatedDimension: SurveyDimensionEntity) => {
+          updatedDimension.id = dimension.id;
+          this.updateDimension(updatedDimension);
+        },
         visible: true,
       });
+      console.log("showDimensionEditDialog", this.dimensionDialog);
     },
 
-    showConfirmDeleteDimensionDialog(dimensionView: SurveyDimensionView) {
-      _.assign(this.dimensionDialog, {
-        dialogTitle: `Really delete dimension '${dimensionView.name}'?`,
+    showConfirmDeleteDimensionDialog(dimension: SurveyDimensionEntity) {
+      _.assign(this.confirmDialog, {
+        dialogTitle: `Really delete dimension '${dimension.title}'?`,
         dialogText: "Doing so will also delete any associated indexes.",
         buttonLabel: "Delete",
-        callback: this.deleteDimension,
+        callback: () => this.deleteDimension(dimension.id),
         visible: true,
       });
+      console.log("CONFIRM DIMENSION DELETE", this.confirmDialog);
     },
 
-    createDimension(dialogResponse: DimensionDialogResponse) {
+    createDimension(dialogResponse: SurveyDimensionCreateInput) {
       this.$apollo
-        .mutate({
+        .mutate<AddDimension, AddDimensionVariables>({
           mutation: ADD_DIMENSION_MUTATION,
           variables: {
             createInput: {
               surveyId: this.survey.id,
               title: dialogResponse.title,
-              // FIXME: sequence should not be hard-coded
-              sequence: 10,
             },
           },
         })
@@ -346,7 +352,8 @@ export default defineComponent({
         });
     },
 
-    updateDimension(updateInput: SurveyDimensionUpdateInput) {
+    updateDimension(updateInput: SurveyDimensionEntity) {
+      console.log("updateInput", updateInput);
       this.$apollo
         .mutate<UpdateDimension, UpdateDimensionVariables>({
           mutation: UPDATE_DIMENSION_MUTATION,
@@ -421,8 +428,10 @@ export default defineComponent({
       _.assign(this.confirmDialog, {
         dialogTitle: `Really delete the index '${index.name}'?`,
         dialogText: "This action is not reversible.",
+        callback: this.deleteIndex,
         visible: true,
       });
+      console.log("CONFIRM INDEX DELETE", this.confirmDialog);
     },
 
     createIndex(createInput: SurveyIndexCreateInput) {
@@ -479,7 +488,7 @@ export default defineComponent({
         });
     },
 
-    prependIcon(item: SurveyDimensionView) {
+    prependIcon(item: AbstractSurveyView) {
       switch (item.type) {
         case SurveyElementType.Dimension:
           return "mdi-arrow-expand-horizontal";
