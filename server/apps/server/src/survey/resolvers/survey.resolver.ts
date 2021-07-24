@@ -17,8 +17,6 @@ import {
 import { SurveyService } from "../services/survey.service";
 import { Int } from "@nestjs/graphql";
 import { WhichItems } from "../survey.types";
-import { Letter } from "../../letter/entities";
-import { Group } from "@server/src/group/entities/group";
 
 @Resolver(() => Survey)
 // @UseGuards(GqlAuthGuard)

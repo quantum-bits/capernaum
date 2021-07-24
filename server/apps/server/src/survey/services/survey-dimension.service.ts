@@ -32,12 +32,18 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
     );
   }
 
+  private alwaysResolve = [
+    "survey",
+    "surveyIndices",
+    "surveyIndices.surveyItems",
+  ];
+
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: ["survey", "surveyIndices"] });
+    return this.repo.findOne(id, { relations: this.alwaysResolve });
   }
 
   readAll() {
-    return this.repo.find();
+    return this.repo.find({ relations: this.alwaysResolve });
   }
 
   resolveRelatedSurvey(surveyDimension: SurveyDimension) {
@@ -51,7 +57,8 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
   update(updateInput: SurveyDimensionUpdateInput) {
     return this.repo
       .preload(updateInput)
-      .then((result) => this.repo.save(result));
+      .then((result) => this.repo.save(result))
+      .then(() => this.readOne(updateInput.id));
   }
 
   async delete(dimensionId: number): Promise<SurveyDimensionDeleteOutput> {

@@ -1,4 +1,5 @@
 <template>
+  <!-- Do this with get/set in order to reset form on display?? -->
   <v-dialog
     v-bind:value="value"
     v-on:input="$emit('input', $event)"
@@ -24,7 +25,7 @@
           <v-btn text :disabled="!formValid" color="warning" @click="onReady">
             {{ mainActionLabel }}
           </v-btn>
-          <v-btn text @click="$emit('input', false)"> Cancel </v-btn>
+          <v-btn text @click="onCancel"> Cancel </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -32,11 +33,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import { AllCapernaumSurveys_surveys_surveyDimensions } from "@/graphql/types/AllCapernaumSurveys";
 import { DialogMode } from "@/components/dialogs/dialog.types";
 
-export default Vue.extend({
+type VueExt = Vue & {
+  $refs: {
+    dimensionForm: { reset: () => void };
+  };
+};
+
+export default (Vue as VueConstructor<VueExt>).extend({
   name: "DimensionDialog",
 
   props: {
@@ -81,11 +88,17 @@ export default Vue.extend({
   },
 
   methods: {
+    onCancel() {
+      this.$emit("input", false);
+      this.$refs.dimensionForm.reset();
+    },
+
     onReady() {
       const response: Partial<AllCapernaumSurveys_surveys_surveyDimensions> = {
         title: this.dimensionTitle,
       };
       this.$emit("input", false);
+      this.$refs.dimensionForm.reset();
       this.$emit("ready", response);
     },
   },

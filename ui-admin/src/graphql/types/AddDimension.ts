@@ -9,7 +9,26 @@ import { SurveyDimensionCreateInput } from "./globalTypes";
 // GraphQL mutation operation: AddDimension
 // ====================================================
 
+export interface AddDimension_createSurveyDimension_surveyIndices_scriptureEngagementPractices {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
+   * Practice title
+   */
+  title: string;
+  /**
+   * Description of this practice
+   */
+  description: string;
+}
+
 export interface AddDimension_createSurveyDimension_surveyIndices_surveyItems {
+  /**
+   * Unique ID for this entity
+   */
+  id: number;
   /**
    * Qualtrics identifier (value of key in `questions` object)
    */
@@ -22,6 +41,10 @@ export interface AddDimension_createSurveyDimension_surveyIndices_surveyItems {
 
 export interface AddDimension_createSurveyDimension_surveyIndices {
   /**
+   * Unique ID for this entity
+   */
+  id: number;
+  /**
    * Title of this index
    */
   title: string;
@@ -33,6 +56,10 @@ export interface AddDimension_createSurveyDimension_surveyIndices {
    * Use this index in prediction tables?
    */
   useForPredictions: boolean;
+  /**
+   * Practices predicted by this index
+   */
+  scriptureEngagementPractices: AddDimension_createSurveyDimension_surveyIndices_scriptureEngagementPractices[];
   surveyItems: AddDimension_createSurveyDimension_surveyIndices_surveyItems[];
 }
 

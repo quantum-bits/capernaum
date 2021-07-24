@@ -1,19 +1,22 @@
 <template>
-  <v-row justify="center">
-    <v-dialog persistent max-width="600">
-      <v-card>
-        <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
-        <v-card-text>{{ dialogText }}</v-card-text>
-        <v-card-actions>
-          <div class="flex-grow-1"></div>
-          <v-btn color="green darken-1" text @click="cancel"> Cancel </v-btn>
-          <v-btn color="green darken-1" text @click="confirm">
-            {{ buttonLabel }}
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-row>
+  <v-dialog
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
+    persistent
+    max-width="600"
+  >
+    <v-card>
+      <v-card-title>{{ dialogTitle }}</v-card-title>
+      <v-card-text>{{ dialogText }}</v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn text color="warning" @click="confirm">
+          {{ buttonLabel }}
+        </v-btn>
+        <v-btn text @click="cancel"> Cancel </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -24,18 +27,19 @@ export default Vue.extend({
 
   props: {
     value: { type: Boolean, required: true },
+
     dialogTitle: { type: String, required: true },
     dialogText: { type: String, required: true },
     buttonLabel: { type: String, required: true },
   },
 
   methods: {
-    cancel() {
+    confirm() {
+      this.$emit("confirmed");
       this.$emit("input", false);
     },
 
-    confirm() {
-      this.$emit("confirmed");
+    cancel() {
       this.$emit("input", false);
     },
   },

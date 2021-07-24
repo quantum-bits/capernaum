@@ -106,10 +106,17 @@ export const ADD_DIMENSION_MUTATION = gql`
       id
       title
       surveyIndices {
+        id
         title
         abbreviation
         useForPredictions
+        scriptureEngagementPractices {
+          id
+          title
+          description
+        }
         surveyItems {
+          id
           qualtricsId
           qualtricsText
         }

@@ -29,13 +29,8 @@
             <span v-html="item.name" />
             <span v-if="item.type === surveyElementType.Index">
               ({{ item.entity.abbreviation }})
-              <v-tooltip v-if="item.entity.useForPredictions" top>
-                <span> Items in this index used for SEP predictions. </span>
-                <template v-slot:activator="{ on }">
-                  <v-chip small color="primary" v-on="on">SEP</v-chip>
-                </template>
-              </v-tooltip>
             </span>
+            <sep-chip v-if="hasSepChip(item)" />
           </template>
 
           <template v-slot:prepend="{ item }">
@@ -111,6 +106,8 @@
       :button-label="confirmDialog.buttonLabel"
       @confirmed="confirmDialog.callback"
     />
+
+    <snackbar ref="snackbar" />
   </v-card>
 </template>
 
@@ -155,11 +152,13 @@ import {
   UpdateDimension,
   UpdateDimensionVariables,
 } from "@/graphql/types/UpdateDimension";
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import {
   AddDimension,
   AddDimensionVariables,
 } from "@/graphql/types/AddDimension";
+import Snackbar from "@/components/Snackbar.vue";
+import SepChip from "@/pages/surveys/SepChip.vue";
 
 enum SurveyElementType {
   Dimension,
@@ -187,10 +186,19 @@ interface SurveyItemView extends AbstractSurveyView {
   entity: SurveyItemEntity;
 }
 
-export default Vue.extend({
+type VueExt = Vue & {
+  $refs: {
+    snackbar: { trigger: (content: string, color?: string) => void };
+    treeView: { updateAll: (val: boolean) => void };
+  };
+};
+
+export default (Vue as VueConstructor<VueExt>).extend({
   name: "SurveyDimensionsTab",
 
   components: {
+    SepChip,
+    Snackbar,
     ConfirmDialog,
     DimensionDialog,
     IndexDialog,
@@ -209,11 +217,14 @@ export default Vue.extend({
       // Grant access to enum from within template
       surveyElementType: SurveyElementType,
 
+      // Work with this copy, rather than the initial prop.
+      workingSurvey: _.cloneDeep(this.survey),
+
       dimensionDialog: {
         dialogTitle: "",
         titleHint: "e.g., 'Focal Dimension'",
         dialogMode: DialogMode.Noop,
-        surveyDimension: null as unknown as SurveyEntity,
+        surveyDimension: null as unknown as SurveyDimensionEntity,
         callback: () => null,
         visible: false,
       },
@@ -245,7 +256,7 @@ export default Vue.extend({
 
   computed: {
     availableItems(): SurveyItemSelection[] {
-      return this.survey.surveyItems.map((item) => ({
+      return this.workingSurvey.surveyItems.map((item) => ({
         id: item.id,
         name: item.qualtricsText,
       }));
@@ -254,32 +265,38 @@ export default Vue.extend({
 
     surveyContent(): SurveyDimensionView[] {
       // Dimensions
-      return this.survey.surveyDimensions.map((dim: SurveyDimensionEntity) => ({
-        id: dim.id,
-        name: dim.title,
-        type: SurveyElementType.Dimension,
-        entity: dim,
+      return this.workingSurvey.surveyDimensions.map(
+        (dim: SurveyDimensionEntity) => ({
+          id: dim.id,
+          name: dim.title,
+          type: SurveyElementType.Dimension,
+          entity: dim,
 
-        // Indices
-        children: dim.surveyIndices.map((idx: SurveyIndexEntity) => ({
-          id: idx.id,
-          name: idx.title,
-          type: SurveyElementType.Index,
-          entity: idx,
+          // Indices
+          children: dim.surveyIndices.map((idx: SurveyIndexEntity) => ({
+            id: idx.id,
+            name: idx.title,
+            type: SurveyElementType.Index,
+            entity: idx,
 
-          // Items
-          children: idx.surveyItems.map((item: SurveyItemEntity) => ({
-            id: item.id,
-            name: item.qualtricsText,
-            type: SurveyElementType.Item,
-            entity: item,
+            // Items
+            children: idx.surveyItems.map((item: SurveyItemEntity) => ({
+              id: item.id,
+              name: item.qualtricsText,
+              type: SurveyElementType.Item,
+              entity: item,
+            })),
           })),
-        })),
-      }));
+        })
+      );
     },
   },
 
   methods: {
+    triggerSnackbar(content: string, color?: string) {
+      this.$refs.snackbar.trigger(content, color);
+    },
+
     hideDimensionDialog() {
       this.dimensionDialog.visible = false;
     },
@@ -294,7 +311,19 @@ export default Vue.extend({
 
     changeAll(val: boolean) {
       console.log(val ? "SHOW ALL" : "HIDE ALL");
-      (this.$refs.treeView as any).updateAll(val);
+      this.$refs.treeView.updateAll(val);
+    },
+
+    hasSepChip(item: SurveyDimensionView | SurveyIndexView): boolean {
+      if (item.type === SurveyElementType.Dimension) {
+        return _.some(
+          (item.entity as SurveyDimensionEntity).surveyIndices,
+          (idx) => idx.useForPredictions
+        );
+      } else if (item.type === SurveyElementType.Index) {
+        return (item.entity as SurveyIndexEntity).useForPredictions;
+      }
+      return false;
     },
 
     // Dimension methods
@@ -302,7 +331,28 @@ export default Vue.extend({
       _.assign(this.dimensionDialog, {
         dialogTitle: "Add a New Survey Dimension",
         dialogMode: DialogMode.Create,
-        callback: this.createDimension,
+        callback: (dialogResponse: SurveyDimensionCreateInput) => {
+          this.createDimension(dialogResponse)
+            .then((response) => {
+              const newDimension = response.data?.createSurveyDimension;
+              if (newDimension) {
+                this.workingSurvey.surveyDimensions.push(newDimension);
+                this.hideDimensionDialog();
+                this.triggerSnackbar("Dimension added");
+              } else {
+                this.triggerSnackbar(
+                  `Failed to create new dimension: ${response.errors}`,
+                  "error"
+                );
+              }
+            })
+            .catch((error) => {
+              this.triggerSnackbar(
+                `Error creating dimension: ${error}`,
+                "error"
+              );
+            });
+        },
         visible: true,
       });
     },
@@ -315,10 +365,10 @@ export default Vue.extend({
         callback: (updatedDimension: SurveyDimensionEntity) => {
           updatedDimension.id = dimension.id;
           this.updateDimension(updatedDimension);
+          _.assign(dimension, updatedDimension);
         },
         visible: true,
       });
-      console.log("showDimensionEditDialog", this.dimensionDialog);
     },
 
     showConfirmDeleteDimensionDialog(dimension: SurveyDimensionEntity) {
@@ -326,33 +376,30 @@ export default Vue.extend({
         dialogTitle: `Really delete dimension '${dimension.title}'?`,
         dialogText: "Doing so will also delete any associated indexes.",
         buttonLabel: "Delete",
-        callback: () => this.deleteDimension(dimension.id),
+        callback: () => {
+          this.deleteDimension(dimension.id);
+          this.workingSurvey.surveyDimensions = _.reject(
+            this.workingSurvey.surveyDimensions,
+            (dim) => dim.id === dimension.id
+          );
+        },
         visible: true,
       });
-      console.log("CONFIRM DIMENSION DELETE", this.confirmDialog);
     },
 
     createDimension(dialogResponse: SurveyDimensionCreateInput) {
-      this.$apollo
-        .mutate<AddDimension, AddDimensionVariables>({
-          mutation: ADD_DIMENSION_MUTATION,
-          variables: {
-            createInput: {
-              surveyId: this.survey.id,
-              title: dialogResponse.title,
-            },
+      return this.$apollo.mutate<AddDimension, AddDimensionVariables>({
+        mutation: ADD_DIMENSION_MUTATION,
+        variables: {
+          createInput: {
+            surveyId: this.workingSurvey.id,
+            title: dialogResponse.title,
           },
-        })
-        .then(() => {
-          this.hideDimensionDialog();
-          this.refetchSurveyData();
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
+        },
+      });
     },
 
-    updateDimension(updateInput: SurveyDimensionEntity) {
+    updateDimension(updateInput: SurveyDimensionUpdateInput) {
       console.log("updateInput", updateInput);
       this.$apollo
         .mutate<UpdateDimension, UpdateDimensionVariables>({
@@ -363,10 +410,10 @@ export default Vue.extend({
         })
         .then(() => {
           this.hideDimensionDialog();
-          this.refetchSurveyData();
+          this.triggerSnackbar("Dimension updated");
         })
         .catch((error) => {
-          console.log("there appears to have been an error: ", error);
+          this.triggerSnackbar(`Error updating dimension: ${error}`, "error");
         });
     },
 
@@ -386,10 +433,10 @@ export default Vue.extend({
           },
         })
         .then(() => {
-          this.refetchSurveyData();
+          this.triggerSnackbar("Dimension deleted");
         })
         .catch((error) => {
-          console.log("there appears to have been an error: ", error);
+          this.triggerSnackbar(`Error deleting dimension: ${error}`, "warning");
         });
     },
 
@@ -444,7 +491,7 @@ export default Vue.extend({
         })
         .then(() => {
           this.hideIndexDialog();
-          this.refetchSurveyData();
+          this.triggerSnackbar("Index created");
         })
         .catch((error) => {
           console.log("there appears to have been an error: ", error);
@@ -461,7 +508,7 @@ export default Vue.extend({
         })
         .then(() => {
           this.hideIndexDialog();
-          this.refetchSurveyData();
+          this.triggerSnackbar("Index updated");
         })
         .catch((error) => {
           console.log("there appears to have been an error: ", error);
@@ -481,7 +528,7 @@ export default Vue.extend({
           },
         })
         .then(() => {
-          this.refetchSurveyData();
+          this.triggerSnackbar("Index deleted");
         })
         .catch((error) => {
           console.log("there appears to have been an error: ", error);
@@ -499,12 +546,6 @@ export default Vue.extend({
         default:
           throw new Error("Bogus dimension item");
       }
-    },
-
-    refetchSurveyData() {
-      this.$apollo.queries.survey
-        .refetch()
-        .catch((err) => console.error("Something went wrong", err));
     },
   },
 });
