@@ -59,18 +59,18 @@ export class UserService extends BaseService<User> {
     );
   }
 
-  private alwaysResolve = ["roles"];
+  private alwaysRelate = ["roles"];
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysResolve });
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   findUserByEmail(email: string) {
-    return this.repo.findOne({ email }, { relations: this.alwaysResolve });
+    return this.repo.findOne({ email }, { relations: this.alwaysRelate });
   }
 
   update(updateInput: UserUpdateInput) {

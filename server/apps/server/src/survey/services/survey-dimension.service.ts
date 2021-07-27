@@ -32,18 +32,18 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
     );
   }
 
-  private alwaysResolve = [
+  private alwaysRelate = [
     "survey",
     "surveyIndices",
     "surveyIndices.surveyItems",
   ];
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysResolve });
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   resolveRelatedSurvey(surveyDimension: SurveyDimension) {

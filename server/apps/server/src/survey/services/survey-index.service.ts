@@ -26,7 +26,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
   }
 
   async construct(createInput: SurveyIndexCreateInput) {
-    return this.repo.manager.transaction(async (manager) => {
+    const newIndexId = await this.repo.manager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
       const surveyItemRepo = manager.getRepository(SurveyItem);
@@ -50,18 +50,26 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
         await surveyItemRepo.save(item);
       }
 
-      return newIndex;
+      return newIndex.id;
     });
+
+    return this.readOne(newIndexId);
   }
+
+  private alwaysRelate = [
+    "surveyItems",
+    "surveyDimension",
+    "scriptureEngagementPractices",
+  ];
 
   readAll() {
     return this.repo.find({
-      relations: [
-        "surveyItems",
-        "surveyDimension",
-        "scriptureEngagementPractices",
-      ],
+      relations: this.alwaysRelate,
     });
+  }
+
+  readOne(id: number) {
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   /**

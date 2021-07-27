@@ -1,11 +1,5 @@
 <template>
-  <!-- Do this with get/set in order to reset form on display?? -->
-  <v-dialog
-    v-bind:value="value"
-    v-on:input="$emit('input', $event)"
-    persistent
-    max-width="800"
-  >
+  <v-dialog v-model="visible" persistent max-width="800">
     <v-card>
       <v-card-title>{{ dialogTitle }}</v-card-title>
       <v-form ref="dimensionForm" v-model="formValid">
@@ -61,7 +55,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
     if (this.dialogMode === DialogMode.Create && this.surveyDimension) {
       throw new Error("Passed survey dimension in create mode");
     } else if (this.dialogMode === DialogMode.Update && !this.surveyDimension) {
-      throw new Error("In update mode, but no survey dimension supplied");
+      throw new Error("No survey dimension supplied for update mode");
     }
   },
 
@@ -76,29 +70,41 @@ export default (Vue as VueConstructor<VueExt>).extend({
   },
 
   computed: {
+    visible: {
+      get(): boolean {
+        return this.value;
+      },
+      set(value: boolean) {
+        this.$emit("input", value);
+      },
+    },
+
     mainActionLabel(): string {
       return this.dialogMode === DialogMode.Create ? "Create" : "Update";
     },
   },
 
   watch: {
-    surveyDimension(newValue) {
-      this.dimensionTitle = newValue.title;
+    surveyDimension: {
+      handler(newValue) {
+        this.dimensionTitle = newValue.title;
+      },
+      deep: true,
     },
   },
 
   methods: {
     onCancel() {
-      this.$emit("input", false);
-      this.$refs.dimensionForm.reset();
+      this.visible = false;
+      // this.$refs.dimensionForm.reset();
     },
 
     onReady() {
       const response: Partial<AllCapernaumSurveys_surveys_surveyDimensions> = {
         title: this.dimensionTitle,
       };
-      this.$emit("input", false);
-      this.$refs.dimensionForm.reset();
+      this.visible = false;
+      // this.$refs.dimensionForm.reset();
       this.$emit("ready", response);
     },
   },

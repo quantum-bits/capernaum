@@ -21,7 +21,7 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
     super(repo);
   }
 
-  private alwaysResolve = [
+  private alwaysRelate = [
     "survey",
     "survey.surveyLetters",
     "survey.surveyLetters.letterType",
@@ -29,12 +29,12 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
   ];
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   readOne(id: number) {
     return this.repo.findOne(id, {
-      relations: this.alwaysResolve,
+      relations: this.alwaysRelate,
     });
   }
 

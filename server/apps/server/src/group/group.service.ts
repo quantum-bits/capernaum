@@ -138,7 +138,7 @@ export class GroupService {
   }
 
   // Always resolve these relations.
-  private alwaysResolve = [
+  private alwaysRelate = [
     "type",
     "survey",
     "survey.surveyLetters",
@@ -149,13 +149,13 @@ export class GroupService {
 
   readAll() {
     return this.repo.find({
-      relations: this.alwaysResolve,
+      relations: this.alwaysRelate,
     });
   }
 
   readOne(id: number): Promise<Group> {
     return this.repo.findOne(id, {
-      relations: this.alwaysResolve,
+      relations: this.alwaysRelate,
     });
   }
 

@@ -40,6 +40,11 @@
           <template v-slot:append="{ item }">
             <span v-if="item.type === surveyElementType.Dimension">
               <icon-button
+                icon-name="mdi-plus-circle"
+                tool-tip="Add a new survey index for this survey dimension."
+                @click="showIndexAddDialog(item.entity)"
+              />
+              <icon-button
                 icon-name="mdi-pencil"
                 tool-tip="Edit this survey dimension."
                 @click="showDimensionEditDialog(item.entity)"
@@ -55,20 +60,16 @@
 
             <span v-else-if="item.type === surveyElementType.Index">
               <icon-button
-                icon-name="mdi-plus-circle"
-                tool-tip="Add a new survey index for this survey dimension."
-                @click="showIndexAddDialog"
-              />
-              <icon-button
                 icon-name="mdi-pencil"
                 tool-tip="Edit this survey index and/or update the associations to survey items."
-                @click="showIndexEditDialog"
+                @click="showIndexEditDialog(item.entity)"
               />
               <icon-button
                 :can-click="canDeleteSurveyIndex(item.entity)"
                 icon-name="mdi-close-circle"
-                tool-tip="Delete this survey index and the associations to survey items."
+                tool-tip="Delete this survey index and all associations to survey items."
                 disabled-tool-tip="This survey index has boolean associations and cannot be deleted."
+                @click="showConfirmDeleteIndexDialog(item.entity)"
               />
             </span>
             <span v-else-if="item.type === surveyElementType.Item" />
@@ -90,6 +91,7 @@
     <index-dialog
       v-model="indexDialog.visible"
       :dialog-title="indexDialog.dialogTitle"
+      :dialog-mode="indexDialog.dialogMode"
       :title-hint="indexDialog.titleHint"
       :abbreviation-hint="indexDialog.abbreviationHint"
       :survey-index="indexDialog.surveyIndex"
@@ -233,6 +235,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
         dialogTitle: "",
         titleHint: "e.g., 'Focus on Others'",
         abbreviationHint: "e.g., 'FOO'",
+        dialogMode: DialogMode.Noop,
         surveyIndex: null as unknown as SurveyIndexEntity,
         selectedItems: [] as SurveyItemEntity[],
         canTurnOffPredictions: false,
@@ -374,14 +377,23 @@ export default (Vue as VueConstructor<VueExt>).extend({
     showConfirmDeleteDimensionDialog(dimension: SurveyDimensionEntity) {
       _.assign(this.confirmDialog, {
         dialogTitle: `Really delete dimension '${dimension.title}'?`,
-        dialogText: "Doing so will also delete any associated indexes.",
+        dialogText: "Will also delete any associated indexes.",
         buttonLabel: "Delete",
         callback: () => {
-          this.deleteDimension(dimension.id);
-          this.workingSurvey.surveyDimensions = _.reject(
-            this.workingSurvey.surveyDimensions,
-            (dim) => dim.id === dimension.id
-          );
+          this.deleteDimension(dimension.id)
+            .then(() => {
+              this.workingSurvey.surveyDimensions = _.reject(
+                this.workingSurvey.surveyDimensions,
+                (dim) => dim.id === dimension.id
+              );
+              this.triggerSnackbar("Dimension deleted");
+            })
+            .catch((error) => {
+              this.triggerSnackbar(
+                `Error deleting dimension: ${error}`,
+                "warning"
+              );
+            });
         },
         visible: true,
       });
@@ -425,27 +437,43 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     deleteDimension(surveyDimensionId: number) {
-      this.$apollo
-        .mutate<TossSurveyDimension, TossSurveyIndexVariables>({
+      return this.$apollo.mutate<TossSurveyDimension, TossSurveyIndexVariables>(
+        {
           mutation: DELETE_DIMENSION,
           variables: {
             id: surveyDimensionId,
           },
-        })
-        .then(() => {
-          this.triggerSnackbar("Dimension deleted");
-        })
-        .catch((error) => {
-          this.triggerSnackbar(`Error deleting dimension: ${error}`, "warning");
-        });
+        }
+      );
     },
 
     // Index methods
-    showIndexAddDialog(dimension: SurveyDimensionView) {
+
+    showIndexAddDialog(dimension: SurveyDimensionEntity) {
       _.assign(this.indexDialog, {
-        dialogTitle: `Add a new survey index for '${dimension.name}'`,
+        dialogTitle: `Add a new survey index for '${dimension.title}'`,
+        dialogMode: DialogMode.Create,
         canTurnOffPredictions: true,
-        callback: this.createIndex,
+        callback: (dialogResponse: SurveyIndexCreateInput) => {
+          dialogResponse.surveyDimensionId = dimension.id;
+          this.createIndex(dialogResponse)
+            .then((response) => {
+              const newIndex = response.data?.surveyIndexCreate;
+              if (newIndex) {
+                dimension.surveyIndices.push(newIndex);
+                this.hideIndexDialog();
+                this.triggerSnackbar("Index created");
+              } else {
+                this.triggerSnackbar(
+                  `Failed to create new index: ${response.errors}`,
+                  "error"
+                );
+              }
+            })
+            .catch((error) => {
+              this.triggerSnackbar(`Problem creating index: ${error}`);
+            });
+        },
         visible: true,
       });
     },
@@ -463,6 +491,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
     ) {
       _.assign(this.indexDialog, {
         dialogTitle: `Edit Survey Index for '${dimensionView.name}'`,
+        dialogMode: DialogMode.Update,
         surveyIndex: indexView.entity,
         selectedItems: this.selectedItems(indexView),
         canTurnOffPredictions: this.canDeleteSurveyIndex(indexView.entity),
@@ -471,31 +500,37 @@ export default (Vue as VueConstructor<VueExt>).extend({
       });
     },
 
-    showConfirmDeleteIndexDialog(index: SurveyIndexView) {
+    showConfirmDeleteIndexDialog(surveyIndex: SurveyIndexEntity) {
       _.assign(this.confirmDialog, {
-        dialogTitle: `Really delete the index '${index.name}'?`,
-        dialogText: "This action is not reversible.",
-        callback: this.deleteIndex,
+        dialogTitle: `Really delete the index '${surveyIndex.title}'?`,
+        dialogText: "Will also delete any associated survey items",
+        buttonLabel: "Delete",
+        callback: () => {
+          this.deleteIndex(surveyIndex.id)
+            .then(() => {
+              _.forEach(this.workingSurvey.surveyDimensions, (dim) => {
+                dim.surveyIndices = _.reject(
+                  dim.surveyIndices,
+                  (idx) => idx.id === surveyIndex.id
+                );
+              });
+              this.triggerSnackbar(`Index '${surveyIndex.title}' deleted`);
+            })
+            .catch((error) => {
+              this.triggerSnackbar(`Problem deleting index: ${error}`);
+            });
+        },
         visible: true,
       });
-      console.log("CONFIRM INDEX DELETE", this.confirmDialog);
     },
 
     createIndex(createInput: SurveyIndexCreateInput) {
-      this.$apollo
-        .mutate<AddIndex, AddIndexVariables>({
-          mutation: ADD_INDEX_MUTATION,
-          variables: {
-            createInput,
-          },
-        })
-        .then(() => {
-          this.hideIndexDialog();
-          this.triggerSnackbar("Index created");
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
+      return this.$apollo.mutate<AddIndex, AddIndexVariables>({
+        mutation: ADD_INDEX_MUTATION,
+        variables: {
+          createInput,
+        },
+      });
     },
 
     updateIndex(updateInput: SurveyIndexUpdateInput) {
@@ -520,19 +555,12 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     deleteIndex(surveyIndexId: number) {
-      this.$apollo
-        .mutate<TossSurveyIndex, TossSurveyIndexVariables>({
-          mutation: DELETE_INDEX,
-          variables: {
-            id: surveyIndexId,
-          },
-        })
-        .then(() => {
-          this.triggerSnackbar("Index deleted");
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
+      return this.$apollo.mutate<TossSurveyIndex, TossSurveyIndexVariables>({
+        mutation: DELETE_INDEX,
+        variables: {
+          id: surveyIndexId,
+        },
+      });
     },
 
     prependIcon(item: AbstractSurveyView) {

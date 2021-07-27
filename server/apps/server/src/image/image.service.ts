@@ -24,18 +24,18 @@ export class ImageService extends BaseService<Image> {
     );
   }
 
-  private alwaysResolve = [
+  private alwaysRelate = [
     "letterElements",
     "letterElements.letter",
     "letterElements.letterElementType",
   ];
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysResolve });
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   update(updateInput: ImageUpdateInput) {

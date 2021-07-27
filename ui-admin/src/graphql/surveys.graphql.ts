@@ -146,7 +146,14 @@ export const ADD_INDEX_MUTATION = gql`
       id
       title
       abbreviation
+      useForPredictions
+      scriptureEngagementPractices {
+        id
+        title
+        description
+      }
       surveyItems {
+        id
         qualtricsText
       }
     }

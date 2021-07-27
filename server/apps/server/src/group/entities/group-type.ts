@@ -1,8 +1,8 @@
 import { Entity, OneToMany } from "typeorm";
 import { Field, Int, ObjectType } from "@nestjs/graphql";
-import { Group } from "@server/src/group/entities/group";
 import { FieldColumn } from "@server/src/decorators";
 import { AbstractEntity } from "@server/src/shared/abstract-entity";
+import { Group } from "./group";
 
 @Entity()
 @ObjectType()

@@ -36,7 +36,7 @@ export class LetterService extends BaseService<Letter> {
     return this.repo.save(this.repo.create(createInput));
   }
 
-  private alwaysResolve = [
+  private alwaysRelate = [
     "surveyLetters",
     "surveyLetters.letterType",
     "surveyLetters.letterType.letterElementTypes",
@@ -46,13 +46,13 @@ export class LetterService extends BaseService<Letter> {
   ];
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   readOne(id: number) {
     return this.repo.findOne(id, {
       relations: [
-        ...this.alwaysResolve,
+        ...this.alwaysRelate,
         "letterElements.image",
         "letterElements.surveyDimension",
       ],

@@ -1,5 +1,10 @@
 <template>
-  <v-dialog persistent max-width="800">
+  <v-dialog
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
+    persistent
+    max-width="800"
+  >
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="indexForm" v-model="formValid" lazy-validation>
@@ -60,10 +65,10 @@
 
         <v-card-actions>
           <v-spacer />
-          <v-btn color="success" text @click="onCancel"> Cancel </v-btn>
-          <v-btn :disabled="!formValid" color="success" text @click="onSave">
-            Submit
+          <v-btn text color="warning" :disabled="!formValid" @click="onSave">
+            {{ mainActionLabel }}
           </v-btn>
+          <v-btn text @click="onCancel"> Cancel </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -71,20 +76,29 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import {
+  DialogMode,
   IndexDialogResponse,
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
+import { AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices } from "@/graphql/types/AllCapernaumSurveys";
 
-export default Vue.extend({
+type VueExt = Vue & {
+  $refs: {
+    indexForm: { resetValidation: () => void };
+  };
+};
+
+export default (Vue as VueConstructor<VueExt>).extend({
   name: "IndexDialog",
 
   props: {
+    value: { type: Boolean, required: true },
+
     dialogTitle: { type: String, required: true },
     titleHint: { type: String, required: true },
     abbreviationHint: { type: String, required: true },
-    value: { type: Boolean, required: true },
     availableItems: {
       type: Array as () => SurveyItemSelection[],
       required: true,
@@ -92,10 +106,17 @@ export default Vue.extend({
     // Can we turn off "use for predictions" slider?
     canTurnOffPredictions: { type: Boolean, required: true },
 
-    title: String,
-    abbreviation: String,
-    useForPredictions: Boolean,
-    selectedItems: Array as () => SurveyItemSelection[],
+    dialogMode: { type: Number, required: true },
+    surveyIndex:
+      Object as () => AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+  },
+
+  created() {
+    if (this.dialogMode === DialogMode.Create && this.surveyIndex) {
+      throw new Error("Passed survey index in create mode");
+    } else if (this.dialogMode === DialogMode.Update && !this.surveyIndex) {
+      throw new Error("No survey index supplied for update mode");
+    }
   },
 
   data() {
@@ -113,6 +134,12 @@ export default Vue.extend({
         required: [(v: string): boolean | string => !!v || "Required field"],
       },
     };
+  },
+
+  computed: {
+    mainActionLabel(): string {
+      return this.dialogMode === DialogMode.Create ? "Create" : "Update";
+    },
   },
 
   methods: {
@@ -133,25 +160,18 @@ export default Vue.extend({
   },
 
   watch: {
-    value: {
+    surveyIndex: {
       handler: function (newValue) {
         if (newValue) {
-          this.dialogState.title = this.title;
-          this.dialogState.abbreviation = this.abbreviation;
-          this.dialogState.useForPredictions = this.useForPredictions;
-          this.dialogState.selectedItems = this.selectedItems;
-
-          if (this.$refs.indexForm) {
-            // FIXME: Replace the `as any` hack.
-            (
-              this.$refs.indexForm as Vue & {
-                resetValidation: () => boolean;
-              }
-            ).resetValidation();
-          }
+          this.dialogState.title = newValue.title;
+          this.dialogState.abbreviation = newValue.abbreviation;
+          this.dialogState.useForPredictions = newValue.useForPredictions;
+          this.dialogState.selectedItems = newValue.selectedItems;
+          this.$refs.indexForm.resetValidation();
         }
       },
       immediate: true,
+      deep: true,
     },
   },
 });

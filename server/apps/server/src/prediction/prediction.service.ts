@@ -21,14 +21,14 @@ export class ScriptureEngagementPracticeService extends BaseService<ScriptureEng
     return this.repo.save(this.repo.create(createInput));
   }
 
-  alwaysResolve = ["surveyIndices"];
+  alwaysRelate = ["surveyIndices"];
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysResolve });
+    return this.repo.findOne(id, { relations: this.alwaysRelate });
   }
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysResolve });
+    return this.repo.find({ relations: this.alwaysRelate });
   }
 
   update(
