@@ -61,17 +61,18 @@
             <span v-else-if="item.type === surveyElementType.Index">
               <icon-button
                 icon-name="mdi-pencil"
-                tool-tip="Edit this survey index and/or update the associations to survey items."
+                tool-tip="Edit this survey index and its survey items."
                 @click="showIndexEditDialog(item.entity)"
               />
               <icon-button
-                :can-click="canDeleteSurveyIndex(item.entity)"
+                :can-click="!hasAssociatedPractices(item.entity)"
                 icon-name="mdi-close-circle"
                 tool-tip="Delete this survey index and all associations to survey items."
                 disabled-tool-tip="This survey index has boolean associations and cannot be deleted."
                 @click="showConfirmDeleteIndexDialog(item.entity)"
               />
             </span>
+
             <span v-else-if="item.type === surveyElementType.Item" />
             <span v-else> Something went horribly wrong. </span>
           </template>
@@ -96,7 +97,7 @@
       :abbreviation-hint="indexDialog.abbreviationHint"
       :survey-index="indexDialog.surveyIndex"
       :available-items="availableItems"
-      :selected-tems="indexDialog.selectedItems"
+      :selected-items="indexDialog.selectedItems"
       :can-turn-off-predictions="indexDialog.canTurnOffPredictions"
       @ready="indexDialog.callback"
     />
@@ -237,7 +238,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
         abbreviationHint: "e.g., 'FOO'",
         dialogMode: DialogMode.Noop,
         surveyIndex: null as unknown as SurveyIndexEntity,
-        selectedItems: [] as SurveyItemEntity[],
+        availableItems: [] as SurveyItemSelection[],
         canTurnOffPredictions: false,
         callback: () => null,
         visible: false,
@@ -260,10 +261,9 @@ export default (Vue as VueConstructor<VueExt>).extend({
   computed: {
     availableItems(): SurveyItemSelection[] {
       return this.workingSurvey.surveyItems.map((item) => ({
-        id: item.id,
-        name: item.qualtricsText,
+        text: item.qualtricsText,
+        value: item.id,
       }));
-      // .concat(this.selectedItems);
     },
 
     surveyContent(): SurveyDimensionView[] {
@@ -367,8 +367,18 @@ export default (Vue as VueConstructor<VueExt>).extend({
         surveyDimension: dimension,
         callback: (updatedDimension: SurveyDimensionEntity) => {
           updatedDimension.id = dimension.id;
-          this.updateDimension(updatedDimension);
-          _.assign(dimension, updatedDimension);
+          this.updateDimension(updatedDimension)
+            .then(() => {
+              _.assign(dimension, updatedDimension);
+              this.hideDimensionDialog();
+              this.triggerSnackbar("Dimension updated");
+            })
+            .catch((error) => {
+              this.triggerSnackbar(
+                `Error updating dimension: ${error}`,
+                "error"
+              );
+            });
         },
         visible: true,
       });
@@ -412,21 +422,12 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     updateDimension(updateInput: SurveyDimensionUpdateInput) {
-      console.log("updateInput", updateInput);
-      this.$apollo
-        .mutate<UpdateDimension, UpdateDimensionVariables>({
-          mutation: UPDATE_DIMENSION_MUTATION,
-          variables: {
-            updateInput,
-          },
-        })
-        .then(() => {
-          this.hideDimensionDialog();
-          this.triggerSnackbar("Dimension updated");
-        })
-        .catch((error) => {
-          this.triggerSnackbar(`Error updating dimension: ${error}`, "error");
-        });
+      return this.$apollo.mutate<UpdateDimension, UpdateDimensionVariables>({
+        mutation: UPDATE_DIMENSION_MUTATION,
+        variables: {
+          updateInput,
+        },
+      });
     },
 
     canDeleteSurveyDimension(surveyDimension: SurveyDimensionEntity) {
@@ -454,6 +455,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
         dialogTitle: `Add a new survey index for '${dimension.title}'`,
         dialogMode: DialogMode.Create,
         canTurnOffPredictions: true,
+        availableItems: this.availableItems,
         callback: (dialogResponse: SurveyIndexCreateInput) => {
           dialogResponse.surveyDimensionId = dimension.id;
           this.createIndex(dialogResponse)
@@ -478,24 +480,24 @@ export default (Vue as VueConstructor<VueExt>).extend({
       });
     },
 
-    selectedItems(index: SurveyIndexView): SurveyItemSelection[] {
-      return index.children.map((item) => ({
-        id: item.id,
-        name: item.name,
-      }));
-    },
-
-    showIndexEditDialog(
-      dimensionView: SurveyDimensionView,
-      indexView: SurveyIndexView
-    ) {
+    showIndexEditDialog(surveyIndex: SurveyIndexEntity) {
       _.assign(this.indexDialog, {
-        dialogTitle: `Edit Survey Index for '${dimensionView.name}'`,
+        dialogTitle: `Edit Survey Index '${surveyIndex.title}'`,
         dialogMode: DialogMode.Update,
-        surveyIndex: indexView.entity,
-        selectedItems: this.selectedItems(indexView),
-        canTurnOffPredictions: this.canDeleteSurveyIndex(indexView.entity),
-        callback: this.updateIndex,
+        surveyIndex: surveyIndex,
+        canTurnOffPredictions: !this.hasAssociatedPractices(surveyIndex),
+        callback: (updatedIndex: SurveyIndexEntity) => {
+          updatedIndex.id = surveyIndex.id;
+          this.updateIndex(updatedIndex)
+            .then(() => {
+              _.assign(surveyIndex, updatedIndex);
+              this.hideIndexDialog();
+              this.triggerSnackbar(`Index '${surveyIndex.title}' updated`);
+            })
+            .catch((error) => {
+              this.triggerSnackbar(`Problem updating index: ${error}`);
+            });
+        },
         visible: true,
       });
     },
@@ -534,24 +536,16 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     updateIndex(updateInput: SurveyIndexUpdateInput) {
-      this.$apollo
-        .mutate<UpdateIndex, UpdateIndexVariables>({
-          mutation: UPDATE_INDEX_MUTATION,
-          variables: {
-            updateInput,
-          },
-        })
-        .then(() => {
-          this.hideIndexDialog();
-          this.triggerSnackbar("Index updated");
-        })
-        .catch((error) => {
-          console.log("there appears to have been an error: ", error);
-        });
+      return this.$apollo.mutate<UpdateIndex, UpdateIndexVariables>({
+        mutation: UPDATE_INDEX_MUTATION,
+        variables: {
+          updateInput,
+        },
+      });
     },
 
-    canDeleteSurveyIndex(surveyIndex: SurveyIndexEntity) {
-      return surveyIndex.scriptureEngagementPractices.length === 0;
+    hasAssociatedPractices(surveyIndex: SurveyIndexEntity) {
+      return surveyIndex.scriptureEngagementPractices.length > 0;
     },
 
     deleteIndex(surveyIndexId: number) {

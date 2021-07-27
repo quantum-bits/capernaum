@@ -1,16 +1,11 @@
 <template>
-  <v-dialog
-    v-bind:value="value"
-    v-on:input="$emit('input', $event)"
-    persistent
-    max-width="800"
-  >
+  <v-dialog v-model="visible" persistent max-width="800">
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="indexForm" v-model="formValid" lazy-validation>
         <v-card-text>
           <v-text-field
-            v-model="dialogState.title"
+            v-model="workingIndex.title"
             label="Survey Index"
             :hint="titleHint"
             :rules="rules.required"
@@ -19,7 +14,7 @@
           />
 
           <v-text-field
-            v-model="dialogState.abbreviation"
+            v-model="workingIndex.abbreviation"
             label="Survey Index Abbreviation"
             :hint="abbreviationHint"
             :rules="rules.required"
@@ -29,7 +24,7 @@
 
           <span v-if="canTurnOffPredictions">
             <v-switch
-              v-model="dialogState.useForPredictions"
+              v-model="workingIndex.useForPredictions"
               label="Use For Predictions in Boolean Association Table"
             />
           </span>
@@ -38,7 +33,7 @@
               <template v-slot:activator="{ on }">
                 <span v-on="on">
                   <v-switch
-                    v-model="dialogState.useForPredictions"
+                    v-model="workingIndex.useForPredictions"
                     disabled
                     label="Use for predictions in Boolean association table"
                   />
@@ -52,10 +47,8 @@
           </span>
 
           <v-select
-            v-model="dialogState.selectedItems"
+            v-model="selectedItems"
             :items="availableItems"
-            item-value="id"
-            item-text="name"
             label="Choose Survey Items"
             return-object
             multiple
@@ -86,7 +79,10 @@ import { AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices } from "@/gr
 
 type VueExt = Vue & {
   $refs: {
-    indexForm: { resetValidation: () => void };
+    indexForm: {
+      reset: () => void;
+      resetValidation: () => void;
+    };
   };
 };
 
@@ -97,21 +93,24 @@ export default (Vue as VueConstructor<VueExt>).extend({
     value: { type: Boolean, required: true },
 
     dialogTitle: { type: String, required: true },
+    dialogMode: { type: Number, required: true },
     titleHint: { type: String, required: true },
     abbreviationHint: { type: String, required: true },
+    canTurnOffPredictions: { type: Boolean, required: true },
     availableItems: {
       type: Array as () => SurveyItemSelection[],
       required: true,
     },
-    // Can we turn off "use for predictions" slider?
-    canTurnOffPredictions: { type: Boolean, required: true },
-
-    dialogMode: { type: Number, required: true },
-    surveyIndex:
-      Object as () => AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+    surveyIndex: {
+      type: Object as () => AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+    },
   },
 
+  // beforeCreate() {
+  //   console.log("BEFORE CREATE");
+  // },
   created() {
+    console.log("CREATED");
     if (this.dialogMode === DialogMode.Create && this.surveyIndex) {
       throw new Error("Passed survey index in create mode");
     } else if (this.dialogMode === DialogMode.Update && !this.surveyIndex) {
@@ -119,24 +118,88 @@ export default (Vue as VueConstructor<VueExt>).extend({
     }
   },
 
+  // beforeMount() {
+  //   console.log("BEFORE MOUNT");
+  // },
+  // mounted() {
+  //   console.log("MOUNTED");
+  // },
+
+  // beforeUpdate() {
+  //   console.log("BEFORE UPDATE");
+  // },
+  // updated() {
+  //   console.log("UPDATED");
+  // },
+
+  // beforeDestroy() {
+  //   console.log("BEFORE DESTROY");
+  // },
+  // destroyed() {
+  //   console.log("DESTROYED");
+  // },
+
   data() {
     return {
-      dialogState: {
+      workingIndex: {
         title: "",
         abbreviation: "",
         useForPredictions: false,
-        selectedItems: [] as SurveyItemSelection[],
-      },
-
+      } as Pick<
+        AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices,
+        "title" | "abbreviation" | "useForPredictions"
+      >,
+      selectedItems: [] as SurveyItemSelection[],
       formValid: false,
-
       rules: {
         required: [(v: string): boolean | string => !!v || "Required field"],
       },
     };
   },
 
+  // As coded:
+  // <index-dialog v-model="dimTabVisible" ... />
+  //
+  // Behaves as:
+  // <index-dialog
+  //   v-bind:value="dimTabVisible"
+  //   v-on:input="dimTabVisible = $event"
+  // />
+
+  /* To open dialog
+     1. SurveyDimensionTab: set dimTabVisible to true.
+     2. IndexDialog: value becomes true because bound to dimTabVisible
+     3. IndexDialog: visible computed prop's get() runs, returns true from value
+     4. VDialog: respond to v-model="visible" by displaying
+     To close dialog
+     1. IndexDialog: set visible to false
+     2. IndexDialog: visible computed prop's set() runs, emitting input even with false value
+     3. SurveyDimensionTab: set dimTabVisible to false
+     4. IndexDialog: value because false because bound to dimTabVisible
+     5. IndexDialog: visible computed prop's get() runs, returns false
+     6. VDialog: respond to v-model="visible" by hiding
+   */
+
   computed: {
+    visible: {
+      get(): boolean {
+        if (this.dialogMode === DialogMode.Create) {
+          if (this.$refs.indexForm) {
+            console.log("RESET FORM");
+            this.$refs.indexForm.reset();
+          } else {
+            console.log("REFS NOT READY");
+          }
+        }
+        console.log("VISIBLE GET", this.value);
+        return this.value;
+      },
+      set(newValue: boolean) {
+        console.log("VISIBLE SET", newValue);
+        this.$emit("input", newValue);
+      },
+    },
+
     mainActionLabel(): string {
       return this.dialogMode === DialogMode.Create ? "Create" : "Update";
     },
@@ -144,33 +207,35 @@ export default (Vue as VueConstructor<VueExt>).extend({
 
   methods: {
     onCancel() {
-      this.$emit("input", false);
+      this.visible = false;
     },
 
     onSave() {
       const response: IndexDialogResponse = {
-        title: this.dialogState.title,
-        abbreviation: this.dialogState.abbreviation,
-        useForPredictions: this.dialogState.useForPredictions,
-        itemIds: this.dialogState.selectedItems.map((item) => item.id),
+        title: this.workingIndex.title,
+        abbreviation: this.workingIndex.abbreviation,
+        useForPredictions: this.workingIndex.useForPredictions,
+        itemIds: this.selectedItems.map((item) => item.value),
       };
       this.$emit("ready", response);
-      this.$emit("input", false);
+      this.visible = false;
     },
   },
 
   watch: {
     surveyIndex: {
-      handler: function (newValue) {
-        if (newValue) {
-          this.dialogState.title = newValue.title;
-          this.dialogState.abbreviation = newValue.abbreviation;
-          this.dialogState.useForPredictions = newValue.useForPredictions;
-          this.dialogState.selectedItems = newValue.selectedItems;
-          this.$refs.indexForm.resetValidation();
-        }
+      handler: function (
+        newValue: AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices
+      ) {
+        this.workingIndex.title = newValue.title;
+        this.workingIndex.abbreviation = newValue.abbreviation;
+        this.workingIndex.useForPredictions = newValue.useForPredictions;
+        this.selectedItems = newValue.surveyItems.map((item) => ({
+          text: item.qualtricsText,
+          value: item.id,
+        }));
       },
-      immediate: true,
+      // immediate: true,
       deep: true,
     },
   },
