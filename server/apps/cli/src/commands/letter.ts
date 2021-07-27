@@ -15,14 +15,18 @@ export async function renderLetter(
 
   const nestContext = new NestContext();
   const writerService = await nestContext.get(WriterService);
+  const letterService = await nestContext.get(LetterService);
+
+  const letter = await letterService.readOne(letterPk);
+
   if (respondentType === SurveyRespondentType.Individual) {
     writerOutput = await writerService.renderIndividualLetter(
-      letterPk,
+      letter,
       groupOrResponsePk
     );
   } else {
     writerOutput = await writerService.renderGroupLetter(
-      letterPk,
+      letter,
       groupOrResponsePk
     );
   }

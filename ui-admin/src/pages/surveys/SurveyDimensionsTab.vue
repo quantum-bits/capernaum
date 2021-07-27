@@ -4,8 +4,8 @@
       <v-row justify="space-around">
         <v-col cols="auto"> Dimensions, Indices, Items </v-col>
         <v-col cols="auto">
-          <v-btn text @click="changeAll(true)">Show All</v-btn>
-          <v-btn text @click="changeAll(false)">Hide All</v-btn>
+          <v-btn text color="primary" @click="changeAll(true)">Show All</v-btn>
+          <v-btn text color="primary" @click="changeAll(false)">Hide All</v-btn>
         </v-col>
         <v-col cols="auto">
           <v-btn color="primary" @click="showDimensionAddDialog">
@@ -268,30 +268,34 @@ export default (Vue as VueConstructor<VueExt>).extend({
 
     surveyContent(): SurveyDimensionView[] {
       // Dimensions
-      return this.workingSurvey.surveyDimensions.map(
-        (dim: SurveyDimensionEntity) => ({
+      return this.workingSurvey.surveyDimensions
+        .map((dim: SurveyDimensionEntity) => ({
           id: dim.id,
           name: dim.title,
           type: SurveyElementType.Dimension,
           entity: dim,
 
           // Indices
-          children: dim.surveyIndices.map((idx: SurveyIndexEntity) => ({
-            id: idx.id,
-            name: idx.title,
-            type: SurveyElementType.Index,
-            entity: idx,
+          children: dim.surveyIndices
+            .map((idx: SurveyIndexEntity) => ({
+              id: idx.id,
+              name: idx.title,
+              type: SurveyElementType.Index,
+              entity: idx,
 
-            // Items
-            children: idx.surveyItems.map((item: SurveyItemEntity) => ({
-              id: item.id,
-              name: item.qualtricsText,
-              type: SurveyElementType.Item,
-              entity: item,
-            })),
-          })),
-        })
-      );
+              // Items
+              children: idx.surveyItems
+                .map((item: SurveyItemEntity) => ({
+                  id: item.id,
+                  name: item.qualtricsText,
+                  type: SurveyElementType.Item,
+                  entity: item,
+                }))
+                .sort((a, b) => a.name.localeCompare(b.name)),
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name)),
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     },
   },
 
@@ -330,6 +334,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     // Dimension methods
+
     showDimensionAddDialog() {
       _.assign(this.dimensionDialog, {
         dialogTitle: "Add a New Survey Dimension",
@@ -486,11 +491,27 @@ export default (Vue as VueConstructor<VueExt>).extend({
         dialogMode: DialogMode.Update,
         surveyIndex: surveyIndex,
         canTurnOffPredictions: !this.hasAssociatedPractices(surveyIndex),
-        callback: (updatedIndex: SurveyIndexEntity) => {
-          updatedIndex.id = surveyIndex.id;
-          this.updateIndex(updatedIndex)
+        callback: (updatedIndex: SurveyIndexUpdateInput) => {
+          this.updateIndex({
+            ...updatedIndex,
+            id: surveyIndex.id,
+          })
             .then(() => {
-              _.assign(surveyIndex, updatedIndex);
+              // Set everything except the items.
+              _.assign(
+                surveyIndex,
+                _.pick(updatedIndex, [
+                  "title",
+                  "abbreviation",
+                  "useForPredictions",
+                ])
+              );
+
+              // Set the items, if any.
+              surveyIndex.surveyItems = this.workingSurvey.surveyItems.filter(
+                (item) => updatedIndex.itemIds?.includes(item.id)
+              );
+
               this.hideIndexDialog();
               this.triggerSnackbar(`Index '${surveyIndex.title}' updated`);
             })

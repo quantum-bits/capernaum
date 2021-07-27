@@ -76,6 +76,7 @@ import {
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 import { AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices } from "@/graphql/types/AllCapernaumSurveys";
+import { SurveyIndexUpdateInput } from "@/graphql/types/globalTypes";
 
 type VueExt = Vue & {
   $refs: {
@@ -211,14 +212,14 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     onSave() {
-      const response: IndexDialogResponse = {
+      const response: Partial<SurveyIndexUpdateInput> = {
         title: this.workingIndex.title,
         abbreviation: this.workingIndex.abbreviation,
         useForPredictions: this.workingIndex.useForPredictions,
         itemIds: this.selectedItems.map((item) => item.value),
       };
-      this.$emit("ready", response);
       this.visible = false;
+      this.$emit("ready", response);
     },
   },
 

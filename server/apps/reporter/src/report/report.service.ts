@@ -81,7 +81,7 @@ export class ReportService {
 
     // Write a letter.
     const writerOutput = await this.writerService.renderIndividualLetter(
-      letter.id,
+      letter,
       importedResponse.surveyResponse.id
     );
     debug("rendered letter %O", writerOutput);
@@ -139,7 +139,7 @@ export class ReportService {
 
     // Write a letter.
     const writerOutput = await this.writerService.renderGroupLetter(
-      letter.id,
+      letter,
       group.id
     );
     debug("rendered letter %O", writerOutput);
