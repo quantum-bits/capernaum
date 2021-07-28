@@ -13,4 +13,6 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
-bootstrap();
+bootstrap()
+  .then(() => console.log("Capernaum started successfully"))
+  .catch((error) => console.error(`Failed: ${error}`));
