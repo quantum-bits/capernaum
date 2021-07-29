@@ -72,7 +72,6 @@
 import Vue, { VueConstructor } from "vue";
 import {
   DialogMode,
-  IndexDialogResponse,
   SurveyItemSelection,
 } from "@/components/dialogs/dialog.types";
 import { AllCapernaumSurveys_surveys_surveyDimensions_surveyIndices } from "@/graphql/types/AllCapernaumSurveys";

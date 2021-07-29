@@ -6,8 +6,8 @@ export class ImageModel extends Model {
   mimeType: string;
   uuid: string;
   title: string;
-  created: number;
-  updated: number;
+  created: string;
+  updated: string;
 
   static tableName = "image";
 }

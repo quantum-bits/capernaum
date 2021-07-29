@@ -1,6 +1,3 @@
-import { config } from "dotenv";
-config();
-
 import PrettyError = require("pretty-error");
 PrettyError.start();
 
@@ -34,6 +31,7 @@ import {
   countGroupPredictions,
   showHierarchy,
   listSurveyLetters,
+  dumpEnv,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
@@ -316,12 +314,17 @@ fixtureCommands
   .action(nuclearOption);
 
 // Email
+
 const emailCommands = program.command("email").description("email commands");
 
 emailCommands
   .command("test")
   .description("send test email")
   .action(sendTestEmail);
+
+// Sundries
+
+program.command("env").description("show process environment").action(dumpEnv);
 
 program
   .command("debug-cache")

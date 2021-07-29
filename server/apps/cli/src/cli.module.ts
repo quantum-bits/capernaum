@@ -6,9 +6,11 @@ import { WriterModule } from "@server/src/writer/writer.module";
 import { QueueModule } from "@reporter/src/queue/queue.module";
 import { ReportModule } from "@reporter/src/report/report.module";
 import { VisualizationModule } from "@server/src/visualization/visualization.module";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       ...typeORMConfig,
     }),

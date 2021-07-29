@@ -1,6 +1,3 @@
-import { config } from "dotenv";
-config();
-
 import { ConnectionOptions } from "typeorm";
 import {
   Letter,
