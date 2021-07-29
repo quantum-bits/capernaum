@@ -18,7 +18,7 @@ export class Letter extends AbstractEntity {
   @FieldColumn("Letter title")
   title: string;
 
-  @FieldColumn("Description of letter")
+  @FieldColumn("Description of letter", { default: "Update description!" })
   description: string;
 
   @FieldColumn("Email message to go out with letter", {
