@@ -20,7 +20,9 @@ export class ScriptureEngagementPractice extends AbstractEntity {
   forPredictionCounts: boolean;
 
   @Field(() => [SurveyIndex], { description: "Survey indices for this SEP" })
-  @ManyToMany(() => SurveyIndex, (sidx) => sidx.scriptureEngagementPractices)
+  @ManyToMany(() => SurveyIndex, (sidx) => sidx.scriptureEngagementPractices, {
+    nullable: true,
+  })
   surveyIndices: SurveyIndex[];
 }
 

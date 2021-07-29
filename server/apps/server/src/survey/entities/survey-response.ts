@@ -34,7 +34,7 @@ export class SurveyResponse extends AbstractEntity {
   @FieldColumn("Respondent's email address")
   email: string;
 
-  @FieldColumn("Group code word")
+  @FieldColumn("Group code word", { nullable: true })
   codeWord: string;
 
   @FieldColumn("Qualtrics response ID (e.g., R_...)")

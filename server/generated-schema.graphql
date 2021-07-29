@@ -635,7 +635,7 @@ type Query {
   users: [User!]!
   userRoles: [UserRole!]!
   qualtricsSurveys(includeInactive: Boolean = false): [QualtricsSurveyListItem!]!
-  organization(organizationId: String!): QualtricsOrganization!
+  organization(organizationId: String = "taylorcfse"): QualtricsOrganization!
   subscriptions: [QualtricsSubscription!]!
   events: [Event!]!
   machines: [Machine!]!
