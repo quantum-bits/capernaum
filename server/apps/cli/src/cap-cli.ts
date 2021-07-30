@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config();
+
 import PrettyError = require("pretty-error");
 PrettyError.start();
 

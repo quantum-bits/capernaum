@@ -1,5 +1,8 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
+/**
+ * Migrate the prediction table to the new schema.
+ */
 export class predictionTableEntry1627593617629 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create the new table.

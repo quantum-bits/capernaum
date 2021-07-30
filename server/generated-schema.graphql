@@ -154,7 +154,7 @@ type SurveyResponse {
   email: String!
 
   """Group code word"""
-  codeWord: String!
+  codeWord: String
 
   """Qualtrics response ID (e.g., R_...)"""
   qualtricsResponseId: String!
