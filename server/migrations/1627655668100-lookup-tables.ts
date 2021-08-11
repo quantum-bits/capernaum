@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
+import { LETTER_TYPE_INDIVIDUAL_ID } from "./migration.constants";
 
 /**
  * Migrate lookup tables to new values.
@@ -6,7 +7,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 export class lookupTables1627655668100 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const letterTypeRows = [
-      [1, "individual", "Individual Letter"],
+      [LETTER_TYPE_INDIVIDUAL_ID, "individual", "Individual Letter"],
       [2, "group", "Group Letter"],
     ];
     for (const row of letterTypeRows) {
@@ -15,6 +16,11 @@ export class lookupTables1627655668100 implements MigrationInterface {
         row
       );
     }
+
+    // Now that the letter types are available, set up the FK constraint.
+    await queryRunner.query(
+      `ALTER TABLE "survey_letter" ADD CONSTRAINT "FK_900b6b096c17390f7b62ff1c77c" FOREIGN KEY ("letterTypeId") REFERENCES "letter_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
+    );
 
     const groupTypeRows = [
       [5, "Everyone at a particular church", "WHOLE_CHURCH", 5],

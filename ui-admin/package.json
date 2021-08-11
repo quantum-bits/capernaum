@@ -12,10 +12,10 @@
     "depcruise": "depcruise --exclude '^node_modules' --output-type dot src | dot -T svg > dependencygraph.svg"
   },
   "dependencies": {
-    "@tiptap/core": "^2.0.0-beta.89",
+    "@tiptap/core": "^2.0.0-beta.95",
     "@tiptap/extension-placeholder": "^2.0.0-beta.26",
-    "@tiptap/starter-kit": "^2.0.0-beta.85",
-    "@tiptap/vue-2": "^2.0.0-beta.41",
+    "@tiptap/starter-kit": "^2.0.0-beta.92",
+    "@tiptap/vue-2": "^2.0.0-beta.43",
     "@vue/composition-api": "^1.0.4",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
@@ -51,6 +51,10 @@
     "vuetify": "^2.5.7",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^3.2.1"
+  },
+  "resolutions": {
+    "prosemirror-model": "1.13.1",
+    "prosemirror-view": "1.16.5"
   },
   "devDependencies": {
     "@mdi/font": "^5.9.55",

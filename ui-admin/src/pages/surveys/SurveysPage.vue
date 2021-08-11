@@ -2,7 +2,7 @@
   <v-container>
     <page-header title="Surveys">
       <v-select
-        label="Select a survey"
+        label="Select an imported survey (import using Qualtrics tab)"
         v-model="selectedSurveyId"
         :items="availableSurveys"
         @change="onSurveySelected"
@@ -84,10 +84,12 @@ export default Vue.extend({
 
   computed: {
     availableSurveys(): Selection[] {
-      return this.surveys.map((survey) => ({
-        text: survey.qualtricsName,
-        value: survey.id,
-      }));
+      return this.surveys
+        .filter((survey) => !!survey.importedDate)
+        .map((survey) => ({
+          text: survey.qualtricsName,
+          value: survey.id,
+        }));
     },
 
     selectedSurvey(): AllCapernaumSurveys_surveys | undefined {

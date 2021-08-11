@@ -22,7 +22,7 @@
             :search="search"
             class="elevation-1"
           >
-            <template v-slot:[`item.date`]="{ item }">
+            <template v-slot:item.date="{ item }">
               {{ item.date | formatDate }}
             </template>
           </v-data-table>
@@ -43,7 +43,7 @@ import { AllEvents_events as Event } from "@/graphql/types/AllEvents";
 import PageHeader from "@/pages/PageHeader.vue";
 
 export default Vue.extend({
-  name: "Events",
+  name: "EventsPage",
 
   components: { PageHeader },
 
@@ -77,7 +77,7 @@ export default Vue.extend({
 
   filters: {
     formatDate(epochSeconds: string) {
-      return DateTime.fromMillis(parseInt(epochSeconds)).toFormat("y-M-d tt");
+      return DateTime.fromMillis(parseInt(epochSeconds)).toFormat("y-MM-dd tt");
     },
   },
 });

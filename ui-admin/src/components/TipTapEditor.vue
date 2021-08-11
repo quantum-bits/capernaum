@@ -53,14 +53,14 @@
             </v-btn>
           </v-btn-toggle>
         </v-col>
-        <v-col>
+        <v-col v-if="debugEnable">
           <v-checkbox label="Debug" v-model="debugContent"></v-checkbox>
         </v-col>
       </v-row>
 
       <editor-content v-if="editor" :editor="editor" />
 
-      <v-row v-if="debugContent">
+      <v-row v-if="debugEnable && debugContent">
         <v-col>
           <h2>Current Content</h2>
           <pre><code>{{ currentContent }}</code></pre>
@@ -94,7 +94,12 @@ import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
 import { generateHTML } from "@tiptap/vue-2";
 import EditSaveDeleteCancelButtons from "@/components/buttons/EditSaveCancelButtons.vue";
-import { isQuillDeltaString, quillDeltaToTipTapJson } from "@/helpers";
+import {
+  isQuillDeltaString,
+  quillDeltaToTipTapJson,
+  emptyTipTapDocument,
+  isTipTapJsonString,
+} from "@/helpers";
 import * as _ from "lodash";
 
 enum Style {
@@ -132,6 +137,7 @@ export default Vue.extend({
       fontStyle: [] as number[],
       style: Style,
 
+      debugEnable: true,
       debugContent: false,
     };
   },
@@ -140,13 +146,19 @@ export default Vue.extend({
     // Decode the initial content.
     tipTapJson(): JSONContent {
       console.log("Initial content", this.initialContent);
+      let content = undefined;
       if (isQuillDeltaString(this.initialContent)) {
         console.log("Quill Delta");
-        return quillDeltaToTipTapJson(this.initialContent);
-      } else {
+        content = quillDeltaToTipTapJson(this.initialContent);
+      } else if (isTipTapJsonString(this.initialContent)) {
         console.log("Tip Tap JSON");
-        return JSON.parse(this.initialContent);
+        content = JSON.parse(this.initialContent);
+      } else {
+        console.log("Empty");
+        content = emptyTipTapDocument();
       }
+      console.log("Content", content);
+      return content;
     },
 
     elevation(): number | undefined {

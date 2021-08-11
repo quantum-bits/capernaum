@@ -25,6 +25,12 @@
                   {{ surveyLetter.letter.title }}
                 </router-link>
               </td>
+              <td>
+                <v-icon class="mr-1">
+                  {{ letterTypeIcon(surveyLetter) }}
+                </v-icon>
+                {{ letterTypeDescription(surveyLetter) }}
+              </td>
               <td>{{ surveyLetter.letter.updated | standardDate }}</td>
               <td>
                 <router-link
@@ -36,7 +42,6 @@
                   {{ surveyLetter.survey.qualtricsName }}
                 </router-link>
               </td>
-              <td>{{ surveyLetter.letterType.description }}</td>
               <td>
                 <v-tooltip v-if="canDeleteLetter(surveyLetter.letter)" top>
                   <template v-slot:activator="{ on }">
@@ -92,8 +97,9 @@ export default Vue.extend({
   },
 
   apollo: {
-    surveyLetters: {
+    allSurveyLetters: {
       query: SURVEY_LETTERS_QUERY,
+      update: (data) => data.surveyLetters,
     },
   },
 
@@ -101,18 +107,34 @@ export default Vue.extend({
     return {
       headers: [
         { text: "Letter" },
+        { text: "Type" },
         { text: "Last Update" },
         { text: "Survey" },
-        { text: "Type" },
         { text: "Actions", sortable: false, align: "center" },
       ],
-      surveyLetters: [] as SurveyLetters_surveyLetters[],
+      allSurveyLetters: [] as SurveyLetters_surveyLetters[],
     };
+  },
+
+  computed: {
+    surveyLetters(): SurveyLetters_surveyLetters[] {
+      return this.allSurveyLetters.filter((ltr) => !!ltr.survey.importedDate);
+    },
   },
 
   methods: {
     canDeleteLetter(letter: SurveyLetters_surveyLetters_letter): boolean {
       return letter.letterElements.length === 0;
+    },
+
+    letterTypeDescription(surveyLetter: SurveyLetters_surveyLetters) {
+      return surveyLetter.letterType.description;
+    },
+
+    letterTypeIcon(surveyLetter: SurveyLetters_surveyLetters) {
+      return surveyLetter.letterType.key === "individual"
+        ? "mdi-email"
+        : "mdi-email-multiple";
     },
 
     deleteLetter(letterId: number): void {

@@ -3,7 +3,7 @@
     <tip-tap-editor
       title="Email Cover Letter"
       :initial-content="letter.emailMessage"
-      @contentUpdated="saveEmailMessage"
+      @save-content="saveEmailMessage"
     />
   </v-container>
 </template>

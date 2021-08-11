@@ -20,7 +20,7 @@ const router = new VueRouter({
     {
       path: "/events",
       name: "events",
-      component: () => import("./pages/Events.vue"),
+      component: () => import("./pages/EventsPage.vue"),
     },
     {
       path: "/password",

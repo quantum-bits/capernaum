@@ -31,6 +31,10 @@ export interface LettersForSurveys_surveys {
    * Name of this survey on Qualtrics
    */
   qualtricsName: string;
+  /**
+   * When this survey was imported from Qualtrics
+   */
+  importedDate: any | null;
 }
 
 export interface LettersForSurveys {

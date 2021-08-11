@@ -44,6 +44,10 @@ export interface SurveyLetters_surveyLetters_survey {
    */
   qualtricsName: string;
   /**
+   * When this survey was imported from Qualtrics
+   */
+  importedDate: any | null;
+  /**
    * Dimensions for this survey; groups indices, which group items.
    */
   surveyDimensions: SurveyLetters_surveyLetters_survey_surveyDimensions[];

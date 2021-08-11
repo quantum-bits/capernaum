@@ -20,12 +20,10 @@ export class EventService extends BaseService<Event> {
 
   async createEvent(createInput: EventCreateInput) {
     const newEvent = await this.repo.save(this.repo.create(createInput));
-    debug("createEvent %O", newEvent);
     await this.pubSub.publish(NEW_EVENT_TRIGGER_NAME, { newEvent });
-    debug("triggered %s", NEW_EVENT_TRIGGER_NAME);
   }
 
   readAll() {
-    this.repo.find();
+    return this.repo.find({ order: { date: "ASC" } });
   }
 }

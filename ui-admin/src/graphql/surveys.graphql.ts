@@ -26,6 +26,7 @@ export const ALL_CAPERNAUM_SURVEYS = gql`
       okayForGroup
       publicName
       detailedDescription
+      importedDate
       groups {
         id
         name
@@ -277,6 +278,7 @@ export const SURVEY_LETTERS_QUERY = gql`
       survey {
         id
         qualtricsName
+        importedDate
         surveyDimensions {
           id
           title

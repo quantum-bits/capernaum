@@ -1,0 +1,1 @@
+export const LETTER_TYPE_INDIVIDUAL_ID = 1;

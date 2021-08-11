@@ -153,6 +153,10 @@ export interface AllCapernaumSurveys_surveys {
    * Detailed description of this survey; mostly for group use
    */
   detailedDescription: string;
+  /**
+   * When this survey was imported from Qualtrics
+   */
+  importedDate: any | null;
   groups: AllCapernaumSurveys_surveys_groups[];
   /**
    * Survey letters for this survey

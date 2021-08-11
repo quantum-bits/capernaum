@@ -67,7 +67,9 @@ export default Vue.extend({
       query: LETTERS_AND_SURVEYS,
       update(data) {
         this.letterTypes = data.letterTypes;
-        this.surveys = data.surveys;
+        this.surveys = data.surveys.filter(
+          (survey: LettersForSurveys_surveys) => !!survey.importedDate
+        );
       },
     },
   },

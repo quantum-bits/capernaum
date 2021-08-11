@@ -29,9 +29,6 @@ export class supportGroups1627596617095 implements MigrationInterface {
       `CREATE TABLE "letter_type" ("id" SERIAL NOT NULL, "key" character varying NOT NULL, "description" character varying NOT NULL, CONSTRAINT "PK_659927f02c8974b814d99680adc" PRIMARY KEY ("id")); COMMENT ON COLUMN "letter_type"."key" IS 'Letter type name'; COMMENT ON COLUMN "letter_type"."description" IS 'Letter type description'`
     );
     await queryRunner.query(
-      `CREATE TABLE "survey_letter" ("id" SERIAL NOT NULL, "surveyId" integer, "letterId" integer, "letterTypeId" integer, CONSTRAINT "UQ_e3c3860159a7a0565293671e0ff" UNIQUE ("surveyId", "letterTypeId"), CONSTRAINT "PK_0825ba67ba87d10cdc616e5123e" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
       `CREATE TABLE "group" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "otherTypeName" character varying, "created" TIMESTAMP NOT NULL DEFAULT now(), "closedAfter" TIMESTAMP NOT NULL, "reportSent" TIMESTAMP, "adminFirstName" character varying NOT NULL, "adminLastName" character varying NOT NULL, "adminEmail" character varying NOT NULL, "codeWord" character varying NOT NULL, "adminComments" character varying NOT NULL DEFAULT '', "plannedInvitees" integer NOT NULL DEFAULT '1', "typeId" integer, "surveyId" integer, CONSTRAINT "PK_256aa0fda9b1de1a73ee0b7106b" PRIMARY KEY ("id")); COMMENT ON COLUMN "group"."name" IS 'Group name'; COMMENT ON COLUMN "group"."otherTypeName" IS 'Name for ''other'' type '; COMMENT ON COLUMN "group"."closedAfter" IS 'Date when survey closes'; COMMENT ON COLUMN "group"."reportSent" IS 'Group report sent'; COMMENT ON COLUMN "group"."adminFirstName" IS 'Group administrator first name'; COMMENT ON COLUMN "group"."adminLastName" IS 'Group administrator last name'; COMMENT ON COLUMN "group"."adminEmail" IS 'Group administrator email address'; COMMENT ON COLUMN "group"."codeWord" IS 'Survey code word used by group'; COMMENT ON COLUMN "group"."adminComments" IS 'Comments from administrator'; COMMENT ON COLUMN "group"."plannedInvitees" IS 'Planned invitee count'`
     );
     await queryRunner.query(
@@ -343,15 +340,6 @@ export class supportGroups1627596617095 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "letter_element" ADD CONSTRAINT "FK_00125b894ec3ebc37b4784e354b" FOREIGN KEY ("imageId") REFERENCES "image"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "survey_letter" ADD CONSTRAINT "FK_facaecc626053801d984cd9fd73" FOREIGN KEY ("surveyId") REFERENCES "survey"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "survey_letter" ADD CONSTRAINT "FK_e751a2f8b0d28a804840611f6d3" FOREIGN KEY ("letterId") REFERENCES "letter"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "survey_letter" ADD CONSTRAINT "FK_900b6b096c17390f7b62ff1c77c" FOREIGN KEY ("letterTypeId") REFERENCES "letter_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE "group" ADD CONSTRAINT "FK_4c8e5fb303da3b6e4a05c7bb62b" FOREIGN KEY ("typeId") REFERENCES "group_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`

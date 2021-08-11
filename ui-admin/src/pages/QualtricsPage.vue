@@ -15,8 +15,6 @@
             <tr>
               <td v-if="isImported(survey)">
                 <router-link
-                  v-bind="attrs"
-                  v-on="on"
                   :to="{
                     name: 'surveys',
                     params: { surveyId: survey.capernaumSurvey.id },
@@ -45,9 +43,9 @@
                 <v-chip
                   v-if="isImported(survey)"
                   small
-                  :color="isOutOfDate(survey) ? 'error' : 'success'"
+                  :color="isUpToDate(survey) ? 'success' : 'error'"
                 >
-                  {{ isOutOfDate(survey) ? "Yes" : "No" }}
+                  {{ isUpToDate(survey) ? "Yes" : "No" }}
                 </v-chip>
               </td>
               <td>
@@ -61,7 +59,7 @@
                 <v-btn
                   small
                   color="error"
-                  v-if="isOutOfDate(survey)"
+                  v-if="!isUpToDate(survey)"
                   @click="importFromQualtrics(survey)"
                 >
                   Update
@@ -111,14 +109,14 @@ export default Vue.extend({
   data() {
     return {
       headers: [
-        { text: "Q Name", value: "qName" },
-        { text: "Q ID", value: "qId" },
-        { text: "Q Active", value: "qIsActive" },
-        { text: "Q Mod Date", value: "qModDate" },
-        { text: "Imported?", value: "isImported" },
+        { text: "Q Name" },
+        { text: "Q ID" },
+        { text: "Q Active" },
+        { text: "Q Mod Date" },
+        { text: "Imported?" },
         { text: "Import Date" },
-        { text: "Out of Date?", value: "outOfDate" },
-        { text: "Actions", value: "actions" },
+        { text: "Up to Date?" },
+        { text: "Actions" },
       ],
       combinedSurveys: [] as CombinedSurveys_combinedSurveys[],
       loadingSurveys: 0,
@@ -141,7 +139,11 @@ export default Vue.extend({
 
   methods: {
     isImported(survey: CombinedSurveys_combinedSurveys) {
-      return !!survey.capernaumSurvey?.id;
+      return (
+        survey.capernaumSurvey &&
+        survey.capernaumSurvey.id &&
+        survey.capernaumSurvey.importedDate
+      );
     },
 
     isActive(survey: CombinedSurveys_combinedSurveys) {
@@ -157,13 +159,15 @@ export default Vue.extend({
       return qDateTime > capDateTime;
     },
 
-    importDate(survey: CombinedSurveys_combinedSurveys) {
+    isUpToDate(survey: CombinedSurveys_combinedSurveys) {
+      return !this.isOutOfDate(survey);
+    },
+
+    importDate(survey: CombinedSurveys_combinedSurveys): string {
       const standardDate = Vue.filter("standardDate");
-      if (survey.capernaumSurvey) {
-        console.log("CAP SURVEY", survey.capernaumSurvey);
-        return standardDate(survey.capernaumSurvey.importedDate);
-      }
-      return "";
+      return survey.capernaumSurvey?.importedDate
+        ? standardDate(survey.capernaumSurvey.importedDate)
+        : "";
     },
 
     /**

@@ -310,6 +310,7 @@ export const LETTERS_AND_SURVEYS = gql`
     surveys {
       id
       qualtricsName
+      importedDate
     }
   }
 `;
