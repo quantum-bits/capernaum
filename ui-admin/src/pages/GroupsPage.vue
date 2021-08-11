@@ -45,6 +45,16 @@
           <template v-slot:item.closedAfter="{ item }">
             {{ item.closedAfter | standardDate }}
           </template>
+          <template v-slot:item.survey="{ item }">
+            <router-link
+              :to="{
+                name: 'surveys',
+                params: { surveyId: item.survey.id },
+              }"
+            >
+              {{ item.survey.qualtricsName }}
+            </router-link>
+          </template>
           <template v-slot:item.status="{ item }">
             <v-chip
               small
@@ -106,6 +116,7 @@ export default Vue.extend({
         { text: "Group Code", value: "codeWord" },
         { text: "Admin", value: "adminFullName" },
         { text: "Email", value: "adminEmail" },
+        { text: "Survey", value: "survey" },
         { text: "Status", value: "status" },
         { text: "Responses", value: "responses", align: "end" },
         { text: "Closed After", value: "closedAfter" },

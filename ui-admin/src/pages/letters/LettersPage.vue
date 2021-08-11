@@ -147,9 +147,9 @@ export default Vue.extend({
         })
         .then((response) => {
           console.log("Letter deleted", response);
-          this.surveyLetters = _.filter(
-            this.surveyLetters,
-            (sl) => sl.letter.id !== letterId
+          this.allSurveyLetters = _.filter(
+            this.allSurveyLetters,
+            (surveyLetter) => surveyLetter.letter.id !== letterId
           );
         })
         .catch((error) => {

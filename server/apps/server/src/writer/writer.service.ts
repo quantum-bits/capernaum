@@ -204,9 +204,9 @@ export class WriterService {
   /**
    * 1. Generate a relative directory in which to store the files associated with a report.
    *    Files will end up at locations like these:
-   *     .../survey-38/group-42/report.pdf
-   *    .../survey-38/individual-30517/report.pdf
-   *    .../survey-38/individual-30517/dimension-9.pdf
+   *      .../survey-38/group-42/report.pdf
+   *      .../survey-38/individual-30517/report.pdf
+   *      .../survey-38/individual-30517/dimension-9.pdf
    * 2. Set the FileService's working directory.
    *
    * @param surveyId

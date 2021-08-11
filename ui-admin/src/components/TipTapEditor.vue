@@ -137,7 +137,7 @@ export default Vue.extend({
       fontStyle: [] as number[],
       style: Style,
 
-      debugEnable: true,
+      debugEnable: false,
       debugContent: false,
     };
   },

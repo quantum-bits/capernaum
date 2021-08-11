@@ -141,7 +141,7 @@ interface DialogState {
 }
 
 export default Vue.extend({
-  name: "Images",
+  name: "ImagesPage",
 
   components: {
     FilePond: vueFilePond(FilePondPluginImagePreview),

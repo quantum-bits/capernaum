@@ -60,7 +60,7 @@ const router = new VueRouter({
     {
       path: "/images",
       name: "images",
-      component: () => import("./pages/Images.vue"),
+      component: () => import("./pages/ImagesPage.vue"),
     },
     {
       path: "/groups",

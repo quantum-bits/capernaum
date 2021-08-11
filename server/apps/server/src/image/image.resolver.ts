@@ -10,7 +10,6 @@ import { ImageService } from "./image.service";
 import { Int } from "@nestjs/graphql";
 import { Image, ImageUpdateInput } from "./entities";
 import { FileService } from "../file/file.service";
-import { LetterElement } from "../letter/entities";
 import { IMAGE_FILE_SERVICE } from "../file/file.module";
 import { Inject, UseGuards } from "@nestjs/common";
 import { GqlAuthGuard } from "../auth/graphql-auth.guard";

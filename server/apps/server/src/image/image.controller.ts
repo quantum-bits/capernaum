@@ -16,6 +16,9 @@ import { FileService } from "../file/file.service";
 import { ImageService } from "./image.service";
 import getRawBody from "raw-body";
 import { IMAGE_FILE_SERVICE } from "../file/file.module";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("image");
 
 @Controller("images")
 export class ImageController {
@@ -47,6 +50,12 @@ export class ImageController {
         "Content-Type": imageDetails.mimeType,
       },
     };
+    debug("getImage %O", {
+      imageDetails,
+      fileName: imageDetails.fileName(),
+      imagePath,
+      options,
+    });
     res.sendFile(imagePath, options);
   }
 

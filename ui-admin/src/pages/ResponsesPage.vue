@@ -424,7 +424,7 @@ export default Vue.extend({
 
       const surveyLetter = _.find(
         surveyResponse.survey.surveyLetters,
-        (sltr) => sltr.letterType.key === "individual"
+        (surveyLetter) => surveyLetter.letterType.key === "individual"
       );
       if (!surveyLetter) {
         this.showSnackbar("No individual letter for this survey");
