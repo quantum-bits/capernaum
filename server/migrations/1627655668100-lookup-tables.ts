@@ -87,6 +87,25 @@ export class lookupTables1627655668100 implements MigrationInterface {
     await queryRunner.query(
       'UPDATE letter_element SET "letterElementTypeId" = 1 WHERE "letterElementTypeId" = 5'
     );
+
+    // Create mapping between letters and elements.
+    for (const row of [
+      [1, 1],
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [2, 1],
+      [2, 2],
+      [2, 3],
+      [2, 4],
+      [2, 5],
+      [2, 6],
+    ]) {
+      await queryRunner.query(
+        'INSERT INTO letter_type_letter_element_type("letterTypeId", "letterElementTypeId") VALUES($1, $2)',
+        row
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

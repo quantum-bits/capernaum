@@ -26,6 +26,7 @@
     "migration:create": "yarn typeorm migration:create --connection=staging",
     "migration:generate": "yarn typeorm migration:generate --connection=staging",
     "migration:run": "yarn typeorm migration:run --connection=staging",
+    "migration:show": "yarn typeorm migration:show --connection=staging",
     "migration:revert": "yarn typeorm migration:revert --connection=staging",
     "test": "jest",
     "test:cov": "jest --coverage",

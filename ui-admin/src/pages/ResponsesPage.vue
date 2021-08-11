@@ -229,10 +229,12 @@ export default Vue.extend({
 
   computed: {
     availableSurveys(): Selection[] {
-      return this.surveys.map((survey) => ({
-        text: survey.qualtricsName,
-        value: survey.id.toString(),
-      }));
+      return this.surveys
+        .filter((survey) => !!survey.importedDate)
+        .map((survey) => ({
+          text: survey.qualtricsName,
+          value: survey.id.toString(),
+        }));
     },
 
     selectedSurvey(): AllCapernaumSurveys_surveys | undefined {

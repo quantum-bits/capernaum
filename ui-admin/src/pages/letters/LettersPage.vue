@@ -22,7 +22,7 @@
                     params: { surveyLetterId: surveyLetter.id },
                   }"
                 >
-                  {{ surveyLetter.letter.title }}
+                  {{ surveyLetter.letter.title || "Untitled" }}
                 </router-link>
               </td>
               <td>
