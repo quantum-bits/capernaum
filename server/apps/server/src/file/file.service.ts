@@ -14,12 +14,14 @@ interface FileDetails {
 // path - ends at a file
 
 // /home/capernaum/static/pdfs/alpha/beta/foo.pdf
-// /====/========= top-level abs dir
-//                 ======/==== top-level rel dir
-//                             =====/==== working rel dir
-//                                        ===.=== file name
-// /====/=========/======/====/=====/====/===.=== abs path
-//                 ======/====/=====/====/===.=== rel path
+// /====/========= topLevelAbsDir
+//                 ======/==== topLevelRelDir
+//                             =====/==== workingRelDir
+//                                        ===.=== fileName
+// /====/=========/======/====/=====/==== absoluteDir
+// /====/=========/======/====/=====/====/===.=== absolutePath(fileName)
+//                 ======/====/=====/==== relativeDir
+//                 ======/====/=====/====/===.=== relativePath(fileName)
 
 export class FileService {
   private readonly topLevelAbsDir: string;
@@ -31,13 +33,19 @@ export class FileService {
     this.topLevelAbsDir = normalize(process.env.CAP_BASE_ABS_DIR);
     this.topLevelRelDir = join(process.env.CAP_STATIC_REL_DIR, subDir);
 
-    // Make sure the directory is there.
+    // Make sure the directory is already there. Don't really want to
+    // create it as its location is based on ENV configuration.
     const dir = join(this.topLevelAbsDir, this.topLevelRelDir);
     if (!fs.existsSync(dir)) {
       throw new Error(`Top-level directory '${dir}' doesn't exist`);
     }
   }
 
+  /**
+   * Set working directory. This is _stateful_, so behavior of other methods
+   * will change based on most-recent invocation of this method!
+   * @param dir - New working directory
+   */
   async setWorkingDir(dir?: string) {
     this.workingRelDir = dir;
     try {

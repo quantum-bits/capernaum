@@ -18,13 +18,13 @@ export class WriterOutput {
   pdfFileName: string;
 
   @Field({
-    description: "Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')",
+    description: "Relative path to PDF file (e.g., 'static/pdfs/...')",
   })
   pdfRelativePath: string;
 
   @Field({
     description:
-      "Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')",
+      "Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/...')",
   })
   pdfAbsolutePath: string;
 

@@ -101,6 +101,7 @@ import {
   WriteLetterVariables,
 } from "@/graphql/types/WriteLetter";
 import { WRITE_LETTER_MUTATION } from "@/graphql/letters.graphql";
+import { showReportInBrowser } from "@/helpers";
 
 export default Vue.extend({
   name: "GroupsPage",
@@ -207,6 +208,7 @@ export default Vue.extend({
           if (response.data) {
             const writeLetter = response.data.writeLetter;
             this.showSnackbar(writeLetter.message);
+            showReportInBrowser();
             if (writeLetter.responseSummary) {
               this.letterWriterOutput = writeLetter;
             }

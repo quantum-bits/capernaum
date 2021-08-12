@@ -217,10 +217,11 @@ export class WriterService {
     surveyId: number,
     type: SurveyRespondentType,
     groupOrResponseId: number
-  ) {
+  ): Promise<string> {
     const workDir = `survey-${surveyId}/${type}-${groupOrResponseId}`;
     const absoluteDir = await this.reportFileService.setWorkingDir(workDir);
     debug(`Absolute dir now '${absoluteDir}'`);
+    return workDir;
   }
 
   private renderImage(letterElement: LetterElement) {
@@ -596,7 +597,7 @@ export class WriterService {
 
     const writerOutput = WriterService.constructOutput(
       true,
-      "Letter created successfully",
+      "Report created successfully",
       pdfFileName,
       this.reportFileService.relativePath(pdfFileName),
       pdfAbsolutePath
@@ -715,6 +716,7 @@ export class WriterService {
     // Grab the type from an arbitrary letter and render away.
     const typeKey = letter.surveyLetters[0].letterType.key;
     switch (typeKey) {
+      // FIXME - Eliminate magic strings.
       case "individual":
         return this.renderIndividualLetter(letter, responseOrGroupId);
       case "group":

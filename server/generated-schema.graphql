@@ -555,12 +555,10 @@ type WriterOutput {
   """Name of PDF file (e.g., 'abc.pdf')"""
   pdfFileName: String!
 
-  """Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')"""
+  """Relative path to PDF file (e.g., 'static/pdfs/...')"""
   pdfRelativePath: String!
 
-  """
-  Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
-  """
+  """Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/...')"""
   pdfAbsolutePath: String!
   responseSummary: ResponseSummary
 }

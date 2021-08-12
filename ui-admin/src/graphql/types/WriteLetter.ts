@@ -77,11 +77,11 @@ export interface WriteLetter_writeLetter {
    */
   pdfFileName: string;
   /**
-   * Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/abc.pdf')
+   * Absolute path to PDF file (e.g., '/home/capernaum/static/pdfs/...')
    */
   pdfAbsolutePath: string;
   /**
-   * Relative path to PDF file (e.g., 'static/pdfs/abc.pdf')
+   * Relative path to PDF file (e.g., 'static/pdfs/...')
    */
   pdfRelativePath: string;
   responseSummary: WriteLetter_writeLetter_responseSummary | null;

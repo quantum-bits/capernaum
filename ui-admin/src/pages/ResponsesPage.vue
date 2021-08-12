@@ -157,6 +157,8 @@ import {
 } from "@/graphql/types/SurveyResponses";
 import Debug from "debug";
 import IconButton from "@/components/buttons/IconButton.vue";
+import { showReportInBrowser } from "@/helpers";
+
 const debug = Debug("cap:responses");
 
 interface Selection {
@@ -446,6 +448,7 @@ export default Vue.extend({
           if (response.data) {
             const writeLetter = response.data.writeLetter;
             this.showSnackbar(writeLetter.message);
+            showReportInBrowser();
             if (writeLetter.responseSummary) {
               this.letterWriterOutput = writeLetter;
             }
