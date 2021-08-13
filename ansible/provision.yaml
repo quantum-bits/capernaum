@@ -103,7 +103,7 @@
       git:
         repo: "{{ cap_repo }}"
         dest: "{{ cap_app_abs_dir }}"
-        version: master
+        version: production
 
     - name: create server .env file
       tags: dot-env
@@ -112,32 +112,48 @@
         dest: "{{ cap_server_abs_dir }}/.env"
         mode: 0400
 
-    - name: create ui .env file
+    - name: create ui-admin .env file
       tags: dot-env
       template:
-        src: templates/dot-env.ui
-        dest: "{{ cap_ui_abs_dir }}/.env"
+        src: templates/dot-env.ui-admin
+        dest: "{{ cap_ui_admin_abs_dir }}/.env"
         mode: 0400
 
-    - name: install node modules for user interface
+    - name: create ui-group .env file
+      tags: dot-env
+      template:
+        src: templates/dot-env.ui-group
+        dest: "{{ cap_ui_group_abs_dir }}/.env"
+        mode: 0400
+
+    - name: install node modules for ui-admin
       yarn:
-        path: "{{ cap_ui_abs_dir }}"
+        path: "{{ cap_ui_admin_abs_dir }}"
+
+    - name: install node modules for ui-group
+      yarn:
+        path: "{{ cap_ui_group_abs_dir }}"
 
     - name: install node modules for server
       yarn:
         path: "{{ cap_server_abs_dir }}"
 
-    - name: build production ui
+    - name: build ui-admin
       command:
-        chdir: "{{ cap_ui_abs_dir }}"
+        chdir: "{{ cap_ui_admin_abs_dir }}"
         cmd: yarn build
 
-    - name: build production reporter
+    - name: build ui-group
+      command:
+        chdir: "{{ cap_ui_group_abs_dir }}"
+        cmd: yarn build
+
+    - name: build reporter
       command:
         chdir: "{{ cap_server_abs_dir }}"
         cmd: yarn reporter:build
 
-    - name: build production server
+    - name: build server
       command:
         chdir: "{{ cap_server_abs_dir }}"
         cmd: yarn server:build

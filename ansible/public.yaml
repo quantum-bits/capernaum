@@ -1,6 +1,7 @@
 cap_repo: "https://github.com/quantum-bits/capernaum.git"
 
-cap_ui_abs_dir: "{{ cap_app_abs_dir }}/ui"
+cap_ui_admin_abs_dir: "{{ cap_app_abs_dir }}/ui-admin"
+cap_ui_group_abs_dir: "{{ cap_app_abs_dir }}/ui-group"
 cap_server_abs_dir: "{{ cap_app_abs_dir }}/server"
 cap_pm2_abs_dir: "{{ cap_app_abs_dir }}/pm2"
 
