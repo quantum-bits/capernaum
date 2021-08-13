@@ -22,7 +22,7 @@
 
     - name: configure node PPA
       apt_repository:
-        repo: deb https://deb.nodesource.com/node_12.x bionic main
+        repo: deb https://deb.nodesource.com/node_{{ node_version }}.x {{ codename }} main
         filename: nodesource
         state: present
 
@@ -43,18 +43,18 @@
         - tree
         - silversearcher-ag
         - multitail
+        - acl
 
 - name: provision capernaum
   hosts: all
   tags: capernaum
-  become: yes
-  become_user: "{{ cap_username }}"
   vars_files:
     - public.yaml
     - private.yaml
   tasks:
     - name: create capernaum user
       when: inventory_hostname not in groups.development
+      become: yes
       become_user: root
       user:
         name: "{{ cap_username }}"
@@ -62,6 +62,8 @@
         shell: /bin/bash
 
     - name: create directories
+      become: yes
+      become_user: "{{ cap_username }}"
       file:
         path: "{{ item }}"
         state: directory
