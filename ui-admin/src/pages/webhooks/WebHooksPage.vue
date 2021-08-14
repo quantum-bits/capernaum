@@ -2,7 +2,7 @@
   <v-container>
     <page-header title="Web Hooks">
       <v-col>
-        <h1 class="body-1">{{ organization.name }}</h1>
+        {{ organization.name }}
       </v-col>
     </page-header>
 
@@ -80,29 +80,29 @@ import {
 
 import URLParse from "url-parse";
 import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
-import WebHookCards from "@/components/WebHookCards.vue";
+import WebHookCards from "@/pages/webhooks/WebHookCards.vue";
 import {
   CategoryType,
   EnhancedSubscription,
   SubscriptionType,
 } from "@/types/qualtrics.types";
-import MachineCards from "@/components/MachineCards.vue";
+import MachineCards from "@/pages/webhooks/MachineCards.vue";
 import {
   ALL_MACHINES,
   CREATE_MACHINE,
   DELETE_MACHINE,
 } from "@/graphql/machine.graphql";
-import MachineDialog from "@/components/dialogs/MachineDialog.vue";
+import MachineDialog from "@/pages/webhooks/MachineDialog.vue";
 import { MachineCreateInput } from "@/graphql/types/globalTypes";
 import { AllMachines_machines as Machine } from "@/graphql/types/AllMachines";
 import { CreateMachine } from "@/graphql/types/CreateMachine";
 import { DeleteMachine } from "@/graphql/types/DeleteMachine";
-import SubscriptionDialog from "@/components/dialogs/SubscriptionDialog.vue";
+import SubscriptionDialog from "@/pages/webhooks/SubscriptionDialog.vue";
 import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
 import { CreateSubscription } from "@/graphql/types/CreateSubscription";
 import { QualtricsListSubscriptions_subscriptions as QualtricsSubscription } from "@/graphql/types/QualtricsListSubscriptions";
 import PageHeader from "@/pages/PageHeader.vue";
-import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
+import { AllCapernaumSurveys } from "@/graphql/types/AllCapernaumSurveys";
 
 type StringToStringMap = Map<string, string>;
 
@@ -128,9 +128,9 @@ export default Vue.extend({
 
     surveyNameById: {
       query: ALL_CAPERNAUM_SURVEYS,
-      update: (data: AllCapernaumSurveys_surveys[]) => {
+      update: (data: AllCapernaumSurveys) => {
         const nameById: StringToStringMap = new Map();
-        data.forEach((survey) =>
+        data.surveys.forEach((survey) =>
           nameById.set(survey.qualtricsId, survey.qualtricsName)
         );
         return nameById;
