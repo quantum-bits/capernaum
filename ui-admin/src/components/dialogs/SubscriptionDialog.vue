@@ -1,5 +1,10 @@
 <template>
-  <v-dialog persistent max-width="600">
+  <v-dialog
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
+    persistent
+    max-width="600"
+  >
     <v-card>
       <v-card-title class="headline">{{ dialogTitle }}</v-card-title>
       <v-form ref="theForm" v-model="formValid" lazy-validation>
@@ -29,7 +34,7 @@
             Cancel
           </v-btn>
 
-          <v-btn :disabled="!formValid" color="success" text @click="onSubmit">
+          <v-btn :disabled="!formValid" color="success" text @click="onSave">
             Submit
           </v-btn>
         </v-card-actions>
@@ -39,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { VueConstructor } from "vue";
 import { ALL_MACHINES } from "@/graphql/machine.graphql";
 import { AllMachines_machines } from "@/graphql/types/AllMachines";
 import { SubscriptionDialogResponse } from "@/components/dialogs/dialog.types";
@@ -52,12 +57,20 @@ interface StringStringChoice {
   value: string;
 }
 
-export default Vue.extend({
+type VueExt = Vue & {
+  $refs: {
+    theForm: {
+      resetValidation: () => boolean;
+    };
+  };
+};
+
+export default (Vue as VueConstructor<VueExt>).extend({
   name: "SubscriptionDialog",
 
   props: {
     dialogTitle: { type: String, required: true },
-    value: { type: Boolean, required: true, default: false },
+    value: { type: Boolean, required: true },
 
     hostName: { type: String, required: true },
     subscriptionType: { type: String, required: true },
@@ -129,14 +142,7 @@ export default Vue.extend({
           this.dialogState.hostName = this.hostName;
           this.dialogState.subscriptionType = this.subscriptionType;
           this.dialogState.surveyId = this.surveyId;
-
-          if (this.$refs.theForm) {
-            (
-              this.$refs.theForm as Vue & {
-                resetValidation: () => boolean;
-              }
-            ).resetValidation();
-          }
+          this.$refs.theForm.resetValidation();
         }
       },
       immediate: true,

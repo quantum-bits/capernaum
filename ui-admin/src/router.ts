@@ -70,7 +70,7 @@ const router = new VueRouter({
     {
       path: "/web-hooks",
       name: "web-hooks",
-      component: () => import("./pages/WebHooks.vue"),
+      component: () => import("./pages/WebHooksPage.vue"),
     },
     {
       // See https://router.vuejs.org/guide/essentials/history-mode.html#caveat

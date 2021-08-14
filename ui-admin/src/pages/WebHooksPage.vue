@@ -107,7 +107,7 @@ import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys
 type StringToStringMap = Map<string, string>;
 
 export default Vue.extend({
-  name: "WebHooks",
+  name: "WebHooksPage",
 
   components: {
     WebHookCards,
