@@ -299,7 +299,7 @@
                 ref="surveySelection"
               >
                 <v-radio
-                  v-for="survey of allSurveys"
+                  v-for="survey of surveys"
                   :key="survey.id"
                   :value="survey.id"
                   color="#4e2b4d"

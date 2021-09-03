@@ -21,7 +21,7 @@
                   </li>
                   <li>
                     <strong>Instructions</strong> that you can share with your
-                    group members about how get started with the survey.
+                    group members about how to get started with the survey.
                   </li>
                 </ol>
               </v-card-text>
