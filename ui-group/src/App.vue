@@ -21,6 +21,7 @@
           alt="Center for Scripture Engagement Logo"
           src="./assets/Cls+results+letter+banner+2+half+size.png"
           width="100%"
+          class="xs-img"
         />
         <v-main>
           <router-view />
@@ -49,7 +50,7 @@
   background-size: 100% 100%;
 }
 
-img {
+.xs-img {
   padding: 12px;
 }
 
