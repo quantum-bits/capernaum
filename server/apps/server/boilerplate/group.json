@@ -2,6 +2,7 @@
   "entity": {
     "name": "Group",
     "pk": "id",
+    "description": "Group of survey respondents",
     "attributes": [
       {
         "name": "name",

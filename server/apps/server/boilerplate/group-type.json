@@ -2,6 +2,7 @@
   "entity": {
     "name": "GroupType",
     "pk": "id",
+    "description": "Type of a group",
     "attributes": [
       {
         "name": "name",
