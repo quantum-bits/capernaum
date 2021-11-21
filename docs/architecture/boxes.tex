@@ -1,0 +1,26 @@
+\usepackage[many]{tcolorbox}
+
+% https://tex.stackexchange.com/questions/181082/how-to-reproduce-this-box-in-tcolorbox
+\newtcbox{\srcbox}{
+  enhanced,
+  nobeforeafter,
+  tcbox raise base,
+  boxrule=0.4pt,
+  top=0mm,
+  bottom=0mm,
+  right=0mm,
+  left=4mm,
+  arc=1pt,
+  boxsep=2pt,
+  before upper={\vphantom{dlg}},
+  colframe=teal!75!white,
+  coltext=teal!25!black,
+  colback=teal!5!white,
+  overlay={
+    \begin{tcbclipinterior}
+      \fill[teal!75!white] (frame.south west) rectangle node[text=white,font=\sffamily\bfseries\tiny,rotate=90] {SRC} ([xshift=4mm]frame.north west);
+    \end{tcbclipinterior}
+  }
+}
+
+\newtcolorbox{cbox}[1]{colback=teal!5!white,colframe=teal!75!white,title={#1}}
