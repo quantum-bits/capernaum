@@ -3,6 +3,7 @@
 \usepackage[colorlinks]{hyperref}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage[svgnames]{xcolor}
 
 \input{boxes}
 
@@ -175,7 +176,6 @@ of the \caper{} architecture.
 \label{sec:data-model}
 
 Figure~\ref{fig:erd} shows the entity-relationship diagram for \caper's \pg{} database.
-
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{data-model}
@@ -183,8 +183,100 @@ Figure~\ref{fig:erd} shows the entity-relationship diagram for \caper's \pg{} da
   \label{fig:erd}
 \end{figure}
 
-\subsection{Administrative Applications}
+\paragraph{\textcolor{Violet}{Surveys (violet)}}
+
+The \texttt{Survey} and \texttt{SurveyItem} tables
+capture the details of a single survey on \qual.
+Using identifiers provided by \qual,
+these tables allow \caper{} to perform the statistical analysis at the heart of each report letter.
+To support statistical analysis,
+\caper{} allows survey questions to be grouped into a category hierarchy.
+Each survey question (\texttt{SurveyItem})
+can be grouped into a \texttt{SurveyIndex},
+which can in turn be grouped into a \texttt{SurveyDimension}.
+\caper{} uses the latter entity to calculate aggregate attitudes
+toward characteristics measured by the survey instrument itself.
+
+\paragraph{\textcolor{Salmon}{Survey Responses (salmon)}}
+
+The \texttt{SurveyResponse}
+and \texttt{SurveyItemResponse}
+tables store the responses a single respondent
+makes to a survey.
+\texttt{SurveyResponse} is related to a survey
+and has one associated \texttt{SurveyItemResponse}
+for each \texttt{SurveyItem}.
+
+\paragraph{\textcolor{LightBlue}{Letters (light blue)}}
+
+Reports sent to survey respondents are called ``letters'' in the data model.
+Report content is entirely data driven and can be updated by a \caper's administrative user
+as desired for new surveys, new versions of a survey, or new report formats.
+
+Each \texttt{Letter} contains multiple
+instances of a \texttt{LetterElement}.
+A \texttt{LetterElement} has an associated type
+(e.g., boilerplate text,
+uploaded image,
+graph of analytical results).
+
+\caper{} can report results for individual survey respondents
+and can also aggregate results for people who identify as part of a group.
+The \texttt{LetterType} entity enforce this distinction
+and also partitions the types of letter elements,
+allowing the user interface to present only valid \emph{element} types
+for each \emph{letter} type.
+
+\paragraph{\textcolor{Goldenrod}{Groups (gold)}}
+
+Survey respondents can indicate membership in a group of respondents
+(e.g., members of a church, students in a course).
+Each \texttt{Group} entity stores the detail of one group
+and will be associated with a \texttt{SurveyResponse}
+when the respondent enters his or her group code
+prior to taking the survey.
+
+\paragraph{\textcolor{LightGreen}{Users (green)}}
+
+Because only a few administrative users have a need to log into \caper{} itself,
+its user management is quite modest.
+There is a many-to-many relationship between \texttt{User} and \texttt{User Role},
+allowing for conventional role-based access control.
+
+A \texttt{User} authenticates with an email address and password.
+Passwords are stored in encrypted form in the database.
+One a user logs in,
+access is granted using a
+\href{https://jwt.io/}{JSON Web Token}
+that enumerates each \texttt{UserRole} for which the \texttt{User} is authorized.
+
+\texttt{UserRole} data are employed to control access to views
+in the administrative application in the browser
+as well as \gql{} and \rest{} API access on the server.
+
+\subsection{Administrative Application}
 \label{sec:admin-applications}
+
+\caper{} includes a \vue{}- and \vuetify{}-based
+``single-page''
+administrative web app.
+The principal user of the admin app
+is a person tasked with using \caper{}
+to analyze and report on \qual{} surveys.
+It allows such a user to:
+\begin{enumerate}
+\item Download the details of a survey from \qual{},
+  either for the first time or to update \caper{} after a change is made to the survey on \qual.
+\item Create or edit a report (``letter'') to be associated with a survey.
+  The app provides a convenient drag-and-drop interface
+  that allows the user to add, remove, and rearrange the various type of
+  letter elements to be included in the report sent to survey respondents.
+\item Upload and curate images to be used in report letters.
+\item View searchable data about survey responses gathered from \qual.
+\item Manually trigger the creation and delivery of a report for a survey respondent
+  for purposes of debugging or verification.
+  
+\end{enumerate}
 
 \subsection{Registration Application}
 \label{sec:group-application}
@@ -209,4 +301,6 @@ The \ghsrc{ansible/provision.yaml}{provisioning file} contains commands for \gh{
 %%% TeX-master: t
 %%% End:
 
-% LocalWords:  Ansible ansible Qualtrics nd lr
+% LocalWords:  Ansible ansible Qualtrics nd lr SurveyItem SurveyIndex
+% LocalWords:  SurveyDimension SurveyResponse SurveyItemResponse LightBlue
+% LocalWords:  LetterElement LetterType
