@@ -8,6 +8,7 @@
 
 \newcommand{\ghsrc}[2]{\href{https://github.com/quantum-bits/capernaum/blob/development/#1}{#2}}
 
+\newcommand{\axios}{\textsc{Axios}}
 \newcommand{\bull}{\textsc{Bull}}
 \newcommand{\caper}{\textsc{Capernaum}}
 \newcommand{\cfse}{\textsc{C4se}}
@@ -61,14 +62,15 @@ key features of the \caper{} architecture.
 
 \begin{figure}
   \centering
-  \begin{cbox}{Key features of \caper}
+  \begin{cbox}{Key Architectural Features}
     \begin{enumerate}
     \item Administrative and registration apps implemented using
       the \href{https://vuejs.org/}{\vue{}} framework and
       the \href{https://vuetifyjs.com/}{\vuetify} UI toolkit.
     \item Server software uses
-      \href{https://nestjs.com/}{\nest} server-side framework
-      running on \href{https://nodejs.org/}{\node}.
+      the \href{https://nodejs.org/}{\node}-based
+      server-side framework
+      \href{https://nestjs.com/}{\nest}.
     \item Implemented entirely in \href{https://www.typescriptlang.org/}{\ts}.
     \item \href{https://graphql.org/}{\gql{}} API
       federates access to both relational data and an external \rest{} API.
@@ -81,8 +83,8 @@ key features of the \caper{} architecture.
     \item Command line interface (\cli) for administration, fixture loading, and testing.
     \item Production performance monitoring using \href{https://prometheus.io/}{\prometheus}.
       Reporting and visualization via \href{https://grafana.com/grafana/}{\grafana}.
-    \item Data persistence uses
-      \href{https://typeorm.io/}{\typeorm} object-relational mapper
+    \item Data persistence uses the
+      \href{https://typeorm.io/}{\typeorm} object-relational mapper,
       backed by a 
       \href{https://www.postgresql.org/}{\pg{}} relational database.
     \item Report generation using \href{https://www.latex-project.org/}{\LaTeX} for typesetting
@@ -90,8 +92,9 @@ key features of the \caper{} architecture.
       Reports delivered to survey respondents using \href{https://nodemailer.com/}{\nodemailer}.
     \item Integrated with
       \href{https://www.qualtrics.com/}{\qual} survey platform
-      using inbound web hooks and
-      \href{https://api.qualtrics.com/}{\rest{} API}.
+      using inbound web hooks and the \qual{}
+      \href{https://api.qualtrics.com/}{\rest{} API},
+      which is accessed using \href{https://axios-http.com/}{\axios}.
     \item Fully open source on \href{https://github.com/quantum-bits/capernaum.git}{\gh}.
     \end{enumerate}
   \end{cbox}
@@ -142,7 +145,7 @@ In October, 2021, it was the
 Although only a fraction of Bible Gateway users take the \cls,
 the potential user volume is a key factor in the design of \caper.
 In particular, \caper{} employs a distributed job queuing system
-for analysis and production of survey analyses,
+for survey analysis and report production,
 designed to scale to handle 2,000 survey responses per minute.
 This requirement is based on the \cfse{}'s
 expectation that usage will grow significantly as Bible Gateway
@@ -153,6 +156,12 @@ is Dr.\ Tom Nurkkala (\tu{} Computer Science \& Engineering).
 Dr. Ken Kiers (\tu{} Physics)
 designed and implemented the user interface.
 
+\section{Architecture}
+\label{sec:architecture}
+
+Figure~\ref{fig:block-diagram}
+presents a block diagram
+of the \caper{} architecture.
 
 \begin{figure}
   \centering
@@ -162,8 +171,31 @@ designed and implemented the user interface.
   \label{fig:block-diagram}
 \end{figure}
 
+\subsection{Data Model}
+\label{sec:data-model}
 
-\section{Deployment}
+Figure~\ref{fig:erd} shows the entity-relationship diagram for \caper's \pg{} database.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{data-model}
+  \caption{Entity-relationship diagram for \caper.}
+  \label{fig:erd}
+\end{figure}
+
+\subsection{Administrative Applications}
+\label{sec:admin-applications}
+
+\subsection{Registration Application}
+\label{sec:group-application}
+
+\subsection{Application Server}
+\label{sec:application-server}
+
+\subsection{Reporting Server}
+\label{sec:reporting-server}
+
+\subsection{Deployment}
 \label{sec:deployment}
 
 \caper{} employs a fully-automated deployment
