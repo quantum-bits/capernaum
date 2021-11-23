@@ -7,32 +7,46 @@
 
 \input{boxes}
 
-\newcommand{\ghsrc}[2]{\href{https://github.com/quantum-bits/capernaum/blob/development/#1}{#2}}
+% GitHub links
+\newcommand{\ghtag}{9f6bf064539bf10283353d70d2495de02675d815}
+\newcommand{\ghurl}{https://github.com/quantum-bits/capernaum/blob/\ghtag}
+\newcommand{\ghsrc}[2]{
+  \begin{tcolorbox}
+    #1 (\href{\ghurl/#2}{\texttt{#2}})
+  \end{tcolorbox}
+}
 
-\newcommand{\axios}{\textsc{Axios}}
-\newcommand{\bull}{\textsc{Bull}}
+% Names for things
 \newcommand{\caper}{\textsc{Capernaum}}
-\newcommand{\cfse}{\textsc{C4se}}
 \newcommand{\cli}{\textsc{Cli}}
-\newcommand{\cls}{\textsc{Cls}}
 \newcommand{\gh}{\textsc{GitHub}}
-\newcommand{\gql}{\textsc{GraphQL}}
-\newcommand{\grafana}{\textsc{Grafana}}
-\newcommand{\nest}{\textsc{Nest}}
-\newcommand{\nodemailer}{\textsc{Node\-mailer}}
-\newcommand{\node}{\textsc{Node}}
-\newcommand{\pg}{\textsc{PostgreSQL}}
-\newcommand{\prometheus}{\textsc{Prometheus}}
-\newcommand{\redis}{\textsc{Redis}}
 \newcommand{\rest}{\textsc{Rest}ful}
-\newcommand{\sio}{\textsc{Socket.IO}}
-\newcommand{\ts}{\textsc{TypeScript}}
-\newcommand{\tu}{TU}
-\newcommand{\typeorm}{\textsc{TypeORM}}
-\newcommand{\vega}{\textsc{Vega-Lite}}
-\newcommand{\vuetify}{\textsc{Vuetify}}
-\newcommand{\vue}{\textsc{Vue}}
-\newcommand{\qual}{\textsc{Qualtrics}}
+
+% Named URLs
+\newcommand{\ansible}{\href{https://www.ansible.com/}{\textsc{Ansible}}}
+\newcommand{\apollo}{\href{https://www.apollographql.com/}{\textsc{Apollo}}}
+\newcommand{\axios}{\href{https://axios-http.com/}{\textsc{Axios}}}
+\newcommand{\bg}{\href{https://www.biblegateway.com/}{Bible Gateway}}
+\newcommand{\bull}{\href{https://www.npmjs.com/package/bull}{\textsc{Bull}}}
+\newcommand{\cfse}{\href{https://www.taylor.edu/center-for-scripture-engagement/}{\textsc{C4se}}}
+\newcommand{\cls}{\href{https://www.taylor.edu/center-for-scripture-engagement/survey/}{\textsc{Cls}}}
+\newcommand{\gql}{\href{https://graphql.org/}{\textsc{GraphQL}}}
+\newcommand{\grafana}{\href{https://grafana.com/grafana/}{\textsc{Grafana}}}
+\newcommand{\jwt}{\href{https://jwt.io/}{\textsc{Jwt}}}
+\newcommand{\nest}{\href{https://nestjs.com/}{\textsc{Nest}}}
+\newcommand{\nodemailer}{\href{https://nodemailer.com/}{\textsc{Node\-mailer}}}
+\newcommand{\node}{\href{https://nodejs.org/}{\textsc{Node}}}
+\newcommand{\pg}{\href{https://www.postgresql.org/}{\textsc{PostgreSQL}}}
+\newcommand{\prometheus}{\href{https://prometheus.io/}{\textsc{Prometheus}}}
+\newcommand{\qual}{\href{https://www.qualtrics.com/}{\textsc{Qualtrics}}}
+\newcommand{\redis}{\href{https://redis.io/}{\textsc{Redis}}}
+\newcommand{\sio}{\href{https://socket.io/}{\textsc{Socket.IO}}}
+\newcommand{\ts}{\href{https://www.typescriptlang.org/}{\textsc{TypeScript}}}
+\newcommand{\tu}{\href{https://www.taylor.edu/}{TU}}
+\newcommand{\typeorm}{\href{https://typeorm.io/}{\textsc{TypeORM}}}
+\newcommand{\vega}{\href{https://vega.github.io/vega-lite/}{\textsc{Vega-Lite}}}
+\newcommand{\vuetify}{\href{https://vuetifyjs.com/}{\textsc{Vuetify}}}
+\newcommand{\vue}{\href{https://vuejs.org/}{\textsc{Vue}}}
 
 \title{\caper{} Architecture}
 \author{Dr.\ Tom Nurkkala}
@@ -40,17 +54,23 @@
 \begin{document}
 \maketitle
 
+\begin{abstract}
+  It's \caper!
+\end{abstract}
+
+\tableofcontents
+
 \section{Introduction}
 \label{sec:introduction}
 
 \caper{} is a web-based system
-that gathers responses to designated surveys taken at \href{https://www.qualtrics.com/}{\qual}.
+that gathers responses to designated surveys taken at {\qual}.
 When notified of a completed survey by a \qual{} web hook,
 \caper{}
 downloads the survey response
-to its \href{https://www.postgresql.org/}{\pg{}} relational database
+to its \pg{} relational database
 using the
-\href{https://api.qualtrics.com/}{\qual{} \rest{} API}.
+\qual{} \href{https://api.qualtrics.com/}{\rest{} API}.
 \caper{} then
 analyzes the response and
 prepares a personalized analysis for the respondent:
@@ -66,36 +86,35 @@ key features of the \caper{} architecture.
   \begin{cbox}{Key Architectural Features}
     \begin{enumerate}
     \item Administrative and registration apps implemented using
-      the \href{https://vuejs.org/}{\vue{}} framework and
-      the \href{https://vuetifyjs.com/}{\vuetify} UI toolkit.
+      the \vue{} framework and
+      the \vuetify UI toolkit.
     \item Server software uses
-      the \href{https://nodejs.org/}{\node}-based
-      server-side framework
-      \href{https://nestjs.com/}{\nest}.
-    \item Implemented entirely in \href{https://www.typescriptlang.org/}{\ts}.
-    \item \href{https://graphql.org/}{\gql{}} API
+      the \node-based
+      server-side framework \nest.
+    \item Implemented entirely in \ts}.
+    \item \gql{}} API
       federates access to both relational data and an external \rest{} API.
-      Uses \href{https://www.apollographql.com/}{Apollo \gql}.
+      Uses \apollo{} \gql.
     \item Push notification to administrative application
-      using \href{https://socket.io/}{\sio}.
+      using \sio.
     \item Distributed job queuing system
-      using \href{https://www.npmjs.com/package/bull}{\bull}
-      and \href{https://redis.io/}{\redis}.
+      using \bull{}
+      and \redis.
     \item Command line interface (\cli) for administration, fixture loading, and testing.
-    \item Production performance monitoring using \href{https://prometheus.io/}{\prometheus}.
-      Reporting and visualization via \href{https://grafana.com/grafana/}{\grafana}.
+    \item Production performance monitoring using \prometheus.
+      Reporting and visualization via \grafana.
     \item Data persistence uses the
-      \href{https://typeorm.io/}{\typeorm} object-relational mapper,
+      \typeorm{} object-relational mapper,
       backed by a 
-      \href{https://www.postgresql.org/}{\pg{}} relational database.
+      \pg{} relational database.
     \item Report generation using \href{https://www.latex-project.org/}{\LaTeX} for typesetting
-      and \href{https://vega.github.io/vega-lite/}{\vega} to render charts.
-      Reports delivered to survey respondents using \href{https://nodemailer.com/}{\nodemailer}.
+      and \vega{} to render charts.
+      Reports delivered to survey respondents using \nodemailer.
     \item Integrated with
-      \href{https://www.qualtrics.com/}{\qual} survey platform
+      \qual{} survey platform
       using inbound web hooks and the \qual{}
       \href{https://api.qualtrics.com/}{\rest{} API},
-      which is accessed using \href{https://axios-http.com/}{\axios}.
+      which is accessed using \axios.
     \item Fully open source on \href{https://github.com/quantum-bits/capernaum.git}{\gh}.
     \end{enumerate}
   \end{cbox}
@@ -105,12 +124,12 @@ key features of the \caper{} architecture.
 
 The main customer for \caper{}
 is the
-\href{https://www.taylor.edu/center-for-scripture-engagement/}{Center for Scripture Engagement}
+Center for Scripture Engagement
 (\cfse)
-at \href{https://www.taylor.edu/}{Taylor University} (\tu).
+at Taylor University (\tu).
 As part of a faith-based institution,
 the \cfse{} publishes the
-\href{https://www.taylor.edu/center-for-scripture-engagement/survey/}{Christian Life Survey}
+Christian Life Survey
 (\cls)
 at \qual.
 \caper{} provides automated analysis and reporting on survey results
@@ -138,24 +157,19 @@ Refer to Table~\ref{tab:caper-stats} for additional statistics about \caper.
 \end{table}
 
 Traffic to the \cls{} is driven primarily by a partnership between \cfse{} and
-\href{https://www.biblegateway.com/}{Bible Gateway}.
-Bible Gateway is one of the top-three most-visited Christian web sites on the Internet.
+\bg.
+\bg{} is one of the top-three most-visited Christian web sites on the Internet.
 In October, 2021, it was the
 \href{https://www.similarweb.com/website/biblegateway.com/}{632-nd most visited site in the world,
   with 80~million visits}.
-Although only a fraction of Bible Gateway users take the \cls,
+Although only a fraction of \bg{} users take the \cls,
 the potential user volume is a key factor in the design of \caper.
 In particular, \caper{} employs a distributed job queuing system
 for survey analysis and report production,
 designed to scale to handle 2,000 survey responses per minute.
 This requirement is based on the \cfse{}'s
-expectation that usage will grow significantly as Bible Gateway
+expectation that usage will grow significantly as \bg{}
 begins actively promoting the \cls{} as planned.
-
-\caper's architect and principal developer
-is Dr.\ Tom Nurkkala (\tu{} Computer Science \& Engineering).
-Dr. Ken Kiers (\tu{} Physics)
-designed and implemented the user interface.
 
 \section{Architecture}
 \label{sec:architecture}
@@ -163,7 +177,6 @@ designed and implemented the user interface.
 Figure~\ref{fig:block-diagram}
 presents a block diagram
 of the \caper{} architecture.
-
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{block-diagram}
@@ -172,8 +185,93 @@ of the \caper{} architecture.
   \label{fig:block-diagram}
 \end{figure}
 
-\subsection{Data Model}
-\label{sec:data-model}
+\subsection{Servers}
+\label{sec:servers}
+
+\subsubsection{Application Server}
+\label{sec:application-server}
+
+\subsubsection{Reporting Server}
+\label{sec:reporting-server}
+
+\subsection{Web Applications}
+\label{sec:web-apps}
+
+\subsubsection{Administrative Application}
+\label{sec:admin-app}
+
+\caper{} includes a \vue{}- and \vuetify{}-based
+``single-page''
+administrative web app.
+The principal user of the admin app
+is a person tasked with using \caper{}
+to analyze and report on \qual{} surveys.
+It allows such a user to:
+\begin{enumerate}
+\item Download the details of a survey from \qual{},
+  either for the first time or to update \caper{} after a change is made to the survey on \qual.
+\item Create or edit a report (``letter'') to be associated with a survey.
+  The app provides a convenient drag-and-drop interface
+  that allows the user to add, remove, and rearrange the various type of
+  letter elements to be included in the report sent to survey respondents.
+\item Upload and curate images to be used in report letters.
+\item View searchable data about survey responses gathered from \qual.
+\item Manually trigger the creation and delivery of a report for a survey respondent
+  for purposes of debugging or verification.
+\end{enumerate}
+
+\subsubsection{Registration Application}
+\label{sec:group-app}
+
+\section{Data Model}
+\label{sec:data-model-overview}
+
+Figure~\ref{fig:summary-data-model}
+shows an overview of the \caper{} data model.
+A detailed model appears in Appendix~\ref{sec:detailed-data-model}.
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{data-model-overview}
+  \caption{Summary data model for \caper.}
+  \label{fig:summary-data-model}
+\end{figure}
+Related tables are grouped by color
+and serve the following purposes.
+\begin{description}
+\item[\textcolor{Violet}{Surveys (violet)}]
+  The \texttt{Survey} and \texttt{SurveyItem} tables
+  capture the details of a single survey on \qual.
+\item[\textcolor{Salmon}{Survey Responses (salmon)}]
+  The \texttt{SurveyResponse}
+  and \texttt{SurveyItemResponse}
+  tables store the responses a single respondent
+  makes to a survey.
+\item[\textcolor{LightBlue}{Letters (light blue)}]
+  Reports sent to survey respondents are called ``letters'' in the data model.
+  Report content is entirely data driven and can be updated by a \caper's administrative user
+  as desired for new surveys, new versions of a survey, or new report formats.
+\item[\textcolor{Goldenrod}{Groups (gold)}]
+  Survey respondents be members of a group of respondents
+\item[\textcolor{LightGreen}{Users (green)}]
+  Only administrative users need to log into \caper{} itself.
+  It implements simple role-based security.
+\end{description}
+
+\section{Command-Line Interface}
+\label{sec:cli}
+
+\section{Dev Ops}
+\label{sec:deployment}
+
+\caper{} employs a fully-automated deployment
+using \ansible.
+The provisioning file contains commands for \gh{}, OS updates, etc.
+\ghsrc{Ansible provisioning file}{ansible/provision.yaml}
+
+\appendix
+
+\section{Detailed Data Model}
+\label{sec:detailed-data-model}
 
 Figure~\ref{fig:erd} shows the entity-relationship diagram for \caper's \pg{} database.
 \begin{figure}
@@ -247,52 +345,13 @@ A \texttt{User} authenticates with an email address and password.
 Passwords are stored in encrypted form in the database.
 One a user logs in,
 access is granted using a
-\href{https://jwt.io/}{JSON Web Token}
+JSON Web Token (\jwt)
 that enumerates each \texttt{UserRole} for which the \texttt{User} is authorized.
 
 \texttt{UserRole} data are employed to control access to views
 in the administrative application in the browser
 as well as \gql{} and \rest{} API access on the server.
 
-\subsection{Administrative Application}
-\label{sec:admin-applications}
-
-\caper{} includes a \vue{}- and \vuetify{}-based
-``single-page''
-administrative web app.
-The principal user of the admin app
-is a person tasked with using \caper{}
-to analyze and report on \qual{} surveys.
-It allows such a user to:
-\begin{enumerate}
-\item Download the details of a survey from \qual{},
-  either for the first time or to update \caper{} after a change is made to the survey on \qual.
-\item Create or edit a report (``letter'') to be associated with a survey.
-  The app provides a convenient drag-and-drop interface
-  that allows the user to add, remove, and rearrange the various type of
-  letter elements to be included in the report sent to survey respondents.
-\item Upload and curate images to be used in report letters.
-\item View searchable data about survey responses gathered from \qual.
-\item Manually trigger the creation and delivery of a report for a survey respondent
-  for purposes of debugging or verification.
-  
-\end{enumerate}
-
-\subsection{Registration Application}
-\label{sec:group-application}
-
-\subsection{Application Server}
-\label{sec:application-server}
-
-\subsection{Reporting Server}
-\label{sec:reporting-server}
-
-\subsection{Deployment}
-\label{sec:deployment}
-
-\caper{} employs a fully-automated deployment
-using \href{https://www.ansible.com/}{Ansible}.
-The \ghsrc{ansible/provision.yaml}{provisioning file} contains commands for \gh{}, OS updates, etc.
 
 \end{document}
 
@@ -301,6 +360,6 @@ The \ghsrc{ansible/provision.yaml}{provisioning file} contains commands for \gh{
 %%% TeX-master: t
 %%% End:
 
-% LocalWords:  Ansible ansible Qualtrics nd lr SurveyItem SurveyIndex
+% LocalWords:  Ansible Qualtrics nd lr SurveyItem SurveyIndex UserRole
 % LocalWords:  SurveyDimension SurveyResponse SurveyItemResponse LightBlue
-% LocalWords:  LetterElement LetterType
+% LocalWords:  LetterElement LetterType LightGreen
