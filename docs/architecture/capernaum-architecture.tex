@@ -71,6 +71,11 @@ key features of the \caper{} architecture.
     \item Report generation using \href{https://www.latex-project.org/}{\LaTeX} for typesetting
       and \vega{} to render charts.
       Reports delivered to survey respondents using \nodemailer.
+    \item Template-based notifications using \handlebars.
+    \item Front end \nginx{} reverse proxy server.
+    \item Run-time processes managed by \pmtwo.
+    \item Configuration details stored environment variables
+      using \dotenv.
     \item Integrated with
       \qual{} survey platform
       using inbound web hooks and the \qual{}
@@ -254,9 +259,9 @@ The application server
 uses the \texttt{QualtricsApiService}
 for a variety of tasks, including these.
 \begin{enumerate}
-\item Retrieve surveys
-\item Retrieve survey results
-\item Establish and update \qual{} web hook endpoints
+\item Retrieve surveys.
+\item Retrieve survey results.
+\item Establish and update \qual{} web hook endpoints.
 \end{enumerate}
 \ghsrc{Import a Survey}{
   As an example of the use of the API service,
@@ -265,6 +270,23 @@ for a variety of tasks, including these.
   (including all questions and available responses)
   into \caper{} for use in report generation.
 }{server/apps/server/src/qualtrics/qualtrics.service.ts}{34}
+
+Survey respondents can sign up to be part of a group,
+which allows \caper{}
+not only to report on individual survey responses
+but also to aggregate group members' responses.
+After a time limit for individual responses expires,
+\caper{}
+constructs a group report
+and emails it to the administrator of the group.
+
+\ghsrc{Maintain a Group}{
+  The \texttt{GroupService}
+  provides a \gql{} API
+  that supports various group operations,
+  including group maintenance
+  and reporting.
+}{server/apps/server/src/group/group.service.ts}{43}
 
 Although the majority of \caper{}'s API surface
 is based on \gql{},
@@ -343,29 +365,65 @@ Each time the \texttt{cron} timer expires, \caper{} generates group reports.
 }{server/apps/reporter/src/report/report.service.ts}{116}
 
 Both individual and group reports are generated
-using \LaTeX{} and \vega{}.
+using \LaTeX{} and \vega{} to construct an attractive PDF.
 
 \caper uses \vega{} to create charts based on survey response data
 and writes those files to disk.
 
-\ghsrc{Create Graphs using \vega}{}{}{}
+\ghsrc{Create Graphs using \vega}{
+  Consistent with the
+  dependency injection architecture
+  used throughout \caper,
+  we define \texttt{VisualizationService} as an injectable service.
+  Each method constructs a \vega{} configuration
+  object and then invokes
+  the \texttt{makeChart} helper function
+  that renders the visualization to a PDF file.
+}{server/apps/server/src/visualization/visualization.service.ts}{8}
 
 \caper{} writes \LaTeX{} sources
 based on letter elements stored in the database
 (created by the administrative user using the
-\hyperref[sec:admin-app]{administrative application}).
+\hyperref[sec:admin-app]{administration app}).
 The generated \LaTeX{} includes
 directives to embed the charts previously created.
 
-\ghsrc{Create \LaTeX{} Source}{}{}{}
+\ghsrc{Create \LaTeX{} Source}{
+  The \texttt{WriterService}
+  includes a \texttt{render} method
+  for each type of report element supported by \caper.
+  The \texttt{renderAllElements} method
+  iterates over letter elements retrieved from the database
+  and invokes an element-specific method to generate a \LaTeX{} snippet.
+  \caper collects these snippets
+  into a single \LaTeX{} source file.
+}{server/apps/server/src/writer/writer.service.ts}{188}
 
 Finally, the reporting server
 runs \LaTeX{} itself to produce a high-quality PDF
 that is then sent to the respondent by email.
 
-\ghsrc{Compile \LaTeX{} Source into a PDF}{}{}{}
+\ghsrc{Compile \LaTeX{} Source into a PDF}{
+  This method writes the render \LaTeX{} source into a file
+  that's then processed by invoking \texttt{latex}.
+}{server/apps/server/src/writer/writer.service.ts}{567}
 
-\ghsrc{Email a PDF Report to Respondent}{}{}{}
+After constructing the PDF version of the report,
+\caper{} sends it by email
+to the survey respondent.
+
+\ghsrc{Email a PDF Report to Respondent}{
+  Construct an email that includes:
+  \begin{enumerate}
+  \item A greeting message
+    written by the administrative user.
+    \caper{} sends both an HTML and plain text version
+    of the greeting message
+    using MIME encoding.
+  \item
+    The PDF report as an attachment.
+  \end{enumerate}
+}{server/apps/server/src/mail/mail.service.ts}{12}
 
 \subsection{Web Applications}
 \label{sec:web-apps}
@@ -392,7 +450,6 @@ It allows such a user to:
 \item Manually trigger the creation and delivery of a report for a survey respondent
   for purposes of debugging or verification.
 \end{enumerate}
-
 
 \subsubsection{Registration Application}
 \label{sec:group-app}
@@ -435,14 +492,74 @@ and serve the following purposes.
 \label{sec:cli}
 
 \section{Dev Ops}
+\label{sec:dev-ops}
+
+\caper{} is deployed on virtual servers
+managed by Taylor University (\tu) Campus~IT.
+
+\subsection{Configuration Management}
+\label{sec:conf-management}
+
+All run-time configuration is provided to \caper{} servers
+as environment variables accessed
+through the \node{} \texttt{process} object.
+\caper{}
+uses the \dotenv{} module,
+which loads environment variables
+from \texttt{.env} files at run time.
+These \texttt{.env} files are constructed
+as part of \hyperref[sec:deployment]{deployment and provisioning}.
+
+\ghsrc{Define \emph{.env} File}{
+  This \ansible{} template
+  supplies the layout of the \texttt{.env} file
+  used to configure the \hyperref[sec:application-server]{application server}.
+}{ansible/templates/dot-env.server}{1}
+
+\subsection{Deployment and Provisioning}
 \label{sec:deployment}
 
 \caper{} employs a fully-automated deployment
-using \ansible.
-The provisioning file contains commands for \gh{}, OS updates, etc.
-\ghsrc{Ansible Provisioning}{
-  Ansible provisioning for full \caper{} deployment to Linux.
+using \ansible,
+which orchestrates a full \caper{} deployment to Linux,
+including:
+\begin{enumerate}
+\item Add personal package archives (PPA's) to a vanilly Ubuntu load.
+\item Install Linux packages using \texttt{apt}.
+\item Create and configure a \texttt{capernaum} user with minimal permissions.
+\item Provision \pg.
+\item Clone the \caper{} source code from \gh.
+\item Create \texttt{.env} files containing run-time configuration details.
+\item Install \node{} modules required by all servers and apps.
+\item Build all of \caper.
+\item Provision the \pmtwo{} process manager.
+\item Using \pmtwo, start the \caper{} \hyperref[sec:servers]{server processes}.
+\item Provision \nginx.
+\item Launch \nginx.
+\end{enumerate}
+\ghsrc{Provision using \ansible}{
+  Complete YAML provisioning file.
 }{ansible/provision.yaml}{1}
+
+\subsection{Monitoring}
+\label{sec:monitoring}
+
+\ghsrc{Configure \prometheus}{
+}{server/apps/reporter/src/app.module.ts}{21}
+
+\subsection{Process Management}
+\label{sec:process-management}
+
+With only a few server processes to manage,
+\caper{} uses the \pmtwo
+package for process control,
+failover,
+restart,
+and logging.
+
+\ghsrc{Configure \pmtwo}{
+  Configure the application and reporting servers.
+}{ansible/templates/ecosystem.config.js}{1}
 
 \appendix
 
