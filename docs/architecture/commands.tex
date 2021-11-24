@@ -1,10 +1,16 @@
 % GitHub links
-\newcommand{\ghtag}{9f6bf064539bf10283353d70d2495de02675d815}
+\newcommand{\ghtag}{arch-doc}
 \newcommand{\ghurl}{https://github.com/quantum-bits/capernaum/blob/\ghtag}
-\newcommand{\ghsrc}[2]{
-  \begin{codebox}
-    #1 (\href{\ghurl/#2}{\texttt{#2}})
-  \end{codebox}
+\newcommand{\ghsrc}[4]{
+  \begin{tcolorbox}[
+    skin=enhanced,
+    after title={\hfill\textsf{source link}},
+    colback=teal!5!white,
+    colframe=teal!75!white,
+    hyperurl=\ghurl/#3\#L#4,
+    title={#1}]
+    #2
+  \end{tcolorbox}
 }
 
 % Names for things
@@ -34,7 +40,7 @@
 \newcommand{\sio}{\href{https://socket.io/}{\textsc{Socket.IO}}}
 \newcommand{\ts}{\href{https://www.typescriptlang.org/}{\textsc{TypeScript}}}
 \newcommand{\tu}{\href{https://www.taylor.edu/}{TU}}
-\newcommand{\typeorm}{\href{https://typeorm.io/}{\textsc{TypeORM}}}
+\newcommand{\typeorm}{\href{https://typeorm.io/}{\textsc{TypeOrm}}}
 \newcommand{\vega}{\href{https://vega.github.io/vega-lite/}{\textsc{Vega-Lite}}}
 \newcommand{\vuetify}{\href{https://vuetifyjs.com/}{\textsc{Vuetify}}}
 \newcommand{\vue}{\href{https://vuejs.org/}{\textsc{Vue}}}
@@ -42,3 +48,6 @@
 %%% Local Variables:
 %%% mode: latex
 %%% End:
+
+% LocalWords:  Capernaum Cli ful Ansible Axios se Cls GraphQL Grafana Jwt
+% LocalWords:  Qualtrics TypeORM Vuetify

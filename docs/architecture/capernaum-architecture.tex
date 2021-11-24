@@ -6,7 +6,6 @@
 \usepackage[svgnames]{xcolor}
 
 \input{boxes}
-
 \input{commands}
 
 \title{\caper{} Architecture}
@@ -42,13 +41,22 @@ emails the PDF to the survey respondent.
 Figure~\ref{fig:features} highlights additional
 key features of the \caper{} architecture.
 
+This document includes
+links to the \caper{} source code
+formatted like this:
+\ghsrc{Source Code Link}{
+  This is a link to the \caper{}
+  source repository on \gh.
+  Click anywhere on the box to access the source code.
+}{README.md}{1}
+
 \begin{figure}
   \centering
   \begin{featurebox}{Key Architectural Features}
     \begin{enumerate}
     \item Administrative and registration apps implemented using
       the \vue{} framework and
-      the \vuetify UI toolkit.
+      the \vuetify{} UI toolkit.
     \item Server software uses
       the \node-based
       server-side framework \nest.
@@ -149,6 +157,35 @@ of the \caper{} architecture.
 \subsection{Servers}
 \label{sec:servers}
 
+\caper{} employs two server processes,
+an \hyperref[sec:application-server]{application server},
+which provides the majority of \caper{} administrative functionality,
+and a \hyperref[sec:reporting-server]{reporting server},
+which generates reports and emails them to survey respondents.
+The two processes communicate via \bull{} job queue
+which uses \redis{} publish-subscribe for interprocess communication.
+The two-server design allows multiple reporting servers to be spun up
+to handle increased demand as usage scales up.
+
+Both servers are built atop the \nest{} application framework for \node.
+\nest{} integrates many best-of-breed services and packages
+in a coherent and performant
+\href{https://www.martinfowler.com/articles/injection.html}{dependency-injection}
+framework.
+\caper{} employs \nest{}
+to support
+\gql{} API,
+\typeorm{} object-relational mapping,
+\pg{} database access and schema migration,
+\bull{} job queuing,
+\qual{} web hooks,
+\sio{} push notifications,
+and \jwt-based access control.
+These represent just a small fraction of the capabilities available in \nest.
+\ghsrc{Dependency Injection}{
+  Injecting a repository into a database service.
+}{server/apps/server/src/survey/services/survey.service.ts}{19}
+
 \subsubsection{Application Server}
 \label{sec:application-server}
 
@@ -180,6 +217,7 @@ It allows such a user to:
 \item Manually trigger the creation and delivery of a report for a survey respondent
   for purposes of debugging or verification.
 \end{enumerate}
+
 
 \subsubsection{Registration Application}
 \label{sec:group-app}
@@ -227,7 +265,9 @@ and serve the following purposes.
 \caper{} employs a fully-automated deployment
 using \ansible.
 The provisioning file contains commands for \gh{}, OS updates, etc.
-\ghsrc{Ansible provisioning file}{ansible/provision.yaml}
+\ghsrc{Ansible Provisioning}{
+  Ansible provisioning for full \caper{} deployment to Linux.
+}{ansible/provision.yaml}{1}
 
 \appendix
 
