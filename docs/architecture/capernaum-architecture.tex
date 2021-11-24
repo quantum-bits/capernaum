@@ -41,15 +41,6 @@ emails the PDF to the survey respondent.
 Figure~\ref{fig:features} highlights additional
 key features of the \caper{} architecture.
 
-This document includes
-links to the \caper{} source code
-formatted like this:
-\ghsrc{Source Code Link}{
-  This is a link to the \caper{}
-  source repository on \gh.
-  Click anywhere on the box to access the source code.
-}{README.md}{1}
-
 \begin{figure}
   \centering
   \begin{featurebox}{Key Architectural Features}
@@ -64,8 +55,9 @@ formatted like this:
     \item \gql{} API
       federates access to both relational data and an external \rest{} API.
       Uses \apollo{} \gql.
-    \item Push notification to administrative application
-      using \sio.
+    \item Push notification to administrative application using
+      \gql{}
+      \href{https://www.apollographql.com/docs/react/data/subscriptions/}{subscriptions}.
     \item Distributed job queuing system
       using \bull{}
       and \redis.
@@ -154,6 +146,15 @@ of the \caper{} architecture.
   \label{fig:block-diagram}
 \end{figure}
 
+\ghsrc{Source Code Link}{
+  Throughout this document,
+  these boxes
+  link to a relevant location
+  in the \caper{} source code.
+  Click anywhere on the box to view the code
+  on \textsc{GitHub}.
+}{README.md}{1}
+
 \subsection{Servers}
 \label{sec:servers}
 
@@ -162,26 +163,12 @@ an \hyperref[sec:application-server]{application server},
 which provides the majority of \caper{} administrative functionality,
 and a \hyperref[sec:reporting-server]{reporting server},
 which generates reports and emails them to survey respondents.
-The two processes communicate via \bull{} job queue
-which uses \redis{} publish-subscribe for interprocess communication.
-The two-server design allows multiple reporting servers to be spun up
-to handle increased demand as usage scales up.
 
 Both servers are built atop the \nest{} application framework for \node.
 \nest{} integrates many best-of-breed services and packages
 in a coherent and performant
 \href{https://www.martinfowler.com/articles/injection.html}{dependency-injection}
 framework.
-\caper{} employs \nest{}
-to support
-\gql{} API,
-\typeorm{} object-relational mapping,
-\pg{} database access and schema migration,
-\bull{} job queuing,
-\qual{} web hooks,
-\sio{} push notifications,
-and \jwt-based access control.
-These represent just a small fraction of the capabilities available in \nest.
 \ghsrc{Dependency Injection}{
   Injecting a repository into a database service.
 }{server/apps/server/src/survey/services/survey.service.ts}{19}
@@ -189,8 +176,196 @@ These represent just a small fraction of the capabilities available in \nest.
 \subsubsection{Application Server}
 \label{sec:application-server}
 
+The application server is the main server-side component in \caper.
+
+\caper{} leverages \nest{}
+to support its
+\gql{} API,
+\typeorm{} object-relational mapping, and
+\pg{} database access and schema migration.
+Using \ts{}
+\href{https://www.typescriptlang.org/docs/handbook/decorators.html}{decorators},
+a single class
+can be annotated to serve as both
+an object-relational \emph{entity}
+and a \gql{} \emph{type}.
+This design eliminates redundant and misaligned class definitions.
+\ghsrc{\gql{} and Object-Relational Mapping}{
+  Example of a class with decorators
+  creating both database entities
+  and \gql{} \href{https://graphql.org/learn/schema/}{types}.
+}{server/apps/server/src/survey/entities/survey.ts}{12}
+
+The application and reporting servers
+communicate via a \bull{} job queue
+which uses \redis{} publish-subscribe
+for inter-process communication.
+The two-server design allows multiple reporting servers to be spun up
+to handle increased demand as usage scales up.
+\ghsrc{Queue a Bull Job}{The reporter process
+  exposes a service
+  injected by the application server
+  to queue a reporting job
+}{server/apps/reporter/src/queue/queue.service.ts}{14}
+
+When a respondent completes a survey,
+\qual{} triggers a web hook
+to notify \caper{} that a new survey
+is ready to be processed.
+\caper{}
+exposes a small number of \rest{} endpoints
+accessed by \qual{} for this purpose.
+\ghsrc{Process \qual{} Web Hook}{
+  The \texttt{QualtricsController} class
+  exposes endpoints to \qual.
+  The \texttt{completedResponse} method
+  handles the \qual{} hook triggered
+  when a respondent completes a survey.
+  This method uses the \texttt{reportService}
+  (injected by the class constructor)
+  to queue a new job for the reporting server via \bull.
+}{server/apps/server/src/qualtrics/qualtrics.controller.ts}{14}
+
+As the application server processes various events from \qual,
+it stores those events in the database for later inspection.
+The server also dynamically pushes events to the
+\hyperref[sec:admin-app]{admin app}
+using a \gql{} subscription.
+Push notifications via the subscription mechanism
+allow an administrative user
+to monitor activity on the \caper{} server
+in near-real-time.
+\ghsrc{Push Notifications}{
+  This method saves a server-side event in the database
+  and pushes the event to the administration app
+  via a \gql{} subscription
+}{server/apps/server/src/events/event.service.ts}{21}
+
+\caper{} exposes
+a relevant subset of the \qual{} \rest{} API
+to the rest of \caper.
+\ghsrc{Consume \qual{} \rest{} API}{
+  This dependency-injectable class
+  gives access to all the \qual{} \rest{} endpoints
+  needed by \caper.
+}{server/libs/qualtrics-api/src/qualtrics-api.service.ts}{91}
+
+The application server
+uses the \texttt{QualtricsApiService}
+for a variety of tasks, including these.
+\begin{enumerate}
+\item Retrieve surveys
+\item Retrieve survey results
+\item Establish and update \qual{} web hook endpoints
+\end{enumerate}
+\ghsrc{Import a Survey}{
+  As an example of the use of the API service,
+  this method
+  import a \qual{} survey
+  (including all questions and available responses)
+  into \caper{} for use in report generation.
+}{server/apps/server/src/qualtrics/qualtrics.service.ts}{34}
+
+Although the majority of \caper{}'s API surface
+is based on \gql{},
+it also exposes a few traditional \rest{} endpoints
+to simplify integration third-party modules
+that don't support \gql.
+For example, the \caper{}
+\hyperref[sec:admin-app]{administration app}
+uses
+\href{https://www.npmjs.com/package/filepond}{filepond}
+to support uploaded images for reports.
+\ghsrc{Upload and Retrieve Files}{
+  The injectable \texttt{ImageController}
+  implements standard HTTP support for uploading and downloading images.
+  The endpoints it exposes are used by
+  the \hyperref[sec:admin-app]{administration app}
+  when creating or updating report content.
+}{server/apps/server/src/image/image.controller.ts}{L24}
+
+\caper{} uses \jwt{} for access control.
+Administrative users authenticate
+with an email address and password (stored encrypted in the \caper{} database)
+and are issued a JSON Web Token (\jwt)
+that is used for authorization throughout a session.
+\ghsrc{Authenticate a User}{
+  The authentication service verifies a user at login time
+  and issues a \jwt{} for session control.
+  Note the use of injected services for the user and \jwt.
+}{server/apps/server/src/auth/auth.service.ts}{14}
+
 \subsubsection{Reporting Server}
 \label{sec:reporting-server}
+
+The reporting server
+(or servers)
+consumes requests posted by
+the application server to the \bull{} job queue.
+
+\ghsrc{Service the Bull Job Queue}{
+  \nest{} provides the \texttt{Process} decorator
+  to configure a method to respond to queued jobs.
+}{server/apps/reporter/src/daemon/queue.daemon.ts}{14}
+
+The reporting server
+creates the report for an individual survey
+and emails the report to the respondent.
+
+\ghsrc{Create and send a report}{
+  The reporting server
+  exposes a service that's injected into the job queue handler
+  to process a single survey response.
+}{server/apps/reporter/src/report/report.service.ts}{43}
+
+In addition to reports for \emph{individual} survey respondents, 
+\caper{} supports summary reports
+for \emph{groups} of respondents.
+\caper{} generates an individual report
+when \qual{} invokes the appropriate web hook
+upon a single respondent completing a survey.
+A group report, however,
+is created at a specific time,
+determined in advance when a group is registered with \caper.
+To schedule group report generation,
+\caper{} uses the \href{https://www.npmjs.com/package/cron}{\texttt{cron}} module,
+which was inspired by the standard \unix{} \texttt{cron} mechanism.
+\ghsrc{Schedule Group Reports}{
+  This class configures the \texttt{cron} module to fire as configured,
+  retrieve details for any group whose scheduled reporting time has passed,
+  and triggers group report generation and delivery.
+}{server/apps/reporter/src/daemon/cron.daemon.ts}{11}
+
+Each time the \texttt{cron} timer expires, \caper{} generates group reports.
+
+\ghsrc{Process a Group Report}{
+  This method triggers group report generation.
+}{server/apps/reporter/src/report/report.service.ts}{116}
+
+Both individual and group reports are generated
+using \LaTeX{} and \vega{}.
+
+\caper uses \vega{} to create charts based on survey response data
+and writes those files to disk.
+
+\ghsrc{Create Graphs using \vega}{}{}{}
+
+\caper{} writes \LaTeX{} sources
+based on letter elements stored in the database
+(created by the administrative user using the
+\hyperref[sec:admin-app]{administrative application}).
+The generated \LaTeX{} includes
+directives to embed the charts previously created.
+
+\ghsrc{Create \LaTeX{} Source}{}{}{}
+
+Finally, the reporting server
+runs \LaTeX{} itself to produce a high-quality PDF
+that is then sent to the respondent by email.
+
+\ghsrc{Compile \LaTeX{} Source into a PDF}{}{}{}
+
+\ghsrc{Email a PDF Report to Respondent}{}{}{}
 
 \subsection{Web Applications}
 \label{sec:web-apps}
@@ -361,6 +536,7 @@ as well as \gql{} and \rest{} API access on the server.
 %%% TeX-master: t
 %%% End:
 
-% LocalWords:  Ansible Qualtrics nd lr SurveyItem SurveyIndex UserRole
-% LocalWords:  SurveyDimension SurveyResponse SurveyItemResponse LightBlue
-% LocalWords:  LetterElement LetterType LightGreen
+% LocalWords:  Ansible Qualtrics nd lr SurveyItem SurveyIndex UserRole README
+% LocalWords:  SurveyDimension SurveyResponse SurveyItemResponse LightBlue md
+% LocalWords:  LetterElement LetterType LightGreen QualtricsController Dev
+% LocalWords:  completedResponse reportService filepond ImageController

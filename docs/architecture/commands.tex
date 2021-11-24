@@ -1,12 +1,14 @@
 % GitHub links
-\newcommand{\ghtag}{arch-doc}
+%\newcommand{\ghtag}{arch-doc}
+\newcommand{\ghtag}{development}
 \newcommand{\ghurl}{https://github.com/quantum-bits/capernaum/blob/\ghtag}
 \newcommand{\ghsrc}[4]{
   \begin{tcolorbox}[
     skin=enhanced,
     after title={\hfill\textsf{source link}},
-    colback=teal!5!white,
-    colframe=teal!75!white,
+    colframe=blue!50!white,
+    % coltext=blue!25!black,
+    colback=blue!5!white,
     hyperurl=\ghurl/#3\#L#4,
     title={#1}]
     #2
@@ -18,6 +20,7 @@
 \newcommand{\cli}{\textsc{Cli}}
 \newcommand{\gh}{\textsc{GitHub}}
 \newcommand{\rest}{\textsc{Rest}ful}
+\newcommand{\unix}{\textsc{Unix}}
 
 % Named URLs
 \newcommand{\ansible}{\href{https://www.ansible.com/}{\textsc{Ansible}}}
@@ -37,7 +40,6 @@
 \newcommand{\prometheus}{\href{https://prometheus.io/}{\textsc{Prometheus}}}
 \newcommand{\qual}{\href{https://www.qualtrics.com/}{\textsc{Qualtrics}}}
 \newcommand{\redis}{\href{https://redis.io/}{\textsc{Redis}}}
-\newcommand{\sio}{\href{https://socket.io/}{\textsc{Socket.IO}}}
 \newcommand{\ts}{\href{https://www.typescriptlang.org/}{\textsc{TypeScript}}}
 \newcommand{\tu}{\href{https://www.taylor.edu/}{TU}}
 \newcommand{\typeorm}{\href{https://typeorm.io/}{\textsc{TypeOrm}}}
