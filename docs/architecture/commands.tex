@@ -1,14 +1,15 @@
 % GitHub links
 %\newcommand{\ghtag}{arch-doc}
 \newcommand{\ghtag}{development}
-\newcommand{\ghurl}{https://github.com/quantum-bits/capernaum/blob/\ghtag}
+\newcommand{\ghurlprefix}{https://github.com/quantum-bits/capernaum/blob/\ghtag}
+\newcommand{\ghurl}[1]{\ghurlprefix/#1}
 \newcommand{\ghsrc}[4]{
   \begin{tcolorbox}[
     skin=enhanced,
     after title={\hfill\textsf{source link}},
     colframe=blue!50!white,
     colback=blue!5!white,
-    hyperurl=\ghurl/#3\#L#4,
+    hyperurl=\ghurl{#3}/\#L#4,
     title={#1}]
     #2
   \end{tcolorbox}
@@ -20,6 +21,7 @@
 \newcommand{\gh}{\textsc{GitHub}}
 \newcommand{\rest}{\textsc{Rest}ful}
 \newcommand{\unix}{\textsc{Unix}}
+\newcommand{\linux}{\textsc{Linux}}
 
 % Named URLs
 \newcommand{\ansible}{\href{https://www.ansible.com/}{\textsc{Ansible}}}
@@ -52,6 +54,7 @@
 
 %%% Local Variables:
 %%% mode: latex
+%%% TeX-master: "capernaum-architecture"
 %%% End:
 
 % LocalWords:  Capernaum Cli ful Ansible Axios se Cls GraphQL Grafana Jwt

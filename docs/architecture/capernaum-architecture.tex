@@ -491,6 +491,14 @@ and serve the following purposes.
 \section{Command-Line Interface}
 \label{sec:cli}
 
+The \cli{} is self-documenting
+with the \texttt{hierarchy} command.
+Refer to Appendix~\ref{sec:cli-command-list}
+for example output
+and a link to the algorithm
+that introspects the command hierarchy
+and generates the output.
+
 \section{Dev Ops}
 \label{sec:dev-ops}
 
@@ -521,11 +529,11 @@ as part of \hyperref[sec:deployment]{deployment and provisioning}.
 
 \caper{} employs a fully-automated deployment
 using \ansible,
-which orchestrates a full \caper{} deployment to Linux,
+which orchestrates a full \caper{} deployment to \linux,
 including:
 \begin{enumerate}
-\item Add personal package archives (PPA's) to a vanilly Ubuntu load.
-\item Install Linux packages using \texttt{apt}.
+\item Add personal package archives (PPA's) to a vanilla Ubuntu load.
+\item Install \linux{} packages using \texttt{apt}.
 \item Create and configure a \texttt{capernaum} user with minimal permissions.
 \item Provision \pg.
 \item Clone the \caper{} source code from \gh.
@@ -544,14 +552,24 @@ including:
 \subsection{Monitoring}
 \label{sec:monitoring}
 
-\ghsrc{Configure \prometheus}{
-}{server/apps/reporter/src/app.module.ts}{21}
+\caper{} uses \prometheus{}
+for server-side monitoring.
+In addition to the standard \linux{} metrics
+gathered by default,
+\caper{} implements an application-specific
+counter for the number of emails sent.
+
+\ghsrc{Define Custom \prometheus{} Counter}{
+  Define a counter for to track the number of emails sent by \caper.
+  Updated as part of report generation
+  (individual and group).
+}{server/apps/reporter/src/report/report.service.ts}{35}
 
 \subsection{Process Management}
 \label{sec:process-management}
 
 With only a few server processes to manage,
-\caper{} uses the \pmtwo
+\caper{} uses the \pmtwo{}
 package for process control,
 failover,
 restart,
@@ -562,6 +580,71 @@ and logging.
 }{ansible/templates/ecosystem.config.js}{1}
 
 \appendix
+
+\section{CLI Command List}
+\label{sec:cli-command-list}
+
+Following is sample output from the \cli's \texttt{hierarchy} command,
+which shows a quick summary of the entire list of commands.
+
+\ghsrc{Print Command Hierarchy}{
+  Introspect all \cli{} commands recursively
+  and generate a nicely-formatted, hierarchical list
+  of all commands, flags, and options.
+}{server/apps/cli/src/commands/hierarchy}{1}
+
+\begin{verbatim}
+debug-cache
+email
+            test
+env
+fixture
+            nuke --force --survey-id <survey-id>
+gql
+group
+            close        group-pk
+            force-report group-pk
+            get          --with-responses code-word
+            list         --open --ready
+help
+hierarchy   --verbose
+letter
+            group      letter-pk group-pk
+            individual letter-pk survey_response-pk
+            list
+qualtrics
+            org
+            response
+                         get --start-date --end-date survey-id response-id
+            subscription
+                         create --topic <name> publication-url survey-id
+                         delete subscription-id
+                         get    subscription-id
+                         list
+            survey
+                         get  survey-id
+                         list --by-date --all
+report
+            group      group-pk
+            individual qualtrics-survey-id qualtrics-response-id
+response
+            dimension
+                       group      ---pdf <pdf-file-name> --dimension <dimension-pk>
+                       individual --pdf <pdf-file-name> --dimension <dimension-pk>
+            import     survey-id
+            msi
+                       group
+                       individual
+            prediction
+                       count      --pdf <pdf-file-name>
+                       group
+                       individual
+            summarize
+survey
+            import  survey-id
+            letters
+            list
+\end{verbatim}
 
 \section{Detailed Data Model}
 \label{sec:detailed-data-model}
@@ -655,5 +738,7 @@ as well as \gql{} and \rest{} API access on the server.
 
 % LocalWords:  Ansible Qualtrics nd lr SurveyItem SurveyIndex UserRole README
 % LocalWords:  SurveyDimension SurveyResponse SurveyItemResponse LightBlue md
-% LocalWords:  LetterElement LetterType LightGreen QualtricsController Dev
-% LocalWords:  completedResponse reportService filepond ImageController
+% LocalWords:  LetterElement LetterType LightGreen QualtricsController Dev env
+% LocalWords:  completedResponse reportService filepond ImageController cron
+% LocalWords:  QualtricsApiService GroupService VisualizationService makeChart
+% LocalWords:  WriterService renderAllElements PPA's capernaum
