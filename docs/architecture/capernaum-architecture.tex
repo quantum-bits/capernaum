@@ -201,7 +201,7 @@ The application and reporting servers
 communicate via a \bull{} job queue
 which uses \redis{} publish-subscribe
 for inter-process communication.
-The two-server design allows multiple reporting servers to be spun up
+The distributed server design allows multiple reporting servers to be spun up
 to handle increased demand as usage scales up.
 \ghsrc{Queue a Bull Job}{The reporter process
   exposes a service
@@ -254,7 +254,7 @@ to the rest of \caper.
 
 The application server
 uses the \texttt{QualtricsApiService}
-for a variety of tasks, including these.
+for a variety of tasks, including:
 \begin{enumerate}
 \item Retrieve surveys.
 \item Retrieve survey results.
@@ -263,7 +263,7 @@ for a variety of tasks, including these.
 \ghsrc{Import a Survey}{
   As an example of the use of the API service,
   this method
-  import a \qual{} survey
+  imports a \qual{} survey
   (including all questions and available responses)
   into \caper{} for use in report generation.
 }{server/apps/server/src/qualtrics/qualtrics.service.ts}{34}
@@ -288,12 +288,12 @@ and emails it to the administrator of the group.
 Although the majority of \caper{}'s API surface
 is based on \gql{},
 it also exposes a few traditional \rest{} endpoints
-to simplify integration third-party modules
+to simplify integration with third-party modules
 that don't support \gql.
 For example, the \caper{}
 \hyperref[sec:admin-app]{administration app}
 uses
-\href{https://www.npmjs.com/package/filepond}{filepond}
+\filepond{}
 to support uploaded images for reports.
 \ghsrc{Upload and Retrieve Files}{
   The injectable \texttt{ImageController}
@@ -318,9 +318,12 @@ that is used for authorization throughout a session.
 \label{sec:reporting-server}
 
 The reporting server
-(or servers)
 consumes requests posted by
 the application server to the \bull{} job queue.
+The \bull{} job queue
+allows \caper{} to employ
+multiple reporting servers
+in order to scale up as usage increases.
 
 \ghsrc{Service the Bull Job Queue}{
   \nest{} provides the \texttt{Process} decorator
@@ -364,8 +367,8 @@ Each time the \texttt{cron} timer expires, \caper{} generates group reports.
 Both individual and group reports are generated
 using \LaTeX{} and \vega{} to construct an attractive PDF.
 
-\caper uses \vega{} to create charts based on survey response data
-and writes those files to disk.
+\caper{} uses \vega{} to create charts based on survey response data
+and writes those files to disk for processing by \LaTeX.
 
 \ghsrc{Create Graphs using \vega}{
   Consistent with the
@@ -392,28 +395,30 @@ directives to embed the charts previously created.
   The \texttt{renderAllElements} method
   iterates over letter elements retrieved from the database
   and invokes an element-specific method to generate a \LaTeX{} snippet.
-  \caper collects these snippets
+  \caper{} collects these snippets
   into a single \LaTeX{} source file.
 }{server/apps/server/src/writer/writer.service.ts}{188}
 
-Finally, the reporting server
-runs \LaTeX{} itself to produce a high-quality PDF
-that is then sent to the respondent by email.
+After writing the \vega-generated graphics
+and \LaTeX{} source to disk,
+the reporting server
+runs \LaTeX{} itself to produce a high-quality PDF.
 
 \ghsrc{Compile \LaTeX{} Source into a PDF}{
   This method writes the render \LaTeX{} source into a file
   that's then processed by invoking \texttt{latex}.
 }{server/apps/server/src/writer/writer.service.ts}{567}
 
-After constructing the PDF version of the report,
-\caper{} sends it by email
+Finally,
+\caper{} sends the resulting PDF by email
 to the survey respondent.
 
 \ghsrc{Email a PDF Report to Respondent}{
   Construct an email that includes:
   \begin{enumerate}
   \item A greeting message
-    written by the administrative user.
+    written by the administrative user
+    (refer to Figure~\ref{fig:letter-details}).
     \caper{} sends both an HTML and plain text version
     of the greeting message
     using MIME encoding.
@@ -552,7 +557,7 @@ is a one-stop landing page that:
   group code (Figure~\ref{fig:survey-landing-page}).
   This design allows the registration application
   to verity that the user has a valid group code
-  before directing the user to \qual.
+  before redirecting the user to \qual.
   \begin{figure}
     \centering
     \screensnap{survey-landing-page}
@@ -647,8 +652,8 @@ as part of \hyperref[sec:deployment]{deployment and provisioning}.
 
 \caper{} employs a fully-automated deployment
 using \ansible,
-which orchestrates a full \caper{} deployment to \linux,
-including:
+which orchestrates a full \caper{} deployment to \linux{}
+as follows:
 \begin{enumerate}
 \item Add personal package archives (PPA's) to a vanilla Ubuntu load.
 \item Install \linux{} packages using \texttt{apt}.
