@@ -4,6 +4,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage[svgnames]{xcolor}
+\usepackage{fancyvrb}
 
 \input{boxes}
 \input{commands}
@@ -13,11 +14,6 @@
 
 \begin{document}
 \maketitle
-
-\begin{abstract}
-  It's \caper!
-\end{abstract}
-
 \tableofcontents
 
 \section{Introduction}
@@ -105,7 +101,7 @@ As of November, 2021,
 \caper{} has processed just over 19,000 surveys.
 Refer to Table~\ref{tab:caper-stats} for additional statistics about \caper.
 
-\begin{table}
+\begin{table}[h]
   \centering
   \begin{tabular}{lr}
     \toprule
@@ -243,7 +239,8 @@ in near-real-time.
 \ghsrc{Push Notifications}{
   This method saves a server-side event in the database
   and pushes the event to the administration app
-  via a \gql{} subscription
+  via a \gql{} subscription.
+  \apollo{} implements subscriptions using a \websocket.
 }{server/apps/server/src/events/event.service.ts}{21}
 
 \caper{} exposes
@@ -428,31 +425,163 @@ to the survey respondent.
 \subsection{Web Applications}
 \label{sec:web-apps}
 
+\caper{} implements two \vue-based ``single-page'' web applications.
+The \hyperref[sec:admin-app]{Administrative App}
+supports the \caper{} administrator,
+and the \hyperref[sec:group-app]{Registration App}
+primarily supports groups of survey respondents.
+
 \subsubsection{Administrative Application}
 \label{sec:admin-app}
 
 \caper{} includes a \vue{}- and \vuetify{}-based
-``single-page''
+single-page
 administrative web app.
 The principal user of the admin app
 is a person tasked with using \caper{}
 to analyze and report on \qual{} surveys.
 It allows such a user to:
 \begin{enumerate}
-\item Download the details of a survey from \qual{},
-  either for the first time or to update \caper{} after a change is made to the survey on \qual.
-\item Create or edit a report (``letter'') to be associated with a survey.
+\item
+  Download the details of a survey from \qual{},
+  either for the first time or to update \caper{} after a change is made to the survey on \qual{}
+  (Figure~\ref{fig:manage-qualtrics}).
+
+  \ghsrc{\qual{} Survey Management Page}{
+    \vue{} component that implements survey management.
+  }{ui-admin/src/pages/QualtricsPage.vue}{1}
+
+  \begin{figure}
+    \centering
+    \screensnap{qualtrics}
+    \caption{
+      Manage \qual{} surveys.
+      Provides details on imported surveys
+      and whether a survey has been updated since its last import.
+    }
+    \label{fig:manage-qualtrics}
+  \end{figure}
+\item
+  Create or edit a report (``letter'') to be associated with a survey
+  (Figure~\ref{fig:letter-details}).
+
+  \ghsrc{Individual Letter Details}{
+    Top-level \vue{} component for letter management.
+    Individual tabs within the interface are implemented as separate components.
+  }{ui-admin/src/pages/letters/LettersPage.vue}{1}
+  
+  \begin{figure}
+    \centering
+    \screensnap{letter-details}
+    \caption{
+      Details of a report (letter), including email cover letter.
+      All text ``areas'' (e.g., the cover letter)
+      employ a \caper{} component that implements
+      the \tiptap{} headless editing framework.
+    }
+    \label{fig:letter-details}
+  \end{figure}
+
   The app provides a convenient drag-and-drop interface
   that allows the user to add, remove, and rearrange the various type of
-  letter elements to be included in the report sent to survey respondents.
-\item Upload and curate images to be used in report letters.
-\item View searchable data about survey responses gathered from \qual.
-\item Manually trigger the creation and delivery of a report for a survey respondent
+  letter elements to be included in the report sent to survey respondents
+  (Figure~\ref{fig:compose-letter}).
+
+  \ghsrc{Letter Composition Tab}{
+    Component that implements letter composition,
+    including adding, removing, editing, and moving elements (using drag-and-drop).
+  }{ui-admin/src/pages/letters/LetterContentTab.vue}{1}
+
+  \begin{figure}
+    \centering
+    \screensnap{compose-letter}
+    \caption{
+      Composing a letter, showing an active drag operation.
+      All letter components can be resequenced similarly.
+      The context menu in each letter element (northeast corner of each box)
+      contains a menu allowing additional letter elements to be inserted
+      above or below each component.
+    }
+    \label{fig:compose-letter}
+  \end{figure}
+\item
+  Upload and curate images to be used in report letters.
+  \ghsrc{File Upload using \filepond}{
+    \vue{} component that implements \filepond{}
+    to support uploading images for inclusion in report letters.
+  }{ui-admin/src/pages/ImagesPage.vue}{1}
+\item
+  View searchable data about survey responses gathered from \qual.
+\item
+  Manually trigger the creation and delivery of a report for a survey respondent
   for purposes of debugging or verification.
+\item
+  Manage \qual{} web hooks that trigger report generation
+  (Figure~\ref{fig:manage-web-hooks}).
+
+  \ghsrc{Manage \qual{} Web Hooks}{
+    This page uses multiple embedded components to represent and maintain
+    \qual{} web hooks.
+  }{ui-admin/src/pages/webhooks/WebHooksPage.vue}{1}
+  
+  \begin{figure}
+    \centering
+    \screensnap{web-hooks}
+    \caption{
+      Manage \qual{} web hooks.
+      \caper{} allows multiple servers to be configured (\textsf{Machines} section),
+      with different web hooks set up for each (\textsf{Subscriptions} section).
+    }
+    \label{fig:manage-web-hooks}
+  \end{figure}
 \end{enumerate}
 
 \subsubsection{Registration Application}
 \label{sec:group-app}
+
+Also a \vue{}- and \vuetify{}-based
+single-page web app,
+the \caper{} registration application
+is a one-stop landing page that:
+
+\begin{enumerate}
+\item
+  Allows individual users to access a configured survey directly.
+\item
+  Lets users who are participating with a group to enter their
+  group code (Figure~\ref{fig:survey-landing-page}).
+  This design allows the registration application
+  to verity that the user has a valid group code
+  before directing the user to \qual.
+  \begin{figure}
+    \centering
+    \screensnap{survey-landing-page}
+    \caption{
+      Survey landing page.
+      Users participating in a group
+      enter their group code
+      in the \textsf{Group Code} box,
+      which is verified by the registration app
+      before redirecting the user to \qual.
+    }
+    \label{fig:survey-landing-page}
+  \end{figure}
+\item
+  Supports registration of groups,
+  using a friendly ``stepper'' based wizard
+  (Figure~\ref{fig:group-registration}).
+  \begin{figure}
+    \centering
+    \screensnap{group-registration}
+    \caption{
+      Group registration page.
+      To keep the interface simple,
+      it is presented as a sequence of discrete steps
+      using a \vue{} stepper component.
+    }
+    \label{fig:group-registration}
+  \end{figure}
+\end{enumerate}
 
 \section{Data Model}
 \label{sec:data-model-overview}
@@ -474,7 +603,7 @@ and serve the following purposes.
   capture the details of a single survey on \qual.
 \item[\textcolor{Salmon}{Survey Responses (salmon)}]
   The \texttt{SurveyResponse}
-  and \texttt{SurveyItemResponse}
+  and \texttt{Survey\-Item\-Re\-sponse}
   tables store the responses a single respondent
   makes to a survey.
 \item[\textcolor{LightBlue}{Letters (light blue)}]
@@ -487,17 +616,6 @@ and serve the following purposes.
   Only administrative users need to log into \caper{} itself.
   It implements simple role-based security.
 \end{description}
-
-\section{Command-Line Interface}
-\label{sec:cli}
-
-The \cli{} is self-documenting
-with the \texttt{hierarchy} command.
-Refer to Appendix~\ref{sec:cli-command-list}
-for example output
-and a link to the algorithm
-that introspects the command hierarchy
-and generates the output.
 
 \section{Dev Ops}
 \label{sec:dev-ops}
@@ -579,21 +697,42 @@ and logging.
   Configure the application and reporting servers.
 }{ansible/templates/ecosystem.config.js}{1}
 
-\appendix
+\section{Command-Line Interface}
+\label{sec:cli}
 
-\section{CLI Command List}
-\label{sec:cli-command-list}
+\caper{} includes a command-line interface (\cli)
+that supports development, testing, and operations.
+The \cli{} supports these operations:
+\begin{enumerate}
+\item Create an individual or group report.
+\item Execute commands via the \qual{} \rest{} API.
+\item Send individual or group reports by email.
+\item Retrieve and list surveys from \qual.
+\item Retrieve survey responses from \qual.
+\item Invoke analytics processing on survey responses for testing.
+\end{enumerate}
 
-Following is sample output from the \cli's \texttt{hierarchy} command,
-which shows a quick summary of the entire list of commands.
+The \cli{} implements a \git-style, nested
+command hierarchy.
+Although powerful,
+it can be easy to forget the details
+of nested commands.
+To remedy this problem,
+the \cli's 
+\texttt{hierarchy} command
+displays a quick summary of all nested commands.
+Figure~\ref{fig:cli-commands}
+shows the command's output.
 
 \ghsrc{Print Command Hierarchy}{
   Introspect all \cli{} commands recursively
   and generate a nicely-formatted, hierarchical list
   of all commands, flags, and options.
-}{server/apps/cli/src/commands/hierarchy}{1}
+}{server/apps/cli/src/commands/hierarchy.ts}{1}
 
-\begin{verbatim}
+\begin{figure}
+  \centering
+\begin{Verbatim}[fontsize=\tiny,frame=single]
 debug-cache
 email
             test
@@ -644,7 +783,12 @@ survey
             import  survey-id
             letters
             list
-\end{verbatim}
+\end{Verbatim}
+  \caption{Command summary generated by the \caper{} \cli}
+  \label{fig:cli-commands}
+\end{figure}
+
+\appendix
 
 \section{Detailed Data Model}
 \label{sec:detailed-data-model}
@@ -673,11 +817,11 @@ toward characteristics measured by the survey instrument itself.
 
 \paragraph{\textcolor{Salmon}{Survey Responses (salmon)}}
 
-The \texttt{SurveyResponse}
-and \texttt{SurveyItemResponse}
+The \texttt{Survey\-Res\-ponse}
+and \texttt{Survey\-Item\-Res\-ponse}
 tables store the responses a single respondent
 makes to a survey.
-\texttt{SurveyResponse} is related to a survey
+\texttt{Survey\-Res\-ponse} is related to a survey
 and has one associated \texttt{SurveyItemResponse}
 for each \texttt{SurveyItem}.
 
@@ -688,8 +832,8 @@ Report content is entirely data driven and can be updated by a \caper's administ
 as desired for new surveys, new versions of a survey, or new report formats.
 
 Each \texttt{Letter} contains multiple
-instances of a \texttt{LetterElement}.
-A \texttt{LetterElement} has an associated type
+instances of a \texttt{Letter\-Ele\-ment}.
+A \texttt{Letter\-Ele\-ment} has an associated type
 (e.g., boilerplate text,
 uploaded image,
 graph of analytical results).
@@ -741,4 +885,5 @@ as well as \gql{} and \rest{} API access on the server.
 % LocalWords:  LetterElement LetterType LightGreen QualtricsController Dev env
 % LocalWords:  completedResponse reportService filepond ImageController cron
 % LocalWords:  QualtricsApiService GroupService VisualizationService makeChart
-% LocalWords:  WriterService renderAllElements PPA's capernaum
+% LocalWords:  WriterService renderAllElements PPA's capernaum qualtrics ui
+% LocalWords:  ansible sponse ponse Ele ment
