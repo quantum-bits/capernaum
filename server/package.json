@@ -38,6 +38,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@nestjs/apollo": "^10.0.8",
     "@nestjs/bull": "^0.5.4",
     "@nestjs/common": "^8.4.2",
     "@nestjs/config": "^2.0.0",
@@ -59,9 +60,9 @@
     "cross-fetch": "^3.1.5",
     "debug": "^4.3.4",
     "dotenv": "^16.0.0",
-    "execa": "^6.1.0",
+    "execa": "^5",
     "fs-extra": "^10.0.1",
-    "got": "^12.0.2",
+    "got": "^11",
     "graphql": "^16.3.0",
     "graphql-subscriptions": "^2.0.0",
     "graphql-tools": "^8.2.2",

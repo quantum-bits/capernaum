@@ -611,7 +611,7 @@ type Query {
   """Fetch all surveys"""
   surveys: [Survey!]!
   survey(id: Int!): Survey!
-  surveyResponses(groupId: Int, surveyId: Int!): [SurveyResponse!]!
+  surveyResponses(surveyId: Int!, groupId: Int): [SurveyResponse!]!
   surveyResponseById(id: Int!): SurveyResponse!
   surveyResponsesForGroup(
     """Limit to one group"""

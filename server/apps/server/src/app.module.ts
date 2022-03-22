@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { GraphQLModule } from "@nestjs/graphql";
+import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SurveyModule } from "./survey/survey.module";
 import { PredictionModule } from "./prediction/prediction.module";
@@ -18,7 +19,8 @@ import { GroupModule } from "./group/group.module";
       synchronize: true,
       retryAttempts: 3,
     }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
       autoSchemaFile: "generated-schema.graphql",
       installSubscriptionHandlers: true,
       context: ({ req }) => ({ req }),
