@@ -24,14 +24,18 @@ export class ImageService extends BaseService<Image> {
     );
   }
 
-  private alwaysRelate = [
-    "letterElements",
-    "letterElements.letter",
-    "letterElements.letterElementType",
-  ];
+  private alwaysRelate = {
+    letterElements: {
+      letter: true,
+      letterElements: true,
+    },
+  };
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   readAll() {

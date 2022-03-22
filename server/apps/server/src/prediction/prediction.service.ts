@@ -23,8 +23,11 @@ export class ScriptureEngagementPracticeService extends BaseService<ScriptureEng
 
   alwaysRelate = ["surveyIndices"];
 
-  readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+  readOne(id: number): Promise<ScriptureEngagementPractice> {
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   readAll() {

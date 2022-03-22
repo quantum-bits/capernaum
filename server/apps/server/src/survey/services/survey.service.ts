@@ -29,23 +29,29 @@ export class SurveyService extends BaseService<Survey> {
     return this.repo.save(this.repo.create(createInput));
   }
 
-  private alwaysRelate = [
-    "surveyLetters",
-    "surveyLetters.letter",
-    "surveyLetters.letterType",
-    "surveyDimensions",
-    "surveyDimensions.surveyIndices",
-    "surveyDimensions.surveyIndices.surveyItems",
-    "surveyDimensions.surveyIndices.scriptureEngagementPractices",
-    "groups",
-  ];
+  private alwaysRelate = {
+    surveyLetters: {
+      letter: true,
+      letterType: true,
+    },
+    surveyDimensions: {
+      surveyIndices: {
+        surveyItems: true,
+        scriptureEngagementPractices: true,
+      },
+    },
+    groups: true,
+  };
 
   readAll() {
     return this.repo.find({ relations: this.alwaysRelate });
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   /**
@@ -54,20 +60,28 @@ export class SurveyService extends BaseService<Survey> {
    * @param id
    */
   readStructure(id: number) {
-    return this.repo.findOne(id, {
-      relations: [
-        "surveyDimensions",
-        "surveyDimensions.surveyIndices",
-        "surveyDimensions.surveyIndices.surveyItems",
-      ],
+    return this.repo.findOne({
+      where: { id },
+      relations: {
+        surveyDimensions: {
+          surveyIndices: {
+            surveyItems: true,
+          },
+        },
+      },
     });
   }
 
   findByQualtricsId(qualtricsId: string): Promise<Survey> {
-    return this.repo.findOne(
-      { qualtricsId },
-      { relations: ["surveyItems", "surveyLetters", "surveyLetters.letter"] }
-    );
+    return this.repo.findOne({
+      where: { qualtricsId },
+      relations: {
+        surveyItems: true,
+        surveyLetters: {
+          letter: true,
+        },
+      },
+    });
   }
 
   resolveRelatedLetters(survey: Survey) {

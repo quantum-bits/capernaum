@@ -1,4 +1,4 @@
-import { ConnectionOptions } from "typeorm";
+import { DataSourceOptions } from "typeorm";
 import {
   Letter,
   LetterElement,
@@ -46,7 +46,7 @@ export const entities = [
   UserRole,
 ];
 
-export const options: ConnectionOptions = {
+export const options: DataSourceOptions = {
   type: "postgres",
   host: process.env.PG_HOST,
   database: process.env.PG_DATABASE,

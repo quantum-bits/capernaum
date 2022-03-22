@@ -18,7 +18,7 @@ export class MachineService extends BaseService<Machine> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOneBy({ id });
   }
 
   readAll() {

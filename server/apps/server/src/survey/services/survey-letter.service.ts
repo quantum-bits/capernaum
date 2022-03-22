@@ -21,15 +21,19 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
     super(repo);
   }
 
-  private alwaysRelate = [
-    "survey",
-    "survey.surveyDimensions",
-    "survey.surveyDimensions.surveyIndices",
-    "letter",
-    "letter.letterElements",
-    "letter.letterElements.letterElementType",
-    "letterType",
-  ];
+  private alwaysRelate = {
+    survey: {
+      surveyDimensions: {
+        surveyIndices: true,
+      },
+    },
+    letter: {
+      letterElements: {
+        letterElementType: true,
+      },
+    },
+    letterType: true,
+  };
 
   async create(createInput: SurveyLetterCreateInput) {
     debug("create %O", createInput);
@@ -39,11 +43,14 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
       const letterRepo = manager.getRepository(Letter);
       const surveyLetterRepo = manager.getRepository(SurveyLetter); // Can't use `this.repo` because transaction.
 
-      const survey = await surveyRepo.findOneOrFail(createInput.surveyId);
+      const survey = await surveyRepo.findOneByOrFail({
+        id: createInput.surveyId,
+      });
       debug("surveyLetter.create/%O", survey);
-      const letterType = await letterTypeRepo.findOneOrFail(
-        createInput.letterTypeId
-      );
+
+      const letterType = await letterTypeRepo.findOneByOrFail({
+        id: createInput.letterTypeId,
+      });
       debug("surveyLetter.create/%O", letterType);
 
       const letter = await letterRepo.save(
@@ -65,7 +72,8 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
       debug("surveyLetter.create/%O", surveyLetter);
 
       // Return the full survey letter.
-      const result = await surveyLetterRepo.findOneOrFail(surveyLetter.id, {
+      const result = await surveyLetterRepo.findOneOrFail({
+        where: { id: surveyLetter.id },
         relations: this.alwaysRelate,
       });
       debug("surveyLetter.create result/%O", result);
@@ -74,10 +82,15 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
   }
 
   readOne(id: number) {
-    return this.repo.find({ where: { id }, relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysRelate });
+    return this.repo.find({
+      relations: this.alwaysRelate,
+    });
   }
 }

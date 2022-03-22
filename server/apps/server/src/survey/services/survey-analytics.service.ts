@@ -199,9 +199,9 @@ export class SurveyAnalyticsService {
         const prediction = new Prediction();
 
         prediction.practice =
-          await this.scriptureEngagementPracticeRepo.findOne(
-            parseInt(rawData[0].sep_id)
-          );
+          await this.scriptureEngagementPracticeRepo.findOneBy({
+            id: parseInt(rawData[0].sep_id),
+          });
 
         prediction.details = _.map(rawData, (datum) => ({
           surveyIndexTitle: datum.sidx_title,
@@ -231,14 +231,15 @@ export class SurveyAnalyticsService {
     const summaryByPracticeId = new Map<number, PredictionCount>();
 
     // Get the group and all its responses.
-    const group = await this.groupRepo.findOneOrFail(groupId, {
-      relations: ["surveyResponses"],
+    const group = await this.groupRepo.findOneOrFail({
+      where: { id: groupId },
+      relations: { surveyResponses: true },
     });
     debug("group details %O", group);
 
     // Process all responses for this group.
     for (const response of group.surveyResponses) {
-      // Run the individual prediction for SEP's
+      // Run the individual prediction for scripture engagement practices.
       const predictions = await this.predictScriptureEngagementPractices(
         response.id,
         SurveyRespondentType.Individual

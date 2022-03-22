@@ -169,7 +169,7 @@ export class QualtricsService {
 
       // Check for an existing import of this response using its Qualtrics ID.
       let foundPreviousImport = false;
-      const previousImport = await surveyResponseRepo.findOne({
+      const previousImport = await surveyResponseRepo.findOneBy({
         qualtricsResponseId: createInput.responseId,
       });
       if (previousImport) {
@@ -180,8 +180,9 @@ export class QualtricsService {
       }
 
       // Load the survey and its items from the database.
-      const survey = await manager.findOneOrFail(Survey, surveyId, {
-        relations: ["surveyItems"],
+      const survey = await manager.findOneOrFail(Survey, {
+        where: { id: surveyId },
+        relations: { surveyItems: true },
       });
 
       // If this response has a group code, associate it with the group.

@@ -9,7 +9,7 @@ import {
   SurveyItem,
 } from "@server/src/survey/entities";
 import { InjectRepository } from "@nestjs/typeorm";
-import { EntityManager, Repository } from "typeorm";
+import { EntityManager, In, Repository } from "typeorm";
 import * as _ from "lodash";
 import { getDebugger } from "@helpers/debug-factory";
 import { AssociationUpdateInput } from "@server/src/prediction/entities";
@@ -31,9 +31,9 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
       const surveyItemRepo = manager.getRepository(SurveyItem);
 
-      const dimension = await surveyDimensionRepo.findOneOrFail(
-        createInput.surveyDimensionId
-      );
+      const dimension = await surveyDimensionRepo.findOneByOrFail({
+        id: createInput.surveyDimensionId,
+      });
 
       const newIndex = await surveyIndexRepo.save(
         surveyIndexRepo.create({
@@ -45,7 +45,7 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
       );
 
       for (const itemId of createInput.itemIds) {
-        const item = await surveyItemRepo.findOneOrFail(itemId);
+        const item = await surveyItemRepo.findOneByOrFail({ id: itemId });
         item.surveyIndex = newIndex;
         await surveyItemRepo.save(item);
       }
@@ -69,7 +69,10 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   /**
@@ -116,8 +119,9 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
       const surveyIndexRepo = manager.getRepository(SurveyIndex);
       const surveyItemRepo = manager.getRepository(SurveyItem);
 
-      const index = await surveyIndexRepo.findOneOrFail(updateInput.id, {
-        relations: ["surveyItems"],
+      const index = await surveyIndexRepo.findOneOrFail({
+        where: { id: updateInput.id },
+        relations: { surveyItems: true },
       });
 
       // Assign scalar updates, if any. Only those props listed will be updated,
@@ -128,7 +132,9 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
       );
 
       // Fetch survey items specified by the update.
-      const updateItems = await surveyItemRepo.findByIds(updateInput.itemIds);
+      const updateItems = await surveyItemRepo.findBy({
+        id: In(updateInput.itemIds),
+      });
       const validUpdateItemIds = updateItems.map((item) => item.id);
 
       // Check that all specified items actually exist.
@@ -160,8 +166,9 @@ export class SurveyIndexService extends BaseService<SurveyIndex> {
     id: number
   ): Promise<SurveyIndexDeleteOutput> {
     debug("_deleteHelper %d", id);
-    const index = await manager.findOneOrFail(SurveyIndex, id, {
-      relations: ["surveyItems"],
+    const index = await manager.findOneOrFail(SurveyIndex, {
+      where: { id },
+      relations: { surveyItems: true },
     });
 
     // Clear FK references from items to this index.

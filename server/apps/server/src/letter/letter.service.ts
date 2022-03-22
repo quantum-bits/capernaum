@@ -12,7 +12,7 @@ import {
   LetterTypeUpdateInput,
   LetterUpdateInput,
 } from "./entities";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { getDebugger } from "@helpers/debug-factory";
 import { BaseService } from "@server/src/shared/base.service";
 import { SurveyDimension, SurveyLetter } from "@server/src/survey/entities";
@@ -36,26 +36,34 @@ export class LetterService extends BaseService<Letter> {
     return this.repo.save(this.repo.create(createInput));
   }
 
-  private alwaysRelate = [
-    "surveyLetters",
-    "surveyLetters.letterType",
-    "surveyLetters.letterType.letterElementTypes",
-    "surveyLetters.survey",
-    "letterElements",
-    "letterElements.letterElementType",
-  ];
+  private alwaysRelate = {
+    surveyLetters: {
+      letterType: {
+        letterElementTypes: true,
+      },
+      survey: true,
+    },
+    letterElements: {
+      letterElementType: true,
+    },
+  };
 
   readAll() {
-    return this.repo.find({ relations: this.alwaysRelate });
+    return this.repo.find({
+      relations: this.alwaysRelate,
+    });
   }
 
-  readOne(id: number) {
-    return this.repo.findOne(id, {
-      relations: [
+  readOne(id: number): Promise<Letter> {
+    return this.repo.findOne({
+      where: { id },
+      relations: {
         ...this.alwaysRelate,
-        "letterElements.image",
-        "letterElements.surveyDimension",
-      ],
+        letterElements: {
+          image: true,
+          surveyDimension: true,
+        },
+      },
     });
   }
 
@@ -92,8 +100,10 @@ export class LetterService extends BaseService<Letter> {
       const letterRepo = manager.getRepository(Letter);
       const surveyLetterRepo = manager.getRepository(SurveyLetter);
 
-      const letter = await letterRepo.findOneOrFail(letterId);
-      const result = await surveyLetterRepo.delete({ letter });
+      const letter = await letterRepo.findOneByOrFail({ id: letterId });
+      const result = await surveyLetterRepo.delete({
+        letter: { id: letter.id },
+      });
       debug("delete/%O", result);
 
       return letterRepo.delete(letter.id).then((result) => result.affected);
@@ -115,11 +125,13 @@ export class LetterTypeService extends BaseService<LetterType> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOneBy({ id });
   }
 
   readAll() {
-    return this.repo.find({ relations: ["letterElementTypes"] });
+    return this.repo.find({
+      relations: { letterElementTypes: true },
+    });
   }
 
   update(updateInput: LetterTypeUpdateInput) {
@@ -143,7 +155,7 @@ export class LetterElementTypeService extends BaseService<LetterElementType> {
   }
 
   readOne(id: number) {
-    return this.repo.findOneOrFail(id);
+    return this.repo.findOneByOrFail({ id });
   }
 
   resolveLetterTypes(letterElementType: LetterElementType) {
@@ -178,8 +190,9 @@ export class LetterElementService extends BaseService<LetterElement> {
     );
     debug("New letter element %O", newLetterElement);
 
-    return this.repo.findOneOrFail(newLetterElement.id, {
-      relations: ["letterElementType"],
+    return this.repo.findOneOrFail({
+      where: { id: newLetterElement.id },
+      relations: { letterElementType: true },
     });
   }
 
@@ -229,7 +242,9 @@ export class LetterElementService extends BaseService<LetterElement> {
     debug("map %o", letterElementIdToNewIndex);
 
     // Get the letter elements.
-    const letterElements = await this.repo.findByIds(letterElementIds);
+    const letterElements = await this.repo.findBy({
+      id: In(letterElementIds),
+    });
     debugLetterElements("from database", letterElements);
 
     // Resequence the letter elements.
@@ -242,8 +257,9 @@ export class LetterElementService extends BaseService<LetterElement> {
     await this.repo.save(letterElements);
 
     // Fetch with additional relations to make client happier.
-    return this.repo.findByIds(letterElementIds, {
-      relations: ["letterElementType"],
+    return this.repo.find({
+      where: { id: In(letterElementIds) },
+      relations: { letterElementType: true },
     });
   }
 

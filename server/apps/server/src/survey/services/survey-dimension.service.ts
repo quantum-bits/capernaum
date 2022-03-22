@@ -32,14 +32,18 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
     );
   }
 
-  private alwaysRelate = [
-    "survey",
-    "surveyIndices",
-    "surveyIndices.surveyItems",
-  ];
+  private alwaysRelate = {
+    survey: true,
+    surveyIndices: {
+      surveyItems: true,
+    },
+  };
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   readAll() {
@@ -65,8 +69,9 @@ export class SurveyDimensionService extends BaseService<SurveyDimension> {
     return this.repo.manager.transaction(async (manager) => {
       const surveyDimensionRepo = manager.getRepository(SurveyDimension);
 
-      const dimension = await surveyDimensionRepo.findOneOrFail(dimensionId, {
-        relations: ["surveyIndices"],
+      const dimension = await surveyDimensionRepo.findOneOrFail({
+        where: { id: dimensionId },
+        relations: { surveyIndices: true },
       });
 
       const dimensionDeleteOutput: SurveyDimensionDeleteOutput = {

@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { LessThan, MoreThan, Repository } from "typeorm";
+import { IsNull, LessThan, MoreThan, Raw, Repository } from "typeorm";
 import {
   Group,
   GroupCreateInput,
@@ -35,7 +35,7 @@ export class GroupTypeService extends BaseService<GroupType> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOneBy({ id: id });
   }
 }
 
@@ -76,7 +76,7 @@ export class GroupService {
     let tries = 100;
     while (tries--) {
       const codeWord = CodeWord.generate();
-      const existingGroup = await this.repo.findOne({ codeWord });
+      const existingGroup = await this.repo.findOneBy({ codeWord });
       if (existingGroup) {
         console.warn(
           `Code word '${codeWord}' already exists; ${tries} more tries`
@@ -105,8 +105,9 @@ export class GroupService {
     debug("group %O", group);
 
     // Fetch the new group and related data for the admin email.
-    const groupPlus = await this.repo.findOneOrFail(group.id, {
-      relations: ["survey", "type"],
+    const groupPlus = await this.repo.findOneOrFail({
+      where: { id: group.id },
+      relations: { survey: true, type: true },
     });
     debug("groupPlus %O", groupPlus);
 
@@ -138,29 +139,32 @@ export class GroupService {
   }
 
   // Always resolve these relations.
-  private alwaysRelate = [
-    "type",
-    "survey",
-    "survey.surveyLetters",
-    "survey.surveyLetters.letter",
-    "survey.surveyLetters.letterType",
-    "surveyResponses",
-  ];
+  private alwaysRelate = {
+    type: true,
+    survey: {
+      surveyLetters: {
+        letter: true,
+        letterType: true,
+      },
+    },
+    surveyResponses: true,
+  };
 
-  readAll() {
+  readAll(): Promise<Group[]> {
     return this.repo.find({
       relations: this.alwaysRelate,
     });
   }
 
   readOne(id: number): Promise<Group> {
-    return this.repo.findOne(id, {
+    return this.repo.findOne({
+      where: { id },
       relations: this.alwaysRelate,
     });
   }
 
   findByCodeWord(codeWord: string) {
-    return this.repo.findOne({ codeWord });
+    return this.repo.findOneBy({ codeWord });
   }
 
   /**
@@ -169,10 +173,10 @@ export class GroupService {
    */
   findOpen() {
     const now = DateTime.now().toString();
-    debug("Check for groups open as of %s", now);
-    return this.repo.find({
-      closedAfter: MoreThan(now),
-      reportSent: null,
+    debug("Check for open groups as of %s", now);
+    return this.repo.findBy({
+      closedAfter: Raw((alias) => `${alias} > ${now}`),
+      reportSent: IsNull(),
     });
   }
 
@@ -181,10 +185,10 @@ export class GroupService {
    */
   findReadyForReport() {
     const now = DateTime.now().toString();
-    debug("Check for ready to report groups as of %s", now);
-    return this.repo.find({
-      closedAfter: LessThan(now),
-      reportSent: null,
+    debug("Check for ready-to-report groups as of %s", now);
+    return this.repo.findBy({
+      closedAfter: Raw((alias) => `${alias} < ${now}`),
+      reportSent: IsNull(),
     });
   }
 

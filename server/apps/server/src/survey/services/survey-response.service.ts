@@ -33,7 +33,8 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id, {
+    return this.repo.findOne({
+      where: { id },
       relations: this.alwaysRelate,
     });
   }
@@ -58,12 +59,14 @@ export class SurveyResponseService extends BaseService<SurveyResponse> {
   }
 
   readForAnalysis(id: number) {
-    return this.repo.findOne(id, {
-      relations: [
-        "survey",
-        "surveyItemResponses",
-        "surveyItemResponses.surveyItems",
-      ],
+    return this.repo.findOne({
+      where: { id },
+      relations: {
+        survey: true,
+        surveyItemResponses: {
+          surveyItem: true,
+        },
+      },
     });
   }
 

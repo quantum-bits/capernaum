@@ -26,7 +26,7 @@ export class UserRoleService extends BaseService<UserRole> {
   }
 
   readOne(id: number) {
-    return this.repo.findOne(id);
+    return this.repo.findOneBy({ id });
   }
 
   readAll() {
@@ -59,10 +59,15 @@ export class UserService extends BaseService<User> {
     );
   }
 
-  private alwaysRelate = ["roles"];
+  private alwaysRelate = {
+    roles: true,
+  };
 
   readOne(id: number) {
-    return this.repo.findOne(id, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { id },
+      relations: this.alwaysRelate,
+    });
   }
 
   readAll() {
@@ -70,7 +75,10 @@ export class UserService extends BaseService<User> {
   }
 
   findUserByEmail(email: string) {
-    return this.repo.findOne({ email }, { relations: this.alwaysRelate });
+    return this.repo.findOne({
+      where: { email },
+      relations: this.alwaysRelate,
+    });
   }
 
   update(updateInput: UserUpdateInput) {
