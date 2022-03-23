@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: SurveyLetters
+// GraphQL query operation: SurveyLetter
 // ====================================================
 
-export interface SurveyLetters_surveyLetters_survey_surveyDimensions_surveyIndices {
+export interface SurveyLetter_surveyLetter_survey_surveyDimensions_surveyIndices {
   /**
    * Unique ID for this entity
    */
@@ -22,7 +22,7 @@ export interface SurveyLetters_surveyLetters_survey_surveyDimensions_surveyIndic
   title: string;
 }
 
-export interface SurveyLetters_surveyLetters_survey_surveyDimensions {
+export interface SurveyLetter_surveyLetter_survey_surveyDimensions {
   /**
    * Unique ID for this entity
    */
@@ -31,10 +31,10 @@ export interface SurveyLetters_surveyLetters_survey_surveyDimensions {
    * Title of this dimension (e.g., 'Focus on Prayer')
    */
   title: string;
-  surveyIndices: SurveyLetters_surveyLetters_survey_surveyDimensions_surveyIndices[];
+  surveyIndices: SurveyLetter_surveyLetter_survey_surveyDimensions_surveyIndices[];
 }
 
-export interface SurveyLetters_surveyLetters_survey {
+export interface SurveyLetter_surveyLetter_survey {
   /**
    * Unique ID for this entity
    */
@@ -50,10 +50,10 @@ export interface SurveyLetters_surveyLetters_survey {
   /**
    * Dimensions for this survey; groups indices, which group items.
    */
-  surveyDimensions: SurveyLetters_surveyLetters_survey_surveyDimensions[];
+  surveyDimensions: SurveyLetter_surveyLetter_survey_surveyDimensions[];
 }
 
-export interface SurveyLetters_surveyLetters_letter_letterElements_letterElementType {
+export interface SurveyLetter_surveyLetter_letter_letterElements_letterElementType {
   /**
    * Unique ID for this entity
    */
@@ -68,7 +68,7 @@ export interface SurveyLetters_surveyLetters_letter_letterElements_letterElement
   description: string;
 }
 
-export interface SurveyLetters_surveyLetters_letter_letterElements_image {
+export interface SurveyLetter_surveyLetter_letter_letterElements_image {
   /**
    * Unique ID for this entity
    */
@@ -80,7 +80,7 @@ export interface SurveyLetters_surveyLetters_letter_letterElements_image {
   url: string;
 }
 
-export interface SurveyLetters_surveyLetters_letter_letterElements_surveyDimension {
+export interface SurveyLetter_surveyLetter_letter_letterElements_surveyDimension {
   /**
    * Unique ID for this entity
    */
@@ -91,12 +91,12 @@ export interface SurveyLetters_surveyLetters_letter_letterElements_surveyDimensi
   title: string;
 }
 
-export interface SurveyLetters_surveyLetters_letter_letterElements {
+export interface SurveyLetter_surveyLetter_letter_letterElements {
   /**
    * Unique ID for this entity
    */
   id: number;
-  letterElementType: SurveyLetters_surveyLetters_letter_letterElements_letterElementType;
+  letterElementType: SurveyLetter_surveyLetter_letter_letterElements_letterElementType;
   /**
    * sequence number
    */
@@ -105,11 +105,11 @@ export interface SurveyLetters_surveyLetters_letter_letterElements {
    * Quill text delta
    */
   textDelta: string | null;
-  image: SurveyLetters_surveyLetters_letter_letterElements_image | null;
-  surveyDimension: SurveyLetters_surveyLetters_letter_letterElements_surveyDimension | null;
+  image: SurveyLetter_surveyLetter_letter_letterElements_image | null;
+  surveyDimension: SurveyLetter_surveyLetter_letter_letterElements_surveyDimension | null;
 }
 
-export interface SurveyLetters_surveyLetters_letter {
+export interface SurveyLetter_surveyLetter_letter {
   /**
    * Unique ID for this entity
    */
@@ -133,10 +133,10 @@ export interface SurveyLetters_surveyLetters_letter {
   /**
    * Elements that make up this letter
    */
-  letterElements: SurveyLetters_surveyLetters_letter_letterElements[];
+  letterElements: SurveyLetter_surveyLetter_letter_letterElements[];
 }
 
-export interface SurveyLetters_surveyLetters_letterType {
+export interface SurveyLetter_surveyLetter_letterType {
   /**
    * Unique ID for this entity
    */
@@ -151,7 +151,7 @@ export interface SurveyLetters_surveyLetters_letterType {
   description: string;
 }
 
-export interface SurveyLetters_surveyLetters {
+export interface SurveyLetter_surveyLetter {
   /**
    * Unique ID for this entity
    */
@@ -159,20 +159,24 @@ export interface SurveyLetters_surveyLetters {
   /**
    * The survey
    */
-  survey: SurveyLetters_surveyLetters_survey;
+  survey: SurveyLetter_surveyLetter_survey;
   /**
    * The letter
    */
-  letter: SurveyLetters_surveyLetters_letter;
+  letter: SurveyLetter_surveyLetter_letter;
   /**
    * The letter type
    */
-  letterType: SurveyLetters_surveyLetters_letterType;
+  letterType: SurveyLetter_surveyLetter_letterType;
 }
 
-export interface SurveyLetters {
+export interface SurveyLetter {
   /**
-   * Retrieve all survey letters
+   * Retrieve one survey letter
    */
-  surveyLetters: SurveyLetters_surveyLetters[];
+  surveyLetter: SurveyLetter_surveyLetter;
+}
+
+export interface SurveyLetterVariables {
+  id: number;
 }

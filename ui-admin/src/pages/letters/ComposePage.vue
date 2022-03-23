@@ -40,18 +40,18 @@
 import Vue from "vue";
 import { Route } from "vue-router";
 import PageHeader from "@/pages/PageHeader.vue";
-import {
-  SurveyLetters,
-  SurveyLetters_surveyLetters,
-  SurveyLetters_surveyLetters_letter_letterElements,
-} from "@/graphql/types/SurveyLetters";
 import { SURVEY_LETTER_QUERY } from "@/graphql/surveys.graphql";
 import LetterDetailsTab from "@/pages/letters/LetterDetailsTab.vue";
 import LetterContentTab from "@/pages/letters/LetterContentTab.vue";
 import LetterPreviewTab from "@/pages/letters/LetterPreviewTab.vue";
+import {
+  SurveyLetter,
+  SurveyLetter_surveyLetter,
+  SurveyLetter_surveyLetter_letter_letterElements,
+} from "@/graphql/types/SurveyLetter";
 
 interface LetterElement
-  extends SurveyLetters_surveyLetters_letter_letterElements {
+  extends SurveyLetter_surveyLetter_letter_letterElements {
   editModeOn: boolean;
   isNew: boolean;
   key: string;
@@ -80,7 +80,7 @@ export default Vue.extend({
     }
 
     this.$apollo
-      .query<SurveyLetters>({
+      .query<SurveyLetter>({
         query: SURVEY_LETTER_QUERY,
         variables: {
           id: parseInt(surveyLetterId),
@@ -103,7 +103,7 @@ export default Vue.extend({
       isChartDialogVisible: false,
       isImageDialogVisible: false,
 
-      surveyLetter: {} as SurveyLetters_surveyLetters,
+      surveyLetter: {} as SurveyLetter_surveyLetter,
 
       // OLD STUFF
       editModeOn: false,

@@ -271,9 +271,62 @@ export const UPDATE_ASSOCIATION_TABLE = gql`
   }
 `;
 
+export const SURVEY_LETTER_QUERY = gql`
+  query SurveyLetter($id: Int!) {
+    surveyLetter(id: $id) {
+      id
+      survey {
+        id
+        qualtricsName
+        importedDate
+        surveyDimensions {
+          id
+          title
+          surveyIndices {
+            id
+            abbreviation
+            title
+          }
+        }
+      }
+      letter {
+        id
+        title
+        updated
+        description
+        emailMessage
+        letterElements {
+          id
+          letterElementType {
+            id
+            key
+            description
+          }
+          sequence
+          textDelta
+          image {
+            id
+            title
+            url
+          }
+          surveyDimension {
+            id
+            title
+          }
+        }
+      }
+      letterType {
+        id
+        key
+        description
+      }
+    }
+  }
+`;
+
 export const SURVEY_LETTERS_QUERY = gql`
-  query SurveyLetters($id: Int) {
-    surveyLetters(id: $id) {
+  query SurveyLetters {
+    surveyLetters {
       id
       survey {
         id
