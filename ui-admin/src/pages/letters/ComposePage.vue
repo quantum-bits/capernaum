@@ -45,7 +45,7 @@ import {
   SurveyLetters_surveyLetters,
   SurveyLetters_surveyLetters_letter_letterElements,
 } from "@/graphql/types/SurveyLetters";
-import { SURVEY_LETTERS_QUERY } from "@/graphql/surveys.graphql";
+import { SURVEY_LETTER_QUERY } from "@/graphql/surveys.graphql";
 import LetterDetailsTab from "@/pages/letters/LetterDetailsTab.vue";
 import LetterContentTab from "@/pages/letters/LetterContentTab.vue";
 import LetterPreviewTab from "@/pages/letters/LetterPreviewTab.vue";
@@ -81,17 +81,15 @@ export default Vue.extend({
 
     this.$apollo
       .query<SurveyLetters>({
-        query: SURVEY_LETTERS_QUERY,
+        query: SURVEY_LETTER_QUERY,
         variables: {
           id: parseInt(surveyLetterId),
         },
       })
       .then((result) => {
-        this.surveyLetter = result.data.surveyLetters[0];
+        this.surveyLetter = result.data.surveyLetter;
         console.info(
-          "SURVEY LETTER LOADED",
-          this.surveyLetter.letter.title,
-          this.surveyLetter.survey.qualtricsName
+          `SURVEY LETTER LOADED: letter '${this.surveyLetter.letter.title}', survey '${this.surveyLetter.survey.qualtricsName}'`
         );
       })
       .catch((err) => {

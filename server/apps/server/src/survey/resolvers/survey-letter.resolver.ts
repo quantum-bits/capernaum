@@ -4,6 +4,9 @@ import {
   SurveyLetterCreateInput,
 } from "@server/src/survey/entities";
 import { SurveyLetterService } from "@server/src/survey/services";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("survey-letter");
 
 @Resolver(() => SurveyLetter)
 export class SurveyLetterResolver {
@@ -20,20 +23,21 @@ export class SurveyLetterResolver {
     return this.surveyLetterService.create(surveyLetterCreateInput);
   }
 
-  @Query(() => [SurveyLetter], { description: "Retrieve all survey letters" })
-  surveyLetters(
+  @Query(() => SurveyLetter, { description: "Retrieve one survey letter" })
+  surveyLetter(
     @Args({
       name: "id",
-      description: "Optional survey letter ID",
+      description: "Survey letter ID",
       type: () => Int,
-      nullable: true,
     })
-    id?: number
+    id: number
   ) {
-    if (id !== undefined) {
-      return this.surveyLetterService.readOne(id);
-    } else {
-      return this.surveyLetterService.readAll();
-    }
+    debug("surveyLetters(id=%d)", id);
+    return this.surveyLetterService.readOne(id);
+  }
+
+  @Query(() => [SurveyLetter], { description: "Retrieve all survey letters" })
+  surveyLetters() {
+    return this.surveyLetterService.readAll();
   }
 }

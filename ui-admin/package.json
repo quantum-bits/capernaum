@@ -30,7 +30,6 @@
     "filepond": "^4.28.2",
     "filepond-plugin-image-preview": "^4.6.10",
     "graphql": "^15.5.3",
-    "graphql-tag": "^2.12.6",
     "is": "^3.3.0",
     "lodash": "^4.17.21",
     "luxon": "^1.27.0",

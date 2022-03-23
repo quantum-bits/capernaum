@@ -602,11 +602,14 @@ type Query {
   """Retrieve all survey items"""
   surveyItemsReadAll: [SurveyItem!]!
 
+  """Retrieve one survey letter"""
+  surveyLetter(
+    """Survey letter ID"""
+    id: Int!
+  ): SurveyLetter!
+
   """Retrieve all survey letters"""
-  surveyLetters(
-    """Optional survey letter ID"""
-    id: Int
-  ): [SurveyLetter!]!
+  surveyLetters: [SurveyLetter!]!
 
   """Fetch all surveys"""
   surveys: [Survey!]!

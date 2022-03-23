@@ -81,11 +81,16 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
     });
   }
 
-  readOne(id: number) {
-    return this.repo.findOne({
-      where: { id },
-      relations: this.alwaysRelate,
-    });
+  readOne(id: number): Promise<SurveyLetter> {
+    return this.repo
+      .findOne({
+        where: { id },
+        relations: this.alwaysRelate,
+      })
+      .then((result) => {
+        debug("surveyLetter.readOne/%O", result);
+        return result;
+      });
   }
 
   readAll() {
