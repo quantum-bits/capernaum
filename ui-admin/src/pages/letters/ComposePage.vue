@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Route, RawLocation } from "vue-router";
+import { Route } from "vue-router";
 import PageHeader from "@/pages/PageHeader.vue";
 import {
   SurveyLetters,
@@ -180,22 +180,14 @@ export default Vue.extend({
     beforeRouteUpdate(
       to: Route,
       from: Route,
-      next: (
-        to?: RawLocation | false | ((vm: Vue.Component) => any) | void
-      ) => void
+      next: (to?: false) => void
     ): void {
       console.log("before route update!");
       this.name = to.params.name;
       next();
     },
 
-    beforeRouteLeave(
-      to: Route,
-      from: Route,
-      next: (
-        to?: RawLocation | false | ((vm: Vue.Component) => any) | void
-      ) => void
-    ): void {
+    beforeRouteLeave(to: Route, from: Route, next: (to?: false) => void): void {
       console.log("inside before route leave!");
       if (!this.allEditsSaved) {
         const answer = window.confirm(
