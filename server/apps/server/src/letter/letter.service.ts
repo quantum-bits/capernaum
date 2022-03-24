@@ -176,6 +176,11 @@ export class LetterElementService extends BaseService<LetterElement> {
     super(repo);
   }
 
+  private alwaysRelate = {
+    letterElementType: true,
+    image: true,
+  };
+
   async create(createInput: LetterElementCreateInput) {
     const letter = await this.letterService.readOne(createInput.letterId);
     const letterElementType = await this.letterElementTypeService.readOne(
@@ -192,18 +197,20 @@ export class LetterElementService extends BaseService<LetterElement> {
 
     return this.repo.findOneOrFail({
       where: { id: newLetterElement.id },
-      relations: { letterElementType: true },
+      relations: this.alwaysRelate,
     });
   }
 
   async update(updateInput: LetterElementUpdateInput) {
-    debug("Update input %O", updateInput);
+    debug("LetterElementService.update %O", updateInput);
 
     const surveyDimension = await this.surveyDimensionService.readOne(
       updateInput.surveyDimensionId
     );
+    debug("%O", surveyDimension);
 
     const image = await this.imageService.readOne(updateInput.imageId);
+    debug("image %O", image);
 
     return this.repo
       .preload({
@@ -259,7 +266,7 @@ export class LetterElementService extends BaseService<LetterElement> {
     // Fetch with additional relations to make client happier.
     return this.repo.find({
       where: { id: In(letterElementIds) },
-      relations: { letterElementType: true },
+      relations: this.alwaysRelate,
     });
   }
 

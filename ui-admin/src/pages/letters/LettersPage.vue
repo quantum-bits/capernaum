@@ -100,6 +100,7 @@ export default Vue.extend({
     allSurveyLetters: {
       query: SURVEY_LETTERS_QUERY,
       update: (data) => data.surveyLetters,
+      fetchPolicy: "cache-and-network",
     },
   },
 

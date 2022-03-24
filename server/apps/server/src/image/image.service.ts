@@ -27,7 +27,7 @@ export class ImageService extends BaseService<Image> {
   private alwaysRelate = {
     letterElements: {
       letter: true,
-      letterElements: true,
+      letterElementType: true,
     },
   };
 

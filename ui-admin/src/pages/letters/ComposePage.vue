@@ -27,7 +27,7 @@
     
               - ordering within categories for letters (order by survey, and then more ordering below this level)
     
-              - IMPT(?) need to do something to have multiple vue2-editor instances at the same time(!)
+              - Important(?) need to do something to have multiple vue2-editor instances at the same time(!)
     
               - if the letter contains the "SE strategies for user" element, and the boolean association
               table is dropped for that letter, then the "SE strategies for user" element should also be dropped (or maybe
@@ -57,11 +57,6 @@ interface LetterElement
   key: string;
 }
 
-export interface SelectedItem {
-  text: string;
-  value: number;
-}
-
 export default Vue.extend({
   name: "ComposePage",
 
@@ -73,7 +68,7 @@ export default Vue.extend({
     LetterPreviewTab,
   },
 
-  created() {
+  mounted() {
     const surveyLetterId = this.$route.params.surveyLetterId;
     if (!surveyLetterId) {
       throw new Error("No survey letter ID supplied in URL");
@@ -85,6 +80,7 @@ export default Vue.extend({
         variables: {
           id: parseInt(surveyLetterId),
         },
+        fetchPolicy: "network-only",
       })
       .then((result) => {
         this.surveyLetter = result.data.surveyLetter;
@@ -198,17 +194,6 @@ export default Vue.extend({
         }
       } else {
         next();
-      }
-    },
-
-    // assume that when we edit a text box, we save all of them (to make sure that ordering info is preserved, etc.)
-    mounted(): void {
-      this.name = this.$route.params.name;
-      if (this.$route.params.letterId === undefined) {
-        // launch form for creating a new letter
-        // FIXME -- this.editModeOn = true;
-        // FIXME -- this.isNew = true;
-        console.log("new letter....");
       }
     },
   },

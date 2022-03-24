@@ -30,6 +30,7 @@ export class SurveyLetterService extends BaseService<SurveyLetter> {
     letter: {
       letterElements: {
         letterElementType: true,
+        image: true,
       },
     },
     letterType: true,

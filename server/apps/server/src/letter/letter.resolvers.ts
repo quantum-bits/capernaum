@@ -99,6 +99,7 @@ export class LetterElementResolver {
 
   @ResolveField("image", () => Image, { nullable: true })
   resolveImage(@Parent() letterElement: LetterElement) {
+    debug("LetterElementResolver.resolveImage/%O", letterElement);
     return this.letterElementService.resolveRelatedImage(letterElement);
   }
 

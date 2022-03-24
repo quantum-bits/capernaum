@@ -332,39 +332,17 @@ export const SURVEY_LETTERS_QUERY = gql`
         id
         qualtricsName
         importedDate
-        surveyDimensions {
-          id
-          title
-          surveyIndices {
-            id
-            abbreviation
-            title
-          }
-        }
       }
       letter {
         id
         title
         updated
         description
-        emailMessage
         letterElements {
           id
-          letterElementType {
-            id
-            key
-            description
-          }
           sequence
-          textDelta
-          image {
-            id
-            title
-            url
-          }
-          surveyDimension {
-            id
-            title
+          letterElementType {
+            key
           }
         }
       }
