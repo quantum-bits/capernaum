@@ -200,39 +200,6 @@ export const UPDATE_SURVEY = gql`
   }
 `;
 
-export const ONE_SURVEY_QUERY = gql`
-  query OneSurvey($surveyId: Int!, $which: WhichItems = All) {
-    survey(id: $surveyId) {
-      id
-      qualtricsName
-      surveyItems(whichItems: $which) {
-        id
-        qualtricsId
-        qualtricsText
-      }
-      surveyDimensions {
-        id
-        title
-        surveyIndices {
-          id
-          title
-          abbreviation
-          useForPredictions
-          scriptureEngagementPractices {
-            id
-            title
-          }
-          surveyItems {
-            id
-            qualtricsId
-            qualtricsText
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const DELETE_DIMENSION = gql`
   mutation TossSurveyDimension($id: Int!) {
     deleteSurveyDimension(id: $id) {
@@ -332,6 +299,10 @@ export const SURVEY_LETTERS_QUERY = gql`
         id
         qualtricsName
         importedDate
+        surveyDimensions {
+          id
+          title
+        }
       }
       letter {
         id
@@ -342,7 +313,14 @@ export const SURVEY_LETTERS_QUERY = gql`
           id
           sequence
           letterElementType {
+            id
             key
+          }
+          image {
+            id
+          }
+          surveyDimension {
+            id
           }
         }
       }

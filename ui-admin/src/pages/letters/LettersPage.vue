@@ -46,9 +46,7 @@
                 <v-tooltip v-if="canDeleteLetter(surveyLetter.letter)" top>
                   <template v-slot:activator="{ on }">
                     <a @click="deleteLetter(surveyLetter.letter.id)" v-on="on">
-                      <v-icon>
-                        {{ "mdi-close-circle" }}
-                      </v-icon>
+                      <v-icon>mdi-close-circle</v-icon>
                     </a>
                   </template>
                   <span>Delete this letter.</span>
@@ -56,7 +54,7 @@
                 <v-tooltip v-else top>
                   <template v-slot:activator="{ on }">
                     <v-icon v-on="on" class="grey--text text--lighten-1">
-                      {{ "mdi-close-circle" }}
+                      mdi-close-circle
                     </v-icon>
                   </template>
                   <span>
@@ -125,6 +123,7 @@ export default Vue.extend({
 
   methods: {
     canDeleteLetter(letter: SurveyLetters_surveyLetters_letter): boolean {
+      console.log(`${letter.title} element count ${letter.letterElements.length}`);
       return letter.letterElements.length === 0;
     },
 
