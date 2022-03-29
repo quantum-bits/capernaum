@@ -98,7 +98,12 @@ export default Vue.extend({
     allSurveyLetters: {
       query: SURVEY_LETTERS_QUERY,
       update: (data) => data.surveyLetters,
-      fetchPolicy: "cache-and-network",
+      // Make sure we refetch all the letter information. Otherwise, changes
+      // to letter content (particularly removing all letter elements) will
+      // confuse the template. The "delete" button will not even appear (!)
+      // after deleting the last letter element.
+      // TODO: Is there a better way to handle this? `cache-and-network` doesn't work.
+      fetchPolicy: "no-cache",
     },
   },
 
@@ -123,7 +128,9 @@ export default Vue.extend({
 
   methods: {
     canDeleteLetter(letter: SurveyLetters_surveyLetters_letter): boolean {
-      console.log(`${letter.title} element count ${letter.letterElements.length}`);
+      console.log(
+        `${letter.title} element count ${letter.letterElements.length}`
+      );
       return letter.letterElements.length === 0;
     },
 

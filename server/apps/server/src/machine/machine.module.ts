@@ -6,6 +6,6 @@ import { MachineService } from "./machine.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Machine])],
-  providers: [MachineService, MachineResolver]
+  providers: [MachineService, MachineResolver],
 })
 export class MachineModule {}

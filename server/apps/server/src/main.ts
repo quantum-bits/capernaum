@@ -6,6 +6,7 @@ PrettyError.start();
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { Logger } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,8 @@ async function bootstrap() {
   await app.listen(3000);
 }
 
+const logger = new Logger("Main");
+
 bootstrap()
-  .then(() => console.log("Capernaum started successfully"))
-  .catch((error) => console.error(`Failed: ${error}`));
+  .then(() => logger.log("Capernaum bootstrapped successfully"))
+  .catch((error) => logger.error(`Failed: ${error}`));

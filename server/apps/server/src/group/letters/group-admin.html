@@ -14,33 +14,31 @@
 </ul>
 
 <p>
-  Your next step will be to notify your group members that the survey is now 
-  available to them (email, text, social media, etc.). Be sure to let them know 
-  your group code and the survey closing date for your group (see above), 
-  which they will need to get started.  
+  Your next step will be to notify your group members that the survey is now
+  available to them (email, text, social media, etc.). Be sure to let them know
+  your group code and the survey closing date for your group (see above), which
+  they will need to get started.
 </p>
 
-<p>
-  Please note:
-</p>
+<p>Please note:</p>
 <ul>
   <li>
-    You may add as many people as you would like to take the survey at any time 
-    until the survey is closed.  It is not possible to add people to the survey 
+    You may add as many people as you would like to take the survey at any time
+    until the survey is closed. It is not possible to add people to the survey
     after it is closed.
   </li>
   <li>
-    You will not hear back from us again until the survey is closed 
-    and we send you your report.
+    You will not hear back from us again until the survey is closed and we send
+    you your report.
   </li>
   <li>
-    If you'd like, you can follow the suggested message below to send out 
-    to the people in your group.  Feel free to modify it as you’d like. 
+    If you'd like, you can follow the suggested message below to send out to the
+    people in your group. Feel free to modify it as you’d like.
   </li>
   <li>
-    It's possible that your email to your group members won't make it 
-    through their spam filters.  You should consider sending a separate 
-    email to your group members letting them know to check their spam filters.
+    It's possible that your email to your group members won't make it through
+    their spam filters. You should consider sending a separate email to your
+    group members letting them know to check their spam filters.
   </li>
 </ul>
 
@@ -54,58 +52,46 @@
 
 <hr />
 <blockquote>
+  <p>Example message to your group members:</p>
+
+  <p>Dear {{ name }}:</p>
 
   <p>
-    Example message to your group members:
+    I’m excited to share with you the link and group code (see below) for the
+    Christian Life Survey. The CLS is designed to give you new ways to think
+    about your walk with God and will provide you insights into your spiritual
+    priorities and areas of focus that can help you engage better with
+    Scripture. The survey is free.
   </p>
 
   <p>
-    Dear {{ name }}:
+    Most people need from 15 to 25 minutes to complete the survey. You’ll
+    receive your personal results by email within a few minutes. Your answers
+    will not be shared with anyone other than you. I will get averages for our
+    group and your results might be included in aggregate results (results for
+    thousands of people all joined together) reported by the Center for
+    Scripture Engagement, but only you will see your individual results.
   </p>
 
-  <p>
-    I’m excited to share with you the link and group code (see below) for the Christian Life Survey.  
-    The CLS is designed to give you new ways to think about your walk with God and will provide 
-    you insights into your spiritual priorities and areas of focus that can help you engage 
-    better with Scripture.  The survey is free.
-  </p>
-
-  <p>
-    Most people need from 15 to 25 minutes to complete the survey. You’ll receive your personal 
-    results by email within a few minutes. Your answers will not be shared with anyone other than 
-    you. I will get averages for our group and your results might be included in aggregate results 
-    (results for thousands of people all joined together) reported by the Center for Scripture 
-    Engagement, but only you will see your individual results.  
-  </p>
-
-  <p>
-    Here is the information you need to know to take the survey.
-  </p>
+  <p>Here is the information you need to know to take the survey.</p>
   <ul>
     <li>
-      <a href="{{ tuClsUrl }}">Link </a> to the survey at Taylor University's web site
+      <a href="{{ tuClsUrl }}">Link </a> to the survey at Taylor University's
+      web site
       <span> ( {{ tuClsUrl }} ) </span>
       (scroll down and click on "Take Survey")
     </li>
     <li>
-      When you are asked if you want to take an individual survey or the group survey, 
-      select group survey by entering our <strong>group code</strong>: {{codeWord}}
+      When you are asked if you want to take an individual survey or the group
+      survey, select group survey by entering our <strong>group code</strong>:
+      {{codeWord}}
     </li>
     <li>Click the <strong>Go To Survey</strong> button.</li>
-    <li>
-      You must take the survey by midnight on {{ closedAfter }}.
-    </li>
+    <li>You must take the survey by midnight on {{ closedAfter }}.</li>
   </ul>
 
-  <p>
-    I’m looking forward to talking to you about the survey.
-  </p>
+  <p>I’m looking forward to talking to you about the survey.</p>
 
-  <p>
-    Sincerely,
-  </p>
-  <p>
-    {{ adminFirstName }} {{ adminLastName }}
-  </p>
-
+  <p>Sincerely,</p>
+  <p>{{ adminFirstName }} {{ adminLastName }}</p>
 </blockquote>

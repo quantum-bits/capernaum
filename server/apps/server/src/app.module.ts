@@ -11,6 +11,7 @@ import { WriterModule } from "./writer/writer.module";
 import { QualtricsModule } from "./qualtrics/qualtrics.module";
 import { MachineModule } from "./machine/machine.module";
 import { GroupModule } from "./group/group.module";
+import { CommonModule } from "./common/common.module";
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { GroupModule } from "./group/group.module";
       driver: ApolloDriver,
       autoSchemaFile: "generated-schema.graphql",
       installSubscriptionHandlers: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req }) => req,
     }),
     SurveyModule,
     PredictionModule,
@@ -33,6 +34,7 @@ import { GroupModule } from "./group/group.module";
     QualtricsModule,
     MachineModule,
     GroupModule,
+    CommonModule,
   ],
 })
 export class AppModule {}
