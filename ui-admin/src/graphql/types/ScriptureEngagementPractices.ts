@@ -36,6 +36,10 @@ export interface ScriptureEngagementPractices_scriptureEngagementPractices {
    */
   moreInfoUrl: string;
   /**
+   * Include this SEP in prediction counts?
+   */
+  forPredictionCounts: boolean;
+  /**
    * Survey indices for this SEP
    */
   surveyIndices: ScriptureEngagementPractices_scriptureEngagementPractices_surveyIndices[];

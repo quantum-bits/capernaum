@@ -7,6 +7,7 @@ export const ALL_SCRIPTURE_ENGAGEMENT_PRACTICES = gql`
       title
       description
       moreInfoUrl
+      forPredictionCounts
       surveyIndices {
         id
         title
@@ -24,6 +25,7 @@ export const ADD_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       title
       description
       moreInfoUrl
+      forPredictionCounts
     }
   }
 `;
@@ -37,6 +39,7 @@ export const UPDATE_SCRIPTURE_ENGAGEMENT_PRACTICE_MUTATION = gql`
       title
       description
       moreInfoUrl
+      forPredictionCounts
     }
   }
 `;

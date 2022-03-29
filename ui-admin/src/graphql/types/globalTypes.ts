@@ -8,15 +8,6 @@
 //==============================================================
 
 /**
- * Which items to retrieve: all, those with an index, those without an index
- */
-export enum WhichItems {
-  All = "All",
-  WithIndex = "WithIndex",
-  WithoutIndex = "WithoutIndex",
-}
-
-/**
  * Communicate updates to survey index-to-SE practice relationships
  */
 export interface AssociationUpdateInput {
