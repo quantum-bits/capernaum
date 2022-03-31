@@ -22,6 +22,7 @@ import { CommonModule } from "./common/common.module";
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      cors: true,
       autoSchemaFile: "generated-schema.graphql",
       installSubscriptionHandlers: true,
       context: ({ req }) => req,
