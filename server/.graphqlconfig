@@ -10,6 +10,13 @@
           "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoiVG9tIiwibGFzdE5hbWUiOiJOdXJra2FsYSIsImVtYWlsIjoidG9tLm51cmtrYWxhQGdtYWlsLmNvbSIsInJvbGVzIjpbeyJpZCI6MSwibmFtZSI6InN5cy1hZG1pbiIsImRlc2NyaXB0aW9uIjoiU3lzdGVtIEFkbWluaXN0cmF0b3IifSx7ImlkIjoyLCJuYW1lIjoic3VydmV5LWFkbWluIiwiZGVzY3JpcHRpb24iOiJTdXJ2ZXkgQWRtaW5pc3RyYXRvciJ9XSwiaWF0IjoxNTc3MjA4MjczfQ.iEPP5Th97LjvsjGpyn25ZzoEJb48pbm0EDtijRplDRI"
         },
         "introspect": false
+      },
+      "Staging Server": {
+        "url": "https://admin.faraday-effect.com/graphql",
+        "headers": {
+          "user-agent": "JS GraphQL",
+          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZmlyc3ROYW1lIjoiVG9tIiwibGFzdE5hbWUiOiJOdXJra2FsYSIsImVtYWlsIjoidG9tLm51cmtrYWxhQGdtYWlsLmNvbSIsInJvbGVzIjpbeyJpZCI6MSwibmFtZSI6InN5cy1hZG1pbiIsImRlc2NyaXB0aW9uIjoiU3lzdGVtIEFkbWluaXN0cmF0b3IifSx7ImlkIjoyLCJuYW1lIjoic3VydmV5LWFkbWluIiwiZGVzY3JpcHRpb24iOiJTdXJ2ZXkgQWRtaW5pc3RyYXRvciJ9XSwiaWF0IjoxNjQ4NzU0NDkwfQ.YTclsp0_wDhkEPg_buEPyBykQoOpr6ipGLtv4oeCv2g"
+        }
       }
     }
   }
