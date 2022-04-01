@@ -11,6 +11,9 @@ import {
 import { InjectRepository } from "@nestjs/typeorm";
 import { BaseService } from "@server/src/shared/base.service";
 import { validatePassword } from "@server/src/auth/crypto";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("user");
 
 @Injectable()
 export class UserRoleService extends BaseService<UserRole> {
@@ -64,6 +67,7 @@ export class UserService extends BaseService<User> {
   };
 
   readOne(id: number) {
+    debug("UserService.readOne(%d)", id);
     return this.repo.findOne({
       where: { id },
       relations: this.alwaysRelate,
@@ -82,13 +86,17 @@ export class UserService extends BaseService<User> {
   }
 
   update(updateInput: UserUpdateInput) {
+    debug("UserService.update/%O", updateInput);
     return this.repo
       .preload(updateInput)
       .then((result) => this.repo.save(result));
   }
 
   async changePassword(passwordInput: ChangePasswordInput) {
+    debug("UserService.changePassword %O", passwordInput);
+
     const user = await this.readOne(passwordInput.userId);
+    debug("CURRENT USER %O", user);
 
     const validPassword = await validatePassword(
       passwordInput.currentPassword,
@@ -96,10 +104,11 @@ export class UserService extends BaseService<User> {
     );
 
     if (validPassword) {
-      return this.repo
-        .update(passwordInput.userId, { password: passwordInput.newPassword })
-        .then(() => "Password changed")
-        .catch((err) => `Something went wrong: ${err}`);
+      debug("PASSWORD VALID '%s'", passwordInput.currentPassword);
+      user.password = passwordInput.newPassword;
+      const updatedUser = await this.repo.save(user);
+      debug("UPDATED USER %O", updatedUser);
+      return "Password changed successfully";
     } else {
       return "Invalid credentials; please try again";
     }

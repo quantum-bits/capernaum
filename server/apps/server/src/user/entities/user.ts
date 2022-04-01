@@ -31,27 +31,12 @@ export class User extends AbstractEntity {
   @Column({ comment: "Encrypted password" })
   password: string; // Don't expose this via GraphQL.
 
-  private tempPassword: string;
-
-  @AfterLoad()
-  private loadTempPassword() {
-    this.tempPassword = this.password;
-    debug("AFTER LOAD '%s'", this.tempPassword);
-  }
-
   @BeforeInsert()
-  private async encryptOnAdd() {
-    this.password = await hashPassword(this.password);
-    debug("BEFORE INSERT %O", this);
-  }
-
   @BeforeUpdate()
-  private async encryptionUpdate() {
-    debug("BEFORE UPDATE '%s', '%s'", this.tempPassword, this.password);
-    if (this.tempPassword !== this.password) {
-      this.password = await hashPassword(this.password);
-      this.loadTempPassword();
-    }
+  private async encryptPassword() {
+    const savedPassword = this.password;
+    this.password = await hashPassword(this.password);
+    debug("ENCRYPT '%s' => '%s'", savedPassword, this.password);
   }
 
   @Field(() => [UserRole])
