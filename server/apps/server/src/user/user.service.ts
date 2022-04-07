@@ -92,16 +92,33 @@ export class UserService extends BaseService<User> {
       .then((result) => this.repo.save(result));
   }
 
-  async changePassword(passwordInput: ChangePasswordInput) {
+  /**
+   * Change a user's password.
+   * @param passwordInput - old and new password
+   * @param doValidation - whether to validate existing password.
+   *
+   * N.B., *only* call with `doValidation` false when invoked from a sys admin command
+   * (like the CLI). Never do so when data is coming from the network.
+   */
+  async changePassword(
+    passwordInput: ChangePasswordInput,
+    doValidation = true
+  ) {
     debug("UserService.changePassword %O", passwordInput);
 
     const user = await this.readOne(passwordInput.userId);
     debug("CURRENT USER %O", user);
 
-    const validPassword = await validatePassword(
-      passwordInput.currentPassword,
-      user.password
-    );
+    let validPassword = false;
+
+    if (doValidation) {
+      validPassword = await validatePassword(
+        passwordInput.currentPassword,
+        user.password
+      );
+    } else {
+      validPassword = true;
+    }
 
     if (validPassword) {
       debug("PASSWORD VALID '%s'", passwordInput.currentPassword);
