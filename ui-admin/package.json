@@ -9,7 +9,9 @@
     "test:unit": "vue-cli-service test:unit",
     "serve:json": "json-server --port 4000 --watch ./src/json-data/db.json",
     "gen:types": "rm -f ./src/graphql/types/*.ts && apollo client:codegen --no-addTypename --target=typescript --outputFlat ./src/graphql/types",
-    "depcruise": "depcruise --exclude '^node_modules' --output-type dot src | dot -T svg > dependencygraph.svg"
+    "depcruise": "depcruise --exclude '^node_modules' --output-type dot src | dot -T svg > dependencygraph.svg",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "dependencies": {
     "@tiptap/core": "^2.0.0-beta.174",
@@ -84,6 +86,7 @@
     "apollo": "^2.33.9",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
+    "cypress": "^9.5.3",
     "dependency-cruiser": "^10.0.7",
     "dotenv-webpack": "^7.0.3",
     "eslint": "^7.31.0",
