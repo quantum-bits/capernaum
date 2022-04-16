@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
+import { AllCapernaumSurveys_surveys as SurveyEntity } from "@/graphql/types/AllCapernaumSurveys";
 import StaticInfoList, {
   StaticInfoItem,
 } from "@/components/lists/StaticInfoList.vue";
@@ -70,11 +70,14 @@ interface GroupDetails {
 export default Vue.extend({
   name: "SurveyDetailsTab",
 
-  components: { StaticInfoList, EditSaveCancelButtons },
+  components: {
+    StaticInfoList,
+    EditSaveCancelButtons,
+  },
 
   props: {
     survey: {
-      type: Object as () => AllCapernaumSurveys_surveys,
+      type: Object as () => SurveyEntity,
       required: true,
     },
   },

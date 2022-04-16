@@ -299,7 +299,22 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
   },
 
+  watch: {
+    survey: {
+      handler: function (newSurvey: SurveyEntity) {
+        console.log("Updating workingSurvey");
+        this.workingSurvey = _.cloneDeep(newSurvey);
+      },
+      immediate: true,
+    },
+  },
+
   methods: {
+    emitUpdatedEvent() {
+      console.log("emitUpdatedEvent()");
+      this.$emit("survey-updated", this.workingSurvey);
+    },
+
     triggerSnackbar(content: string, color?: string) {
       this.$refs.snackbar.trigger(content, color);
     },
@@ -347,6 +362,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
                 this.workingSurvey.surveyDimensions.push(newDimension);
                 this.hideDimensionDialog();
                 this.triggerSnackbar("Dimension added");
+                this.emitUpdatedEvent();
               } else {
                 this.triggerSnackbar(
                   `Failed to create new dimension: ${response.errors}`,
@@ -377,6 +393,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
               _.assign(dimension, updatedDimension);
               this.hideDimensionDialog();
               this.triggerSnackbar("Dimension updated");
+              this.emitUpdatedEvent();
             })
             .catch((error) => {
               this.triggerSnackbar(
@@ -402,6 +419,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
                 (dim) => dim.id === dimension.id
               );
               this.triggerSnackbar("Dimension deleted");
+              this.emitUpdatedEvent();
             })
             .catch((error) => {
               this.triggerSnackbar(
@@ -470,6 +488,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
                 dimension.surveyIndices.push(newIndex);
                 this.hideIndexDialog();
                 this.triggerSnackbar("Index created");
+                this.emitUpdatedEvent();
               } else {
                 this.triggerSnackbar(
                   `Failed to create new index: ${response.errors}`,
@@ -514,6 +533,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
 
               this.hideIndexDialog();
               this.triggerSnackbar(`Index '${surveyIndex.title}' updated`);
+              this.emitUpdatedEvent();
             })
             .catch((error) => {
               this.triggerSnackbar(`Problem updating index: ${error}`);
@@ -538,6 +558,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
                 );
               });
               this.triggerSnackbar(`Index '${surveyIndex.title}' deleted`);
+              this.emitUpdatedEvent();
             })
             .catch((error) => {
               this.triggerSnackbar(`Problem deleting index: ${error}`);
