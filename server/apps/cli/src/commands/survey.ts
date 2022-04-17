@@ -6,6 +6,10 @@ import {
 } from "@server/src/survey/services";
 import { printPretty, printTable } from "@helpers/formatting";
 import * as _ from "lodash";
+import { SurveyModel } from "../models/survey.model";
+import { getDebugger } from "@helpers/debug-factory";
+
+const debug = getDebugger("cli");
 
 /**
  * Import a survey.
@@ -21,9 +25,20 @@ export async function listSurveys() {
   const surveys = await surveyService.readAll();
   await nestContext.close();
 
-  const headers = ["Survey ID", "Description"];
+  const headers = [
+    "ID",
+    "Q ID",
+    "Q Name",
+    "Q Mod Date",
+    "Imported",
+    "Description",
+  ];
   const data = _.map(surveys, (survey) => [
     survey.id,
+    survey.qualtricsId,
+    survey.qualtricsName,
+    survey.qualtricsModDate,
+    survey.importedDate?.toDateString(),
     survey.detailedDescription,
   ]);
 
@@ -55,4 +70,9 @@ export async function listSurveyLetters() {
       return idx === 2 || idx === 4;
     },
   });
+}
+
+export async function deleteSurvey(surveyId: string) {
+  debug("Delete survey with ID %d", surveyId);
+  await SurveyModel.query().deleteById(surveyId);
 }

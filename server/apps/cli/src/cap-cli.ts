@@ -38,6 +38,7 @@ import {
   listUsers,
   createUser,
   changePassword,
+  deleteSurvey,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
@@ -168,6 +169,12 @@ surveyCommands
   .command("letters")
   .description("list survey letters")
   .action(listSurveyLetters);
+
+surveyCommands
+  .command("delete")
+  .argument("<survey-id>", "survey ID (database key)")
+  .description("delete a survey with malice aforethought")
+  .action(deleteSurvey);
 
 // Group
 
