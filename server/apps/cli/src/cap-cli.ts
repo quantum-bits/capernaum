@@ -39,6 +39,7 @@ import {
   createUser,
   changePassword,
   deleteSurvey,
+  deleteUser,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
@@ -70,6 +71,12 @@ userCommands
   .argument("<user-id>", "database user ID")
   .argument("<new-password>", "plaint-text new password")
   .action(changePassword);
+
+userCommands
+  .command("delete")
+  .description("delete a user")
+  .argument("<email>", "user email address")
+  .action(deleteUser);
 
 // Qualtrics
 
@@ -172,7 +179,7 @@ surveyCommands
 
 surveyCommands
   .command("delete")
-  .argument("<survey-id>", "survey ID (database key)")
+  .argument("<survey-id>", "survey ID (SV_...)")
   .description("delete a survey with malice aforethought")
   .action(deleteSurvey);
 

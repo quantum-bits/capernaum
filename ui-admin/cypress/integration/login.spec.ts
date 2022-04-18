@@ -1,21 +1,23 @@
 describe("Login Page", () => {
-  it("logs in to Capernaum", () => {
+  before(() => {
+    cy.exec("cd ../server && yarn cli user delete brooke@example.com");
+    cy.exec(
+      "cd ../server && yarn cli user create Brook Trout brooke@example.com password"
+    );
+  });
+
+  it("logs in using the UI", () => {
     cy.visit("/");
+    cy.location("pathname").should("equal", "/login");
+
     cy.get("input[name='email']").type("brooke@example.com");
-    cy.get("input[name='password']").type("Password99");
-    cy.contains("Log In").click();
-    cy.url().should("contain", "letters");
+    cy.get("input[name='password']").type("password");
+    cy.get('[data-cy="login"]').click();
+
+    cy.location("pathname").should("equal", "/letters");
+    cy.contains("CapernaumAdmin").should("be.visible");
   });
 });
 
-describe("Survey Page", () => {
-  it("selects a survey", () => {
-    cy.visit("/surveys");
-  });
-});
-
-describe("Qualtrics Page", () => {
-  it("imports a survey", () => {
-    cy.visit("/qualtrics");
-  });
-});
+// Credits
+//   https://github.com/cypress-io/cypress-example-recipes/blob/master/examples/logging-in__jwt/cypress/integration/using-ui-spec.js

@@ -130,4 +130,8 @@ export class UserService extends BaseService<User> {
       return "Invalid credentials; please try again";
     }
   }
+
+  delete(email: string) {
+    return this.repo.delete({ email: email });
+  }
 }

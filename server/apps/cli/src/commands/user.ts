@@ -45,6 +45,21 @@ export async function createUser(
   console.log("NEW USER %O", newUser);
 }
 
+export async function deleteUser(email: string) {
+  debug(`Delete user '${email}'`);
+
+  const nestContext = new NestContext();
+  const userService: UserService = await nestContext.get(UserService);
+  const result = await userService.delete(email);
+  await nestContext.close();
+
+  if (result.affected === 1) {
+    console.log(`User '${email}' deleted`);
+  } else {
+    console.error("User not deleted");
+  }
+}
+
 export async function changePassword(userId: string, newPassword: string) {
   debug(`Change password '${userId}', '${newPassword}'`);
 

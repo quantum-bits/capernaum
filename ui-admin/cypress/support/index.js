@@ -14,7 +14,19 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+beforeEach(() => {
+  cy.window().then((win) => {
+    win.localStorage.setItem(
+      "vuex",
+      JSON.stringify({
+        accessToken:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAsImZpcnN0TmFtZSI6IkJyb29rIiwibGFzdE5hbWUiOiJUcm91dCIsImVtYWlsIjoiYnJvb2tlQGV4YW1wbGUuY29tIiwicm9sZXMiOltdLCJpYXQiOjE2NTAzMTE5OTh9.XUl7NBFjA5-wzuYVMxcusAdF4gelqn2ES9xALRZfuPw",
+      })
+    );
+  });
+});

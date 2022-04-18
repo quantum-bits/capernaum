@@ -74,5 +74,5 @@ export async function listSurveyLetters() {
 
 export async function deleteSurvey(surveyId: string) {
   debug("Delete survey with ID %d", surveyId);
-  await SurveyModel.query().deleteById(surveyId);
+  await SurveyModel.query().delete().where("qualtricsId", surveyId);
 }
