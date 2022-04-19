@@ -19,3 +19,4 @@ venv/
 .vscode/
 *DELETE-ME
 ormconfig.json
+cypress/video/

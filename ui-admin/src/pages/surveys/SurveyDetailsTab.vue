@@ -17,16 +17,19 @@
               v-model="groupDetails.okayForGroup"
               label="Okay for group?"
               @change="resetValidation"
+              data-cy="checkbox-okay-for-group"
             />
             <v-text-field
               v-model="groupDetails.publicName"
               label="Public name"
               :rules="[requiredForGroup]"
+              data-cy="text-field-public-name"
             />
             <v-text-field
               v-model="groupDetails.detailedDescription"
               label="Detailed description"
               :rules="[requiredForGroup]"
+              data-cy="text-field-detailed-description"
             />
           </v-form>
         </v-card-text>

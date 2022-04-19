@@ -6,6 +6,7 @@
         v-model="selectedSurveyId"
         :items="availableSurveys"
         @change="onSurveySelected"
+        data-cy="survey-select"
       />
     </page-header>
     <v-tabs v-model="currentTab" fixed-tabs>

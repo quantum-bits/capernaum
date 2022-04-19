@@ -1,10 +1,55 @@
 describe("Survey Page", () => {
-  before(() => {
+  beforeEach(() => {
     cy.capSetJWT();
-    cy.capImportSurvey();
   });
 
-  it("imports a survey", () => {
+  beforeEach(() => {
+    cy.capImportSurvey();
     cy.visit("/surveys");
+    cy.get('input[data-cy="survey-select"]').parent().click();
+    cy.get(".v-menu__content").contains("CLS Spring 2020 Copy").click();
+  });
+
+  it("fills out group info", () => {
+    cy.get(".v-tab").contains("Details").click();
+    cy.contains("Qualtrics Information").and("Group Settings");
+
+    cy.get('[data-cy="edit-save-cancel-edit-btn"]').click();
+    cy.get('input[data-cy="checkbox-okay-for-group"').check({ force: true });
+    cy.get('input[data-cy="text-field-public-name"]')
+      .clear()
+      .type("Group Name for Public Consumption");
+    cy.get('input[data-cy="text-field-detailed-description"]')
+      .clear()
+      .type("This is the one you want!");
+    cy.get('[data-cy="edit-save-cancel-save-btn"]').click();
+  });
+
+  describe.only("manages survey dimensions", () => {
+    beforeEach(() => {
+      cy.get(".v-tab").contains("Dimensions").click();
+      cy.contains("Dimensions, Indices, Items");
+    });
+
+    it("add dimensions", () => {
+      const dimNames = ["Dimension Red", "Dimension Green", "Dimension Blue"];
+
+      // Create each dimension.
+      for (const dimName of dimNames) {
+        cy.contains("Add Dimension").click();
+        cy.get('[data-cy="text-dimension-title"]').type(dimName);
+        cy.get('[data-cy="action-btn"]').click();
+      }
+
+      // Make sure the dimension is present in the tree.
+      for (const dimName of dimNames) {
+        cy.get('[data-cy="tree-view"]').contains(dimName);
+      }
+    });
+  });
+
+  it("opens the associations tab", () => {
+    cy.get(".v-tab").contains("Associations").click();
+    cy.contains("Scripture Engagement Associations");
   });
 });

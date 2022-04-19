@@ -5,6 +5,7 @@
       color="primary"
       :disabled="!enableEditButton"
       @click="enterEditMode"
+      data-cy="edit-save-cancel-edit-btn"
     >
       Edit
     </v-btn>
@@ -14,11 +15,17 @@
       color="warning"
       :disabled="!enableSaveButton"
       @click="saveChanges"
+      data-cy="edit-save-cancel-save-btn"
     >
       Save
     </v-btn>
 
-    <v-btn text :disabled="!enableCancelButton" @click="cancelEditMode">
+    <v-btn
+      text
+      :disabled="!enableCancelButton"
+      @click="cancelEditMode"
+      data-cy="edit-save-cancel-cancel-btn"
+    >
       Cancel
     </v-btn>
   </div>

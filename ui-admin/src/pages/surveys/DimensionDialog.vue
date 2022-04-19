@@ -11,15 +11,22 @@
             :rules="rules.required"
             outlined
             persistent-hint
+            data-cy="text-dimension-title"
           />
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
-          <v-btn text :disabled="!formValid" color="warning" @click="onReady">
+          <v-btn
+            text
+            :disabled="!formValid"
+            color="warning"
+            @click="onReady"
+            data-cy="action-btn"
+          >
             {{ mainActionLabel }}
           </v-btn>
-          <v-btn text @click="onCancel"> Cancel </v-btn>
+          <v-btn text @click="onCancel" data-cy="cancel-btn"> Cancel </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -96,7 +103,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
   methods: {
     onCancel() {
       this.visible = false;
-      // this.$refs.dimensionForm.reset();
+      this.$refs.dimensionForm.reset();
     },
 
     onReady() {
@@ -104,7 +111,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
         title: this.dimensionTitle,
       };
       this.visible = false;
-      // this.$refs.dimensionForm.reset();
+      this.$refs.dimensionForm.reset();
       this.$emit("ready", response);
     },
   },

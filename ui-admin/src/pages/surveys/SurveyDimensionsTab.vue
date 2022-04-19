@@ -24,6 +24,7 @@
           rounded
           hoverable
           :items="surveyContent"
+          data-cy="tree-view"
         >
           <template v-slot:label="{ item }">
             <span v-html="item.name" />
