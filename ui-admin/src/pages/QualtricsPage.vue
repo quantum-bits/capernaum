@@ -34,7 +34,11 @@
               </td>
               <td>{{ survey.qualtricsModDate | standardDate }}</td>
               <td>
-                <v-chip small :color="isImported(survey) ? 'success' : ''">
+                <v-chip
+                  small
+                  :color="isImported(survey) ? 'success' : ''"
+                  data-cy="imported-chip"
+                >
                   {{ isImported(survey) ? "Yes" : "No" }}
                 </v-chip>
               </td>

@@ -13,20 +13,19 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Cypress {
+    interface Chainable {
+      /**
+       * Custom command to select DOM element by data-cy attribute.
+       * @example cy.dataCy('greeting')
+       */
+      capSetJWT(): Chainable<Element>;
+      capImportSurvey(): Chainable<Element>;
+    }
+  }
+}
+
 // Import commands.js using ES2015 syntax:
 import "./commands";
-
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
-
-beforeEach(() => {
-  cy.window().then((win) => {
-    win.localStorage.setItem(
-      "vuex",
-      JSON.stringify({
-        accessToken:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjAsImZpcnN0TmFtZSI6IkJyb29rIiwibGFzdE5hbWUiOiJUcm91dCIsImVtYWlsIjoiYnJvb2tlQGV4YW1wbGUuY29tIiwicm9sZXMiOltdLCJpYXQiOjE2NTAzMTE5OTh9.XUl7NBFjA5-wzuYVMxcusAdF4gelqn2ES9xALRZfuPw",
-      })
-    );
-  });
-});
