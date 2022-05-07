@@ -1,31 +1,34 @@
 describe("Survey Page", () => {
+  before(() => {
+    cy.capSetJWT();
+    cy.capImportSurvey();
+    cy.visit("/surveys");
+    cy.get('input[data-cy="survey-select"]').parent().click();
+    cy.get(".v-menu__content").contains("Cap Testing").click();
+  });
+
   beforeEach(() => {
     cy.capSetJWT();
   });
 
-  beforeEach(() => {
-    cy.capImportSurvey();
-    cy.visit("/surveys");
-    cy.get('input[data-cy="survey-select"]').parent().click();
-    cy.get(".v-menu__content").contains("CLS Spring 2020 Copy").click();
+  describe("manages survey details", () => {
+    it("fills out group info", () => {
+      cy.get(".v-tab").contains("Details").click();
+      cy.contains("Qualtrics Information");
+
+      cy.get('[data-cy="edit-save-cancel-edit-btn"]').click();
+      cy.get('input[data-cy="checkbox-okay-for-group"').check({ force: true });
+      cy.get('input[data-cy="text-field-public-name"]')
+        .clear()
+        .type("Group Name for Public Consumption");
+      cy.get('input[data-cy="text-field-detailed-description"]')
+        .clear()
+        .type("This is the one you want!");
+      cy.get('[data-cy="edit-save-cancel-save-btn"]').click();
+    });
   });
 
-  it("fills out group info", () => {
-    cy.get(".v-tab").contains("Details").click();
-    cy.contains("Qualtrics Information").and("Group Settings");
-
-    cy.get('[data-cy="edit-save-cancel-edit-btn"]').click();
-    cy.get('input[data-cy="checkbox-okay-for-group"').check({ force: true });
-    cy.get('input[data-cy="text-field-public-name"]')
-      .clear()
-      .type("Group Name for Public Consumption");
-    cy.get('input[data-cy="text-field-detailed-description"]')
-      .clear()
-      .type("This is the one you want!");
-    cy.get('[data-cy="edit-save-cancel-save-btn"]').click();
-  });
-
-  describe.only("manages survey dimensions", () => {
+  describe("manages survey dimensions", () => {
     beforeEach(() => {
       cy.get(".v-tab").contains("Dimensions").click();
       cy.contains("Dimensions, Indices, Items");
@@ -48,8 +51,10 @@ describe("Survey Page", () => {
     });
   });
 
-  it("opens the associations tab", () => {
-    cy.get(".v-tab").contains("Associations").click();
-    cy.contains("Scripture Engagement Associations");
+  describe("manages survey associations", () => {
+    it("opens the associations tab", () => {
+      cy.get(".v-tab").contains("Associations").click();
+      cy.contains("Scripture Engagement Associations");
+    });
   });
 });

@@ -303,7 +303,7 @@ export default (Vue as VueConstructor<VueExt>).extend({
   watch: {
     survey: {
       handler: function (newSurvey: SurveyEntity) {
-        console.log("Updating workingSurvey");
+        console.log("watched survey has changed");
         this.workingSurvey = _.cloneDeep(newSurvey);
       },
       immediate: true,
@@ -455,7 +455,6 @@ export default (Vue as VueConstructor<VueExt>).extend({
     },
 
     canDeleteSurveyDimension(surveyDimension: SurveyDimensionEntity) {
-      console.log("DIM", surveyDimension);
       return surveyDimension.surveyIndices.every(
         (surveyIndex) => surveyIndex.scriptureEngagementPractices.length === 0
       );

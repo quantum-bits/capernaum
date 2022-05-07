@@ -9,6 +9,7 @@
         data-cy="survey-select"
       />
     </page-header>
+
     <v-tabs v-model="currentTab" fixed-tabs>
       <v-tab>Details</v-tab>
       <v-tab>Dimensions</v-tab>
@@ -19,12 +20,14 @@
       <v-tab-item>
         <survey-detail-tab :survey="selectedSurvey" />
       </v-tab-item>
+
       <v-tab-item>
         <survey-dimensions-tab
           :survey="selectedSurvey"
           @survey-updated="onSurveyUpdated"
         />
       </v-tab-item>
+
       <v-tab-item>
         <prediction-table-tab :survey="selectedSurvey" />
       </v-tab-item>
