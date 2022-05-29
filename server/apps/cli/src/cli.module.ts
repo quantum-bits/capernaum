@@ -6,6 +6,7 @@ import { WriterModule } from "@server/src/writer/writer.module";
 import { QueueModule } from "@reporter/src/queue/queue.module";
 import { ReportModule } from "@reporter/src/report/report.module";
 import { VisualizationModule } from "@server/src/visualization/visualization.module";
+import { UserModule } from "@server/src/user/user.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { VisualizationModule } from "@server/src/visualization/visualization.mod
     QueueModule,
     ReportModule,
     VisualizationModule,
+    UserModule,
   ],
 })
 export class CliModule {}

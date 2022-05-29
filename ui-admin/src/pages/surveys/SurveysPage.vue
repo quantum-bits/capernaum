@@ -6,8 +6,10 @@
         v-model="selectedSurveyId"
         :items="availableSurveys"
         @change="onSurveySelected"
+        data-cy="survey-select"
       />
     </page-header>
+
     <v-tabs v-model="currentTab" fixed-tabs>
       <v-tab>Details</v-tab>
       <v-tab>Dimensions</v-tab>
@@ -18,9 +20,14 @@
       <v-tab-item>
         <survey-detail-tab :survey="selectedSurvey" />
       </v-tab-item>
+
       <v-tab-item>
-        <survey-dimensions-tab :survey="selectedSurvey" />
+        <survey-dimensions-tab
+          :survey="selectedSurvey"
+          @survey-updated="onSurveyUpdated"
+        />
       </v-tab-item>
+
       <v-tab-item>
         <prediction-table-tab :survey="selectedSurvey" />
       </v-tab-item>
@@ -34,7 +41,7 @@ import PageHeader from "@/pages/PageHeader.vue";
 import { ALL_CAPERNAUM_SURVEYS } from "@/graphql/surveys.graphql";
 import {
   AllCapernaumSurveys,
-  AllCapernaumSurveys_surveys,
+  AllCapernaumSurveys_surveys as SurveyEntity,
 } from "@/graphql/types/AllCapernaumSurveys";
 import SurveyDetailTab from "./SurveyDetailsTab.vue";
 import SurveyDimensionsTab from "./SurveyDimensionsTab.vue";
@@ -58,7 +65,7 @@ export default Vue.extend({
 
   data() {
     return {
-      surveys: [] as AllCapernaumSurveys_surveys[],
+      surveys: [] as SurveyEntity[],
       currentTab: 0,
       selectedSurveyId: undefined as number | undefined,
     };
@@ -92,7 +99,7 @@ export default Vue.extend({
         }));
     },
 
-    selectedSurvey(): AllCapernaumSurveys_surveys | undefined {
+    selectedSurvey(): SurveyEntity | undefined {
       return _.find(
         this.surveys,
         (survey) => survey.id === this.selectedSurveyId
@@ -107,6 +114,15 @@ export default Vue.extend({
         name: "surveys",
         params: { surveyId: surveyId.toString() },
       });
+    },
+
+    onSurveyUpdated(survey: SurveyEntity) {
+      if (this.selectedSurveyId) {
+        this.$set(this.surveys, this.selectedSurveyId, survey);
+        console.log(`Set survey ${this.selectedSurveyId} to`, survey);
+      } else {
+        throw new Error("Selected survey ID is not set");
+      }
     },
   },
 });

@@ -34,7 +34,11 @@
               </td>
               <td>{{ survey.qualtricsModDate | standardDate }}</td>
               <td>
-                <v-chip small :color="isImported(survey) ? 'success' : ''">
+                <v-chip
+                  small
+                  :color="isImported(survey) ? 'success' : ''"
+                  data-cy="imported-chip"
+                >
                   {{ isImported(survey) ? "Yes" : "No" }}
                 </v-chip>
               </td>
@@ -53,6 +57,7 @@
                   small
                   v-if="!isImported(survey)"
                   @click="importFromQualtrics(survey)"
+                  data-cy="import-btn"
                 >
                   Import
                 </v-btn>
@@ -181,12 +186,11 @@ export default Vue.extend({
           variables: {
             qualtricsId: survey.qualtricsId,
           },
-          // fetchPolicy: "no-cache",
         })
         .then((result) => {
           console.log("IMPORT RESULT", result);
           if (result.data) {
-            // Data are automatically updated by the Apollo client/cache.
+            this.$apollo.queries.combinedSurveys.refetch();
             this.showSnackbar("Imported successfully");
           }
         })

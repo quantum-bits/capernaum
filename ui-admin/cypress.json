@@ -1,0 +1,13 @@
+{
+  "baseUrl": "http://localhost:8080",
+  "projectId": "fkdgrp",
+  "env": {
+    "capUser": {
+      "firstName": "Brooke",
+      "lastName": "Trout",
+      "email": "brooke@example.com",
+      "password": "password"
+    },
+    "qualtricsSurveyId": "SV_0NyRAwZoSOSKPoW"
+  }
+}

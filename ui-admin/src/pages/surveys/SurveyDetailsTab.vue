@@ -17,16 +17,19 @@
               v-model="groupDetails.okayForGroup"
               label="Okay for group?"
               @change="resetValidation"
+              data-cy="checkbox-okay-for-group"
             />
             <v-text-field
               v-model="groupDetails.publicName"
               label="Public name"
               :rules="[requiredForGroup]"
+              data-cy="text-field-public-name"
             />
             <v-text-field
               v-model="groupDetails.detailedDescription"
               label="Detailed description"
               :rules="[requiredForGroup]"
+              data-cy="text-field-detailed-description"
             />
           </v-form>
         </v-card-text>
@@ -49,7 +52,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
+import { AllCapernaumSurveys_surveys as SurveyEntity } from "@/graphql/types/AllCapernaumSurveys";
 import StaticInfoList, {
   StaticInfoItem,
 } from "@/components/lists/StaticInfoList.vue";
@@ -70,11 +73,14 @@ interface GroupDetails {
 export default Vue.extend({
   name: "SurveyDetailsTab",
 
-  components: { StaticInfoList, EditSaveCancelButtons },
+  components: {
+    StaticInfoList,
+    EditSaveCancelButtons,
+  },
 
   props: {
     survey: {
-      type: Object as () => AllCapernaumSurveys_surveys,
+      type: Object as () => SurveyEntity,
       required: true,
     },
   },

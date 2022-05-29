@@ -35,6 +35,11 @@ import {
   showHierarchy,
   listSurveyLetters,
   dumpEnv,
+  listUsers,
+  createUser,
+  changePassword,
+  deleteSurvey,
+  deleteUser,
 } from "./commands";
 import { WebhookEventFactory } from "@qapi/qualtrics-api.service";
 import { SurveyRespondentType } from "@server/src/survey/survey.types";
@@ -44,6 +49,34 @@ import { dumpDebugCache } from "@helpers/debug-factory";
 
 const program = new Command();
 program.version("0.0.1");
+
+// User
+
+const userCommands = program.command("user").description("user commands");
+
+userCommands.command("list").description("list all users").action(listUsers);
+
+userCommands
+  .command("create")
+  .description("create a new user")
+  .argument("<first-name>", "user first name")
+  .argument("<last-name>", "user last name")
+  .argument("<email>", "user email address")
+  .argument("<password>", "plain-text password")
+  .action(createUser);
+
+userCommands
+  .command("password")
+  .description("change user password")
+  .argument("<user-id>", "database user ID")
+  .argument("<new-password>", "plaint-text new password")
+  .action(changePassword);
+
+userCommands
+  .command("delete")
+  .description("delete a user")
+  .argument("<email>", "user email address")
+  .action(deleteUser);
 
 // Qualtrics
 
@@ -143,6 +176,12 @@ surveyCommands
   .command("letters")
   .description("list survey letters")
   .action(listSurveyLetters);
+
+surveyCommands
+  .command("delete")
+  .argument("<survey-id>", "survey ID (SV_...)")
+  .description("delete a survey with malice aforethought")
+  .action(deleteSurvey);
 
 // Group
 

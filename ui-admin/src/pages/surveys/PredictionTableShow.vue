@@ -18,6 +18,7 @@
           <v-icon color="success" v-if="column.predict">
             mdi-check-circle
           </v-icon>
+          <v-icon disabled v-else> mdi-close-circle </v-icon>
         </td>
       </tr>
     </tbody>

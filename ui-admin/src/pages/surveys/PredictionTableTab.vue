@@ -15,9 +15,9 @@
         :is-data-valid="true"
         @enter-edit-mode="inEditMode = true"
         @leave-edit-mode="inEditMode = false"
-        @backup-data="saveTableContent"
+        @backup-data="backupTableContent"
         @restore-data="restoreTableContent"
-        @persist-data="saveTableEdits"
+        @persist-data="persistTableEdits"
       />
     </v-card-actions>
   </v-card>
@@ -28,7 +28,7 @@ import Vue from "vue";
 import * as _ from "lodash";
 import PredictionTableShow from "./PredictionTableShow.vue";
 import PredictionTableEdit from "./PredictionTableEdit.vue";
-import { AllCapernaumSurveys_surveys } from "@/graphql/types/AllCapernaumSurveys";
+import { AllCapernaumSurveys_surveys as SurveyEntity } from "@/graphql/types/AllCapernaumSurveys";
 import { ALL_SCRIPTURE_ENGAGEMENT_PRACTICES } from "@/graphql/scripture-engagement-practices.graphql";
 import { ScriptureEngagementPractices } from "@/graphql/types/ScriptureEngagementPractices";
 import {
@@ -70,7 +70,7 @@ export default Vue.extend({
 
   props: {
     survey: {
-      type: Object as () => AllCapernaumSurveys_surveys,
+      type: Object as () => SurveyEntity,
       required: true,
     },
   },
@@ -83,6 +83,17 @@ export default Vue.extend({
     };
   },
 
+  watch: {
+    survey: {
+      handler: function (newSurvey: SurveyEntity) {
+        console.log("watched survey has changed");
+        this.constructAssociationTable(newSurvey);
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
+
   computed: {
     // Returns true iff the current `associationTable.rows` are the same as `savedTableRows`.
     isDataDirty(): boolean {
@@ -90,85 +101,94 @@ export default Vue.extend({
     },
   },
 
-  /**
-   * Do most of the heavy lifting in this lifecycle event. Using the `apollo` option
-   * was more trouble than it was worth.
-   */
-  async mounted() {
-    this.associationTable = {
-      headers: [
-        {
-          text: "SE Practice",
-          align: "text-left",
-        },
-      ],
-      rows: [],
-    };
-
-    // Create array of survey indices that are ordered by dimension
-    // and filtered to include only those used for predictions.
-    const orderedActiveIndices = _.chain(this.survey.surveyDimensions)
-      .orderBy("sequence")
-      .flatMap((surveyDimension) => surveyDimension.surveyIndices)
-      .filter((surveyIndex) => surveyIndex.useForPredictions)
-      .value();
-
-    // Set up all the table headers. Also create a map from the survey index ID
-    // to the column of the table where that index will appear.
-    const indexIdToColumnIdx = new Map<number, number>();
-    _.forEach(orderedActiveIndices, (surveyIndex, idx) => {
-      this.associationTable.headers.push({
-        text: surveyIndex.abbreviation,
-        align: "text-center",
-      });
-      indexIdToColumnIdx.set(surveyIndex.id, idx);
-    });
-
-    // Create a row of the table for each of the SE practices. Also create a map
-    // from the practice ID to the row in which that practice will appear in the table.
-    const scriptureEngagementPractices =
-      await this.getScriptureEngagementPractices();
-    const practiceIdToRowIndex = new Map<number, number>();
-    _.forEach(scriptureEngagementPractices, (sePractice, idx) => {
-      const row: AssociationTableRow = {
-        title: sePractice.title,
-        columns: _.map(orderedActiveIndices, (index) => ({
-          indexId: index.id,
-          practiceId: sePractice.id,
-          predict: false,
-        })),
-      };
-      this.associationTable.rows.push(row);
-      practiceIdToRowIndex.set(sePractice.id, idx);
-    });
-
-    // Iterate over the active indices again, updating those cells of the association
-    // table that are currently enabled for predictions.
-    _.forEach(orderedActiveIndices, (surveyIndex) => {
-      _.forEach(surveyIndex.scriptureEngagementPractices, (sePractice) => {
-        const tableColumn = indexIdToColumnIdx.get(surveyIndex.id);
-        const tableRow = practiceIdToRowIndex.get(sePractice.id);
-        if (tableRow !== undefined && tableColumn !== undefined) {
-          const datum =
-            this.associationTable.rows[tableRow].columns[tableColumn];
-          datum.predict = true;
-          // console.log(
-          //   `datum[${surveyIndex.id}/${tableRow}][${sePractice.id}/${tableColumn}] = true`
-          // );
-        } else {
-          throw new Error(
-            `No mapping for [${surveyIndex.id}][${sePractice.id}]`
-          );
-        }
-      });
-    });
-
-    this.saveTableContent();
-  },
-
   methods: {
-    saveTableContent() {
+    /**
+     * Construct the association table based on the survey dimensions, indices, and items,
+     * together with the list of SEPs.
+     */
+    async constructAssociationTable(newSurvey: SurveyEntity) {
+      this.associationTable = {
+        headers: [
+          {
+            text: "SE Practice",
+            align: "text-left",
+          },
+        ],
+        rows: [],
+      };
+
+      // Create array of survey indices that are ordered by dimension
+      // and filtered to include only those used for predictions.
+      const orderedActiveIndices = _.chain(newSurvey.surveyDimensions)
+        .orderBy("sequence")
+        .flatMap((surveyDimension) => surveyDimension.surveyIndices)
+        .filter((surveyIndex) => surveyIndex.useForPredictions)
+        .value();
+
+      // Set up all the table headers. Also create a map from the survey index ID
+      // to the column of the table where that index will appear.
+      const indexIdToColumnIdx = new Map<number, number>();
+      _.forEach(orderedActiveIndices, (surveyIndex, idx) => {
+        this.associationTable.headers.push({
+          text: surveyIndex.abbreviation,
+          align: "text-center",
+        });
+        indexIdToColumnIdx.set(surveyIndex.id, idx);
+      });
+
+      // Create a row of the table for each of the SE practices. Also create a map
+      // from the practice ID to the row in which that practice will appear in the table.
+      const scriptureEngagementPractices =
+        await this.getScriptureEngagementPractices();
+      const practiceIdToRowIndex = new Map<number, number>();
+      _.forEach(scriptureEngagementPractices, (sePractice, idx) => {
+        const row: AssociationTableRow = {
+          title: sePractice.title,
+          columns: _.map(orderedActiveIndices, (index) => ({
+            indexId: index.id,
+            practiceId: sePractice.id,
+            predict: false,
+          })),
+        };
+        this.associationTable.rows.push(row);
+        practiceIdToRowIndex.set(sePractice.id, idx);
+      });
+
+      // Iterate over the active indices again, updating those cells of the association
+      // table that are currently enabled for predictions.
+      _.forEach(orderedActiveIndices, (surveyIndex) => {
+        _.forEach(surveyIndex.scriptureEngagementPractices, (sePractice) => {
+          const tableColumn = indexIdToColumnIdx.get(surveyIndex.id);
+          const tableRow = practiceIdToRowIndex.get(sePractice.id);
+          if (tableRow !== undefined && tableColumn !== undefined) {
+            const datum =
+              this.associationTable.rows[tableRow].columns[tableColumn];
+            datum.predict = true;
+          } else {
+            throw new Error(
+              `No mapping for [${surveyIndex.id}][${sePractice.id}]`
+            );
+          }
+        });
+      });
+
+      this.backupTableContent();
+    },
+
+    logSavedTable() {
+      const allRows: { [index: string]: string[] } = {};
+      for (const row of this.savedTableRows) {
+        allRows[row.title] = _.map(
+          row.columns,
+          (col) => `${col.indexId}:${col.predict ? "YES" : ""}`
+        );
+      }
+      console.table(allRows);
+    },
+
+    backupTableContent() {
       this.savedTableRows = _.cloneDeep(this.associationTable.rows);
+      this.logSavedTable();
     },
 
     restoreTableContent() {
@@ -180,7 +200,7 @@ export default Vue.extend({
       return _.flatMap(rows, (row) => row.columns);
     },
 
-    saveTableEdits() {
+    persistTableEdits() {
       // Fish out the entries that are different from the last-saved set of entries.
       const changedEntries = _.differenceWith(
         this.allEntries(this.associationTable.rows),
@@ -198,7 +218,7 @@ export default Vue.extend({
         })
         .then((result) => {
           console.log(result);
-          this.saveTableContent();
+          this.backupTableContent();
           this.inEditMode = false;
         });
     },
