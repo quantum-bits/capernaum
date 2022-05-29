@@ -86,7 +86,7 @@
     "apollo": "^2.33.10",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
-    "cypress": "^9.5.4",
+    "cypress": "9.6.0",
     "dependency-cruiser": "^10.0.7",
     "dotenv-webpack": "^7.0.3",
     "eslint": "^7.31.0",
