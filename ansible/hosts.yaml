@@ -1,3 +1,6 @@
+# This is the inventory file.
+# https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+
 development:
   hosts:
     nurkbook:
@@ -10,10 +13,13 @@ development:
 
 staging:
   hosts:
-    cap-staging:
+    faraday-effect:
       ansible_user: tom
       ansible_host: faraday-effect.com
-      server_name: faraday-effect.com
+      domain_name: faraday-effect.com
+      subdomain:
+        admin: admin
+        group: groups
   vars:
     node_env: production
     node_version: 14
@@ -21,6 +27,8 @@ staging:
     nginx_config: nginx-production.conf
     cap_base_abs_dir: "/home/capernaum"
     cap_app_abs_dir: "{{ cap_base_abs_dir }}/app"
+    admin_domain_name: "{{ subdomain.admin }}.{{ domain_name }}"
+    group_domain_name: "{{ subdomain.group }}.{{ domain_name }}"
 
 production:
   hosts:

@@ -54,3 +54,17 @@ MAIL_USER={{ mail.user }}
 MAIL_PASS={{ mail.pass }}
 {% endif %}
 {% endif %}
+
+##### CLI
+
+AUTH_TOKEN="{{ cli_auth_token }}"
+AUTH_HEADER="Bearer $AUTH_TOKEN"
+
+##### Groups
+
+TU_C4SE_URL={{ tu_c4se_url }}
+TU_CLS_URL={{ tu_cls_url }}
+
+##### Scheduler
+
+CRON_TIME={{ cron_time }}
