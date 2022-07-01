@@ -42,16 +42,16 @@ PROXY_PORT={{ proxy.port }}
 {% if mail is defined %}
 ##### Email
 
-MAIL_HOST={{ mail.host }}
-MAIL_FROM={{ mail.from }}
+MAIL_HOST="{{ mail.host }}"
+MAIL_FROM="{{ mail.from }}"
 {% if mail.port is defined %}
 MAIL_PORT={{ mail.port }}
 {% endif %}
 {% if mail.user is defined %}
-MAIL_USER={{ mail.user }}
+MAIL_USER="{{ mail.user }}"
 {% endif %}
 {% if mail.pass is defined %}
-MAIL_PASS={{ mail.pass }}
+MAIL_PASS="{{ mail.pass }}"
 {% endif %}
 {% endif %}
 

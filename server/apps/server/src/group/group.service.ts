@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, LessThan, MoreThan, Raw, Repository } from "typeorm";
+import { IsNull, Raw, Repository } from "typeorm";
 import {
   Group,
   GroupCreateInput,

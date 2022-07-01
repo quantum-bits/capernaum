@@ -19,6 +19,11 @@ export class MailService {
       logger: debug.enabled,
       debug: debug.enabled,
       connectionTimeout: 15 * 1000,
+      tls: {
+        // Do not fail on invalid certs. Default behavior was causing
+        // email failure on the staging server.
+        rejectUnauthorized: false,
+      },
     };
 
     if (process.env.MAIL_PORT) {
