@@ -20,6 +20,7 @@ staging:
       subdomain:
         admin: admin
         group: groups
+        ssl: admin
   vars:
     node_env: production
     node_version: 14
@@ -29,6 +30,7 @@ staging:
     cap_app_abs_dir: "{{ cap_base_abs_dir }}/app"
     admin_domain_name: "{{ subdomain.admin }}.{{ domain_name }}"
     group_domain_name: "{{ subdomain.group }}.{{ domain_name }}"
+    ssl_domain_name: "{{ subdomain.ssl }}.{{ domain_name }}"
 
 production:
   hosts:

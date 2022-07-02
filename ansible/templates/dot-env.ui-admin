@@ -1,4 +1,5 @@
 ##### URLs
 
-URL_WEBSOCKET={{ url.websocket }}
 URL_HTTP={{ url.http }}
+
+URL_WEBSOCKET={{ url.websocket }}
