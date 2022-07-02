@@ -19,7 +19,7 @@ staging:
       domain_name: faraday-effect.com
       subdomain:
         admin: admin
-        group: groups
+        group: group
         ssl: admin
   vars:
     node_env: production
