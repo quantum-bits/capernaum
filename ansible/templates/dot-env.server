@@ -71,4 +71,4 @@ TU_CLS_URL={{ tu_cls_url }}
 
 ##### Scheduler
 
-CRON_TIME={{ cron_time }}
+CRON_TIME="{{ cron_time }}"

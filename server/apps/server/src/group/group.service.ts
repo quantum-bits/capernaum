@@ -18,6 +18,7 @@ import { BaseService } from "@server/src/shared/base.service";
 import { DateTime } from "luxon";
 import { SurveyService } from "@server/src/survey/services";
 import { GroupDemographics } from "@server/src/writer/writer.service";
+import { psqlDateTime } from "@helpers/formatting";
 
 const debug = getDebugger("group");
 
@@ -172,7 +173,7 @@ export class GroupService {
    * and whose group report has not been sent.
    */
   findOpen() {
-    const now = DateTime.now().toString();
+    const now: string = psqlDateTime();
     debug("Check for open groups as of %s", now);
     return this.repo.findBy({
       closedAfter: Raw((alias) => `${alias} > ${now}`),
@@ -184,10 +185,10 @@ export class GroupService {
    * Find groups ready to have a group report created and sent.
    */
   findReadyForReport() {
-    const now = DateTime.now().toString();
+    const now: string = psqlDateTime();
     debug("Check for ready-to-report groups as of %s", now);
     return this.repo.findBy({
-      closedAfter: Raw((alias) => `${alias} < ${now}`),
+      closedAfter: Raw((alias) => `${alias} < '${now}'`),
       reportSent: IsNull(),
     });
   }

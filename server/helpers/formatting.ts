@@ -49,3 +49,7 @@ export function isoDate(date: Date) {
 export function localeDate(date: string) {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
 }
+
+export function psqlDateTime(when: DateTime = DateTime.now()) {
+  return when.toFormat("yyyy-LL-dd HH:mm:ss");
+}
