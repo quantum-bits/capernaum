@@ -20,4 +20,4 @@ nginx_conf_file: "capernaum.conf"
 tu_c4se_url: https://www.taylor.edu/center-for-scripture-engagement/
 tu_cls_url: https://www.taylor.edu/center-for-scripture-engagement/survey/index.shtml
 
-cron_time: "* */15 * * * *"
+cron_time: "0 */15 * * * *"
