@@ -34,7 +34,7 @@
     "graphql-tag": "^2.12.6",
     "is": "^3.3.0",
     "lodash": "^4.17.21",
-    "luxon": "^1.27.0",
+    "luxon": "^1.28.1",
     "pluralize": "^8.0.0",
     "pretty-format": "^27.0.6",
     "quill-delta": "^4.2.2",
